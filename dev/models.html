@@ -7,7 +7,10 @@
     <style>
       body {
         margin: 0;
-        /* The canvas fills the rest of the window exactly; no scrollbars. */
+        /* Header, controls and info on top; below, the list and the canvas fill the rest. */
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
         overflow: hidden;
         font-family: system-ui, sans-serif;
         background: #2b2140;
@@ -22,11 +25,37 @@
       header a {
         color: #8fd3ff;
       }
+      main {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+      }
+      /* The list scrolls on its own, beside the canvas (above it on a narrow screen). */
       #list {
+        width: 17rem;
+        flex: none;
+        overflow-y: auto;
         display: flex;
         flex-wrap: wrap;
-        gap: 0.4rem;
-        padding: 0 0.75rem 0.5rem;
+        align-content: flex-start;
+        gap: 0.3rem;
+        padding: 0 0.5rem 0.5rem 0.75rem;
+      }
+      #stage {
+        flex: 1;
+        min-width: 0;
+        min-height: 0;
+        position: relative;
+        overflow: hidden;
+      }
+      @media (max-width: 700px) {
+        main {
+          flex-direction: column;
+        }
+        #list {
+          width: auto;
+          max-height: 32vh;
+        }
       }
       #list button {
         font: inherit;
@@ -64,6 +93,23 @@
       canvas {
         display: block;
       }
+      /* Pinned inside its area, so its size never feeds back into the layout. */
+      #stage canvas {
+        position: absolute;
+        inset: 0;
+      }
+      body.render #stage canvas {
+        position: static;
+      }
+      body.render {
+        height: auto;
+        display: block;
+      }
+      body.render main,
+      body.render #stage {
+        display: block;
+        overflow: visible;
+      }
       body.render header,
       body.render #list,
       body.render #controls,
@@ -73,15 +119,17 @@
     </style>
   </head>
   <body>
-    <!-- Dev tool: look at voxel models (?model=<id>). Excluded by `npm run build:release`. -->
+    <!-- Dev tool: look at the game's 3D assets (?model=, ?bay=, ?prop=). Excluded by `npm run build:release`. -->
     <header>
       <a href="./">← dev</a>
       <strong>Models</strong>
     </header>
-    <div id="list"></div>
     <div id="controls"></div>
     <div id="info"></div>
-    <canvas id="view"></canvas>
+    <main>
+      <div id="list"></div>
+      <div id="stage"><canvas id="view"></canvas></div>
+    </main>
     <script type="module" src="/src/dev/modelViewer.ts"></script>
   </body>
 </html>

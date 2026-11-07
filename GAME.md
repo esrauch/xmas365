@@ -10,82 +10,109 @@ of dread. The house, characters, story and puzzles are Puzz's own.
 
 ## The story: Santa's hostile takeover (decided 2026-11-07)
 
-**Santa Claus, CEO of Q4 Everyday, is staging a hostile takeover of every
-holiday.** He has rebranded each holiday's room as a Christmas subsidiary
-("Easter, a Q4 Everyday company"), scrambled their prized things into the
-wrong rooms, and **locked up all six holiday mascots**. Next stop: every day
-of the year is Christmas.
+**Santa Claus has founded Xmas365**, and it's staging a hostile takeover of
+every holiday. Each holiday's room has been rebranded as an Xmas365
+subsidiary ("Easter, an Xmas365 company"), their prized things scrambled into
+the wrong rooms, and **all six holiday mascots locked up**. The plan is in
+the name: Christmas, all 365 days of the year.
 
-He didn't bother locking up **Ordinary Tuesday**. Nobody throws a party for a
-Tuesday; surely Tuesday is nobody important, and will just go along with
-the plan. **You are Ordinary Tuesday**, and you've had enough of being
-overlooked. You set out to free the mascots, one holiday at a time.
+All 365. **You are Leap Day**, February 29th, the day that only turns up
+every four years, and nobody throws you a party. Santa didn't lock you up
+because you aren't in his plan at all: day 366 isn't on the spreadsheet. He
+doesn't know you exist. That makes you the one thing Xmas365 can't account
+for: you set out to free the mascots, one holiday at a time, and in the end
+you're the loophole that tears the whole merger up.
 
-When the last mascot is free and Santa's merger is torn up, the mascots
-throw you a party and declare you **Extraordinary Tuesday**.
+When the last mascot is free and the merger is torn up, the mascots throw
+you a party and promise to celebrate you every year, not just one in four.
 
 Christmas is a victim too: the elves, the reindeer and the tree have been
-taken over by their own corporate boss, so Christmas is restored like every
-other room. Santa himself lives outside the six rooms, in his memos.
+taken over by their own boss, so Christmas is restored like every other
+room. Santa himself never appears in the rooms: he's in his memos.
 
 ### The cast
 
-- **You: Ordinary Tuesday.** Beige, understated, quietly determined. Tuesday
-  speaks only in dry one-liners at milestones, usually answering Santa.
-- **Santa, CEO of Q4 Everyday.** Pompous, never menacing: press releases,
-  synergy, "restructuring". He never gets your name right ("Thank you for
-  your continued cooperation, Monday." / "It's Tuesday.") until the very end.
+- **You: Leap Day**, shown as a little frog in round glasses (the frog is
+  Leap Day's traditional symbol): small, overlooked, quietly determined, and
+  a good hopper. Leap
+  Day speaks only in dry one-liners at milestones, usually reacting to the
+  latest memo you've found.
+- **Santa, CEO of Xmas365.** Pompous, never menacing: press releases,
+  synergy, "integration". He writes to his own staff, not to you; he doesn't
+  know you exist until the very end ("Who is *Leap Day*?").
 - **The six mascots**, each caged at its room's centrepiece, freed when you
   restore it, with a short thank-you; all six come to your party.
 
-| Holiday | Mascot (suggested) |
-|---|---|
-| Halloween | the Spider |
-| Thanksgiving | the Turkey |
-| Christmas | an Elf |
-| Valentine's | Cupid |
-| Easter | the Easter Bunny |
-| Fourth of July | to decide (a firework, or Uncle Sam) |
+| Holiday | Mascot (decided 2026-11-07) | What makes it read |
+|---|---|---|
+| Halloween | the Spider, in a witch's hat | a round fuzzy body, stubby leg pairs, a pointed hat |
+| Thanksgiving | the Turkey, in a Pilgrim-style buckle hat | the fanned tail, the tall buckled hat |
+| Christmas | the Snowman, in a top hat | stacked snowballs, carrot nose, the hat |
+| Valentine's | the Teddy Bear, a heart on its tummy | round ears, a big red heart |
+| Easter | the Easter Bunny | the tall ears |
+| Fourth of July | the Eaglet, in an Uncle Sam hat | a fluffy chick, white head, the striped top hat |
+
+**The look:** clear and cute at low poly; *directionally* chibi but not all
+the way (big heads and round bodies, stubby limbs, simple dot eyes, not
+baby-like). Each one has one bold silhouette feature and a few flat colour
+blocks, so all seven (with Leap Day the frog) tell apart at a glance. Hats
+carry a lot of the identity: four of the six wear one, each a different
+shape.
 
 ### How the story is told
 
-- **In the world first.** Every room starts *acquired*: corporate Christmas
-  signage over it, its colours drained, its mascot in a cage at the
-  centrepiece. Freeing its items peels the branding back; restoring the
-  centrepiece opens the cage, brings back the room's own colour and music,
-  and lights its lamp in the hall.
-- **Short beats only at milestones:** entering a room the first time,
-  freeing a stray, bringing an item home, freeing a mascot. Santa's beats are
-  memos and faxes; Tuesday answers in a line. Panels themselves stay clean
-  (rules only): the story never sits between the player and a puzzle.
-- **Santa escalates, never undoes.** His memos change with every lamp you
-  light: smug press releases, then panicked restructuring, then a desperate
-  final offer before the merger contract. He never takes back your progress.
+- **In the world first.** Every room starts *acquired*: Xmas365 signage over
+  it, its colours drained, its mascot in a cage at the centrepiece. Freeing
+  its items peels the branding back; restoring the centrepiece opens the
+  cage, brings back the room's own colour and music, and lights its lamp in
+  the hall.
+- **Found memos.** The story is Xmas365's internal memos, which aren't meant
+  for you: you find them at milestones (entering a room the first time,
+  freeing a stray, bringing an item home, freeing a mascot) and they're
+  pinned up in the hall to reread. Santa writes candidly to his staff ("Re:
+  the Easter integration. The Bunny remains uncooperative."), so you're
+  overhearing the villain's plan, not being lectured. Leap Day reacts in a
+  line; a freed mascot says thank-you. Panels themselves stay clean (rules
+  only): the story never sits between the player and a puzzle.
+- **The memos escalate, never undo.** They change as rooms are restored:
+  smug press releases, then confused reports of rooms "reverting", then
+  panic about an "unaccounted-for date". Santa never takes back your
+  progress.
 
 ### Progression
 
-1. **Opening, guided.** Santa's takeover memo, addressed to "Monday":
-   carry on as usual. Only **Thanksgiving** is open. Its warm-up teaches
-   carving; freeing its first stray and carrying the item home opens that
-   item's holiday, and with it the rest of the house fans out.
-2. **The loop, in any order.** In each room: the warm-up (the genre's
-   rules), two stray runs (each stray item is caught in this room's genre,
-   twisted by its own holiday), the items carried home, then the
-   centrepiece run, which frees the mascot and lights the lamp. There's
-   always another room or stray to try when a panel has you stuck.
-3. **Optional bonus panels.** A few hard bonus panels per room (generated or
-   hand-picked) earn small visible rewards: a room decoration, a party hat
-   for its mascot. The story never needs them.
-4. **Santa's merger contract.** With all six mascots free, the contract is
+1. **Opening & room unlocks.** A dropped Xmas365 memo announces the takeover of
+   all 365 days. Only **Thanksgiving** starts open (showing its big Warm-up
+   button). Every other room starts with a big Locked indicator until you bring
+   one of its two home items there: arriving with an eligible item turns the
+   center button into **"Restore Item & Unlock Room"**, which places that first
+   item and becomes the room's big **Warm-up** button.
+2. **The Room Ladder UX.** Once a room's warm-up is beaten, the room displays a
+   two-part progression ladder:
+   - **Bottom (finding strays):** the completed warm-up sits at the bottom
+     (clearly green/complete) with progression lines branching up to the room's
+     **two stray runs**. Each stray box turns green when solved and stays in
+     place once complete.
+   - **Top (unlocking the centrepiece):** above that, the room's **two home
+     items to return** sit in their own distinct item-slot UX (not puzzle
+     buttons), with connector lines feeding up to unlock the **centrepiece
+     run** once both items are restored. Solving the centrepiece frees the
+     mascot and lights the room's lamp in the hall.
+3. **Optional bonus panels.** Once a room's mascot is freed from its cage,
+   tapping the mascot offers a few hard bonus panels (generated or hand-picked)
+   that earn visible rewards: a room decoration and a party hat for that mascot
+   to wear at the finale. The story never needs them.
+4. **The merger contract.** With all six mascots free, Xmas365's contract is
    the run of two-twist panels (each genre with two twists it hasn't had);
-   each panel tears up a clause.
-5. **Tuesday's party.** The freed mascots throw it; its last puzzle is the
-   cake relay (one board, every genre adding to it). They crown you
-   Extraordinary Tuesday, and Santa finally gets your name right.
-6. **After the story: Tuesday's Calendar Desk.** In the hall from the start
-   but dusty, "closed for the merger"; after the party it opens as the
-   endless mode: the daily Tuesday puzzle, and the mixer (any genre, any
-   twists).
+   each panel tears up a clause, and the last is the loophole: day 366.
+5. **Leap Day's party.** The freed mascots throw it; its last puzzle is the
+   cake relay (one board, every genre adding to it). They crown you **"Day 366
+   (Every Year)"**—pencilling February 29th onto every year's calendar—and
+   Santa finally learns who you are.
+6. **After the story: the Calendar Desk.** Your desk in the hall, there from
+   the start (reclaiming each holiday's warm-up, standard generator and twists
+   as you restore the house); after the party it opens the full endless mode:
+   the daily puzzle (**"Day 366"**) and the mixer (any genre, any twists).
 
 **Hints** are the plain step hint on every panel (one correct move), with no
 character voice and no cost.
@@ -95,7 +122,7 @@ character voice and no cost.
 - **Each holiday is one diorama, seen in a single fixed view**: the whole
   room laid out like a toy theatre set, everything in it on show. No
   walking about inside a holiday.
-- **Tuesday's hall is the hub** (Holiday Hall: a round toy-theatre room,
+- **Holiday Hall is the hub** (a round toy-theatre room,
   each holiday an alcove around it). Turn to a holiday to go into it; turn
   back to the hall.
 - So any holiday is two clicks from any other: the hall in between.
@@ -128,7 +155,7 @@ is kept below as material; see "Round one".)
 
 ### Structure, kept: dioramas, items and gating
 
-The holiday rooms, items, strays, centrepieces, lamps and Tuesday's final
+The holiday rooms, items, strays, centrepieces, lamps and the final
 door all stay; they now organise runs of panels instead of single puzzles.
 Each room holds:
 
@@ -176,21 +203,20 @@ July was edge flags; red, white and blue is the more Fourth-of-July colour
 rule, and snowflakes gave Christmas a twist of its own (a mirror). The full
 twist-by-puzzle map is in `PUZZLES.md`.
 
-**Not cleaned up yet:** the room sections below still describe the old
-twists (red and green in the Tree-Top Star, the Stocking and the Christmas
-Tree; flags in the Star-Spangled Flag and the Hot Dog; both in Tuesday's
-panels). They'll be redone from the generators; see `PUZZLES.md`.
+The room sections below are design history and may describe older twists;
+the built rooms use the current set (see `PUZZLES.md` for what each run
+carries now).
 
 **A room is complete** when its two stray runs and its centrepiece run are
-done. Each completed room lights one of six lamps in Tuesday's hall (like
+done. Each completed room lights one of six lamps in Holiday Hall (like
 *The Witness*'s lasers into the mountain).
 
-### The final area: Santa's merger contract, then Tuesday's party
+### The final area: the merger contract, then Leap Day's party
 
-**Story framing (2026-11-07):** the two-twist panels below are Santa's merger
-contract (each panel tears up a clause); the board relay is the last puzzle
-at the mascots' party for Extraordinary Tuesday. The notes below are the
-puzzle design history.
+**Story framing (2026-11-07):** the two-twist panels below are Xmas365's
+merger contract (each panel tears up a clause); the board relay is the last
+puzzle at the mascots' party for Leap Day. The notes below are the puzzle
+design history, from when the final area was Tuesday's (the earlier host).
 
 
 With all six lamps lit, Tuesday's door opens on a run of six panels, **one per
@@ -237,7 +263,7 @@ Dark pieces: never touching each other (a run of them is too annoying to
 turn blind), and panel 5's dark top-right corner was too annoying too.
 
 **Grand finale (agreed in outline): a board relay on one board**, building
-Tuesday's party cake: picture (the cake) → words (full Strands on the cake)
+the party cake: picture (the cake) → words (full Strands on the cake)
 → carving (slices that never cut a word) → bunny route (eat it slice by slice,
 reading the message) → lights (plug where the bunny finished; one wire per
 slice) → webs (bunting between the candles, the light string's bulbs).
@@ -252,9 +278,8 @@ Between the big puzzles, the inspirations have a lighter layer: *11th Hour*'s
 lids to pair up, clickable scenery and story scenes. Puzz will have one too,
 filled in after the puzzles:
 
-- **Finding the strays:** a line from Tuesday (or a smug memo from Santa)
-  hints where a stray is
-  hiding ("Something round and golden is keeping very sweet company").
+- **Finding the strays:** a found Xmas365 memo ("the Golden Egg has been
+  filed somewhere sweet") hints where a stray is hiding ("Something round and golden is keeping very sweet company").
   Spotting it is the quick win; its puzzle is the big one.
 - **Gags:** clickable jokes and reactions all over each room, above all
   round the mash-ups.
@@ -296,7 +321,8 @@ so bringing them home sets up its puzzle.
 
 Chosen to be recognisable as small models, distinct in silhouette and
 colour from each other, funny out of place, and secular and playful (no
-religious symbols, no Pilgrim or Native imagery).
+religious symbols; no Pilgrim or Native characters or scenes: the Turkey's
+Pilgrim-style buckle hat is a costume, and the only one).
 
 ## Where the strays are
 
@@ -686,8 +712,8 @@ board ("Each portion gets: 🦃 🥧 🍒").
    pin it down.
 4. **Seconds:** every portion gets one turkey, one pie and *two* cranberries.
 5. **The Feast:** a 7×7 table of fair shares, no numbers at all. Solved, the
-   dishes slide into place, Tuesday grudgingly takes a seat, and
-   Thanksgiving's lamp lights.
+   dishes slide into place, the Turkey's cage opens, and Thanksgiving's lamp
+   lights.
 
 **Thanksgiving's items abroad** (both carry fair shares):
 - **Cornucopia (in Easter):** courses: the bunny finishes one outlined
@@ -980,7 +1006,7 @@ Prototype status, the audit against the inspiration games, and next steps:
 ## Design principles
 
 - **Every panel is fair.** Its rules are learned from earlier panels (and
-  Tuesday's notes), it has one answer reached by logic, and it can always
+  the rules shown on it), it has one answer reached by logic, and it can always
   be reset.
 - **Clicky.** Instant feedback on every tap; a panel shows which clue it's
   unhappy with. The UHS hint
@@ -993,10 +1019,8 @@ Prototype status, the audit against the inspiration games, and next steps:
 
 ## To decide
 
-- The exact lines: Santa's memos (one per milestone and lamp count),
-  Tuesday's replies, each mascot's thank-you.
-- The Fourth of July's mascot.
-- Which bonus panels go in which room, and what each one earns.
+- The exact lines: Xmas365's memos (one per milestone, escalating),
+  Leap Day's reactions, each mascot's thank-you.
 - How the cake relay looks with the mascots at the party.
 - Whether some strays should start hidden (the lighter layer).
 - The lighter layer's riddles and gags (after the panels).

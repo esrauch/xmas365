@@ -79,13 +79,14 @@ body {
   position: absolute;
   transform: translate(-50%, 0);
   pointer-events: none;
+  z-index: 2;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   gap: 0px;
-  padding: 2px 7px;
-  border-radius: 7px;
-  background: rgba(255, 252, 245, 0.94);
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: rgba(255, 252, 245, 0.96);
   color: #1f2430;
   border: 2px solid #2d3748;
   box-shadow:
@@ -98,9 +99,9 @@ body {
     box-shadow 0.14s ease,
     background 0.14s ease;
   width: max-content;
-  max-width: 138px;
+  max-width: 152px;
   text-align: center;
-  line-height: 1.12;
+  line-height: 1.15;
 }
 
 .hotspot-layer.settled .hotspot-pill {
@@ -113,21 +114,118 @@ body {
 }
 
 .hotspot-pill.locked {
-  background: rgba(237, 242, 247, 0.9);
+  background: rgba(237, 242, 247, 0.92);
   color: #4a5568;
   border-color: #718096;
   box-shadow: 0 2px 0 #4a5568;
+  cursor: default;
+}
+
+.hotspot-pill.locked:hover {
+  transform: translate(-50%, 0) scale(1);
+  background: rgba(237, 242, 247, 0.92);
 }
 
 .hotspot-pill.done {
-  background: rgba(240, 255, 244, 0.95);
-  border-color: #2f855a;
+  background: #c6f6d5;
+  color: #1c4532;
+  border-color: #276749;
+  box-shadow:
+    0 2px 0 #1c4532,
+    0 3px 8px rgba(0, 0, 0, 0.22);
+}
+
+.hotspot-pill.done:hover {
+  background: #9ae6b4;
 }
 
 .hotspot-pill.place {
   background: #fefcbf;
   border-color: #d69e2e;
   animation: pulse-place 1.4s infinite ease-in-out;
+}
+
+/* Progression ladder SVG connector overlay */
+.ladder-lines-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+/* Distinct non-puzzle Return Item Socket UX feeding up to the Centerpiece */
+.ladder-return-slot {
+  position: absolute;
+  transform: translate(-50%, 0);
+  pointer-events: none;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px 3px 5px;
+  border-radius: 999px;
+  font-family: system-ui, sans-serif;
+  width: max-content;
+  max-width: 154px;
+  line-height: 1.1;
+  background: rgba(31, 36, 48, 0.86);
+  color: #e2e8f0;
+  border: 2px dashed #718096;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
+  cursor: default;
+}
+
+.ladder-return-slot .slot-socket {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  flex-shrink: 0;
+}
+
+.ladder-return-slot.done {
+  background: #c6f6d5;
+  color: #1c4532;
+  border: 2px solid #276749;
+  box-shadow:
+    0 2px 0 #1c4532,
+    0 3px 8px rgba(0, 0, 0, 0.22);
+}
+
+.ladder-return-slot.done .slot-socket {
+  background: #276749;
+  color: #ffffff;
+  border-color: #1c4532;
+  font-weight: 900;
+}
+
+.ladder-return-slot.place {
+  background: #fefcbf;
+  color: #744210;
+  border: 2.5px solid #d69e2e;
+  box-shadow:
+    0 2px 0 #744210,
+    0 4px 10px rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+  animation: pulse-place 1.4s infinite ease-in-out;
+}
+
+.hotspot-layer.settled .ladder-return-slot.place {
+  pointer-events: auto;
+}
+
+.ladder-return-slot.place .slot-socket {
+  background: #d69e2e;
+  color: #ffffff;
+  border-color: #975a16;
 }
 
 .hotspot-pill.hero {

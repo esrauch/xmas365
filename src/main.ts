@@ -405,6 +405,8 @@ function renderTopBar(): void {
     ...ROOM_SPECS.map((r) => {
       const active = currentBay === r.id;
       const done = gameState.isRoomComplete(r);
+      const unlocked = gameState.isRoomUnlocked(r);
+      const canUnlock = !unlocked && gameState.carriedEligibleItemForRoom(r) !== null;
       return h(
         'button',
         {
@@ -415,13 +417,21 @@ function renderTopBar(): void {
             fontWeight: '800',
             fontSize: '12px',
             cursor: 'pointer',
-            background: active ? r.accent : done ? '#c6f6d5' : '#fffdf9',
+            background: active
+              ? r.accent
+              : done
+                ? '#c6f6d5'
+                : canUnlock
+                  ? '#fefcbf'
+                  : unlocked
+                    ? '#fffdf9'
+                    : '#edf2f7',
             color: active ? '#fff' : '#1f2430',
-            border: '2px solid #1f2430',
+            border: canUnlock ? '2px solid #d69e2e' : '2px solid #1f2430',
           },
           onclick: () => switchBay(r.id),
         },
-        done ? `${r.icon}★` : r.icon,
+        done ? `${r.icon}★` : canUnlock ? `${r.icon}✨` : unlocked ? r.icon : `${r.icon}🔒`,
       );
     }),
     h(
@@ -448,12 +458,6 @@ function renderTopBar(): void {
 }
 
 function renderCarryTray(): void {
-  const roomSpec =
-    currentBay === 'hall' ? null : (ROOM_SPECS.find((r) => r.id === currentBay) ?? null);
-  if (roomSpec && !gameState.solvedRuns.has(roomSpec.warmup.id)) {
-    carryTrayHost.replaceChildren();
-    return;
-  }
   const carried = gameState.carriedItems();
   if (carried.length === 0) {
     carryTrayHost.replaceChildren();
@@ -537,8 +541,49 @@ function placeItemOnPedestal(itemId: string): void {
   rebuildScene();
 }
 
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const ladderSvg = document.createElementNS(SVG_NS, 'svg');
+ladderSvg.setAttribute('class', 'ladder-lines-svg');
+
 function buildHotspotDOM(hotspots: Hotspot3D[]): void {
   projectedPills = hotspots.map((hs) => {
+    if (hs.kind === 'return-slot') {
+      const el = h(
+        hs.status === 'place' ? 'button' : 'div',
+        {
+          class: `ladder-return-slot ${hs.status}`,
+          onclick:
+            hs.status === 'place'
+              ? (e: MouseEvent) => {
+                  e.stopPropagation();
+                  hs.onClick();
+                }
+              : undefined,
+        },
+        h('span', { class: 'slot-socket' }, hs.icon),
+        h(
+          'div',
+          {
+            style: {
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: '1px',
+            },
+          },
+          h('span', { style: { fontWeight: '800', fontSize: '10.5px' } }, hs.label),
+          hs.status === 'place'
+            ? h(
+                'span',
+                { style: { fontSize: '8.5px', fontWeight: '800', color: '#975a16' } },
+                '✨ Tap to Restore',
+              )
+            : null,
+        ),
+      );
+      return { hotspot: hs, el };
+    }
+
     const el = h(
       'button',
       {
@@ -564,7 +609,7 @@ function buildHotspotDOM(hotspots: Hotspot3D[]): void {
                 fontSize: hs.hero ? '12px' : '9px',
                 fontWeight: '700',
                 opacity: hs.hero ? '0.95' : '0.88',
-                color: hs.hero ? hs.accent : undefined,
+                color: hs.status === 'done' ? '#22543d' : hs.hero ? hs.accent : undefined,
               },
             },
             hs.sublabel,
@@ -573,7 +618,7 @@ function buildHotspotDOM(hotspots: Hotspot3D[]): void {
     );
     return { hotspot: hs, el };
   });
-  hotspotLayer.replaceChildren(...projectedPills.map((p) => p.el));
+  hotspotLayer.replaceChildren(ladderSvg, ...projectedPills.map((p) => p.el));
 }
 
 const tempProj = new THREE.Vector3();
@@ -616,6 +661,8 @@ function layoutStableHotspots(): void {
   stableCam.updateMatrixWorld();
 
   const padX = Math.min(76, w * 0.2);
+  const posById = new Map<string, { x: number; y: number }>();
+
   for (const item of projectedPills) {
     if (item.hotspot.bay !== currentBay) {
       item.el.style.display = 'none';
@@ -631,6 +678,47 @@ function layoutStableHotspots(): void {
       item.el.style.display = '';
       item.el.style.left = `${clampedX.toFixed(1)}px`;
       item.el.style.top = `${y.toFixed(1)}px`;
+      posById.set(item.hotspot.id, { x: clampedX, y });
+    }
+  }
+
+  // Render progression ladder lines between connected nodes in the current room
+  ladderSvg.replaceChildren();
+  for (const item of projectedPills) {
+    if (item.hotspot.bay !== currentBay || !item.hotspot.connections) continue;
+    const src = posById.get(item.hotspot.id);
+    if (!src) continue;
+    for (const conn of item.hotspot.connections) {
+      const dst = posById.get(conn.targetId);
+      if (!dst) continue;
+      const x1 = src.x;
+      const y1 = src.y + 8;
+      const x2 = dst.x;
+      const y2 = dst.y + 26;
+      const midY = (y1 + y2) * 0.5;
+      const d = `M ${x1.toFixed(1)} ${y1.toFixed(1)} C ${x1.toFixed(1)} ${midY.toFixed(1)}, ${x2.toFixed(1)} ${midY.toFixed(1)}, ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+
+      const backPath = document.createElementNS(SVG_NS, 'path');
+      backPath.setAttribute('d', d);
+      backPath.setAttribute('fill', 'none');
+      backPath.setAttribute('stroke', '#1f2430');
+      backPath.setAttribute('stroke-width', '6.5');
+      backPath.setAttribute('stroke-linecap', 'round');
+      ladderSvg.appendChild(backPath);
+
+      const fgPath = document.createElementNS(SVG_NS, 'path');
+      fgPath.setAttribute('d', d);
+      fgPath.setAttribute('fill', 'none');
+      fgPath.setAttribute(
+        'stroke',
+        conn.state === 'done' ? '#38a169' : conn.state === 'place' ? '#ecc94b' : '#a0aec0',
+      );
+      fgPath.setAttribute('stroke-width', conn.state === 'locked' ? '2.5' : '3.5');
+      fgPath.setAttribute('stroke-linecap', 'round');
+      if (conn.state === 'locked') {
+        fgPath.setAttribute('stroke-dasharray', '5 5');
+      }
+      ladderSvg.appendChild(fgPath);
     }
   }
 }

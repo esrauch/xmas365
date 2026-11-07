@@ -200,6 +200,11 @@ export function getBayLightMood(bay: BayId, act = gameState.act()): BayLightMood
   }
 }
 
+export interface HotspotConnection {
+  targetId: string;
+  state: 'done' | 'place' | 'locked';
+}
+
 export interface Hotspot3D {
   id: string;
   bay: BayId;
@@ -207,6 +212,8 @@ export interface Hotspot3D {
   sublabel?: string;
   icon: string;
   status: 'locked' | 'ready' | 'done' | 'place' | 'door';
+  kind?: 'puzzle' | 'return-slot';
+  connections?: HotspotConnection[];
   accent: string;
   hero?: boolean;
   worldPos: THREE.Vector3;
@@ -1350,13 +1357,19 @@ function buildCenterpieceSculpture(roomId: RoomId, accent: string, done: boolean
         archRib.rotation.z = side * 0.72;
         g.add(archRib);
       }
-      // Apex keystone & dark twilight recess backdrop
+      // Apex keystone & flat dark twilight recess backdrop (strictly behind the web at z = -0.07..-0.01)
       g.add(sphere(0.065, '#ff7b29', 0, 0.96, 0.02));
-      g.add(box(0.78, 0.56, 0.08, '#140d1f', 0, 0.42, -0.03));
-      const archBack = new THREE.Mesh(new THREE.ConeGeometry(0.42, 0.36, 4), mat('#140d1f'));
-      archBack.rotation.y = Math.PI / 4;
-      archBack.scale.set(1.3, 1, 0.25);
-      archBack.position.set(0, 0.76, -0.03);
+      g.add(box(0.78, 0.52, 0.06, '#140d1f', 0, 0.38, -0.04));
+      const gableShape = new THREE.Shape();
+      gableShape.moveTo(-0.39, 0.63);
+      gableShape.lineTo(0.39, 0.63);
+      gableShape.lineTo(0, 0.94);
+      gableShape.closePath();
+      const archBack = new THREE.Mesh(
+        new THREE.ExtrudeGeometry(gableShape, { depth: 0.06, bevelEnabled: false }),
+        mat('#140d1f'),
+      );
+      archBack.position.set(0, 0, -0.07);
       g.add(archBack);
 
       // 2. Concentric silver spiderweb (6 radial spokes + 3 polygonal web rings)
@@ -3183,7 +3196,14 @@ export function buildHolidayHallDiorama(callbacks: {
     });
 
     // 4. Bottom-Center: Tour Holiday Hall Medallion
-    const nextIncomplete = ROOM_SPECS.find((r) => !gameState.isRoomComplete(r)) ?? ROOM_SPECS[0];
+    const nextIncomplete =
+      ROOM_SPECS.find(
+        (r) =>
+          !gameState.isRoomComplete(r) &&
+          (gameState.isRoomUnlocked(r) || gameState.carriedEligibleItemForRoom(r) !== null),
+      ) ??
+      ROOM_SPECS.find((r) => !gameState.isRoomComplete(r)) ??
+      ROOM_SPECS[0];
     const compassGroup = new THREE.Group();
     compassGroup.position.set(0, 0, 2.02);
     compassGroup.add(cyl(0.46, 0.5, 0.1, nextIncomplete.accent, 0, 0.05, 0, 16));
@@ -3368,6 +3388,8 @@ export function buildHolidayHallDiorama(callbacks: {
     }
 
     // TIER 1 (TOP-CENTER): THE CENTERPIECE ON A RAISED ALTAR SHELF (ly = 2.15..3.15)
+    const roomUnlocked = gameState.isRoomUnlocked(room);
+    const carriedUnlockItem = gameState.carriedEligibleItemForRoom(room);
     const warmupDone = gameState.solvedRuns.has(room.warmup.id);
     const cpDone = gameState.solvedRuns.has(room.centerpiece.proto.id);
     const cpUnlocked = gameState.isCenterpieceUnlocked(room);
@@ -3384,12 +3406,20 @@ export function buildHolidayHallDiorama(callbacks: {
       hotspots.push({
         id: `proto:${room.centerpiece.proto.id}`,
         bay: room.id,
-        label: `${room.centerpiece.icon} ${room.centerpiece.title}`,
-        sublabel: cpDone ? '★ Restored!' : cpUnlocked ? 'Ready to Solve!' : '🔒 Place 2 Items',
-        icon: cpDone ? '★' : cpUnlocked ? room.centerpiece.icon : '🔒',
+        label: cpDone
+          ? `✓ ${room.centerpiece.icon} ${room.centerpiece.title}`
+          : cpUnlocked
+            ? `${room.centerpiece.icon} ${room.centerpiece.title}`
+            : `🔒 ${room.centerpiece.title}`,
+        sublabel: cpDone
+          ? '★ Restored!'
+          : cpUnlocked
+            ? '▶ Ready to Solve!'
+            : 'Restore 2 Items Below',
+        icon: cpDone ? '✓' : cpUnlocked ? room.centerpiece.icon : '🔒',
         status: cpDone ? 'done' : cpUnlocked ? 'ready' : 'locked',
         accent: room.accent,
-        worldPos: bayToWorld(theta, 0, 2.04, 0.62),
+        worldPos: bayToWorld(theta, 0, 2.32, 0.62),
         cameraPos: cpFocusPos,
         cameraLook: cpFocusLook,
         meshGroup: cpGroup,
@@ -3437,17 +3467,24 @@ export function buildHolidayHallDiorama(callbacks: {
       }
       bay.add(pg);
 
-      // Only show the return-item button once warm-up is done and the player actually has the item
-      if (warmupDone && hasItem) {
+      // In the Ladder UX (once warm-up is done), show both return slots with lines feeding up to the centerpiece
+      if (warmupDone) {
         hotspots.push({
           id: `pedestal:${reqId}`,
           bay: room.id,
+          kind: 'return-slot',
           label: `${item.icon} ${item.title}`,
-          sublabel: isPlaced ? '✓ Returned' : '✨ Tap to Place!',
-          icon: isPlaced ? '✓' : '✨',
-          status: isPlaced ? 'done' : 'place',
+          sublabel: isPlaced ? '✓ Restored' : isCarried ? '✨ Tap to Restore' : 'Return Item',
+          icon: isPlaced ? '✓' : isCarried ? '✨' : item.icon,
+          status: isPlaced ? 'done' : isCarried ? 'place' : 'locked',
+          connections: [
+            {
+              targetId: `proto:${room.centerpiece.proto.id}`,
+              state: isPlaced ? 'done' : isCarried ? 'place' : 'locked',
+            },
+          ],
           accent: isCarried ? '#d69e2e' : room.accent,
-          worldPos: bayToWorld(theta, lx, 1.42, lz + 0.22),
+          worldPos: bayToWorld(theta, lx, 1.56, lz + 0.22),
           cameraPos: cpFocusPos,
           cameraLook: bayToWorld(theta, lx, 1.75, lz),
           meshGroup: pg,
@@ -3490,18 +3527,20 @@ export function buildHolidayHallDiorama(callbacks: {
       }
       bay.add(sg);
 
-      if (warmupDone && !strayDone) {
+      if (warmupDone) {
         const camPos = bayToWorld(theta, lx * 0.5, 1.75, 3.8);
         const camLook = bayToWorld(theta, lx, 0.68, lz);
         hotspots.push({
           id: `proto:${stray.proto.id}`,
           bay: room.id,
-          label: `${stray.icon} ${stray.title}`,
-          sublabel: `→ ${homeRoomSpec?.shortTitle ?? ''}`,
-          icon: stray.icon,
-          status: 'ready',
+          label: strayDone ? `✓ ${stray.icon} ${stray.title}` : `${stray.icon} ${stray.title}`,
+          sublabel: strayDone
+            ? `✓ Freed → ${homeRoomSpec?.shortTitle ?? ''}`
+            : `→ ${homeRoomSpec?.shortTitle ?? ''}`,
+          icon: strayDone ? '✓' : stray.icon,
+          status: strayDone ? 'done' : 'ready',
           accent: homeRoomSpec?.accent ?? room.accent,
-          worldPos: bayToWorld(theta, lx, 0.18, lz + 0.28),
+          worldPos: bayToWorld(theta, lx, 0.62, 1.52),
           cameraPos: camPos,
           cameraLook: camLook,
           meshGroup: sg,
@@ -3512,11 +3551,45 @@ export function buildHolidayHallDiorama(callbacks: {
       }
     });
 
-    // TIER 4: WARM-UP BUTTON (centered hero button when incomplete; disappears from diorama once solved, playable from Calendar Desk)
-    if (!warmupDone) {
-      const warmupFocusPos = bayToWorld(theta, 0, 1.65, 3.8);
-      const warmupFocusLook = bayToWorld(theta, 0, 1.25, 0.5);
-      const warmupWorldPos = bayToWorld(theta, 0, 1.38, 0.75);
+    // TIER 4: ROOM LOCK / ITEM UNLOCK / WARM-UP (hero in center before warm-up is beaten; green base of ladder at bottom once beaten)
+    const warmupFocusPos = bayToWorld(theta, 0, 1.65, 3.8);
+    const warmupFocusLook = bayToWorld(theta, 0, 1.25, 0.5);
+    const centerHeroWorldPos = bayToWorld(theta, 0, 1.38, 0.75);
+    if (!roomUnlocked) {
+      if (carriedUnlockItem) {
+        hotspots.push({
+          id: `unlock:${room.id}`,
+          bay: room.id,
+          label: `✨ Restore ${carriedUnlockItem.icon} ${carriedUnlockItem.title}`,
+          sublabel: `▶ Tap to Restore Item & Unlock ${room.shortTitle}`,
+          icon: '✨',
+          status: 'place',
+          accent: '#d69e2e',
+          hero: true,
+          worldPos: centerHeroWorldPos,
+          cameraPos: warmupFocusPos,
+          cameraLook: warmupFocusLook,
+          onClick: () => callbacks.onPlaceItem(carriedUnlockItem.id),
+        });
+      } else {
+        const req0 = STRAY_ITEMS[room.centerpiece.requiredItems[0]];
+        const req1 = STRAY_ITEMS[room.centerpiece.requiredItems[1]];
+        hotspots.push({
+          id: `locked:${room.id}`,
+          bay: room.id,
+          label: `🔒 ${room.shortTitle} Locked`,
+          sublabel: `Bring ${req0.icon} ${req0.title} or ${req1.icon} ${req1.title} to unlock`,
+          icon: '🔒',
+          status: 'locked',
+          accent: '#718096',
+          hero: true,
+          worldPos: centerHeroWorldPos,
+          cameraPos: warmupFocusPos,
+          cameraLook: warmupFocusLook,
+          onClick: () => {},
+        });
+      }
+    } else if (!warmupDone) {
       hotspots.push({
         id: `proto:${room.warmup.id}`,
         bay: room.id,
@@ -3526,7 +3599,25 @@ export function buildHolidayHallDiorama(callbacks: {
         status: 'ready',
         accent: room.accent,
         hero: true,
-        worldPos: warmupWorldPos,
+        worldPos: centerHeroWorldPos,
+        cameraPos: warmupFocusPos,
+        cameraLook: warmupFocusLook,
+        onClick: () => callbacks.onOpenProto(room.warmup.id, warmupFocusPos, warmupFocusLook),
+      });
+    } else {
+      hotspots.push({
+        id: `proto:${room.warmup.id}`,
+        bay: room.id,
+        label: `✓ ${room.icon} ${room.warmup.title}`,
+        sublabel: '✓ Warm-up Complete',
+        icon: '✓',
+        status: 'done',
+        connections: room.strays.map((s) => ({
+          targetId: `proto:${s.proto.id}`,
+          state: 'done' as const,
+        })),
+        accent: '#2f855a',
+        worldPos: bayToWorld(theta, 0, -0.02, 2.12),
         cameraPos: warmupFocusPos,
         cameraLook: warmupFocusLook,
         onClick: () => callbacks.onOpenProto(room.warmup.id, warmupFocusPos, warmupFocusLook),

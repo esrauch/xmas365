@@ -475,6 +475,29 @@ export class GameState {
     return ROOM_SPECS.filter((r) => this.isRoomComplete(r)).length;
   }
 
+  /**
+   * Whether a room is unlocked: Thanksgiving starts open; other rooms unlock once at least
+   * one of their two home items is restored (or if the room's warm-up was already beaten).
+   */
+  isRoomUnlocked(room: RoomSpec): boolean {
+    if (room.id === 'thanksgiving' || this.freePlayUnlocked) return true;
+    if (this.solvedRuns.has(room.warmup.id)) return true;
+    return room.centerpiece.requiredItems.some((id) => this.placedItems.has(id));
+  }
+
+  /**
+   * If the player is currently carrying one of this room's two home items (unplaced), return it.
+   */
+  carriedEligibleItemForRoom(room: RoomSpec): StraySpec | null {
+    for (const reqId of room.centerpiece.requiredItems) {
+      const item = STRAY_ITEMS[reqId];
+      if (this.solvedRuns.has(item.proto.id) && !this.placedItems.has(reqId)) {
+        return item;
+      }
+    }
+    return null;
+  }
+
   isStrayUnlocked(room: RoomSpec): boolean {
     return this.solvedRuns.has(room.warmup.id);
   }

@@ -14,7 +14,8 @@ All built rooms now use the current set.
 
 ## The premise
 
-Ordinary Tuesday has mixed up the six holidays. Each holiday brings two
+Xmas365, Santa's hostile takeover, has mixed up the six holidays (you are
+Leap Day, freeing them; see `GAME.md`). Each holiday brings two
 things, kept apart on purpose:
 
 - **A base puzzle:** a proven logic puzzle (Nikoli, Simon Tatham's
@@ -28,7 +29,8 @@ things, kept apart on purpose:
 So the game is a 6 × 6 grid where any puzzle can carry any twist. Each
 room plays its own puzzle plain (the warm-up), then with two visiting
 twists (the strays), then with its own holiday's twist at home (the
-centrepiece). Tuesday's final area fills in more of the grid: each puzzle
+centrepiece). The final area, Xmas365's merger contract, fills in more of
+the grid: each puzzle
 with two twists it hasn't had yet. Across the whole grid the player keeps
 meeting the same six puzzles and six twists in new combinations, which is
 *The Witness*'s pleasure: learn a language, then read it everywhere.
@@ -142,7 +144,7 @@ one per genre, each twist appearing twice.
   mirror joins.
 - **Spooky, at home (Spider's Web, ✅; generator ⚙️):** knots outside the
   lantern's light show no number. Home-only extra: diagonal threads.
-- **Egg Hunt (Tuesday, 🟡; generator ⚙️):** 🕷 marks the spider's home; an egg's
+- **Egg Hunt (generator ⚙️):** 🕷 marks the spider's home; an egg's
   number is how many threads it takes to reach it from home, always more
   than the shortest possible path (it refutes the obvious route).
 - **Red, White and Blue (generator ⚙️; the Tree-Top Star now carries Snowflakes):**
@@ -158,7 +160,7 @@ All six columns are in the generator (⚙️), at every tier, in any mix (three
 clue-adding twists at once only on easy so far). Playtested 2026-11-03:
 Spooky and Portions (cuts) are good; the rest were adjusted as below.
 
-- **Love Letters (Tuesday, 🟡; ⚙️):** some sizes are letters; the message shows
+- **Love Letters (⚙️):** some sizes are letters; the message shows
   a digit *n* as the letter for size *n*, other letters as they are (2A4 →
   YAM). Two letters on easy, three from medium up (each a different size).
   Size letters avoid T, P and C (the dishes).
@@ -170,7 +172,7 @@ Spooky and Portions (cuts) are good; the rest were adjusted as below.
   Random carvings rarely mirror over a big area, so frames come out small
   (4×4 on a 9×9); carving symmetrically inside a chosen frame is the next
   step to make them larger.
-- **Spooky (Tuesday, 🟡; ⚙️):** some sizes show '?'. Playtested: good.
+- **Spooky (⚙️):** some sizes show '?'. Playtested: good.
 - **Egg Hunt, as baskets (⚙️; decided 2026-11-03):** Carving's Easter twist
   isn't numbered eggs (the "first cut" version was built and playtested:
   too confusing). Instead every portion gets an Easter basket: one 🥚 egg,
@@ -194,7 +196,7 @@ All six columns are in the generator (⚙️), generating in seconds across easy
   match numbered blanks in a message (e.g. LIGHT, SHINE, SPARK).
 - **Snowflakes, at home (⚙️):** inside a frosty frame, the wires mirror across the axis;
   outside the frame, wiring carries on freely.
-- **Spooky (Tuesday, 🟡; ⚙️):** some pieces stay dark, and turn blind, until
+- **Spooky (⚙️):** some pieces stay dark, and turn blind, until
   the whole panel is solved.
 - **Egg Hunt (Golden Egg, ✅; ⚙️):** an egg bulb must be reached in exactly its
   number of steps from the plug.
@@ -245,13 +247,13 @@ at every tier in seconds or less (eggs on hard is the slowest, ~6 s).
 - **Portions (⚙️):** short fences between neighbouring squares that no word
   steps straight across, added after the board is laid: only on edges the
   true words never step, next to squares another way to lie would use, and
-  kept only while they rule ways out (spare ones dropped). Tuesday's built
+  kept only while they rule ways out (spare ones dropped). The earlier final area's
   words panel uses the older form: two portions, the same number of words
   each.
 
 ### Hops (Easter)
 
-- **Love Letters (Tuesday, 🟡; ⚙️):** some eggs show letters; each bunny's message
+- **Love Letters (⚙️):** some eggs show letters; each bunny's message
   of numbered blanks is its steps where its letters lie.
 - **Snowflakes (⚙️):** inside a frame, the trail's strokes mirror; it
   enters and leaves in a different order, so the numbers differ.
@@ -274,22 +276,21 @@ All six columns are in the generator (⚙️), generating across easy, medium, a
   cover whole lines, so they differ outside the frame.
 - **Spooky (Witch's Broom, ✅; ⚙️):** some clues are in the dark (at most one
   per line, never a line's only clue).
-- **Egg Hunt (Tuesday, 🟡; ⚙️):** an egg on a row clue marks which run in that
+- **Egg Hunt (⚙️):** an egg on a row clue marks which run in that
   row covers the egg square.
 - **Red, White and Blue, at home (Grand Finale, ✅; ⚙️):** colour clues (runs of
   different colours may touch without a gap; empty squares are white).
-- **Portions (Tuesday, 🟡; ⚙️):** every outlined portion holds the same
+- **Portions (⚙️):** every outlined portion holds the same
   number of filled squares.
 
 ---
 
-## Tuesday's final area (tentative)
+## The final area: the merger contract, then the party
 
-Twelve panels, two per puzzle: an intro, then a bigger level where each
-twist rules out at least two more answers. Built with the old twist set
-(red and green, flags); to be redone from the generators once the matrix
-is filled in. The grand finale is a board relay on one board, building
-Tuesday's party cake (outline in `GAME.md`).
+Xmas365's merger contract is six two-twist panels, one per genre, each twist
+appearing twice (`src/proto/puzzles/tuesday.ts`, still named for the earlier
+host). After it, the last puzzle is a board relay on one board, building
+Leap Day's party cake (outline in `GAME.md`), not built yet.
 
 ## Status (2026-11-07)
 
