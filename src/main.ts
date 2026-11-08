@@ -206,6 +206,14 @@ let activeDialogueBeatId: BeatId | null = null;
 let shownMemoBeatId: BeatId | null = null;
 let cagedPromptTimer: number | null = null;
 
+/**
+ * One-line "barks" that play like a caged mascot's plea: a speech bubble at the bottom with
+ * no button, which fades away on its own. Leap Day's reactions to the opening memo (P2) and
+ * to the first item home (T3) work this way too.
+ */
+const BARK_BEATS: ReadonlySet<string> = new Set(['P2', 'T3']);
+const BARK_SECONDS = 5;
+
 function clearCagedPromptTimer(): void {
   if (cagedPromptTimer !== null) {
     window.clearTimeout(cagedPromptTimer);
@@ -300,7 +308,7 @@ function renderActiveStoryBeat(): void {
   }
 
   const sp = SPEAKERS[line.speaker];
-  const isCagedMascotPrompt = beatId.endsWith('.caged');
+  const isBark = beatId.endsWith('.caged') || BARK_BEATS.has(beatId);
   const isLastLine = activeDialogueStepIndex >= lines.length - 1;
   const hasMoreBeats = gameState.beatQueue.length > 1;
   const btnLabel = !isLastLine
@@ -343,15 +351,6 @@ function renderActiveStoryBeat(): void {
     }
   };
 
-  if (isCagedMascotPrompt) {
-    cagedPromptTimer = window.setTimeout(() => {
-      cagedPromptTimer = null;
-      gameState.dismissBeat(beatId);
-      renderTopBar();
-      renderActiveStoryBeat();
-    }, 5000);
-  }
-
   const card = h(
     'div',
     {
@@ -363,7 +362,7 @@ function renderActiveStoryBeat(): void {
         borderRadius: '13px',
         padding: '10px 13px',
         boxShadow: '0 4px 0 #1f2430, 0 10px 22px rgba(0,0,0,0.28)',
-        pointerEvents: isCagedMascotPrompt ? 'none' : 'auto',
+        pointerEvents: isBark ? 'none' : 'auto',
       },
     },
     docNode,
@@ -396,7 +395,7 @@ function renderActiveStoryBeat(): void {
             )
           : null,
       ),
-      isCagedMascotPrompt
+      isBark
         ? null
         : h(
             'button',
@@ -425,8 +424,50 @@ function renderActiveStoryBeat(): void {
     ),
   );
 
-  // When Leap Day speaks in Holiday Hall (such as P2 right after closing the All-Hands Memo),
-  // anchor the speech bubble directly to Leap Day's 3D mascot!
+  // A bark: a speech bubble at the bottom (its tail pointing up toward the speaker), which
+  // fades and goes away on its own; taps pass straight through it.
+  if (isBark) {
+    leapBubbleHost.replaceChildren();
+    card.style.borderRadius = '18px';
+    const tail = h('div', {
+      style: {
+        width: '0',
+        height: '0',
+        borderLeft: '11px solid transparent',
+        borderRight: '11px solid transparent',
+        borderBottom: `12px solid ${sp.border}`,
+        margin: '0 auto -1px auto',
+      },
+    });
+    const bubble = h(
+      'div',
+      {
+        style: {
+          width: 'min(380px, 100%)',
+          margin: '0 auto',
+          pointerEvents: 'none',
+          transition: 'opacity 0.35s ease',
+          animation: 'puzz-card-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) both',
+        },
+      },
+      tail,
+      card,
+    );
+    storyBannerHost.replaceChildren(bubble);
+    cagedPromptTimer = window.setTimeout(() => {
+      bubble.style.opacity = '0';
+      cagedPromptTimer = window.setTimeout(() => {
+        cagedPromptTimer = null;
+        gameState.dismissBeat(beatId);
+        renderTopBar();
+        renderActiveStoryBeat();
+      }, 350);
+    }, BARK_SECONDS * 1000);
+    return;
+  }
+
+  // When Leap Day speaks in Holiday Hall (other than a bark), anchor the speech bubble
+  // directly to Leap Day's 3D mascot.
   if (currentBay === 'hall' && line.speaker === 'leapday') {
     storyBannerHost.replaceChildren();
     card.style.animation = 'puzz-card-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) both';

@@ -455,7 +455,9 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
 
     // Heavy brass padlock on locked doors (pre-built, visibility toggled in syncState)
     const lockGroup = new THREE.Group();
-    lockGroup.position.set(0.46, 0.34, 0.055);
+    // Twice life size so it reads from the hall camera; moved in so it stays on the leaf.
+    lockGroup.position.set(0.4, 0.26, 0.07);
+    lockGroup.scale.setScalar(2);
     const lockBodyMat = toonMaterial({ color: hexToNumber('#d69e2e') });
     const lockBodyMesh = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.12, 0.04), lockBodyMat);
     lockBodyMesh.position.set(0, -0.04, 0);
@@ -482,8 +484,17 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
     completeFxGroup.add(
       fxPlane(1.0, 1.1, fxMaterial(radialTexture(), room.accent, 0.3), 0, 0.62, 0.13),
     );
+    // The step's pool of colour; an upper door's balcony ledge is shallow, so its pool is too.
     completeFxGroup.add(
-      fxPlane(1.1, 0.8, fxMaterial(radialTexture(), room.accent, 0.42), 0, 0.012, 0.42, true),
+      fxPlane(
+        1.1,
+        upper ? 0.34 : 0.8,
+        fxMaterial(radialTexture(), room.accent, 0.42),
+        0,
+        0.012,
+        upper ? 0.12 : 0.42,
+        true,
+      ),
     );
     bay.add(completeFxGroup);
 
@@ -493,8 +504,9 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
     unlockedFxGroup.add(
       fxPlane(0.95, 1.15, fxMaterial(radialTexture(), spill, 0.38), 0, 0.42, 0.1),
     );
-    const length = upper ? 0.5 : 1.55;
-    const wedge = fxWedge(0.56, upper ? 0.8 : 1.6, length, fxMaterial(beamTexture(), spill, 0.8));
+    // Upper doors spill only as far as the balcony's edge.
+    const length = upper ? 0.26 : 1.55;
+    const wedge = fxWedge(0.56, upper ? 0.72 : 1.6, length, fxMaterial(beamTexture(), spill, 0.8));
     wedge.rotation.x = -Math.PI / 2;
     wedge.position.set(0, 0.014, 0.08 + length / 2);
     unlockedFxGroup.add(wedge);
@@ -589,17 +601,28 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
   wheel.add(slip);
   bay.add(wheel);
 
-  // Footlights along the front of the stage
+  // Footlights along the front of the stage. This close to the rotunda's centre the hall's
+  // slice is only ~1.8 wide (and a phone sees ~1.66 of it), so the row stays inside it.
   const footZ = 3.42;
-  const house = new THREE.Mesh(new THREE.PlaneGeometry(3.9, 1.1), mat('#1a120c'));
+  // Beyond them the floor falls into the dark of the house: a trapezoid narrowing toward the
+  // centre with the slice, just above the rotunda's centre rugs.
+  const houseDepth = 1.1;
+  const houseGeo = new THREE.PlaneGeometry(1, houseDepth);
+  const housePos = houseGeo.attributes['position'] as THREE.BufferAttribute;
+  for (let i = 0; i < housePos.count; i++) {
+    // Local +y is the footlight end once laid flat; -y runs toward the centre.
+    housePos.setX(i, housePos.getX(i) * (housePos.getY(i) > 0 ? 1.74 : 0.7));
+  }
+  housePos.needsUpdate = true;
+  const house = new THREE.Mesh(houseGeo, mat('#1a120c'));
   house.rotation.x = -Math.PI / 2;
-  house.position.set(0, 0.006, footZ + 0.62);
+  house.position.set(0, 0.04, footZ + 0.07 + houseDepth / 2);
   house.receiveShadow = true;
   bay.add(house);
-  bay.add(box(3.9, 0.06, 0.14, '#2a1d14', 0, 0.03, footZ, false));
-  bay.add(box(3.9, 0.012, 0.15, '#8a6a2a', 0, 0.064, footZ, false));
-  for (let i = 0; i < 9; i++) {
-    const fx = -1.68 + i * 0.42;
+  bay.add(box(1.8, 0.06, 0.14, '#2a1d14', 0, 0.03, footZ, false));
+  bay.add(box(1.8, 0.012, 0.15, '#8a6a2a', 0, 0.064, footZ, false));
+  for (let i = 0; i < 5; i++) {
+    const fx = -0.84 + i * 0.42;
     const hood = new THREE.Mesh(
       new THREE.CylinderGeometry(0.085, 0.085, 0.16, 12, 1, false, -Math.PI / 2, Math.PI),
       mat('#6b4a1c'),
