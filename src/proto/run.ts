@@ -17,20 +17,12 @@ export interface RunDef<P extends { name: string; tip?: string }> extends Omit<P
   mountPanel(host: HTMLElement, panel: P, hooks: PanelHooks): void;
 }
 
-const KEY = 'puzz.proto.panels';
-const save = (done: Set<string>): void => {
-  try {
-    localStorage.setItem(KEY, JSON.stringify([...done]));
-  } catch {
-    // No storage: ticks last for this visit.
-  }
-};
-
 export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): Proto {
   const { panels, mountPanel, ...proto } = def;
   return {
     ...proto,
     teaches: true,
+    panelCount: panels.length,
     mount(host, ctx) {
       const done = gameState.solvedPanels;
       let autoAdvanceTimer = 0;
@@ -395,8 +387,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         mountPanel(nextPane, panel, {
           solved: (text) => {
             panelSolved = true;
-            done.add(`${proto.id}:${i}`);
-            save(done);
+            gameState.markPanelSolved(proto.id, i);
             const allSolved = panels.every((_, k) => done.has(`${proto.id}:${k}`));
             renderStrip(i, i, allSolved);
             if (allSolved || i === panels.length - 1) {

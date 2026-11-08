@@ -59,12 +59,13 @@ describe('CLAUSE_WEBS (Clause I: Halloween · Spiderwebs)', () => {
     expect(seen.size).toBe(CLAUSE_PANEL_COUNT);
   });
 
-  it('ensures every panel is <= 7x7, matches twistsOf(panel), and has a unique solution', () => {
+  it('uses 5x5 boards for intro reminder panels and 7x7 boards for base, solo, duo, and all6, with a unique solution', () => {
     for (const [idx, item] of CLAUSE_WEBS.panels.entries()) {
       const h = item.panel.rows.length;
       const w = item.panel.rows[0]?.length ?? 0;
-      expect(h, `panel ${idx} (${item.name}) height`).toBeLessThanOrEqual(7);
-      expect(w, `panel ${idx} (${item.name}) width`).toBeLessThanOrEqual(7);
+      const expectedSize = item.section === 'intro' ? 5 : 7;
+      expect(h, `panel ${idx} (${item.name}) height`).toBe(expectedSize);
+      expect(w, `panel ${idx} (${item.name}) width`).toBe(expectedSize);
       expect(twistsOf(item.panel), `panel ${idx} (${item.name}) twistsOf`).toEqual(item.twists);
 
       const web = fromPanel(item.panel);

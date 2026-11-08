@@ -146,4 +146,48 @@ describe('XMAS365™ Merger Contract Finale gauntlet (6 clauses × 29 panels = 1
     expect(state.freePlayUnlocked).toBe(true);
     expect(state.pinnedMemos.has('Y7')).toBe(true);
   });
+
+  it('derives runs, clauses, and memos from panels and round-trips JSON save state', () => {
+    const state = new GameState();
+    state.resetAll();
+
+    // Toggling a room warm-up and centerpiece via setRunSolved fills their panels and pins memos
+    const tg = ROOM_SPECS[1]; // Thanksgiving
+    state.setRunSolved(tg.warmup.id, true);
+    expect(state.runSolvedPanelCount(tg.warmup.id)).toBe(state.runPanelCount(tg.warmup.id));
+    expect(state.solvedRuns.has(tg.warmup.id)).toBe(true);
+    expect(state.pinnedMemos.has('thanksgiving.enter')).toBe(true);
+
+    state.setRunSolved(tg.centerpiece.proto.id, true);
+    expect(state.completedRoomCount()).toBe(1);
+    expect(state.pinnedMemos.has('E1')).toBe(true);
+
+    // Unchecking the centerpiece removes its panels, un-completes the room, and unpins E1
+    state.setRunSolved(tg.centerpiece.proto.id, false);
+    expect(state.runSolvedPanelCount(tg.centerpiece.proto.id)).toBe(0);
+    expect(state.completedRoomCount()).toBe(0);
+    expect(state.pinnedMemos.has('E1')).toBe(false);
+
+    // Toggling clauses via setClauseVoided updates panel counts and round-trips via exportSaveJson/importSaveJson
+    state.setClauseVoided(0, true);
+    state.setClauseVoided(2, true);
+    expect(state.voidedClauseCount()).toBe(2);
+    expect(state.clauseSolvedPanelCount('webs')).toBe(29);
+    expect(state.clauseSolvedPanelCount('lights')).toBe(29);
+
+    const exported = state.exportSaveJson();
+    state.resetAll();
+    expect(state.voidedClauseCount()).toBe(0);
+    expect(state.solvedRuns.has(tg.warmup.id)).toBe(false);
+
+    const res = state.importSaveJson(exported);
+    expect(res).toEqual({ ok: true });
+    expect(state.solvedRuns.has(tg.warmup.id)).toBe(true);
+    expect(state.pinnedMemos.has('thanksgiving.enter')).toBe(true);
+    expect(state.voidedClauseCount()).toBe(2);
+    expect(state.isClauseVoided(0)).toBe(true);
+    expect(state.isClauseVoided(2)).toBe(true);
+
+    expect(state.importSaveJson('not-json').ok).toBe(false);
+  });
 });

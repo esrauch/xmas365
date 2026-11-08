@@ -326,80 +326,72 @@ export const ROOM_SPECS: readonly [RoomSpec, RoomSpec, RoomSpec, RoomSpec, RoomS
 
 export const FINALE_PROTO = clause;
 
-const SOLVED_RUNS_KEY = 'puzz.proto.solved';
-const PLACED_ITEMS_KEY = 'puzz.meta.placed';
-const MILESTONES_KEY = 'puzz.meta.milestones';
-const FREEPLAY_KEY = 'puzz.meta.freeplay';
-const PINNED_MEMOS_KEY = 'puzz.story.memos';
-const HALL_PENDING_KEY = 'puzz.story.hallPending';
-const FIRST_HOLIDAY_KEY = 'puzz.story.firstHoliday';
+export const SAVE_KEY = 'puzz.save';
+export const SAVE_VERSION = 1;
 
-function readSet(key: string): Set<string> {
-  try {
-    return new Set(JSON.parse(localStorage.getItem(key) ?? '[]') as string[]);
-  } catch {
-    return new Set();
-  }
+export interface SaveData {
+  version: number;
+  /** Solved panel keys (`<protoId>:<idx>` for room runs, `clause:<genre>:<idx>` for Merger Contract clauses). */
+  solvedPanels: string[];
+  /** Placed stray item IDs on their home pedestals (`chocolates`, `starlights`, etc.). */
+  placedItems: StrayId[];
+  /** Seen story beat IDs (`P0`, `P1`, `T1`, `C1.torn`, etc.). */
+  milestones: string[];
+  /** Story beats queued for the next return to Holiday Hall (`E1`..`E6`). */
+  hallPendingBeats: BeatId[];
+  /** Name of the first holiday room completed (`{holiday}` interpolation in `E1`). */
+  firstRevertedHoliday: string;
+  /** Whether Free Play / Custom Twist Mixer is explicitly unlocked. */
+  freePlayUnlocked: boolean;
 }
 
-function writeSet(key: string, set: Set<string>): void {
+function getRoomProtos(): Proto[] {
+  const out: Proto[] = [];
+  for (const r of ROOM_SPECS) {
+    for (const p of [r.warmup, r.strays[0]?.proto, r.strays[1]?.proto, r.centerpiece?.proto] as (
+      Proto | undefined
+    )[]) {
+      if (p) out.push(p);
+    }
+  }
+  return out;
+}
+
+const LEGACY_KEYS = {
+  solvedRuns: 'puzz.proto.solved',
+  solvedPanels: 'puzz.proto.panels',
+  placedItems: 'puzz.meta.placed',
+  milestones: 'puzz.meta.milestones',
+  freePlay: 'puzz.meta.freeplay',
+  pinnedMemos: 'puzz.story.memos',
+  hallPending: 'puzz.story.hallPending',
+  firstHoliday: 'puzz.story.firstHoliday',
+} as const;
+
+function readLegacyArray(key: string): string[] {
   try {
-    localStorage.setItem(key, JSON.stringify([...set]));
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : [];
   } catch {
-    // Ignore storage failures in private browsing.
+    return [];
   }
 }
 
 export class GameState {
-  readonly solvedRuns = readSet(SOLVED_RUNS_KEY);
-  readonly solvedPanels = readSet('puzz.proto.panels');
-  readonly placedItems = readSet(PLACED_ITEMS_KEY);
-  readonly milestones = readSet(MILESTONES_KEY);
-  readonly pinnedMemos = readSet(PINNED_MEMOS_KEY) as Set<MemoId>;
-  readonly hallPendingBeats = readSet(HALL_PENDING_KEY) as Set<BeatId>;
+  readonly solvedRuns = new Set<string>();
+  readonly solvedPanels = new Set<string>();
+  readonly placedItems = new Set<string>();
+  readonly milestones = new Set<string>();
+  readonly pinnedMemos = new Set<MemoId>(['P1']);
+  readonly hallPendingBeats = new Set<BeatId>();
   readonly beatQueue: BeatId[] = [];
-  firstRevertedHoliday = ((): string => {
-    try {
-      return localStorage.getItem(FIRST_HOLIDAY_KEY) ?? 'Thanksgiving';
-    } catch {
-      return 'Thanksgiving';
-    }
-  })();
-  freePlayUnlocked = ((): boolean => {
-    try {
-      return localStorage.getItem(FREEPLAY_KEY) === '1';
-    } catch {
-      return false;
-    }
-  })();
+  firstRevertedHoliday = 'Thanksgiving';
+  freePlayUnlocked = false;
 
   constructor() {
-    // `P1` is always pinned to the Hall Corkboard from the very start of the game (`SCRIPT.md`)
-    if (!this.pinnedMemos.has('P1')) {
-      this.pinnedMemos.add('P1');
-      writeSet(PINNED_MEMOS_KEY, this.pinnedMemos as Set<string>);
-    }
-
-    // Backfill solvedRuns from per-panel progress if a run's final panel was already beaten
-    for (const room of ROOM_SPECS) {
-      for (const proto of [
-        room.warmup,
-        room.strays[0].proto,
-        room.strays[1].proto,
-        room.centerpiece.proto,
-      ]) {
-        if ([...this.solvedPanels].some((k) => k.startsWith(`${proto.id}:`))) {
-          // Check if the highest-indexed panel is solved
-          const minLast =
-            proto.kind === 'stray' || proto.id === 'mailbox' ? 2 : proto.id === 'lovenotes' ? 3 : 4;
-          for (let i = minLast; i <= 8; i++) {
-            if (this.solvedPanels.has(`${proto.id}:${i}`)) {
-              this.solvedRuns.add(proto.id);
-            }
-          }
-        }
-      }
-    }
+    this.loadFromStorage();
   }
 
   private listeners = new Set<() => void>();
@@ -413,17 +405,311 @@ export class GameState {
     for (const fn of this.listeners) fn();
   }
 
-  /** Pin a memo to the Hall Corkboard without necessariamente opening a modal. */
+  /** Total panel count for a room run (`proto.panelCount ?? 1`), or `174` for `'clause'`. */
+  runPanelCount(protoId: string): number {
+    if (protoId === 'clause') return CLAUSE_GENRES.length * CLAUSE_PANEL_COUNT;
+    return getRoomProtos().find((p) => p.id === protoId)?.panelCount ?? 1;
+  }
+
+  /** Number of solved panels (`0..N`) for a room run or `'clause'`. */
+  runSolvedPanelCount(protoId: string): number {
+    if (protoId === 'clause') {
+      return CLAUSE_GENRES.reduce((sum, g) => sum + this.clauseSolvedPanelCount(g), 0);
+    }
+    const count = this.runPanelCount(protoId);
+    let solved = 0;
+    for (let i = 0; i < count; i++) {
+      if (this.solvedPanels.has(`${protoId}:${i}`)) solved++;
+    }
+    return solved;
+  }
+
+  /** Total number of panels across all 6 holiday rooms + all 6 Merger Contract clauses. */
+  totalGamePanelCount(): number {
+    const roomTotal = getRoomProtos().reduce((sum, p) => sum + (p.panelCount ?? 1), 0);
+    return roomTotal + CLAUSE_GENRES.length * CLAUSE_PANEL_COUNT;
+  }
+
+  /** Total number of solved panels across all 6 holiday rooms + all 6 Merger Contract clauses. */
+  totalSolvedPanelCount(): number {
+    const roomSolved = getRoomProtos().reduce((sum, p) => sum + this.runSolvedPanelCount(p.id), 0);
+    return roomSolved + this.runSolvedPanelCount('clause');
+  }
+
+  private fillClausePanels(clauseIdx: number, voided: boolean): void {
+    const genre = CLAUSE_GENRES[clauseIdx];
+    if (!genre) return;
+    this.solvedPanels.delete(`clause:${clauseIdx}`);
+    for (let i = 0; i < CLAUSE_PANEL_COUNT; i++) {
+      const key = `clause:${genre}:${i}`;
+      if (voided) this.solvedPanels.add(key);
+      else this.solvedPanels.delete(key);
+    }
+  }
+
+  private fillRunPanels(protoId: string, solved: boolean): void {
+    if (protoId === 'clause') {
+      for (let c = 0; c < CLAUSE_GENRES.length; c++) {
+        this.fillClausePanels(c, solved);
+      }
+      return;
+    }
+    const count = this.runPanelCount(protoId);
+    if (solved) {
+      for (let i = 0; i < count; i++) {
+        this.solvedPanels.add(`${protoId}:${i}`);
+      }
+    } else {
+      for (const k of [...this.solvedPanels]) {
+        if (k.startsWith(`${protoId}:`)) {
+          this.solvedPanels.delete(k);
+        }
+      }
+    }
+  }
+
+  /**
+   * Recompute `solvedRuns` and `pinnedMemos` deterministically from `solvedPanels`,
+   * `placedItems`, and `milestones` so they never drift out of sync.
+   */
+  recomputeDerived(): void {
+    // Expand any legacy `clause:<0..5>` keys into their 29 panel keys
+    for (let c = 0; c < CLAUSE_GENRES.length; c++) {
+      if (this.solvedPanels.has(`clause:${c}`)) {
+        this.fillClausePanels(c, true);
+      }
+    }
+
+    this.solvedRuns.clear();
+    for (const proto of getRoomProtos()) {
+      const count = proto.panelCount ?? 1;
+      let allDone = true;
+      for (let i = 0; i < count; i++) {
+        if (!this.solvedPanels.has(`${proto.id}:${i}`)) {
+          allDone = false;
+          break;
+        }
+      }
+      if (allDone) {
+        this.solvedRuns.add(proto.id);
+      }
+    }
+
+    const allClausesDone = CLAUSE_GENRES.every((genre) => {
+      for (let i = 0; i < CLAUSE_PANEL_COUNT; i++) {
+        if (!this.solvedPanels.has(`clause:${genre}:${i}`)) return false;
+      }
+      return true;
+    });
+    if (allClausesDone) {
+      this.solvedRuns.add('clause');
+    }
+
+    // Derive pinned memos in canonical order from current progress + seen memo milestones
+    this.pinnedMemos.clear();
+    this.pinnedMemos.add('P1');
+    const anyStraySolved = Object.values(STRAY_ITEMS).some(
+      (s) => s.proto && this.solvedRuns.has(s.proto.id),
+    );
+    if (anyStraySolved || this.milestones.has('T1')) {
+      this.pinnedMemos.add('T1');
+    }
+    for (const room of ROOM_SPECS) {
+      const enterId = ROOM_SCRIPT[room.id].enterMemoId;
+      if ((room.warmup && this.solvedRuns.has(room.warmup.id)) || this.milestones.has(enterId)) {
+        this.pinnedMemos.add(enterId);
+      }
+    }
+    const completedRooms = ROOM_SPECS.filter(
+      (r) => r.centerpiece?.proto && this.solvedRuns.has(r.centerpiece.proto.id),
+    ).length;
+    for (let k = 1; k <= ROOM_SPECS.length; k++) {
+      const escId = `E${k}` as MemoId;
+      if (k <= completedRooms || this.milestones.has(escId)) {
+        this.pinnedMemos.add(escId);
+      }
+    }
+    if (this.solvedRuns.has('clause') || this.milestones.has('Y7')) {
+      this.pinnedMemos.add('Y7');
+    }
+  }
+
+  /** Export a clean, serializable snapshot of the entire save state. */
+  exportSave(): SaveData {
+    this.recomputeDerived();
+    return {
+      version: SAVE_VERSION,
+      solvedPanels: [...this.solvedPanels].sort(),
+      placedItems: [...this.placedItems].filter((id): id is StrayId => id in STRAY_ITEMS).sort(),
+      milestones: [...this.milestones].sort(),
+      hallPendingBeats: [...this.hallPendingBeats],
+      firstRevertedHoliday: this.firstRevertedHoliday,
+      freePlayUnlocked: this.freePlayUnlocked,
+    };
+  }
+
+  /** Export a formatted JSON string of the save state for backup/sharing. */
+  exportSaveJson(): string {
+    return JSON.stringify(this.exportSave(), null, 2);
+  }
+
+  /** Persist the unified save state to `localStorage['puzz.save']`. */
+  save(): void {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(this.exportSave()));
+    } catch {
+      // Ignore storage errors in private browsing / sandboxed contexts.
+    }
+  }
+
+  /** Load save state from `localStorage['puzz.save']`, migrating legacy keys if needed. */
+  private loadFromStorage(): void {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (raw) {
+        const res = this.applySaveObject(JSON.parse(raw) as unknown, false);
+        if (res.ok) return;
+      }
+    } catch {
+      // Fall through to legacy migration or fresh state
+    }
+
+    // Check for legacy multi-key save data and migrate cleanly
+    const legacyPanels = readLegacyArray(LEGACY_KEYS.solvedPanels);
+    const legacyRuns = readLegacyArray(LEGACY_KEYS.solvedRuns);
+    const legacyPlaced = readLegacyArray(LEGACY_KEYS.placedItems);
+    const legacyMilestones = readLegacyArray(LEGACY_KEYS.milestones);
+    const legacyPending = readLegacyArray(LEGACY_KEYS.hallPending);
+    let legacyFirstHoliday = 'Thanksgiving';
+    let legacyFreePlay = false;
+    try {
+      legacyFirstHoliday = localStorage.getItem(LEGACY_KEYS.firstHoliday) ?? 'Thanksgiving';
+      legacyFreePlay = localStorage.getItem(LEGACY_KEYS.freePlay) === '1';
+    } catch {
+      // Ignore
+    }
+
+    for (const k of legacyPanels) this.solvedPanels.add(k);
+    for (const runId of legacyRuns) this.fillRunPanels(runId, true);
+    for (const itemId of legacyPlaced) {
+      if (itemId in STRAY_ITEMS) this.placedItems.add(itemId);
+    }
+    for (const m of legacyMilestones) this.milestones.add(m);
+    for (const b of legacyPending) this.hallPendingBeats.add(b as BeatId);
+    this.firstRevertedHoliday = legacyFirstHoliday;
+    this.freePlayUnlocked = legacyFreePlay;
+
+    this.recomputeDerived();
+    if (
+      legacyPanels.length > 0 ||
+      legacyRuns.length > 0 ||
+      legacyPlaced.length > 0 ||
+      legacyMilestones.length > 0 ||
+      legacyFreePlay
+    ) {
+      this.save();
+      try {
+        for (const k of Object.values(LEGACY_KEYS)) localStorage.removeItem(k);
+      } catch {
+        // Ignore
+      }
+    }
+  }
+
+  private applySaveObject(
+    parsed: unknown,
+    persistAndNotify: boolean,
+  ): { ok: true } | { ok: false; error: string } {
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return { ok: false, error: 'Save data must be a JSON object.' };
+    }
+    const obj = parsed as Partial<SaveData> & { solvedRuns?: unknown };
+    if (obj.solvedPanels !== undefined && !Array.isArray(obj.solvedPanels)) {
+      return { ok: false, error: '"solvedPanels" must be an array of strings.' };
+    }
+    if (obj.placedItems !== undefined && !Array.isArray(obj.placedItems)) {
+      return { ok: false, error: '"placedItems" must be an array of item IDs.' };
+    }
+
+    this.solvedPanels.clear();
+    this.placedItems.clear();
+    this.milestones.clear();
+    this.hallPendingBeats.clear();
+    this.beatQueue.length = 0;
+
+    if (Array.isArray(obj.solvedPanels)) {
+      for (const k of obj.solvedPanels) {
+        if (typeof k === 'string') this.solvedPanels.add(k);
+      }
+    }
+    if (Array.isArray(obj.solvedRuns)) {
+      for (const runId of obj.solvedRuns) {
+        if (typeof runId === 'string') this.fillRunPanels(runId, true);
+      }
+    }
+    if (Array.isArray(obj.placedItems)) {
+      for (const id of obj.placedItems) {
+        if (typeof id === 'string' && id in STRAY_ITEMS) {
+          this.placedItems.add(id);
+          // Placed items imply their stray run was solved
+          const stray = STRAY_ITEMS[id as StrayId];
+          this.fillRunPanels(stray.proto.id, true);
+        }
+      }
+    }
+    if (Array.isArray(obj.milestones)) {
+      for (const m of obj.milestones) {
+        if (typeof m === 'string') this.milestones.add(m);
+      }
+    }
+    if (Array.isArray(obj.hallPendingBeats)) {
+      for (const b of obj.hallPendingBeats) {
+        if (typeof b === 'string') this.hallPendingBeats.add(b as BeatId);
+      }
+    }
+    this.firstRevertedHoliday =
+      typeof obj.firstRevertedHoliday === 'string' && obj.firstRevertedHoliday.trim()
+        ? obj.firstRevertedHoliday
+        : 'Thanksgiving';
+    this.freePlayUnlocked = Boolean(obj.freePlayUnlocked);
+
+    this.recomputeDerived();
+    if (this.solvedRuns.has('clause')) {
+      this.freePlayUnlocked = true;
+    }
+
+    if (persistAndNotify) {
+      this.save();
+      this.notify();
+    }
+    return { ok: true };
+  }
+
+  /** Validate and import a JSON save string, updating the game and saving to `puzz.save`. */
+  importSaveJson(jsonText: string): { ok: true } | { ok: false; error: string } {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(jsonText);
+    } catch (err) {
+      return {
+        ok: false,
+        error: `Invalid JSON: ${err instanceof Error ? err.message : String(err)}`,
+      };
+    }
+    return this.applySaveObject(parsed, true);
+  }
+
+  /** Pin a memo to the Hall Corkboard without necessarily opening a modal. */
   pinMemo(id: MemoId): void {
     if (!this.pinnedMemos.has(id)) {
       this.pinnedMemos.add(id);
-      writeSet(PINNED_MEMOS_KEY, this.pinnedMemos as Set<string>);
+      this.save();
     }
   }
 
   /** Return all discovered XMAS365 / Xmas12 memos in canonical Corkboard order. */
   pinnedMemosInOrder(): MemoSpec[] {
-    this.pinMemo('P1');
+    this.recomputeDerived();
     return MEMO_ORDER.filter((id) => this.pinnedMemos.has(id)).map((id) => MEMOS[id]);
   }
 
@@ -447,7 +733,7 @@ export class GameState {
     return (
       this.milestones.has('P0') ||
       this.milestones.has('P1') ||
-      this.solvedRuns.size > 0 ||
+      this.solvedPanels.size > 0 ||
       this.placedItems.size > 0
     );
   }
@@ -456,7 +742,7 @@ export class GameState {
   markIntroSeen(): void {
     if (!this.milestones.has('P0')) {
       this.milestones.add('P0');
-      writeSet(MILESTONES_KEY, this.milestones);
+      this.save();
     }
   }
 
@@ -474,7 +760,8 @@ export class GameState {
       this.beatQueue.splice(idx, 1);
     }
     this.milestones.add(target);
-    writeSet(MILESTONES_KEY, this.milestones);
+    this.recomputeDerived();
+    this.save();
     this.notify();
   }
 
@@ -491,7 +778,7 @@ export class GameState {
       if (this.hallPendingBeats.size > 0) {
         const pending = [...this.hallPendingBeats];
         this.hallPendingBeats.clear();
-        writeSet(HALL_PENDING_KEY, this.hallPendingBeats as Set<string>);
+        this.save();
         for (const beatId of pending) {
           this.enqueueBeat(beatId);
         }
@@ -500,11 +787,22 @@ export class GameState {
     }
   }
 
-  markRunSolved(protoId: string): void {
-    if (!this.solvedRuns.has(protoId)) {
-      this.solvedRuns.add(protoId);
-      writeSet(SOLVED_RUNS_KEY, this.solvedRuns);
+  /** Record a single solved panel (`<protoId>:<panelIdx>`) in a room puzzle run. */
+  markPanelSolved(protoId: string, panelIdx: number): void {
+    const key = `${protoId}:${panelIdx}`;
+    if (!this.solvedPanels.has(key)) {
+      this.solvedPanels.add(key);
+      this.recomputeDerived();
+      this.save();
+    }
+  }
 
+  markRunSolved(protoId: string): void {
+    const wasAlreadySolved = this.solvedRuns.has(protoId);
+    this.fillRunPanels(protoId, true);
+    this.recomputeDerived();
+
+    if (!wasAlreadySolved) {
       // 1. First stray ever freed -> `T1` Logistics memo
       const isStray = Object.values(STRAY_ITEMS).some((s) => s.proto.id === protoId);
       if (isStray) {
@@ -523,71 +821,96 @@ export class GameState {
         const count = this.completedRoomCount();
         if (count === 1) {
           this.firstRevertedHoliday = cpRoom.shortTitle;
-          try {
-            localStorage.setItem(FIRST_HOLIDAY_KEY, this.firstRevertedHoliday);
-          } catch {
-            // Ignore
-          }
         }
-        if (count >= 1 && count <= 6) {
+        if (count >= 1 && count <= ROOM_SPECS.length) {
           const escId = `E${count}` as MemoId;
           this.pinMemo(escId);
           this.hallPendingBeats.add(escId);
-          writeSet(HALL_PENDING_KEY, this.hallPendingBeats as Set<string>);
         }
       }
 
       // 4. Merger contract solved -> loophole & Santa confrontation (`C6.torn`), party (`Y1`, `Y2`, `Y4`), and `Y7` memo
       if (protoId === 'clause') {
-        this.setFreePlay(true);
+        this.freePlayUnlocked = true;
         this.enqueueBeat('C6.torn');
         this.enqueueBeat('Y1');
         this.enqueueBeat('Y2');
         this.enqueueBeat('Y4');
         this.enqueueBeat('Y7');
       }
-
-      this.notify();
     }
+
+    this.recomputeDerived();
+    this.save();
+    this.notify();
   }
 
+  /**
+   * Toggle a run's solved state directly (used by Settings toggles and dev tools).
+   * Updates all panels of the run and syncs derived state/memos without queuing modal popups.
+   */
   setRunSolved(protoId: string, solved: boolean): void {
+    this.fillRunPanels(protoId, solved);
     if (solved) {
       if (protoId === 'clause') {
-        for (let i = 0; i < CLAUSE_GENRES.length; i++) {
-          this.solvedPanels.add(`clause:${i}`);
+        this.freePlayUnlocked = true;
+      }
+      const cpRoom = ROOM_SPECS.find((r) => r.centerpiece.proto.id === protoId);
+      if (cpRoom && this.completedRoomCount() === 0) {
+        this.firstRevertedHoliday = cpRoom.shortTitle;
+      }
+    } else {
+      // Clear associated story milestones so unchecked runs unpin their memos and can replay beats
+      const warmupRoom = ROOM_SPECS.find((r) => r.warmup.id === protoId);
+      if (warmupRoom) {
+        this.milestones.delete(ROOM_SCRIPT[warmupRoom.id].enterMemoId);
+      }
+      const cpRoom = ROOM_SPECS.find((r) => r.centerpiece.proto.id === protoId);
+      if (cpRoom) {
+        this.milestones.delete(ROOM_SCRIPT[cpRoom.id].freedBeatId);
+      }
+      if (protoId === 'clause') {
+        for (const b of [
+          ...CLAUSE_EARLY_TORN_BEATS,
+          'C6.torn',
+          'Y1',
+          'Y2',
+          'Y4',
+          'Y5',
+          'Y6',
+          'Y7',
+        ]) {
+          this.milestones.delete(b);
         }
-        writeSet('puzz.proto.panels', this.solvedPanels);
-      }
-      this.markRunSolved(protoId);
-      return;
-    }
-    const hadRun = this.solvedRuns.delete(protoId);
-    writeSet(SOLVED_RUNS_KEY, this.solvedRuns);
-    let panelChanged = false;
-    for (const k of [...this.solvedPanels]) {
-      if (k.startsWith(`${protoId}:`)) {
-        this.solvedPanels.delete(k);
-        panelChanged = true;
       }
     }
-    if (panelChanged) writeSet('puzz.proto.panels', this.solvedPanels);
-    if (hadRun || panelChanged) this.notify();
+    this.recomputeDerived();
+    if (!solved) {
+      const anyStraySolved = Object.values(STRAY_ITEMS).some((s) =>
+        this.solvedRuns.has(s.proto.id),
+      );
+      if (!anyStraySolved) this.milestones.delete('T1');
+      const count = this.completedRoomCount();
+      for (let k = count + 1; k <= ROOM_SPECS.length; k++) {
+        const escId = `E${k}` as MemoId;
+        this.milestones.delete(escId);
+        this.hallPendingBeats.delete(escId);
+      }
+      this.recomputeDerived();
+    }
+    this.save();
+    this.notify();
   }
 
   /** Whether a specific panel (`0..28`) within a Merger Contract clause has been solved. */
   isClausePanelSolved(genre: ClauseGenre | string, panelIdx: number): boolean {
     if (this.solvedRuns.has('clause')) return true;
-    const clauseIdx = CLAUSE_GENRES.indexOf(genre as ClauseGenre);
-    if (clauseIdx !== -1 && this.solvedPanels.has(`clause:${clauseIdx}`)) return true;
     return this.solvedPanels.has(`clause:${genre}:${panelIdx}`);
   }
 
   /** Number of solved panels (`0..29`) within a Merger Contract clause. */
   clauseSolvedPanelCount(genre: ClauseGenre | string): number {
     if (this.solvedRuns.has('clause')) return CLAUSE_PANEL_COUNT;
-    const clauseIdx = CLAUSE_GENRES.indexOf(genre as ClauseGenre);
-    if (clauseIdx !== -1 && this.solvedPanels.has(`clause:${clauseIdx}`)) return CLAUSE_PANEL_COUNT;
     let count = 0;
     for (let i = 0; i < CLAUSE_PANEL_COUNT; i++) {
       if (this.solvedPanels.has(`clause:${genre}:${i}`)) count++;
@@ -601,15 +924,23 @@ export class GameState {
    */
   markClausePanelSolved(genre: ClauseGenre | string, panelIdx: number): boolean {
     const key = `clause:${genre}:${panelIdx}`;
+    const wasClauseVoided =
+      CLAUSE_GENRES.indexOf(genre as ClauseGenre) !== -1 &&
+      this.isClauseVoided(CLAUSE_GENRES.indexOf(genre as ClauseGenre));
     const isNew = !this.solvedPanels.has(key);
     if (isNew) {
       this.solvedPanels.add(key);
-      writeSet('puzz.proto.panels', this.solvedPanels);
     }
     const clauseIdx = CLAUSE_GENRES.indexOf(genre as ClauseGenre);
-    if (clauseIdx !== -1 && this.clauseSolvedPanelCount(genre) >= CLAUSE_PANEL_COUNT) {
-      this.markClauseVoided(clauseIdx);
+    if (
+      clauseIdx !== -1 &&
+      !wasClauseVoided &&
+      this.clauseSolvedPanelCount(genre) >= CLAUSE_PANEL_COUNT
+    ) {
+      this.markClauseVoided(clauseIdx, true);
     } else if (isNew) {
+      this.recomputeDerived();
+      this.save();
       this.notify();
     }
     return isNew;
@@ -618,7 +949,6 @@ export class GameState {
   /** Whether a Merger Contract clause (`0..5`) has been completely voided. */
   isClauseVoided(clauseIdx: number): boolean {
     if (this.solvedRuns.has('clause')) return true;
-    if (this.solvedPanels.has(`clause:${clauseIdx}`)) return true;
     const genre = CLAUSE_GENRES[clauseIdx];
     return genre ? this.clauseSolvedPanelCount(genre) >= CLAUSE_PANEL_COUNT : false;
   }
@@ -633,41 +963,61 @@ export class GameState {
   }
 
   /**
-   * Mark a Merger Contract clause (`0..5`) as voided, queuing its `C<n>.torn` beat,
+   * Mark a Merger Contract clause (`0..5`) as voided during gameplay, queuing its `C<n>.torn` beat,
    * and completing `'clause'` once all 6 clauses are voided.
    */
-  markClauseVoided(clauseIdx: number): boolean {
-    const key = `clause:${clauseIdx}`;
-    const wasVoided = this.solvedPanels.has(key) || this.solvedRuns.has('clause');
-    if (!this.solvedPanels.has(key)) {
-      this.solvedPanels.add(key);
-      const genre = CLAUSE_GENRES[clauseIdx];
-      if (genre) {
-        for (let i = 0; i < CLAUSE_PANEL_COUNT; i++) {
-          this.solvedPanels.add(`clause:${genre}:${i}`);
-        }
-      }
-      writeSet('puzz.proto.panels', this.solvedPanels);
-    }
+  markClauseVoided(clauseIdx: number, forceTrigger = false): boolean {
+    const wasVoided = !forceTrigger && this.isClauseVoided(clauseIdx);
+    this.fillClausePanels(clauseIdx, true);
     if (!wasVoided) {
       const allVoided = this.voidedClauseCount() >= CLAUSE_GENRES.length;
       if (allVoided) {
         this.markRunSolved('clause');
       } else {
+        this.recomputeDerived();
         const earlyBeat = CLAUSE_EARLY_TORN_BEATS[clauseIdx];
         if (earlyBeat) {
           this.enqueueBeat(earlyBeat);
         }
+        this.save();
         this.notify();
       }
+    } else {
+      this.recomputeDerived();
+      this.save();
     }
     return !wasVoided;
+  }
+
+  /**
+   * Toggle a Merger Contract clause (`0..5`) directly (used by Settings toggles).
+   */
+  setClauseVoided(clauseIdx: number, voided: boolean): void {
+    this.fillClausePanels(clauseIdx, voided);
+    if (!voided) {
+      const earlyBeat = CLAUSE_EARLY_TORN_BEATS[clauseIdx];
+      if (earlyBeat) this.milestones.delete(earlyBeat);
+      for (const b of ['C6.torn', 'Y1', 'Y2', 'Y4', 'Y5', 'Y6', 'Y7']) {
+        this.milestones.delete(b);
+      }
+    }
+    this.recomputeDerived();
+    if (this.solvedRuns.has('clause')) {
+      this.freePlayUnlocked = true;
+    }
+    this.save();
+    this.notify();
   }
 
   placeItem(itemId: string): void {
     if (!this.placedItems.has(itemId)) {
       this.placedItems.add(itemId);
-      writeSet(PLACED_ITEMS_KEY, this.placedItems);
+      const stray = STRAY_ITEMS[itemId as StrayId];
+      if (stray) {
+        this.fillRunPanels(stray.proto.id, true);
+      }
+      this.recomputeDerived();
+      this.save();
 
       // First item ever restored -> `T3` Leap Day line
       this.enqueueBeat('T3');
@@ -678,16 +1028,22 @@ export class GameState {
 
   setItemPlaced(itemId: string, placed: boolean): void {
     if (placed) {
+      this.placedItems.add(itemId);
       const stray = STRAY_ITEMS[itemId as StrayId];
-      if (stray && !this.solvedRuns.has(stray.proto.id)) {
-        this.solvedRuns.add(stray.proto.id);
-        writeSet(SOLVED_RUNS_KEY, this.solvedRuns);
+      if (stray) {
+        this.fillRunPanels(stray.proto.id, true);
       }
-      this.placeItem(itemId);
+      this.recomputeDerived();
+      this.save();
+      this.notify();
       return;
     }
     if (this.placedItems.delete(itemId)) {
-      writeSet(PLACED_ITEMS_KEY, this.placedItems);
+      if (this.placedItems.size === 0) {
+        this.milestones.delete('T3');
+      }
+      this.recomputeDerived();
+      this.save();
       this.notify();
     }
   }
@@ -703,15 +1059,11 @@ export class GameState {
     this.beatQueue.length = 0;
     this.firstRevertedHoliday = 'Thanksgiving';
     this.freePlayUnlocked = false;
-    writeSet(SOLVED_RUNS_KEY, this.solvedRuns);
-    writeSet(PLACED_ITEMS_KEY, this.placedItems);
-    writeSet(MILESTONES_KEY, this.milestones);
-    writeSet(PINNED_MEMOS_KEY, this.pinnedMemos as Set<string>);
-    writeSet(HALL_PENDING_KEY, this.hallPendingBeats as Set<string>);
     try {
-      localStorage.removeItem(FREEPLAY_KEY);
-      localStorage.removeItem(FIRST_HOLIDAY_KEY);
-      localStorage.removeItem('puzz.proto.panels');
+      localStorage.removeItem(SAVE_KEY);
+      for (const k of Object.values(LEGACY_KEYS)) {
+        localStorage.removeItem(k);
+      }
     } catch {
       // Ignore storage errors
     }
@@ -722,18 +1074,15 @@ export class GameState {
   markMilestone(id: string): void {
     if (!this.milestones.has(id)) {
       this.milestones.add(id);
-      writeSet(MILESTONES_KEY, this.milestones);
+      this.recomputeDerived();
+      this.save();
       this.notify();
     }
   }
 
   setFreePlay(on: boolean): void {
     this.freePlayUnlocked = on;
-    try {
-      localStorage.setItem(FREEPLAY_KEY, on ? '1' : '0');
-    } catch {
-      // Ignore
-    }
+    this.save();
     this.notify();
   }
 

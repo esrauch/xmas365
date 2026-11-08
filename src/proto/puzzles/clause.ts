@@ -412,16 +412,21 @@ export const clause: Proto = {
         );
       let activePane: HTMLElement | null = null;
 
-      // Top navigation & controls row
+      // Row 0: Clause navigation header (Back button + Clause title)
       const backBtn = h(
         'button',
         {
           style: {
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
             borderRadius: '999px',
-            height: '30px',
-            padding: '0 12px',
+            padding: '5px 12px',
             fontWeight: '800',
             fontSize: '12.5px',
+            lineHeight: '1.2',
+            whiteSpace: 'nowrap',
+            flexShrink: '0',
             cursor: 'pointer',
             border: '1.5px solid #1f2430',
             background: '#fffaf0',
@@ -430,7 +435,7 @@ export const clause: Proto = {
           },
           onclick: () => renderChecklist(),
         },
-        '← Contract Checklist',
+        '← Checklist',
       );
 
       const clauseBadge = h(
@@ -439,16 +444,48 @@ export const clause: Proto = {
           style: {
             fontWeight: '800',
             fontSize: '13.5px',
+            lineHeight: '1.25',
             color: '#1f2430',
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
+            minWidth: '0',
           },
         },
-        h('span', {}, clauseDef.icon),
-        h('span', {}, clauseDef.title),
+        h('span', { style: { flexShrink: '0' } }, clauseDef.icon),
+        h('span', { style: { minWidth: '0' } }, clauseDef.title),
       );
 
+      const clauseHeaderRow = h(
+        'div',
+        {
+          style: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '10px',
+          },
+        },
+        backBtn,
+        clauseBadge,
+      );
+
+      // Row 1: Compact 29-pip progress strip grouped by section
+      const pipStrip = h('div', {
+        style: {
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          gap: '3px',
+          padding: '6px 8px',
+          background: '#f7f3eb',
+          borderRadius: '10px',
+          border: '1px solid #e2d9c8',
+        },
+      });
+
+      // Row 2: Controls row below the panel progression (Reset on left, Hint + ? on right)
       const resetBtn = h(
         'button',
         {
@@ -459,6 +496,7 @@ export const clause: Proto = {
             padding: '0 11px',
             fontWeight: '700',
             fontSize: '12.5px',
+            whiteSpace: 'nowrap',
             cursor: 'pointer',
             border: '1px solid #cbbba0',
             background: '#fffdf9',
@@ -479,6 +517,7 @@ export const clause: Proto = {
             padding: '0 11px',
             fontWeight: '700',
             fontSize: '12.5px',
+            whiteSpace: 'nowrap',
             cursor: 'pointer',
             border: '1px solid #d69e2e',
             background: '#fefcbf',
@@ -543,46 +582,24 @@ export const clause: Proto = {
         '?',
       );
 
-      const topBar = h(
+      const controlsRow = h(
         'div',
         {
           style: {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            flexWrap: 'wrap',
             gap: '8px',
           },
         },
+        resetBtn,
         h(
           'div',
-          { style: { display: 'flex', alignItems: 'center', gap: '8px' } },
-          backBtn,
-          clauseBadge,
-        ),
-        h(
-          'div',
-          { style: { display: 'flex', alignItems: 'center', gap: '6px' } },
-          resetBtn,
+          { style: { display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto' } },
           hintBtn,
           helpBtn,
         ),
       );
-
-      // Compact 29-pip progress strip grouped by section
-      const pipStrip = h('div', {
-        style: {
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-          gap: '3px',
-          padding: '6px 8px',
-          background: '#f7f3eb',
-          borderRadius: '10px',
-          border: '1px solid #e2d9c8',
-        },
-      });
 
       const renderPips = (activeIdx: number): void => {
         const nodes: HTMLElement[] = [];
@@ -698,6 +715,8 @@ export const clause: Proto = {
           .map((k) => clauseDef.gimmicks.find((g) => g.key === k))
           .filter((g): g is NonNullable<typeof g> => Boolean(g));
 
+        const isIntro = item.section === 'intro';
+
         metaHeader.replaceChildren(
           h(
             'div',
@@ -711,80 +730,72 @@ export const clause: Proto = {
               },
             },
             h(
-              'div',
+              'span',
               {
-                style: {
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  flexWrap: 'wrap',
-                },
+                style: { fontWeight: '800', fontSize: '14px', color: '#1f2430' },
               },
-              h(
-                'span',
-                {
-                  style: {
-                    fontSize: '11.5px',
-                    fontWeight: '800',
-                    padding: '2px 8px',
-                    borderRadius: '999px',
-                    background: sec.bg,
-                    color: sec.color,
-                    border: `1px solid ${sec.color}`,
-                  },
-                },
-                sec.badge,
-              ),
-              h(
-                'span',
-                {
-                  style: { fontWeight: '800', fontSize: '14px', color: '#1f2430' },
-                },
-                `Panel ${idx + 1}/${panels.length} · ${item.name}`,
-              ),
+              `Panel ${idx + 1}/${panels.length} · ${item.name}`,
             ),
             h(
               'span',
               {
                 style: {
-                  fontSize: '12px',
-                  fontWeight: '700',
-                  background: '#fffdf9',
-                  color: '#2d3748',
-                  border: `1.5px solid ${clauseDef.accent}`,
+                  fontSize: '11px',
+                  fontWeight: '800',
+                  padding: '2px 8px',
                   borderRadius: '999px',
-                  padding: '2px 10px',
+                  whiteSpace: 'nowrap',
+                  background: sec.bg,
+                  color: sec.color,
+                  border: `1px solid ${sec.color}`,
                 },
               },
-              item.tip,
+              sec.badge,
             ),
           ),
-          h(
-            'div',
-            {
-              style: {
-                padding: '7px 11px',
-                borderRadius: '8px',
-                background: item.section === 'intro' ? '#f0fff4' : '#fffaf0',
-                border: `1.5px solid ${item.section === 'intro' ? '#38a169' : '#d69e2e'}`,
-                fontSize: '12.5px',
-                lineHeight: '1.4',
-                color: '#2d3748',
-              },
-            },
-            activeGimmicks.length > 0
-              ? h(
-                  'span',
-                  { style: { fontWeight: '800', marginRight: '6px', color: '#1f2430' } },
-                  activeGimmicks.map((g) => `${g.icon} ${g.label}`).join(' + ') + ':',
-                )
-              : h(
-                  'span',
-                  { style: { fontWeight: '800', marginRight: '6px', color: '#1f2430' } },
-                  `${clauseDef.icon} Base Rules:`,
-                ),
-            h('span', {}, item.explain),
-          ),
+          isIntro
+            ? h(
+                'div',
+                {
+                  style: {
+                    padding: '6px 10px',
+                    borderRadius: '8px',
+                    background: '#f0fff4',
+                    border: '1.5px solid #38a169',
+                    fontSize: '12px',
+                    lineHeight: '1.38',
+                    color: '#2d3748',
+                  },
+                },
+                activeGimmicks.length > 0
+                  ? h(
+                      'span',
+                      { style: { fontWeight: '800', marginRight: '6px', color: '#1f2430' } },
+                      activeGimmicks.map((g) => `${g.icon} ${g.label}`).join(' + ') + ':',
+                    )
+                  : h(
+                      'span',
+                      { style: { fontWeight: '800', marginRight: '6px', color: '#1f2430' } },
+                      `${clauseDef.icon} Base Rules:`,
+                    ),
+                h('span', {}, item.explain),
+              )
+            : h(
+                'div',
+                {
+                  style: {
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    lineHeight: '1.35',
+                    background: '#fffdf9',
+                    color: '#2d3748',
+                    border: `1.5px solid ${clauseDef.accent}`,
+                    borderRadius: '8px',
+                    padding: '5px 10px',
+                  },
+                },
+                item.tip,
+              ),
         );
 
         message.textContent = '';
@@ -856,7 +867,15 @@ export const clause: Proto = {
         });
       };
 
-      root.replaceChildren(topBar, helpBox, pipStrip, metaHeader, boardStage, footerRow);
+      root.replaceChildren(
+        clauseHeaderRow,
+        pipStrip,
+        controlsRow,
+        helpBox,
+        metaHeader,
+        boardStage,
+        footerRow,
+      );
       openPanel(at);
     };
 

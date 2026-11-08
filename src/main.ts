@@ -35,6 +35,7 @@ import { type BuiltIntroCinematic, buildIntroCinematic } from './game/introCinem
 import { FINALE_PROTO, ROOM_SPECS, type RoomSpec, STRAY_ITEMS, gameState } from './game/state';
 import { type Proto, blip, h } from './proto/kit';
 import { PROTOS } from './proto/puzzles';
+import { ALL_CLAUSES, CLAUSE_PANEL_COUNT } from './proto/puzzles/clauses';
 import { celUniforms } from './render/toon';
 import { View } from './render/view';
 import { isFpsEnabled, isSoundEnabled, setFpsEnabled, setSoundEnabled } from './settings';
@@ -2136,6 +2137,8 @@ function openSettingsModal(): void {
   isCameraFocused = false;
 
   let confirmReset = false;
+  let showSaveEditor = false;
+  let saveFeedback: { ok: boolean; text: string } | null = null;
   const bodyHost = h('div', { class: 'puzz-modal-body' });
 
   const syncSceneBehindModal = (): void => {
@@ -2162,6 +2165,7 @@ function openSettingsModal(): void {
       },
       onchange: (e: Event) => {
         const next = (e.target as HTMLInputElement).checked;
+        saveFeedback = null;
         onToggle(next);
         syncSceneBehindModal();
         renderSettingsContent();
@@ -2200,6 +2204,9 @@ function openSettingsModal(): void {
     const fpsOn = isFpsEnabled();
     const act = gameState.act();
     const lamps = gameState.completedRoomCount();
+    const voidedClauses = gameState.voidedClauseCount();
+    const totalSolvedPanels = gameState.totalSolvedPanelCount();
+    const totalPanels = gameState.totalGamePanelCount();
 
     // 1. General Settings (Sound Toggle + FPS Counter Toggle + Reset Progress)
     const controlsSection = h(
@@ -2215,7 +2222,7 @@ function openSettingsModal(): void {
           borderRadius: '12px',
           background: '#fffdf9',
           border: '2px solid #d8cfc0',
-          marginBottom: '14px',
+          marginBottom: '12px',
         },
       },
       h(
@@ -2332,6 +2339,7 @@ function openSettingsModal(): void {
               return;
             }
             confirmReset = false;
+            saveFeedback = { ok: true, text: 'All progress reset to New Game.' };
             gameState.resetAll();
             blip(330, 90);
             syncSceneBehindModal();
@@ -2342,7 +2350,212 @@ function openSettingsModal(): void {
       ),
     );
 
-    // 2. Developer Panel: Global Checkboxes + Quick Presets + 6 Holiday Room Matrices
+    // 2. Save State (`puzz.save`) Backup & Restore Card
+    const saveTextarea = h('textarea', {
+      rows: '6',
+      spellcheck: 'false',
+      style: {
+        width: '100%',
+        boxSizing: 'border-box',
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+        fontSize: '11.5px',
+        lineHeight: '1.4',
+        padding: '8px 10px',
+        borderRadius: '8px',
+        border: '1.5px solid #cbd5e0',
+        background: '#1f2430',
+        color: '#edf2f7',
+        resize: 'vertical',
+      },
+    }) as HTMLTextAreaElement;
+    saveTextarea.value = gameState.exportSaveJson();
+
+    const saveCard = h(
+      'div',
+      {
+        style: {
+          padding: '11px 14px',
+          borderRadius: '12px',
+          background: '#fffdf9',
+          border: '2px solid #d8cfc0',
+          marginBottom: '12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+        },
+      },
+      h(
+        'div',
+        {
+          style: {
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px',
+          },
+        },
+        h(
+          'div',
+          { style: { display: 'flex', flexDirection: 'column', gap: '2px' } },
+          h(
+            'span',
+            {
+              style: {
+                fontSize: '11px',
+                fontWeight: '800',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                color: '#4a5568',
+              },
+            },
+            '💾 Save State (puzz.save)',
+          ),
+          h(
+            'span',
+            { style: { fontSize: '13px', fontWeight: '800', color: '#1f2430' } },
+            `Act ${act} · ★ ${lamps}/6 Rooms · 📜 ${voidedClauses}/${ALL_CLAUSES.length} Clauses · ✓ ${totalSolvedPanels}/${totalPanels} Panels`,
+          ),
+        ),
+        h(
+          'div',
+          { style: { display: 'flex', flexWrap: 'wrap', gap: '6px' } },
+          h(
+            'button',
+            {
+              style: {
+                padding: '6px 12px',
+                borderRadius: '8px',
+                fontWeight: '800',
+                fontSize: '12px',
+                cursor: 'pointer',
+                background: '#edf2f7',
+                color: '#1f2430',
+                border: '1.5px solid #1f2430',
+              },
+              onclick: () => {
+                const json = gameState.exportSaveJson();
+                if (navigator.clipboard?.writeText) {
+                  void navigator.clipboard.writeText(json).then(
+                    () => {
+                      saveFeedback = { ok: true, text: 'Copied save JSON to clipboard!' };
+                      blip(660, 55);
+                      renderSettingsContent();
+                    },
+                    () => {
+                      showSaveEditor = true;
+                      saveFeedback = {
+                        ok: true,
+                        text: 'Select and copy your save JSON below.',
+                      };
+                      renderSettingsContent();
+                    },
+                  );
+                } else {
+                  showSaveEditor = true;
+                  saveFeedback = { ok: true, text: 'Select and copy your save JSON below.' };
+                  renderSettingsContent();
+                }
+              },
+            },
+            '📋 Copy Save JSON',
+          ),
+          h(
+            'button',
+            {
+              style: {
+                padding: '6px 12px',
+                borderRadius: '8px',
+                fontWeight: '800',
+                fontSize: '12px',
+                cursor: 'pointer',
+                background: showSaveEditor ? '#1f2430' : '#fffaf0',
+                color: showSaveEditor ? '#fff' : '#744210',
+                border: '1.5px solid #1f2430',
+              },
+              onclick: () => {
+                showSaveEditor = !showSaveEditor;
+                saveFeedback = null;
+                blip(523, 45);
+                renderSettingsContent();
+              },
+            },
+            showSaveEditor ? '▾ Hide JSON Editor' : '📥 Restore / Edit Save JSON',
+          ),
+        ),
+      ),
+      saveFeedback
+        ? h(
+            'div',
+            {
+              style: {
+                fontSize: '12px',
+                fontWeight: '700',
+                padding: '6px 10px',
+                borderRadius: '8px',
+                background: saveFeedback.ok ? '#f0fff4' : '#fff5f5',
+                color: saveFeedback.ok ? '#22543d' : '#c53030',
+                border: `1.5px solid ${saveFeedback.ok ? '#68d391' : '#feb2b2'}`,
+              },
+            },
+            `${saveFeedback.ok ? '✓' : '⚠️'} ${saveFeedback.text}`,
+          )
+        : null,
+      showSaveEditor
+        ? h(
+            'div',
+            {
+              style: {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                marginTop: '2px',
+              },
+            },
+            h(
+              'div',
+              { style: { fontSize: '11.5px', color: '#4a5568', fontWeight: '600' } },
+              'Paste a backup JSON save object below and click Apply to restore your progress:',
+            ),
+            saveTextarea,
+            h(
+              'div',
+              { style: { display: 'flex', justifyContent: 'flex-end', gap: '8px' } },
+              h(
+                'button',
+                {
+                  style: {
+                    padding: '6px 14px',
+                    borderRadius: '8px',
+                    fontWeight: '800',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    background: '#2f855a',
+                    color: '#fff',
+                    border: '1.5px solid #1f2430',
+                    boxShadow: '0 2px 0 #1f2430',
+                  },
+                  onclick: () => {
+                    const res = gameState.importSaveJson(saveTextarea.value);
+                    if (res.ok) {
+                      saveFeedback = { ok: true, text: 'Save state restored and applied!' };
+                      blip(660, 70);
+                      syncSceneBehindModal();
+                    } else {
+                      saveFeedback = { ok: false, text: res.error };
+                      blip(240, 90);
+                    }
+                    renderSettingsContent();
+                  },
+                },
+                '✓ Apply Save JSON',
+              ),
+            ),
+          )
+        : null,
+    );
+
+    // 3. Progression & State Toggles: Quick Presets + Global Flags + 6 Contract Clauses + 6 Holiday Rooms
     const presetBtn = (label: string, onClick: () => void): HTMLElement =>
       h(
         'button',
@@ -2358,6 +2571,7 @@ function openSettingsModal(): void {
             border: '1.5px solid #1f2430',
           },
           onclick: () => {
+            saveFeedback = null;
             onClick();
             blip(523, 60);
             syncSceneBehindModal();
@@ -2393,12 +2607,12 @@ function openSettingsModal(): void {
               color: '#4a5568',
             },
           },
-          '🛠️ Developer Panel',
+          '🛠️ Progression & Save State Toggles',
         ),
         h(
           'div',
           { style: { fontSize: '14px', fontWeight: '800', color: '#1f2430' } },
-          `Unlock & Completion States (Act ${act} · ★ ${lamps}/6 Lamps)`,
+          `Toggle Rooms, Pedestals & Contract Clauses (Act ${act} · ★ ${lamps}/6 Lamps)`,
         ),
       ),
       h(
@@ -2416,7 +2630,7 @@ function openSettingsModal(): void {
             }
           }
         }),
-        presetBtn('Complete All 6 Rooms', () => {
+        presetBtn('Complete All 6 Rooms (Act III)', () => {
           for (const r of ROOM_SPECS) {
             gameState.setRunSolved(r.warmup.id, true);
             for (const s of r.strays) {
@@ -2425,6 +2639,21 @@ function openSettingsModal(): void {
             }
             gameState.setRunSolved(r.centerpiece.proto.id, true);
           }
+          gameState.setRunSolved('clause', false);
+        }),
+        presetBtn('Void 5 Clauses (Ready for Loophole)', () => {
+          for (const r of ROOM_SPECS) {
+            gameState.setRunSolved(r.warmup.id, true);
+            for (const s of r.strays) {
+              gameState.setRunSolved(s.proto.id, true);
+              gameState.setItemPlaced(s.id, true);
+            }
+            gameState.setRunSolved(r.centerpiece.proto.id, true);
+          }
+          for (let c = 0; c < ALL_CLAUSES.length - 1; c++) {
+            gameState.setClauseVoided(c, true);
+          }
+          gameState.setClauseVoided(ALL_CLAUSES.length - 1, false);
         }),
         presetBtn('Unlock Everything (Act IV)', () => {
           for (const r of ROOM_SPECS) {
@@ -2448,7 +2677,7 @@ function openSettingsModal(): void {
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
           gap: '8px',
-          marginBottom: '12px',
+          marginBottom: '10px',
         },
       },
       makeCheckRow(
@@ -2459,9 +2688,87 @@ function openSettingsModal(): void {
       ),
       makeCheckRow(
         '📜 XMAS365™ Merger Contract Solved',
-        'Completes Grand Finale Door (Act IV)',
+        `Voids all ${ALL_CLAUSES.length} clauses (${ALL_CLAUSES.length * CLAUSE_PANEL_COUNT} panels · Act IV Party)`,
         gameState.solvedRuns.has('clause'),
         (next) => gameState.setRunSolved('clause', next),
+      ),
+    );
+
+    const contractDone = gameState.solvedRuns.has('clause');
+    const clauseCard = h(
+      'div',
+      {
+        style: {
+          padding: '10px 12px',
+          borderRadius: '11px',
+          background: '#fffdf9',
+          border: `2px solid ${contractDone ? '#2f855a' : '#c53030'}`,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '7px',
+          marginBottom: '9px',
+        },
+      },
+      h(
+        'div',
+        {
+          style: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '6px',
+          },
+        },
+        h(
+          'div',
+          { style: { display: 'flex', flexDirection: 'column', gap: '1px' } },
+          h(
+            'span',
+            { style: { fontWeight: '800', fontSize: '13.5px', color: '#1f2430' } },
+            '📜 XMAS365™ Merger Contract Clauses (Holiday Hall)',
+          ),
+          h(
+            'span',
+            { style: { fontSize: '10.5px', fontWeight: '700', color: '#6b7280' } },
+            `${gameState.runSolvedPanelCount('clause')}/${gameState.runPanelCount('clause')} panels solved across 6 clauses`,
+          ),
+        ),
+        h(
+          'span',
+          {
+            style: {
+              fontSize: '11px',
+              fontWeight: '800',
+              padding: '2px 8px',
+              borderRadius: '999px',
+              background: contractDone ? '#c6f6d5' : '#fff5f5',
+              color: contractDone ? '#22543d' : '#c53030',
+            },
+          },
+          contractDone
+            ? '★ Contract Voided'
+            : `${voidedClauses}/${ALL_CLAUSES.length} Clauses Voided`,
+        ),
+      ),
+      h(
+        'div',
+        {
+          style: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(195px, 1fr))',
+            gap: '6px',
+          },
+        },
+        ...ALL_CLAUSES.map((clauseDef, idx) => {
+          const voided = gameState.isClauseVoided(idx);
+          const solvedCount = gameState.clauseSolvedPanelCount(clauseDef.genre);
+          return makeCheckRow(
+            `${clauseDef.icon} ${clauseDef.title}`,
+            `${solvedCount}/${CLAUSE_PANEL_COUNT} panels · ${clauseDef.genreTitle}`,
+            voided,
+            (next) => gameState.setClauseVoided(idx, next),
+          );
+        }),
       ),
     );
 
@@ -2470,6 +2777,15 @@ function openSettingsModal(): void {
       const req1 = STRAY_ITEMS[room.centerpiece.requiredItems[1]];
       const roomDone = gameState.isRoomComplete(room);
       const roomSign = gameState.getRoomSignage(room);
+
+      const warmupDone = gameState.runSolvedPanelCount(room.warmup.id);
+      const warmupTotal = gameState.runPanelCount(room.warmup.id);
+      const stray0Done = gameState.runSolvedPanelCount(room.strays[0].proto.id);
+      const stray0Total = gameState.runPanelCount(room.strays[0].proto.id);
+      const stray1Done = gameState.runSolvedPanelCount(room.strays[1].proto.id);
+      const stray1Total = gameState.runPanelCount(room.strays[1].proto.id);
+      const cpDone = gameState.runSolvedPanelCount(room.centerpiece.proto.id);
+      const cpTotal = gameState.runPanelCount(room.centerpiece.proto.id);
 
       return h(
         'div',
@@ -2534,19 +2850,19 @@ function openSettingsModal(): void {
           },
           makeCheckRow(
             `Warm-up: ${room.warmup.title}`,
-            'Unlocks room strays',
+            `${warmupDone}/${warmupTotal} panels · Unlocks room strays`,
             gameState.solvedRuns.has(room.warmup.id),
             (next) => gameState.setRunSolved(room.warmup.id, next),
           ),
           makeCheckRow(
             `Stray Freed: ${room.strays[0].icon} ${room.strays[0].title}`,
-            `Found in ${room.shortTitle}`,
+            `${stray0Done}/${stray0Total} panels · Found in ${room.shortTitle}`,
             gameState.solvedRuns.has(room.strays[0].proto.id),
             (next) => gameState.setRunSolved(room.strays[0].proto.id, next),
           ),
           makeCheckRow(
             `Stray Freed: ${room.strays[1].icon} ${room.strays[1].title}`,
-            `Found in ${room.shortTitle}`,
+            `${stray1Done}/${stray1Total} panels · Found in ${room.shortTitle}`,
             gameState.solvedRuns.has(room.strays[1].proto.id),
             (next) => gameState.setRunSolved(room.strays[1].proto.id, next),
           ),
@@ -2564,7 +2880,7 @@ function openSettingsModal(): void {
           ),
           makeCheckRow(
             `Centerpiece: ${room.centerpiece.icon} ${room.centerpiece.title}`,
-            'Lights room Master Lamp',
+            `${cpDone}/${cpTotal} panels · Lights room Master Lamp`,
             gameState.solvedRuns.has(room.centerpiece.proto.id),
             (next) => gameState.setRunSolved(room.centerpiece.proto.id, next),
           ),
@@ -2584,10 +2900,11 @@ function openSettingsModal(): void {
       },
       devHeader,
       globalChecks,
+      clauseCard,
       h('div', { style: { display: 'flex', flexDirection: 'column', gap: '9px' } }, ...roomCards),
     );
 
-    bodyHost.replaceChildren(controlsSection, devSection);
+    bodyHost.replaceChildren(controlsSection, saveCard, devSection);
   };
 
   const card = h(

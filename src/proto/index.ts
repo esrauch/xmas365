@@ -3,30 +3,13 @@
  * (?p=<id>), with its rules, a reset, and a tick once solved (remembered in
  * this browser).
  */
+import { gameState } from '../game/state';
 import { type Proto, h } from './kit';
 import { PROTOS } from './puzzles';
 
 const nav = document.querySelector('nav');
 const main = document.querySelector('main');
 if (!nav || !main) throw new Error('puzzles.html is missing nav or main');
-
-const DONE_KEY = 'puzz.proto.solved';
-const done = new Set<string>(
-  ((): string[] => {
-    try {
-      return JSON.parse(localStorage.getItem(DONE_KEY) ?? '[]') as string[];
-    } catch {
-      return [];
-    }
-  })(),
-);
-const remember = (): void => {
-  try {
-    localStorage.setItem(DONE_KEY, JSON.stringify([...done]));
-  } catch {
-    // No storage: ticks last for this visit.
-  }
-};
 
 const ROOMS = [
   "Valentine's",
@@ -52,7 +35,10 @@ function renderNav(current: string): void {
           'a',
           {
             href: `?p=${p.id}`,
-            class: [p.id === current ? 'on' : '', done.has(p.id) ? 'done' : ''].join(' '),
+            class: [
+              p.id === current ? 'on' : '',
+              gameState.solvedRuns.has(p.id) ? 'done' : '',
+            ].join(' '),
           },
           p.title,
           ' ',
@@ -74,8 +60,7 @@ function show(p: Proto): void {
       solved: () => {
         status.textContent = 'Solved!';
         status.className = 'status win';
-        done.add(p.id);
-        remember();
+        gameState.markRunSolved(p.id);
         renderNav(p.id);
       },
       status: (text) => {

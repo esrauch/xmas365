@@ -17,6 +17,8 @@ export interface Proto {
   rules: string;
   /** The panels teach the rules: keep them folded away (a run of panels). */
   teaches?: boolean;
+  /** Number of panels in this puzzle run. */
+  panelCount?: number;
   /** Build the puzzle in `host`; call `solved()` when it's done. */
   mount(host: HTMLElement, ctx: Ctx): void;
 }
