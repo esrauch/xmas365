@@ -221,7 +221,6 @@ export interface Hotspot3D {
 export interface DioramaCallbacks {
   onSelectBay: (bay: BayId) => void;
   onOpenProto: (protoId: string, focusPos: THREE.Vector3, focusLook: THREE.Vector3) => void;
-  onOpenDesk: (focusPos: THREE.Vector3, focusLook: THREE.Vector3) => void;
   onShowStory: () => void;
   onOpenCorkboard?: () => void;
   onClickMascot?: (roomId: RoomId) => void;
@@ -297,6 +296,8 @@ export interface BuiltBay {
   fxPulses: FxPulseEntry[];
   floating: FloatingEntry[];
   syncState: (hotspotsOut: Hotspot3D[]) => void;
+  /** Per-frame animation of this bay's own moments (a room's mascot leaving its cage). */
+  animate?: (t: number) => void;
 }
 
 export function makeBayGroup(theta: number): THREE.Group {
@@ -1369,6 +1370,351 @@ export function buildPropMesh(id: string, accent: string): THREE.Group {
       g.add(broomGroup);
       break;
     }
+    case 'watermelon': {
+      // Fourth of July relic in Valentine's: juicy crimson watermelon wedge with green rind & black seeds
+      const wm = new THREE.Group();
+      wm.position.set(0, 0.08, 0);
+      const rind = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.24, 0.24, 0.09, 18, 1, false, 0, Math.PI),
+        mat('#2f855a'),
+      );
+      rind.rotation.z = Math.PI / 2;
+      rind.rotation.y = Math.PI / 2;
+      rind.position.set(0, 0.16, 0);
+      const pith = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.215, 0.215, 0.095, 18, 1, false, 0, Math.PI),
+        mat('#f0fff4'),
+      );
+      pith.rotation.z = Math.PI / 2;
+      pith.rotation.y = Math.PI / 2;
+      pith.position.set(0, 0.16, 0);
+      const flesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.195, 0.195, 0.1, 18, 1, false, 0, Math.PI),
+        mat('#e53e3e'),
+      );
+      flesh.rotation.z = Math.PI / 2;
+      flesh.rotation.y = Math.PI / 2;
+      flesh.position.set(0, 0.16, 0);
+      wm.add(rind, pith, flesh);
+      for (const [sx, sy] of [
+        [-0.08, 0.1],
+        [0, 0.08],
+        [0.08, 0.1],
+        [-0.04, 0.13],
+        [0.04, 0.13],
+      ] as const) {
+        wm.add(sphere(0.016, '#1a202c', sx, sy, 0.052));
+        wm.add(sphere(0.016, '#1a202c', sx, sy, -0.052));
+      }
+      g.add(wm);
+      break;
+    }
+    case 'wishbone': {
+      // Thanksgiving relic in Valentine's: golden lucky wishbone tied with a crimson ribbon
+      const wb = new THREE.Group();
+      wb.position.set(0, 0.04, 0);
+      for (const side of [-1, 1] as const) {
+        const leg = cyl(0.024, 0.032, 0.34, '#f6e05e', side * 0.085, 0.18, 0, 10);
+        leg.rotation.z = side * 0.32;
+        wb.add(leg);
+        wb.add(sphere(0.032, '#ecc94b', side * 0.135, 0.035, 0));
+      }
+      wb.add(sphere(0.042, '#f6e05e', 0, 0.33, 0));
+      wb.add(cyl(0.026, 0.026, 0.07, '#f6e05e', 0, 0.38, 0, 10));
+      wb.add(box(0.14, 0.032, 0.048, '#e53e3e', 0, 0.33, 0.02));
+      g.add(wb);
+      break;
+    }
+    case 'candycane': {
+      // Christmas relic in Valentine's: oversized peppermint candy cane with a green holly bow
+      const cc = new THREE.Group();
+      cc.position.set(0.03, 0.02, 0);
+      for (let s = 0; s < 7; s++) {
+        cc.add(
+          cyl(0.04, 0.04, 0.048, s % 2 === 0 ? '#ffffff' : '#e53e3e', 0, 0.04 + s * 0.046, 0, 12),
+        );
+      }
+      const hook = new THREE.Mesh(
+        new THREE.TorusGeometry(0.085, 0.038, 10, 16, Math.PI),
+        mat('#e53e3e'),
+      );
+      hook.position.set(-0.085, 0.35, 0);
+      cc.add(hook);
+      cc.add(box(0.15, 0.042, 0.055, '#2f855a', 0, 0.22, 0.032));
+      cc.add(sphere(0.028, '#ecc94b', 0, 0.22, 0.058));
+      g.add(cc);
+      break;
+    }
+    case 'rose': {
+      // Valentine's relic in Easter: single long-stemmed crimson rose in a bud vase
+      const rg = new THREE.Group();
+      rg.add(cyl(0.055, 0.085, 0.18, '#fbd38d', 0, 0.09, 0, 12));
+      rg.add(cyl(0.018, 0.02, 0.28, '#2f855a', 0, 0.24, 0, 8));
+      for (const side of [-1, 1] as const) {
+        const leaf = box(0.09, 0.022, 0.045, '#38a169', side * 0.055, 0.22 + side * 0.03, 0);
+        leaf.rotation.z = -side * 0.38;
+        rg.add(leaf);
+      }
+      rg.add(sphere(0.085, '#c53030', 0, 0.39, 0));
+      rg.add(sphere(0.062, '#e53e3e', 0, 0.43, 0));
+      rg.add(sphere(0.038, '#ed64a6', 0, 0.46, 0));
+      g.add(rg);
+      break;
+    }
+    case 'ghost': {
+      // Halloween relic in Easter: cute billowy white bedsheet ghost with dark peepholes
+      const gg = new THREE.Group();
+      gg.add(cyl(0.09, 0.19, 0.32, '#ffffff', 0, 0.18, 0, 16));
+      gg.add(sphere(0.115, '#ffffff', 0, 0.34, 0));
+      for (let i = 0; i < 6; i++) {
+        const ang = (i / 6) * Math.PI * 2;
+        gg.add(sphere(0.048, '#f7fafc', Math.cos(ang) * 0.15, 0.05, Math.sin(ang) * 0.15));
+      }
+      gg.add(sphere(0.024, '#1a202c', -0.042, 0.35, 0.1));
+      gg.add(sphere(0.024, '#1a202c', 0.042, 0.35, 0.1));
+      gg.add(sphere(0.028, '#805ad5', 0, 0.29, 0.105));
+      g.add(gg);
+      break;
+    }
+    case 'gingerbread': {
+      // Christmas relic in Easter: frosted gingerbread cookie man with icing buttons & bowtie
+      const gb = new THREE.Group();
+      gb.position.set(0, 0.04, 0);
+      gb.add(sphere(0.095, '#b7791f', 0, 0.34, 0));
+      gb.add(box(0.16, 0.18, 0.06, '#b7791f', 0, 0.18, 0));
+      for (const side of [-1, 1] as const) {
+        const arm = box(0.12, 0.055, 0.055, '#b7791f', side * 0.13, 0.21, 0);
+        arm.rotation.z = -side * 0.25;
+        const leg = box(0.06, 0.12, 0.055, '#b7791f', side * 0.055, 0.05, 0);
+        leg.rotation.z = -side * 0.12;
+        gb.add(arm, leg);
+      }
+      gb.add(sphere(0.018, '#ffffff', -0.032, 0.36, 0.085));
+      gb.add(sphere(0.018, '#ffffff', 0.032, 0.36, 0.085));
+      gb.add(box(0.075, 0.028, 0.025, '#e53e3e', 0, 0.26, 0.035));
+      gb.add(sphere(0.022, '#38a169', 0, 0.19, 0.035));
+      gb.add(sphere(0.022, '#e53e3e', 0, 0.13, 0.035));
+      g.add(gb);
+      break;
+    }
+    case 'chocobunny': {
+      // Easter relic in Fourth of July: sculpted milk-chocolate bunny with pastel pink foil bow
+      const cb = new THREE.Group();
+      cb.add(cyl(0.18, 0.2, 0.04, '#f6e05e', 0, 0.02, 0, 14));
+      cb.add(sphere(0.12, '#5c3317', 0, 0.14, 0));
+      cb.add(sphere(0.09, '#5c3317', 0, 0.28, 0.02));
+      for (const side of [-1, 1] as const) {
+        const ear = box(0.045, 0.16, 0.035, '#5c3317', side * 0.038, 0.41, 0.01);
+        ear.rotation.z = -side * 0.1;
+        cb.add(ear);
+      }
+      cb.add(box(0.11, 0.038, 0.04, '#ed64a6', 0, 0.21, 0.085));
+      cb.add(sphere(0.022, '#f687b3', 0, 0.28, 0.105));
+      g.add(cb);
+      break;
+    }
+    case 'harvestcorn': {
+      // Thanksgiving relic in Fourth of July: multi-colored Indian harvest corn cob with peeled husks
+      const hc = new THREE.Group();
+      hc.position.set(0, 0.04, 0);
+      const cob = cyl(0.068, 0.085, 0.34, '#ecc94b', 0, 0.2, 0, 14);
+      cob.rotation.z = 0.22;
+      hc.add(cob);
+      for (const [ky, khex] of [
+        [0.12, '#9b2c2c'],
+        [0.18, '#dd6b20'],
+        [0.24, '#ecc94b'],
+        [0.3, '#744210'],
+      ] as const) {
+        const band = cyl(0.082, 0.082, 0.042, khex, (0.2 - ky) * 0.22, ky, 0, 12);
+        band.rotation.z = 0.22;
+        hc.add(band);
+      }
+      for (const side of [-1, 1] as const) {
+        const husk = box(0.06, 0.26, 0.09, '#d69e2e', side * 0.095, 0.14, 0);
+        husk.rotation.z = -side * 0.48;
+        hc.add(husk);
+      }
+      g.add(hc);
+      break;
+    }
+    case 'snowglobe': {
+      // Christmas relic in Fourth of July: winter snow globe with a mini evergreen & snow flurries
+      const sg = new THREE.Group();
+      sg.add(cyl(0.16, 0.19, 0.09, '#744210', 0, 0.045, 0, 16));
+      sg.add(cyl(0.165, 0.165, 0.024, '#d69e2e', 0, 0.09, 0, 16));
+      sg.add(cyl(0.14, 0.14, 0.03, '#ffffff', 0, 0.11, 0, 14));
+      sg.add(cyl(0, 0.085, 0.16, '#2f855a', 0, 0.2, 0, 10));
+      sg.add(glowSphere(0.025, '#ffea79', 0, 0.29, 0, 1.1));
+      const domeMat = toonMaterial({
+        color: hexToNumber('#bee3f8'),
+        transparent: true,
+        opacity: 0.42,
+      });
+      const dome = new THREE.Mesh(new THREE.SphereGeometry(0.175, 16, 14), domeMat);
+      dome.position.set(0, 0.22, 0);
+      sg.add(dome);
+      g.add(sg);
+      break;
+    }
+    case 'chick': {
+      // Easter relic in Halloween: bright yellow marshmallow Peeps-style chick on a purple nest
+      const ck = new THREE.Group();
+      ck.add(cyl(0.17, 0.19, 0.04, '#ed64a6', 0, 0.02, 0, 14));
+      const body = sphere(0.125, '#f6e05e', 0, 0.13, -0.02);
+      body.scale.set(0.95, 0.88, 1.25);
+      ck.add(body);
+      ck.add(sphere(0.092, '#f6e05e', 0, 0.26, 0.05));
+      const beak = new THREE.Mesh(new THREE.ConeGeometry(0.032, 0.07, 8), mat('#ed8936'));
+      beak.rotation.x = Math.PI / 2;
+      beak.position.set(0, 0.25, 0.155);
+      ck.add(beak);
+      ck.add(sphere(0.018, '#1a202c', -0.038, 0.28, 0.125));
+      ck.add(sphere(0.018, '#1a202c', 0.038, 0.28, 0.125));
+      g.add(ck);
+      break;
+    }
+    case 'picnic': {
+      // Fourth of July relic in Halloween: woven picnic hamper with red-white-blue gingham cloth
+      const pb = new THREE.Group();
+      pb.add(box(0.36, 0.2, 0.24, '#b7791f', 0, 0.1, 0));
+      pb.add(box(0.39, 0.035, 0.27, '#e53e3e', 0, 0.21, 0));
+      pb.add(box(0.14, 0.04, 0.28, '#ffffff', -0.08, 0.212, 0));
+      pb.add(box(0.14, 0.04, 0.28, '#2b6cb0', 0.08, 0.212, 0));
+      pb.add(box(0.38, 0.04, 0.25, '#9c6b3b', 0, 0.24, 0));
+      const handle = new THREE.Mesh(
+        new THREE.TorusGeometry(0.14, 0.018, 8, 16, Math.PI),
+        mat('#744210'),
+      );
+      handle.position.set(0, 0.25, 0);
+      pb.add(handle);
+      g.add(pb);
+      break;
+    }
+    case 'gravyboat': {
+      // Thanksgiving relic in Halloween: cream porcelain gravy boat on saucer with rich brown gravy
+      const gb = new THREE.Group();
+      gb.add(cyl(0.21, 0.17, 0.03, '#fffaf0', 0, 0.015, 0, 16));
+      gb.add(cyl(0.22, 0.22, 0.015, '#d69e2e', 0, 0.03, 0, 16));
+      const bowl = sphere(0.14, '#fffaf0', 0, 0.13, 0);
+      bowl.scale.set(1.45, 0.78, 0.92);
+      gb.add(bowl);
+      const gravy = cyl(0.13, 0.13, 0.025, '#744210', 0, 0.19, 0, 14);
+      gravy.scale.set(1.35, 1, 0.82);
+      gb.add(gravy);
+      const loop = new THREE.Mesh(new THREE.TorusGeometry(0.055, 0.016, 8, 12), mat('#d69e2e'));
+      loop.position.set(-0.19, 0.15, 0);
+      gb.add(loop);
+      g.add(gb);
+      break;
+    }
+    case 'locket': {
+      // Valentine's relic in Thanksgiving: gleaming golden heart locket on a gold chain
+      const lk = new THREE.Group();
+      lk.position.set(0, 0.04, 0);
+      const chain = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.012, 8, 18), mat('#ecc94b'));
+      chain.rotation.x = Math.PI / 2.4;
+      chain.position.set(0, 0.04, 0);
+      lk.add(chain);
+      for (const side of [-1, 1] as const) {
+        lk.add(sphere(0.088, '#f6e05e', side * 0.06, 0.24, 0));
+      }
+      const tip = cyl(0, 0.14, 0.18, '#f6e05e', 0, 0.15, 0, 12);
+      tip.rotation.z = Math.PI;
+      lk.add(tip);
+      lk.add(sphere(0.048, '#e53e3e', 0, 0.21, 0.075));
+      g.add(lk);
+      break;
+    }
+    case 'jellybeans': {
+      // Easter relic in Thanksgiving: glass apothecary jar filled with rainbow Easter jelly beans
+      const jb = new THREE.Group();
+      jb.add(cyl(0.15, 0.15, 0.28, '#fefcbf', 0, 0.15, 0, 14));
+      const beanColors = ['#ed64a6', '#48bb78', '#ecc94b', '#9f7aea', '#4299e1', '#f56565'];
+      for (let i = 0; i < 12; i++) {
+        const ang = (i / 12) * Math.PI * 2;
+        const by = 0.06 + (i % 4) * 0.055;
+        jb.add(
+          sphere(
+            0.042,
+            beanColors[i % beanColors.length] ?? '#ed64a6',
+            Math.cos(ang) * 0.115,
+            by,
+            Math.sin(ang) * 0.115,
+          ),
+        );
+      }
+      jb.add(cyl(0.12, 0.13, 0.045, '#d69e2e', 0, 0.3, 0, 14));
+      jb.add(sphere(0.038, '#ecc94b', 0, 0.34, 0));
+      g.add(jb);
+      break;
+    }
+    case 'candycorn': {
+      // Halloween relic in Thanksgiving: iconic yellow-orange-white tri-color candy corn trio
+      const cc = new THREE.Group();
+      for (const [cx, cz, rotZ, sc] of [
+        [0, 0.02, 0, 1.05],
+        [-0.11, -0.02, 0.22, 0.85],
+        [0.11, -0.02, -0.22, 0.85],
+      ] as const) {
+        const cone = new THREE.Group();
+        cone.position.set(cx, 0.02, cz);
+        cone.rotation.z = rotZ;
+        cone.scale.setScalar(sc);
+        cone.add(cyl(0.085, 0.115, 0.1, '#ecc94b', 0, 0.05, 0, 12));
+        cone.add(cyl(0.05, 0.085, 0.11, '#dd6b20', 0, 0.155, 0, 12));
+        cone.add(cyl(0.01, 0.05, 0.09, '#ffffff', 0, 0.255, 0, 12));
+        cc.add(cone);
+      }
+      g.add(cc);
+      break;
+    }
+    case 'loveletter': {
+      // Valentine's relic in Christmas: blush-pink parchment envelope sealed with a crimson heart wax seal
+      const ll = new THREE.Group();
+      ll.position.set(0, 0.06, 0);
+      ll.rotation.x = -0.18;
+      ll.add(box(0.36, 0.24, 0.045, '#fff5f7', 0, 0.14, 0));
+      ll.add(box(0.37, 0.03, 0.05, '#fbb6ce', 0, 0.25, 0));
+      const flap = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.14, 4), mat('#fed7e2'));
+      flap.rotation.z = Math.PI;
+      flap.rotation.y = Math.PI / 4;
+      flap.scale.z = 0.28;
+      flap.position.set(0, 0.19, 0.022);
+      ll.add(flap);
+      ll.add(glowSphere(0.048, '#e53e3e', 0, 0.13, 0.032, 0.85));
+      g.add(ll);
+      break;
+    }
+    case 'icepop': {
+      // Fourth of July relic in Christmas: red-white-blue rocket ice pop on a wooden stick
+      const ip = new THREE.Group();
+      ip.add(box(0.042, 0.14, 0.018, '#fbd38d', 0, 0.07, 0));
+      ip.add(cyl(0.085, 0.09, 0.1, '#2b6cb0', 0, 0.16, 0, 12));
+      ip.add(cyl(0.075, 0.085, 0.1, '#ffffff', 0, 0.26, 0, 12));
+      ip.add(cyl(0.02, 0.075, 0.11, '#e53e3e', 0, 0.365, 0, 12));
+      g.add(ip);
+      break;
+    }
+    case 'cauldron': {
+      // Halloween relic in Christmas: cast-iron witch's cauldron bubbling with glowing green potion
+      const cd = new THREE.Group();
+      cd.add(sphere(0.175, '#2d3748', 0, 0.17, 0));
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(0.145, 0.026, 10, 18), mat('#1a202c'));
+      rim.rotation.x = Math.PI / 2;
+      rim.position.set(0, 0.28, 0);
+      cd.add(rim);
+      cd.add(cyl(0.135, 0.135, 0.025, '#48bb78', 0, 0.285, 0, 16));
+      for (const [bx, bz, br] of [
+        [-0.05, 0.03, 0.036],
+        [0.05, -0.02, 0.042],
+        [0.01, 0.06, 0.028],
+      ] as const) {
+        cd.add(glowSphere(br, '#68d391', bx, 0.31, bz, 1.1));
+      }
+      g.add(cd);
+      break;
+    }
     default: {
       g.add(box(0.42, 0.34, 0.42, accent, 0, 0.17, 0));
       break;
@@ -1379,6 +1725,26 @@ export function buildPropMesh(id: string, accent: string): THREE.Group {
   return g;
 }
 
+function buildPropSilhouette(id: string): {
+  group: THREE.Group;
+  silMat: THREE.MeshBasicMaterial;
+} {
+  const group = buildPropMesh(id, '#4a5568');
+  const silMat = new THREE.MeshBasicMaterial({
+    color: 0x3b4252,
+    transparent: true,
+    opacity: 0.38,
+  });
+  group.traverse((c) => {
+    if (c instanceof THREE.Mesh) {
+      c.material = silMat;
+      c.castShadow = false;
+      c.receiveShadow = false;
+    }
+  });
+  return { group, silMat };
+}
+
 function buildMascotStageWithCage(
   roomId: RoomId,
   accent: string,
@@ -1387,24 +1753,29 @@ function buildMascotStageWithCage(
   mascotMesh: THREE.Group;
   cage: THREE.Group;
   baseTopMat: THREE.MeshToonMaterial;
+  padlocks: {
+    group: THREE.Group;
+    bodyMat: THREE.MeshToonMaterial;
+    shackle: THREE.Mesh;
+  }[];
 } {
   const stage = new THREE.Group();
   const hitCyl = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.42, 0.44, 0.92, 12),
+    new THREE.CylinderGeometry(0.46, 0.48, 0.96, 12),
     new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
   );
   hitCyl.position.set(0, 0.46, 0);
   hitCyl.layers.set(2);
   stage.add(hitCyl);
-  const baseBot = cyl(0.36, 0.4, 0.09, '#5c3d24', 0, 0.045, 0, 16);
+  const baseBot = cyl(0.38, 0.42, 0.09, '#5c3d24', 0, 0.045, 0, 16);
   const baseTopMat = mat(accent);
-  const baseTop = new THREE.Mesh(new THREE.CylinderGeometry(0.33, 0.35, 0.04, 16), baseTopMat);
+  const baseTop = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.37, 0.04, 16), baseTopMat);
   baseTop.position.set(0, 0.1, 0);
   baseBot.receiveShadow = false;
   baseTop.receiveShadow = false;
   stage.add(baseBot, baseTop);
 
-  const mascotMesh = buildMascotMesh(ROOM_MASCOT_ID[roomId], 0.58);
+  const mascotMesh = buildMascotMesh(ROOM_MASCOT_ID[roomId], 0.54);
   mascotMesh.position.set(0, 0.12, 0);
   mascotMesh.traverse((c) => {
     c.castShadow = false;
@@ -1413,7 +1784,7 @@ function buildMascotStageWithCage(
   stage.add(mascotMesh);
 
   const cage = new THREE.Group();
-  const cageRadius = 0.3;
+  const cageRadius = 0.31;
   const cageBottomY = 0.13;
   const cageTopY = 0.77;
   const cageHeight = cageTopY - cageBottomY;
@@ -1432,33 +1803,56 @@ function buildMascotStageWithCage(
     const ang = ((i + 0.5) / 8) * Math.PI * 2;
     const bx = Math.sin(ang) * cageRadius;
     const bz = Math.cos(ang) * cageRadius;
-    cage.add(cyl(0.013, 0.013, cageHeight, '#4a5568', bx, cageBottomY + cageHeight / 2, bz, 8));
+    cage.add(cyl(0.016, 0.016, cageHeight, '#4a5568', bx, cageBottomY + cageHeight / 2, bz, 8));
   }
 
   for (const rotY of [Math.PI / 8, -Math.PI / 8]) {
     const domeArc = new THREE.Mesh(
-      new THREE.TorusGeometry(cageRadius, 0.015, 8, 16, Math.PI),
+      new THREE.TorusGeometry(cageRadius, 0.017, 8, 16, Math.PI),
       mat('#2d3748'),
     );
     domeArc.rotation.y = rotY;
     domeArc.position.set(0, cageTopY, 0);
     cage.add(domeArc);
   }
-  const hookRing = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.012, 8, 12), mat('#d69e2e'));
+  const hookRing = new THREE.Mesh(new THREE.TorusGeometry(0.048, 0.014, 8, 12), mat('#d69e2e'));
   hookRing.position.set(0, cageTopY + cageRadius + 0.03, 0);
   cage.add(hookRing);
 
-  const lockX = Math.sin(Math.PI / 8) * (cageRadius + 0.02);
-  const lockZ = Math.cos(Math.PI / 8) * (cageRadius + 0.02);
-  cage.add(box(0.09, 0.1, 0.04, '#c53030', lockX, 0.42, lockZ));
-  cage.add(box(0.094, 0.024, 0.044, '#ecc94b', lockX, 0.42, lockZ));
+  // 5 Padlocks arranged across the front arc of the cage (one per Home Relic)
+  const padlocks: {
+    group: THREE.Group;
+    bodyMat: THREE.MeshToonMaterial;
+    shackle: THREE.Mesh;
+  }[] = [];
+  const lockAngles = [-1.04, -0.52, 0, 0.52, 1.04];
+  for (const ang of lockAngles) {
+    const lg = new THREE.Group();
+    const lx = Math.sin(ang) * (cageRadius + 0.038);
+    const lz = Math.cos(ang) * (cageRadius + 0.038);
+    lg.position.set(lx, 0.23, lz);
+    lg.rotation.y = ang;
+    const bodyMat = mat('#c53030');
+    const bodyMesh = new THREE.Mesh(new THREE.BoxGeometry(0.086, 0.098, 0.042), bodyMat);
+    lg.add(bodyMesh);
+    lg.add(box(0.092, 0.022, 0.046, '#ecc94b', 0, 0, 0, false));
+    const shackle = new THREE.Mesh(
+      new THREE.TorusGeometry(0.028, 0.009, 6, 12, Math.PI),
+      mat('#cbd5e0'),
+    );
+    shackle.position.set(0, 0.05, 0);
+    lg.add(shackle);
+    cage.add(lg);
+    padlocks.push({ group: lg, bodyMat, shackle });
+  }
+
   cage.traverse((c) => {
     c.castShadow = false;
     c.receiveShadow = false;
   });
   stage.add(cage);
 
-  return { stage, mascotMesh, cage, baseTopMat };
+  return { stage, mascotMesh, cage, baseTopMat, padlocks };
 }
 
 export interface HolidayAlcoveConfig {
@@ -1474,9 +1868,9 @@ export interface HolidayAlcoveConfig {
 
 /**
  * Construct a complete Holiday Alcove bay once, pre-building all state variants
- * (lamp on/off, fairy lights, centerpiece materials, mascot cage, pedestal items,
- * and stray table items) and returning a `BuiltBay` whose `syncState()` updates
- * everything in-place with zero 3D resource churn.
+ * (lamp on/off, fairy lights, decorative centerpiece materials, mascot cage with
+ * 5 padlocks, 5 relic shelves with silhouettes, and 5 relic tables) and returning
+ * a `BuiltBay` whose `syncState()` updates everything in-place with zero 3D churn.
  */
 export function buildHolidayAlcoveBay(
   config: HolidayAlcoveConfig,
@@ -1505,22 +1899,22 @@ export function buildHolidayAlcoveBay(
   bay.add(cyl(0.22, 0.26, 5.8, '#3b281a', WALL_WIDTH / 2 - 0.06, 2.9, 0.14, 12, false));
 
   // Holiday rug segment in front of the bay
-  bay.add(box(2.5, 0.03, 2.35, room.floorColor, 0, 0.015, 1.28, false));
-  bay.add(box(2.2, 0.04, 2.05, room.accent, 0, 0.02, 1.28, false));
-  bay.add(box(1.95, 0.045, 1.8, '#8c6946', 0, 0.024, 1.28, false));
+  bay.add(box(2.7, 0.03, 2.35, room.floorColor, 0, 0.015, 1.28, false));
+  bay.add(box(2.4, 0.04, 2.05, room.accent, 0, 0.02, 1.28, false));
+  bay.add(box(2.15, 0.045, 1.8, '#8c6946', 0, 0.024, 1.28, false));
 
   // Holiday-specific practical lighting & atmospheric props
   config.decorateAlcove(bay, flames, fireflies);
 
   // Master Holiday Lamp above the bay's centerpiece arch (both on/off meshes pre-built)
-  const lampOn = glowSphere(0.2, room.accent, 0, 3.55, 0.24, 1.25);
-  const lampOff = sphere(0.2, '#3b4252', 0, 3.55, 0.24, false);
+  const lampOn = glowSphere(0.2, room.accent, 0, 3.68, 0.24, 1.25);
+  const lampOff = sphere(0.2, '#3b4252', 0, 3.68, 0.24, false);
   bay.add(lampOn, lampOff);
 
   // String of 9 fairy lights draped across the top of the diorama
   for (let i = -4; i <= 4; i++) {
     const bx = i * 0.36;
-    const by = 3.32 - Math.cos(i * 0.38) * 0.14;
+    const by = 3.48 - Math.cos(i * 0.38) * 0.12;
     const bulbHex = (Math.abs(i) % 2 === 0 ? room.accent : room.secondaryAccent) as `#${string}`;
     bay.add(cyl(0.022, 0.022, 0.04, '#1f2430', bx, by + 0.05, 0.23, 8, false));
     const cNum = hexToNumber(bulbHex);
@@ -1543,40 +1937,76 @@ export function buildHolidayAlcoveBay(
     });
   }
 
-  // TIER 1 (TOP-CENTER): THE CENTERPIECE ON A RAISED ALTAR SHELF
-  const cpGroup = new THREE.Group();
-  cpGroup.position.set(0, 2.12, 0.36);
-  cpGroup.add(box(1.24, 0.16, 0.56, '#6b4928', 0, 0, 0, false));
-  cpGroup.add(box(1.12, 0.06, 0.48, '#d69e2e', 0, 0.1, 0, false));
-  const cpAccentOrGoldMat = mat(room.accent);
-  const cpCrownGlowMat = glowMat('#f6e05e', 0.95);
-  const cpSculpture = new THREE.Group();
-  config.buildCenterpiece(cpSculpture, cpAccentOrGoldMat, cpCrownGlowMat);
-  cpSculpture.rotation.x = 0.22;
-  cpSculpture.traverse((c) => {
-    c.castShadow = false;
-  });
-  cpGroup.add(cpSculpture);
-  bay.add(cpGroup);
+  // TIER 1 (TOP-CENTER): LARGE MASCOT CAGE ON A RAISED ALTAR SHELF (locked by 5 padlocks)
+  const cageShelfGroup = new THREE.Group();
+  cageShelfGroup.position.set(0, 2.02, 0.42);
+  cageShelfGroup.add(box(1.48, 0.16, 0.64, '#6b4928', 0, 0, 0, false));
+  cageShelfGroup.add(box(1.38, 0.06, 0.58, '#d69e2e', 0, 0.1, 0, false));
+  bay.add(cageShelfGroup);
 
-  // Holiday Mascot Stage on the front-center of the rug
   const {
     stage: mascotStage,
     mascotMesh,
     cage,
     baseTopMat,
+    padlocks,
   } = buildMascotStageWithCage(room.id, room.accent);
-  mascotStage.position.set(0, 0.02, 1.44);
+  mascotStage.position.set(0, 2.05, 0.45);
+  mascotStage.scale.setScalar(1.38);
   bay.add(mascotStage);
   floating.push({ mesh: mascotMesh, phase: theta + 1.1, baseY: 0.12 });
 
-  // TIER 2: TWO WALL-MOUNTED NATIVE ITEM PEDESTALS
-  const pedX = [-1.14, 1.14] as const;
-  const pedestalEntries = room.centerpiece.requiredItems.map((reqId, idx) => {
-    const lx = pedX[idx] ?? pedX[0];
-    const lz = 0.44;
+  // DECORATIVE ROOM PROP (formerly the centerpiece sculpture): sits on a low central rug
+  // plinth in front of the back wall so it never collides with the wall shelves or mantle.
+  const cpGroup = new THREE.Group();
+  cpGroup.position.set(0, 0.04, 0.92);
+  cpGroup.scale.setScalar(0.58);
+  const cpAccentOrGoldMat = mat(room.accent);
+  const cpCrownGlowMat = glowMat('#f6e05e', 0.95);
+  const cpSculpture = new THREE.Group();
+  config.buildCenterpiece(cpSculpture, cpAccentOrGoldMat, cpCrownGlowMat);
+  cpSculpture.rotation.x = 0.12;
+  const cpDecorativeMats: {
+    mat: THREE.MeshToonMaterial;
+    baseColor: THREE.Color;
+    baseEmissive: THREE.Color;
+    baseEmissiveIntensity: number;
+  }[] = [];
+  const seenMats = new Set<THREE.Material>();
+  cpSculpture.traverse((c) => {
+    c.castShadow = false;
+    if (c instanceof THREE.Mesh && c.material instanceof THREE.MeshToonMaterial) {
+      if (!seenMats.has(c.material)) {
+        seenMats.add(c.material);
+        cpDecorativeMats.push({
+          mat: c.material,
+          baseColor: c.material.color.clone(),
+          baseEmissive: c.material.emissive.clone(),
+          baseEmissiveIntensity: c.material.emissiveIntensity,
+        });
+      }
+    }
+  });
+  cpGroup.add(cpSculpture);
+  bay.add(cpGroup);
+
+  // TIER 2: FIVE WALL-MOUNTED RELIC SHELVES IN A SEMICIRCLE AROUND & BELOW THE CAGE
+  // Left upper -> Left lower -> Bottom center -> Right lower -> Right upper
+  const shelfArc: readonly { x: number; y: number; z: number }[] = [
+    { x: -1.2, y: 2.38, z: 0.42 },
+    { x: -0.96, y: 1.78, z: 0.44 },
+    { x: 0, y: 1.44, z: 0.46 },
+    { x: 0.96, y: 1.78, z: 0.44 },
+    { x: 1.2, y: 2.38, z: 0.42 },
+  ];
+  const shelfEntries = room.homeRelics.map((reqId, idx) => {
+    const slot = shelfArc[idx] ?? { x: 0, y: 1.32, z: 0.46 };
+    const lx = slot.x;
+    const ly = slot.y;
+    const lz = slot.z;
     const pg = new THREE.Group();
-    pg.position.set(lx, 1.48, lz);
+    pg.position.set(lx, ly, lz);
+    pg.scale.setScalar(0.76);
     pg.add(cyl(0.28, 0.16, 0.24, '#6b4928', 0, -0.06, -0.06, 14, false));
 
     const midRingMat = mat('#718096');
@@ -1596,9 +2026,13 @@ export function buildHolidayAlcoveBay(
     pg.add(placedMesh);
     floating.push({ mesh: placedMesh, phase: idx + 0.5, baseY: 0.18 });
 
+    const { group: silhouetteMesh, silMat: silhouetteMat } = buildPropSilhouette(reqId);
+    silhouetteMesh.position.set(0, 0.18, 0);
+    pg.add(silhouetteMesh);
+
     const emptyCapMat = mat('#4a5568');
-    const emptyCap = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.08, 14), emptyCapMat);
-    emptyCap.position.set(0, 0.2, 0);
+    const emptyCap = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.06, 14), emptyCapMat);
+    emptyCap.position.set(0, 0.17, 0);
     emptyCap.receiveShadow = true;
     pg.add(emptyCap);
 
@@ -1606,28 +2040,40 @@ export function buildHolidayAlcoveBay(
     return {
       reqId,
       lx,
+      ly,
       lz,
       pg,
       midRingMat,
       topRingMat,
       placedMesh,
+      silhouetteMesh,
+      silhouetteMat,
       emptyCap,
       emptyCapMat,
     };
   });
 
-  // TIER 3: TWO STRAY ITEM SIDE TABLES ON THE FLOOR
-  const strayX = [-1.14, 1.14] as const;
+  // TIER 3: FIVE RELIC TABLES ON THE FLOOR IN A STAGGERED 2-ROW ARC
+  const strayLayout: readonly { x: number; z: number; pillY: number }[] = [
+    { x: -1.16, z: 1.64, pillY: 0.42 },
+    { x: -0.64, z: 1.26, pillY: 0.84 },
+    { x: 0, z: 1.68, pillY: 0.42 },
+    { x: 0.64, z: 1.26, pillY: 0.84 },
+    { x: 1.16, z: 1.64, pillY: 0.42 },
+  ];
   const strayEntries = room.strays.map((stray, idx) => {
-    const lx = strayX[idx] ?? strayX[0];
-    const lz = 1.46;
+    const slot = strayLayout[idx] ?? { x: 0, z: 1.5, pillY: 0.48 };
+    const lx = slot.x;
+    const lz = slot.z;
+    const pillY = slot.pillY;
     const homeRoomSpec = ROOM_SPECS.find((r) => r.id === stray.homeRoom);
     const sg = new THREE.Group();
     sg.position.set(lx, 0, lz);
-    sg.add(cyl(0.36, 0.3, 0.36, '#6b4928', 0, 0.18, 0));
+    sg.scale.setScalar(0.8);
+    sg.add(cyl(0.34, 0.28, 0.36, '#6b4928', 0, 0.18, 0));
 
     const rimMat = mat(homeRoomSpec?.accent ?? room.accent);
-    const rimMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.36, 0.06, 14), rimMat);
+    const rimMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.34, 0.06, 14), rimMat);
     rimMesh.position.set(0, 0.38, 0);
     rimMesh.castShadow = true;
     rimMesh.receiveShadow = true;
@@ -1636,13 +2082,14 @@ export function buildHolidayAlcoveBay(
     const prop = buildPropMesh(stray.id, room.accent);
     prop.position.set(0, 0.42, 0);
     sg.add(prop);
-    floating.push({ mesh: prop, phase: idx * 1.7, baseY: 0.42 });
+    floating.push({ mesh: prop, phase: idx * 1.4, baseY: 0.42 });
 
     bay.add(sg);
     return {
       stray,
       lx,
       lz,
+      pillY,
       homeRoomSpec,
       sg,
       rimMat,
@@ -1650,22 +2097,43 @@ export function buildHolidayAlcoveBay(
     };
   });
 
-  const cpFocusPos = bayToWorld(theta, 0, 2.15, 3.6);
-  const cpFocusLook = bayToWorld(theta, 0, 2.35, 0.36);
+  const cageFocusPos = bayToWorld(theta, 0, 2.25, 3.6);
+  const cageFocusLook = bayToWorld(theta, 0, 2.48, 0.42);
+  const homeTwistFocusPos = bayToWorld(theta, 0, 1.75, 3.7);
+  const homeTwistFocusLook = bayToWorld(theta, 0, 0.95, 0.55);
   const warmupFocusPos = bayToWorld(theta, 0, 1.65, 3.8);
-  const warmupFocusLook = bayToWorld(theta, 0, 1.25, 0.5);
-  const centerHeroWorldPos = bayToWorld(theta, 0, 1.38, 0.75);
+  const warmupFocusLook = bayToWorld(theta, 0, 1.15, 0.55);
+  const centerHeroWorldPos = bayToWorld(theta, 0, 0.62, 1.15);
+  const drainedScratchColor = new THREE.Color(0x4a5568);
+
+  // The mascot's exit: the 5th relic lifts the cage away and the mascot hops off its shelf
+  // toward the hall (about 1.5 s). `wasComplete` is null until the first sync, so a room that
+  // loads already restored doesn't replay it.
+  const EXIT_SECONDS = 1.5;
+  const cageBaseY = cage.position.y;
+  const mascotBase = mascotMesh.position.clone();
+  const mascotBaseScale = mascotMesh.scale.x;
+  let wasComplete: boolean | null = null;
+  let exitPending = false;
+  let exitStart: number | null = null;
+  const resetExit = (): void => {
+    cage.position.y = cageBaseY;
+    mascotMesh.position.copy(mascotBase);
+    mascotMesh.rotation.set(0, 0, 0);
+    mascotMesh.scale.setScalar(mascotBaseScale);
+  };
 
   const syncState = (hotspotsOut: Hotspot3D[]): void => {
     const complete = gameState.isRoomComplete(room);
+    const restoredCount = gameState.roomRestoredRelicCount(room);
     const roomUnlocked = gameState.isRoomUnlocked(room);
     const carriedUnlockItem = gameState.carriedEligibleItemForRoom(room);
     const warmupDone = gameState.solvedRuns.has(room.warmup.id);
-    const cpDone = gameState.solvedRuns.has(room.centerpiece.proto.id);
-    const cpUnlocked = gameState.isCenterpieceUnlocked(room);
+    const homeTwistDone = gameState.solvedRuns.has(room.homeTwist.proto.id);
+    const homeTwistUnlocked = gameState.isHomeTwistUnlocked(room);
     const strayUnlocked = gameState.isStrayUnlocked(room);
 
-    // Master lamp & fairy lights
+    // Master lamp & fairy lights light up when all 5 relics are placed (mascot freed)
     lampOn.visible = complete;
     lampOff.visible = !complete;
     for (const fl of fairyLights) {
@@ -1679,69 +2147,103 @@ export function buildHolidayAlcoveBay(
       }
     }
 
-    // Centerpiece accent / crown materials
-    cpAccentOrGoldMat.color.setHex(hexToNumber((cpDone ? '#f6e05e' : room.accent) as `#${string}`));
-    const crownHex = cpDone ? '#ffea79' : '#f6e05e';
-    cpCrownGlowMat.color.setHex(hexToNumber(crownHex));
-    cpCrownGlowMat.emissive.setHex(hexToNumber(crownHex));
+    // Old centerpiece prop stays as background decoration: drained while incomplete, full color when complete
+    for (const entry of cpDecorativeMats) {
+      if (complete) {
+        entry.mat.color.copy(entry.baseColor);
+        entry.mat.emissive.copy(entry.baseEmissive);
+        entry.mat.emissiveIntensity = entry.baseEmissiveIntensity;
+      } else {
+        entry.mat.color.copy(entry.baseColor).lerp(drainedScratchColor, 0.72);
+        entry.mat.emissiveIntensity = 0;
+      }
+    }
+    if (complete) {
+      cpAccentOrGoldMat.color.setHex(hexToNumber('#f6e05e'));
+      cpCrownGlowMat.color.setHex(hexToNumber('#ffea79'));
+      cpCrownGlowMat.emissive.setHex(hexToNumber('#ffea79'));
+      cpCrownGlowMat.emissiveIntensity = 0.95;
+    }
 
-    // Mascot stage cage & base top color
-    cage.visible = !cpDone;
-    baseTopMat.color.setHex(hexToNumber((cpDone ? '#48bb78' : room.accent) as `#${string}`));
+    // Mascot cage & 5 padlocks on the top-center shelf (the exit animation hides them itself)
+    if (wasComplete === false && complete) {
+      exitPending = true;
+      exitStart = null;
+    }
+    if (!complete) {
+      exitPending = false;
+      resetExit();
+    }
+    wasComplete = complete;
+    cage.visible = !complete || exitPending;
+    mascotMesh.visible = !complete || exitPending;
+    baseTopMat.color.setHex(hexToNumber((complete ? '#48bb78' : room.accent) as `#${string}`));
+    for (let i = 0; i < padlocks.length; i++) {
+      const lock = padlocks[i];
+      if (!lock) continue;
+      const unlockedLock = i < restoredCount;
+      lock.bodyMat.color.setHex(hexToNumber(unlockedLock ? '#48bb78' : '#c53030'));
+      lock.shackle.position.y = unlockedLock ? 0.056 : 0.04;
+      lock.shackle.rotation.y = unlockedLock ? 0.65 : 0;
+    }
 
     hotspotsOut.push({
       id: `mascot:${room.id}`,
       bay: room.id,
-      label: room.shortTitle,
-      icon: room.icon,
-      status: cpDone ? 'done' : 'ready',
+      label: complete
+        ? `★ ${room.shortTitle} Mascot Freed!`
+        : `🔒 ${room.shortTitle} Cage (${restoredCount}/5 Padlocks Open)`,
+      sublabel: complete ? 'In Holiday Hall' : 'Place all 5 Relics below to free!',
+      icon: complete ? '★' : room.icon,
+      status: complete ? 'done' : 'ready',
       accent: room.accent,
       hiddenPill: true,
-      worldPos: bayToWorld(theta, 0, 0.35, 1.44),
-      cameraPos: bayToWorld(theta, 0, 1.65, 3.8),
-      cameraLook: bayToWorld(theta, 0, 0.45, 1.44),
+      worldPos: bayToWorld(theta, 0, 2.38, 0.56),
+      cameraPos: cageFocusPos,
+      cameraLook: cageFocusLook,
       meshGroup: mascotStage,
       onClick: () => {
         callbacks.onClickMascot?.(room.id);
       },
     });
 
+    // Rung 2: Home Twist Run (5 puzzles, 5×5 → 7×7, unlocked right after Intro Run)
     if (warmupDone) {
       hotspotsOut.push({
-        id: `proto:${room.centerpiece.proto.id}`,
+        id: `proto:${room.homeTwist.proto.id}`,
         bay: room.id,
-        label: cpDone
-          ? `✓ ${room.centerpiece.icon} ${room.centerpiece.title}`
-          : cpUnlocked
-            ? `${room.centerpiece.icon} ${room.centerpiece.title}`
-            : `🔒 ${room.centerpiece.title}`,
-        sublabel: cpDone
-          ? '★ Restored!'
-          : cpUnlocked
-            ? '▶ Ready to Solve!'
-            : 'Restore 2 Relics Below',
-        icon: cpDone ? '✓' : cpUnlocked ? room.centerpiece.icon : '🔒',
-        status: cpDone ? 'done' : cpUnlocked ? 'ready' : 'locked',
+        label: homeTwistDone
+          ? `✓ ${room.homeTwist.icon} ${room.homeTwist.title}`
+          : `${room.homeTwist.icon} ${room.homeTwist.title}`,
+        sublabel: homeTwistDone ? '✓ Home Twist Complete' : '▶ Tap to Solve Home Twist',
+        icon: homeTwistDone ? '✓' : room.homeTwist.icon,
+        status: homeTwistDone ? 'done' : homeTwistUnlocked ? 'ready' : 'locked',
+        hero: !homeTwistDone,
         accent: room.accent,
-        worldPos: bayToWorld(theta, 0, 2.32, 0.62),
-        cameraPos: cpFocusPos,
-        cameraLook: cpFocusLook,
-        meshGroup: cpGroup,
+        worldPos: homeTwistDone ? bayToWorld(theta, -0.78, 0.02, 2.16) : centerHeroWorldPos,
+        cameraPos: homeTwistFocusPos,
+        cameraLook: homeTwistFocusLook,
         onClick: () => {
-          if (cpUnlocked) callbacks.onOpenProto(room.centerpiece.proto.id, cpFocusPos, cpFocusLook);
+          if (homeTwistUnlocked) {
+            callbacks.onOpenProto(room.homeTwist.proto.id, homeTwistFocusPos, homeTwistFocusLook);
+          }
         },
       });
     }
 
-    // Update pedestals in-place
-    for (const ped of pedestalEntries) {
+    // Update 5 Relic Shelves in a semicircle around & below the cage
+    for (const ped of shelfEntries) {
       const item = STRAY_ITEMS[ped.reqId];
       const hasItem = gameState.solvedRuns.has(item.proto.id);
       const isPlaced = gameState.placedItems.has(ped.reqId);
       const isCarried = hasItem && !isPlaced;
+      const foundInRoom = ROOM_SPECS.find((r) => r.strays.some((s) => s.id === ped.reqId));
 
       ped.placedMesh.visible = isPlaced;
+      ped.silhouetteMesh.visible = !isPlaced;
       ped.emptyCap.visible = !isPlaced;
+      ped.silhouetteMat.color.setHex(isCarried ? 0xf6e05e : 0x3b4252);
+      ped.silhouetteMat.opacity = isCarried ? 0.65 : 0.38;
       ped.midRingMat.color.setHex(
         hexToNumber(isPlaced ? '#48bb78' : isCarried ? '#f6e05e' : '#718096'),
       );
@@ -1750,25 +2252,29 @@ export function buildHolidayAlcoveBay(
       );
       ped.emptyCapMat.color.setHex(hexToNumber(isCarried ? '#ecc94b' : '#4a5568'));
 
-      if (warmupDone) {
+      if (roomUnlocked) {
         hotspotsOut.push({
           id: `pedestal:${ped.reqId}`,
           bay: room.id,
           kind: 'return-slot',
           label: `${item.icon} ${item.title}`,
-          sublabel: isPlaced ? '✓ Restored' : isCarried ? '✨ Tap to Restore' : 'Restore Relic',
+          sublabel: isPlaced
+            ? '✓ Padlock Opened'
+            : isCarried
+              ? '✨ Tap to Place & Open Padlock'
+              : `📍 Found in ${foundInRoom?.icon ?? ''} ${foundInRoom?.shortTitle ?? ''}`,
           icon: isPlaced ? '✓' : isCarried ? '✨' : item.icon,
           status: isPlaced ? 'done' : isCarried ? 'place' : 'locked',
           connections: [
             {
-              targetId: `proto:${room.centerpiece.proto.id}`,
+              targetId: `mascot:${room.id}`,
               state: isPlaced ? 'done' : isCarried ? 'place' : 'locked',
             },
           ],
           accent: isCarried ? '#d69e2e' : room.accent,
-          worldPos: bayToWorld(theta, ped.lx, 1.56, ped.lz + 0.22),
-          cameraPos: cpFocusPos,
-          cameraLook: bayToWorld(theta, ped.lx, 1.75, ped.lz),
+          worldPos: bayToWorld(theta, ped.lx, ped.ly - 0.08, ped.lz + 0.22),
+          cameraPos: cageFocusPos,
+          cameraLook: bayToWorld(theta, ped.lx, ped.ly + 0.15, ped.lz),
           meshGroup: ped.pg,
           onClick: () => {
             if (isCarried) callbacks.onPlaceItem(ped.reqId);
@@ -1777,9 +2283,10 @@ export function buildHolidayAlcoveBay(
       }
     }
 
-    // Update stray tables in-place
+    // Update 5 Relic Tables on the floor (hidden until both home levels are done!)
     for (const st of strayEntries) {
       const strayDone = gameState.solvedRuns.has(st.stray.proto.id);
+      st.sg.visible = strayUnlocked;
       st.prop.visible = !strayDone;
       st.rimMat.color.setHex(
         hexToNumber(
@@ -1787,40 +2294,41 @@ export function buildHolidayAlcoveBay(
         ),
       );
 
-      if (warmupDone) {
-        const camPos = bayToWorld(theta, st.lx * 0.5, 1.75, 3.8);
-        const camLook = bayToWorld(theta, st.lx, 0.68, st.lz);
+      if (strayUnlocked) {
+        const camPos = bayToWorld(theta, st.lx * 0.45, 1.75, 3.8);
+        const camLook = bayToWorld(theta, st.lx, 0.64, st.lz);
+        const shortStrayTitle = st.stray.title.replace(/^The\s+/i, '');
         hotspotsOut.push({
           id: `proto:${st.stray.proto.id}`,
           bay: room.id,
           label: strayDone
-            ? `✓ ${st.stray.icon} ${st.stray.title}`
-            : `${st.stray.icon} ${st.stray.title}`,
+            ? `✓ ${st.stray.icon} ${shortStrayTitle}`
+            : `${st.stray.icon} ${shortStrayTitle}`,
           sublabel: strayDone
             ? `✓ Freed → ${st.homeRoomSpec?.shortTitle ?? ''}`
             : `→ ${st.homeRoomSpec?.shortTitle ?? ''}`,
           icon: strayDone ? '✓' : st.stray.icon,
           status: strayDone ? 'done' : 'ready',
           accent: st.homeRoomSpec?.accent ?? room.accent,
-          worldPos: bayToWorld(theta, st.lx, 0.62, 1.52),
+          worldPos: bayToWorld(theta, st.lx, st.pillY, st.lz + 0.06),
           cameraPos: camPos,
           cameraLook: camLook,
           meshGroup: st.sg,
           onClick: () => {
-            if (strayUnlocked) callbacks.onOpenProto(st.stray.proto.id, camPos, camLook);
+            callbacks.onOpenProto(st.stray.proto.id, camPos, camLook);
           },
         });
       }
     }
 
-    // Tier 4: Room lock / item unlock / warm-up
+    // Rung 1: Room lock / relic unlock / Intro Run
     if (!roomUnlocked) {
       if (carriedUnlockItem) {
         hotspotsOut.push({
           id: `unlock:${room.id}`,
           bay: room.id,
-          label: `✨ Restore ${carriedUnlockItem.icon} ${carriedUnlockItem.title}`,
-          sublabel: `▶ Tap to Restore Relic & Unlock ${room.shortTitle}`,
+          label: `✨ Place ${carriedUnlockItem.icon} ${carriedUnlockItem.title}`,
+          sublabel: `▶ Tap to Place Relic & Unlock ${room.shortTitle}`,
           icon: '✨',
           status: 'place',
           accent: '#d69e2e',
@@ -1831,13 +2339,11 @@ export function buildHolidayAlcoveBay(
           onClick: () => callbacks.onPlaceItem(carriedUnlockItem.id),
         });
       } else {
-        const req0 = STRAY_ITEMS[room.centerpiece.requiredItems[0]];
-        const req1 = STRAY_ITEMS[room.centerpiece.requiredItems[1]];
         hotspotsOut.push({
           id: `locked:${room.id}`,
           bay: room.id,
           label: `🔒 ${room.shortTitle} Locked`,
-          sublabel: `Bring ${req0.icon} ${req0.title} or ${req1.icon} ${req1.title} to unlock`,
+          sublabel: `Bring any ${room.shortTitle} Relic to unlock`,
           icon: '🔒',
           status: 'locked',
           accent: '#718096',
@@ -1853,7 +2359,7 @@ export function buildHolidayAlcoveBay(
         id: `proto:${room.warmup.id}`,
         bay: room.id,
         label: `${room.icon} ${room.warmup.title}`,
-        sublabel: '▶ Tap to Start Warm-up',
+        sublabel: '▶ Tap to Start Intro Run',
         icon: '★',
         status: 'ready',
         accent: room.accent,
@@ -1868,15 +2374,17 @@ export function buildHolidayAlcoveBay(
         id: `proto:${room.warmup.id}`,
         bay: room.id,
         label: `✓ ${room.icon} ${room.warmup.title}`,
-        sublabel: '✓ Warm-up Complete',
+        sublabel: '✓ Intro Run Complete',
         icon: '✓',
         status: 'done',
-        connections: room.strays.map((s) => ({
-          targetId: `proto:${s.proto.id}`,
-          state: 'done' as const,
-        })),
+        connections: [
+          {
+            targetId: `proto:${room.homeTwist.proto.id}`,
+            state: 'done' as const,
+          },
+        ],
         accent: '#2f855a',
-        worldPos: bayToWorld(theta, 0, -0.02, 2.12),
+        worldPos: bayToWorld(theta, 0.78, 0.02, 2.16),
         cameraPos: warmupFocusPos,
         cameraLook: warmupFocusLook,
         onClick: () => callbacks.onOpenProto(room.warmup.id, warmupFocusPos, warmupFocusLook),
@@ -1893,5 +2401,33 @@ export function buildHolidayAlcoveBay(
     fxPulses,
     floating,
     syncState,
+    animate: (t) => {
+      if (!exitPending) return;
+      exitStart ??= t;
+      const u = Math.min(1, (t - exitStart) / EXIT_SECONDS);
+      // The cage lifts straight up and out of frame over the first third.
+      const lift = Math.min(1, u / 0.33);
+      cage.position.y = cageBaseY + lift * lift * 1.6;
+      // Then the mascot crouches, hops off the shelf's front edge and drops out of view.
+      const hop = Math.max(0, (u - 0.25) / 0.75);
+      const squash = u < 0.25 ? Math.sin((u / 0.25) * Math.PI) * 0.12 : 0;
+      mascotMesh.scale.set(
+        (1 + squash * 0.5) * mascotBaseScale,
+        (1 - squash) * mascotBaseScale,
+        (1 + squash * 0.5) * mascotBaseScale,
+      );
+      mascotMesh.position.set(
+        mascotBase.x + hop * 0.35,
+        mascotBase.y + Math.sin(hop * Math.PI) * 0.45 - hop * hop * 1.9,
+        mascotBase.z + hop * 0.9,
+      );
+      mascotMesh.rotation.y = hop * 0.6;
+      if (u >= 1) {
+        exitPending = false;
+        cage.visible = false;
+        mascotMesh.visible = false;
+        resetExit();
+      }
+    },
   };
 }

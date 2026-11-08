@@ -229,13 +229,12 @@ function interactive(): void {
         gameState.setRunSolved(stray.proto.id, true);
         gameState.setItemPlaced(stray.id, true);
       }
-      gameState.setRunSolved(room.centerpiece.proto.id, true);
+      gameState.setRunSolved(room.homeTwist.proto.id, true);
     }
     if (variant === 'restored') gameState.setRunSolved(FINALE_PROTO.id, true);
     return buildHolidayHallDiorama({
       onSelectBay: () => undefined,
       onOpenProto: () => undefined,
-      onOpenDesk: () => undefined,
       onShowStory: () => undefined,
       onPlaceItem: () => undefined,
     });
@@ -346,9 +345,8 @@ function interactive(): void {
   heading('Mascots');
   for (const id of MASCOT_IDS.map((m) => `mascots/${m}`))
     entry(id, `model:${id}`, () => showModel(id));
-  // At the start: every stray item on its table, the centrepieces locked (empty pedestals left out).
-  // Restored: the items home on their pedestals, and the centrepieces done.
-  const centrepieces = new Set(ROOM_SPECS.map((r) => `proto:${r.centerpiece.proto.id}`));
+  // At the start: every relic on its table in the room it's stranded in (empty shelves left out).
+  // Restored: every relic home on its shelf.
   for (const variant of ['start', 'restored'] as const) {
     heading(`Holiday Hall (${variant})`);
     entry('whole hall', `bay:${variant}/all`, () => showHall(variant, 'all'));
@@ -363,7 +361,7 @@ function interactive(): void {
       );
   heading('Props (restored)');
   for (const spot of halls.restored.hotspots)
-    if (spot.meshGroup && (spot.id.startsWith('pedestal:') || centrepieces.has(spot.id)))
+    if (spot.meshGroup && spot.id.startsWith('pedestal:'))
       entry(`${spot.label} · ${spot.bay}`, `prop:restored/${spot.id}`, () =>
         showProp('restored', spot.id),
       );

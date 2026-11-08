@@ -2,13 +2,11 @@
  * Shared types, canonical terminology, and helpers for the 6 Clauses of the
  * XMAS365™ Merger Contract and the 6×6 Holiday Base × Twist system.
  *
- * Each clause (`C1`–`C6`) is a 29-puzzle Run of a single Base:
- * - Puzzle 0 (`base`, 1 puzzle): Plain Base with no twists.
- * - Puzzles 1–6 (`intro`, 6 puzzles): Reminder puzzles (one per twist in
+ * Each clause (`C1`–`C6`) is a 22-puzzle Run of a single Base:
+ * - Puzzles 0–5 (`intro`, 6 puzzles): Reminder puzzles (one per twist in
  *   canonical order) that re-explain how that twist works in this Base.
- * - Puzzles 7–12 (`solo`, 6 puzzles): Nontrivial Solo Twist puzzles (`easy`/`medium`).
- * - Puzzles 13–27 (`duo`, 15 puzzles): All 15 Double Twist combinations (`0 <= i < j < 6`).
- * - Puzzle 28 (`all6`, 1 puzzle): Finale puzzle combining all 6 twists at once.
+ * - Puzzles 6–20 (`duo`, 15 puzzles): All 15 Double Twist combinations (`0 <= i < j < 6`).
+ * - Puzzle 21 (`all6`, 1 puzzle): Finale puzzle combining all 6 twists at once.
  */
 
 export type ClauseGenre = 'webs' | 'carving' | 'lights' | 'words' | 'hops' | 'pictures';
@@ -20,7 +18,7 @@ export type ClauseId = 'C1' | 'C2' | 'C3' | 'C4' | 'C5' | 'C6';
 
 export type ClauseSection = 'base' | 'intro' | 'solo' | 'duo' | 'all6';
 
-export const CLAUSE_PANEL_COUNT = 29;
+export const CLAUSE_PANEL_COUNT = 22;
 
 export const CLAUSE_GENRES: readonly ClauseGenre[] = [
   'webs',
@@ -131,6 +129,29 @@ export function twistKeyToHoliday(key: string): HolidayId | undefined {
   }
 }
 
+/** Map a `(genre, twistHoliday)` pair to that genre's generator twist key. */
+export function getGenreTwistKey(genre: ClauseGenre, twistHoliday: HolidayId): string {
+  switch (twistHoliday) {
+    case 'halloween':
+      return 'dark';
+    case 'thanksgiving':
+      if (genre === 'lights') return 'slices';
+      if (genre === 'hops') return 'courses';
+      if (genre === 'pictures') return 'portions';
+      return 'cuts';
+    case 'christmas':
+      return 'snow';
+    case 'valentines':
+      return 'letters';
+    case 'easter':
+      if (genre === 'carving') return 'basket';
+      if (genre === 'hops') return 'burrows';
+      return 'eggs';
+    case 'fourth':
+      return 'colours';
+  }
+}
+
 export interface PuzzleIdentity {
   baseName: string;
   baseHoliday: string;
@@ -195,7 +216,7 @@ export interface TwistMeta {
 export interface ClausePanelItem<P = unknown> {
   /** Display flavor name of the puzzle. */
   name: string;
-  /** Stage within the 29-puzzle Clause Run. */
+  /** Stage within the 22-puzzle Clause Run. */
   section: ClauseSection;
   /** Active twist keys on this puzzle (in canonical `twistOrder`). */
   twists: readonly string[];
@@ -226,7 +247,7 @@ export interface ClauseDef<P = unknown> {
   twistOrder: readonly string[];
   /** Metadata for each of the 6 twists in `twistOrder`. */
   twistMeta: readonly TwistMeta[];
-  /** Exactly 29 puzzles: 1 base + 6 intro + 6 solo + 15 duo + 1 all6. */
+  /** Exactly 22 puzzles: 6 rule reminders + 15 two-twist pairs + 1 all-twist boss. */
   panels: readonly ClausePanelItem<P>[];
 }
 

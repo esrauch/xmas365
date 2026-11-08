@@ -1,6 +1,6 @@
 /**
  * The entry point for Puzz: Holiday Hall — a single 3D cel-shaded toy-theatre
- * rotunda where the central Merger Contract & Calendar Desk bay and all six
+ * rotunda where the central Merger Contract & Freed Mascots' Corner bay and all six
  * Holiday Alcoves live around the perimeter of the same room.
  *
  * Rotating between holidays pans around Holiday Hall in 3D, with horizontal-FOV
@@ -11,6 +11,7 @@ import { common } from './content/palettes';
 import {
   type BeatId,
   type DialogueLine,
+  HALL_MASCOT_LINES,
   MEMOS,
   MEMO_ORDER,
   type MemoId,
@@ -20,7 +21,6 @@ import {
   getBeatSpec,
 } from './content/script';
 import { installErrorOverlay } from './dev/errorOverlay';
-import { mountCalendarDesk } from './game/calendarDesk';
 import {
   BAY_ORDER,
   type BayId,
@@ -58,7 +58,7 @@ const view = new View(canvas, { fov: 40, outline: params.get('outline') !== '0' 
 // Scene state: all 7 bays live in one Holiday Hall diorama
 let currentBay: BayId = 'hall';
 let activeDiorama: BuiltDiorama | null = null;
-let activeModal: 'none' | 'proto' | 'desk' | 'corkboard' | 'settings' | 'credits' = 'none';
+let activeModal: 'none' | 'proto' | 'corkboard' | 'settings' | 'credits' = 'none';
 let activeProtoId: string | null = null;
 let activeProtoWasSolvedOnOpen = false;
 
@@ -211,10 +211,10 @@ let cagedPromptTimer: number | null = null;
 
 /**
  * One-line "barks" that play like a caged mascot's plea: a speech bubble at the bottom with
- * no button, which fades away on its own. Leap Day's reactions to the opening memo (P2) and
- * to the first item home (T3) work this way too.
+ * no button, which fades away on its own. Leap Day's one-off reactions work this way too: to
+ * the opening memo (P2), the first relic freed (T2) and the first relic on a shelf (T3).
  */
-const BARK_BEATS: ReadonlySet<string> = new Set(['P2', 'T3']);
+const BARK_BEATS: ReadonlySet<string> = new Set(['P2', 'T2', 'T3']);
 const BARK_SECONDS = 5;
 
 function clearCagedPromptTimer(): void {
@@ -772,13 +772,15 @@ function buildHotspotDOM(hotspots: Hotspot3D[]): void {
     .filter((hs) => !hs.hiddenPill)
     .map((hs) => {
       if (hs.kind === 'return-slot') {
-        const slotTitle = hs.label.startsWith(`${hs.icon} `)
+        const rawTitle = hs.label.startsWith(`${hs.icon} `)
           ? hs.label.slice(hs.icon.length + 1)
           : hs.label;
+        const slotTitle = rawTitle.replace(/^The\s+/i, '');
         const el = h(
           hs.status === 'place' ? 'button' : 'div',
           {
             class: `ladder-return-slot ${hs.status}`,
+            title: hs.sublabel ? `${rawTitle} · ${hs.sublabel}` : rawTitle,
             onclick:
               hs.status === 'place'
                 ? (e: MouseEvent) => {
@@ -798,7 +800,7 @@ function buildHotspotDOM(hotspots: Hotspot3D[]): void {
                 gap: '1px',
               },
             },
-            h('span', { style: { fontWeight: '800', fontSize: '10.5px' } }, slotTitle),
+            h('span', { style: { fontWeight: '800', fontSize: '10px' } }, slotTitle),
             hs.status === 'place'
               ? h(
                   'span',
@@ -896,7 +898,7 @@ function layoutStableHotspots(): void {
   stableCam.lookAt(bayToWorld(camAngleTarget, 0, 1.38, 0.75));
   stableCam.updateMatrixWorld();
 
-  const padX = currentBay === 'hall' ? Math.min(60, w * 0.16) : Math.min(76, w * 0.2);
+  const padX = currentBay === 'hall' ? Math.min(54, w * 0.14) : Math.min(58, w * 0.15);
   const topBarBottom =
     topBar.getBoundingClientRect().bottom - view.canvas.getBoundingClientRect().top;
   const minY = Math.max(88, topBarBottom > 0 ? topBarBottom + 22 : 88);
@@ -984,20 +986,85 @@ function syncBayUIAndHotspots(): void {
   }
 }
 
+function showHallMascotBark(roomId: RoomSpec['id']): void {
+  const entry = HALL_MASCOT_LINES[roomId];
+  const room = ROOM_SPECS.find((r) => r.id === roomId);
+  if (!entry || !room) return;
+  clearCagedPromptTimer();
+  leapBubbleHost.replaceChildren();
+  const card = h(
+    'div',
+    {
+      class: 'interactive',
+      style: {
+        background: '#fffdf9',
+        color: '#1f2430',
+        border: `2.5px solid ${room.accent}`,
+        borderRadius: '18px',
+        padding: '10px 13px',
+        boxShadow: '0 4px 0 #1f2430, 0 10px 22px rgba(0,0,0,0.28)',
+        pointerEvents: 'none',
+      },
+    },
+    h(
+      'div',
+      {
+        style: {
+          fontSize: '11px',
+          fontWeight: '900',
+          letterSpacing: '0.05em',
+          color: room.accent,
+          marginBottom: '4px',
+        },
+      },
+      `${entry.icon} ${entry.speaker.toUpperCase()} · ${room.shortTitle.toUpperCase()}`,
+    ),
+    h(
+      'div',
+      { style: { fontSize: '12.5px', lineHeight: '1.4', fontWeight: '600' } },
+      `"${entry.line}"`,
+    ),
+  );
+  const bubble = h(
+    'div',
+    {
+      style: {
+        width: 'min(380px, 100%)',
+        margin: '0 auto',
+        pointerEvents: 'none',
+        transition: 'opacity 0.35s ease',
+        animation: 'puzz-card-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) both',
+      },
+    },
+    card,
+  );
+  storyBannerHost.replaceChildren(bubble);
+  cagedPromptTimer = window.setTimeout(() => {
+    bubble.style.opacity = '0';
+    cagedPromptTimer = window.setTimeout(() => {
+      cagedPromptTimer = null;
+      renderActiveStoryBeat();
+    }, 350);
+  }, BARK_SECONDS * 1000);
+}
+
 function rebuildScene(): void {
   if (!activeDiorama) {
     activeDiorama = buildHolidayHallDiorama({
       onSelectBay: (bay) => switchBay(bay),
       onOpenProto: (protoId, focusPos, focusLook) => openProtoModal(protoId, focusPos, focusLook),
-      onOpenDesk: (focusPos, focusLook) => openCalendarDeskModal(focusPos, focusLook),
       onShowStory: () => openCorkboardModal(),
       onOpenCorkboard: () => openCorkboardModal(),
       onClickMascot: (roomId) => {
         const room = ROOM_SPECS.find((r) => r.id === roomId);
         if (!room) return;
+        blip(587, 55);
+        if (currentBay === 'hall' && gameState.isRoomComplete(room)) {
+          showHallMascotBark(roomId);
+          return;
+        }
         const script = ROOM_SCRIPT[roomId];
         const beatId = gameState.isRoomComplete(room) ? script.freedBeatId : script.cagedBeatId;
-        blip(587, 55);
         gameState.enqueueBeat(beatId, true);
         renderActiveStoryBeat();
       },
@@ -1131,16 +1198,14 @@ const ROOM_TINTS: Record<string, string> = {
   fourth: '#eff6ff',
 };
 
-function showUnlockDialog(roomSpec: RoomSpec, kind: 'warm-up' | 'centerpiece'): void {
-  const isWarmup = kind === 'warm-up';
-  const readyForSanta =
-    !isWarmup && gameState.completedRoomCount() >= 6 && !gameState.solvedRuns.has('clause');
+function showUnlockDialog(roomSpec: RoomSpec, kind: 'intro' | 'home'): void {
+  const isWarmup = kind === 'intro';
   const titleText = isWarmup
-    ? `${roomSpec.icon} ${roomSpec.genreLabel} Unlocked at Calendar Desk!`
-    : `${roomSpec.icon} All ${roomSpec.genreLabel} Twists Unlocked!`;
+    ? `${roomSpec.icon} ${roomSpec.homeTwist.title} Unlocked!`
+    : `${roomSpec.icon} 5 Relic Runs Unlocked in ${roomSpec.shortTitle}!`;
   const detailText = isWarmup
-    ? `Beating the ${roomSpec.shortTitle} Warm-up (${roomSpec.warmup.title}) unlocked both the Warm-up replay and the Standard (No-Twist) ${roomSpec.genreLabel} generator at Leap Day's Calendar Desk!`
-    : `Beating the ${roomSpec.shortTitle} Centerpiece (${roomSpec.centerpiece.title}) unlocked all 6 holiday twists for ${roomSpec.genreLabel} at Leap Day's Calendar Desk!`;
+    ? `Beating the ${roomSpec.shortTitle} Intro Run (${roomSpec.warmup.title}) unlocked ${roomSpec.homeTwist.title} (Home Twist) and Free Play (5×5 / 7×7 / 9×9) on this rung!`
+    : `Beating ${roomSpec.homeTwist.title} unlocked all 5 foreign Relic Runs on the floor of ${roomSpec.shortTitle}, plus Free Play (5×5 / 7×7 / 9×9) on this rung!`;
 
   const overlay = h(
     'div',
@@ -1183,7 +1248,7 @@ function showUnlockDialog(roomSpec: RoomSpec, kind: 'warm-up' | 'centerpiece'): 
             marginBottom: '10px',
           },
         },
-        isWarmup ? '🔓 Unlocked!' : '✨ Holiday Restored!',
+        '🔓 Unlocked!',
       ),
       h(
         'h3',
@@ -1220,53 +1285,6 @@ function showUnlockDialog(roomSpec: RoomSpec, kind: 'warm-up' | 'centerpiece'): 
             flexWrap: 'wrap',
           },
         },
-        !isWarmup
-          ? h(
-              'button',
-              {
-                style: {
-                  padding: '8px 16px',
-                  borderRadius: '999px',
-                  fontWeight: '800',
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                  background: readyForSanta ? '#c53030' : roomSpec.accent,
-                  color: '#fff',
-                  border: '2px solid #1f2430',
-                  boxShadow: '0 2px 0 #1f2430',
-                },
-                onclick: () => {
-                  overlay.remove();
-                  switchBay('hall');
-                },
-              },
-              readyForSanta
-                ? '🎅 Confront CEO Santa in Holiday Hall ▸'
-                : '← Return to Holiday Hall ▸',
-            )
-          : null,
-        h(
-          'button',
-          {
-            style: {
-              padding: '8px 16px',
-              borderRadius: '999px',
-              fontWeight: '800',
-              fontSize: '13px',
-              cursor: 'pointer',
-              background: '#805ad5',
-              color: '#fff',
-              border: '2px solid #1f2430',
-              boxShadow: '0 2px 0 #1f2430',
-            },
-            onclick: () => {
-              overlay.remove();
-              switchBay('hall');
-              openCalendarDeskModal();
-            },
-          },
-          '📅 Open Calendar Desk',
-        ),
         h(
           'button',
           {
@@ -1628,7 +1646,7 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
     (r) =>
       r.warmup.id === proto.id ||
       r.strays.some((s) => s.proto.id === proto.id) ||
-      r.centerpiece.proto.id === proto.id,
+      r.homeTwist.proto.id === proto.id,
   );
   const strayEntry = Object.values(STRAY_ITEMS).find((s) => s.proto.id === proto.id);
   const accent = roomSpec?.accent ?? '#c53030';
@@ -1661,11 +1679,7 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
         rebuildScene();
         hotspotLayer.style.display = 'none';
         sideArrowsHost.style.display = 'none';
-        if (
-          !wasAlreadySolved &&
-          roomSpec &&
-          (proto.kind === 'warm-up' || proto.kind === 'centerpiece')
-        ) {
+        if (!wasAlreadySolved && roomSpec && (proto.kind === 'intro' || proto.kind === 'home')) {
           wasAlreadySolved = true;
           showUnlockDialog(roomSpec, proto.kind);
         }
@@ -1674,14 +1688,12 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
           ? ROOM_SPECS.find((r) => r.id === strayEntry.homeRoom)
           : undefined;
         const cpRoom =
-          proto.kind === 'centerpiece'
-            ? ROOM_SPECS.find((r) => r.centerpiece.proto.id === proto.id)
+          proto.kind === 'home'
+            ? ROOM_SPECS.find((r) => r.homeTwist.proto.id === proto.id)
             : undefined;
         const readyForSanta =
-          Boolean(cpRoom) &&
-          gameState.completedRoomCount() >= 6 &&
-          !gameState.solvedRuns.has('clause');
-        const returnHallRoom = homeRoom ?? cpRoom;
+          gameState.completedRoomCount() >= 6 && !gameState.solvedRuns.has('clause');
+        const returnHallRoom = homeRoom;
 
         doneBanner.replaceChildren(
           h(
@@ -1709,7 +1721,7 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
               strayEntry
                 ? `🎉 Freed ${strayEntry.icon} ${strayEntry.title}! Belongs in ${homeRoom?.shortTitle ?? strayEntry.homeRoom}.`
                 : cpRoom
-                  ? `✨ Holiday Restored! 🎉 ${proto.title} Complete!`
+                  ? `✨ Home Twist Complete! 🎉 All 5 Relic Runs in ${cpRoom.shortTitle} are now open!`
                   : `🎉 ${proto.title} Complete!`,
             ),
             h(
@@ -1850,44 +1862,6 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
   );
   modalHost.replaceChildren(backdrop);
   mountPuzzle();
-}
-
-function openCalendarDeskModal(
-  focusPos = bayToWorld(getBayAngle('hall'), 0.5, 1.9, 3.7),
-  focusLook = bayToWorld(getBayAngle('hall'), 0.82, 0.8, 1.15),
-): void {
-  activeModal = 'desk';
-  hotspotLayer.style.display = 'none';
-  sideArrowsHost.style.display = 'none';
-  renderActiveStoryBeat();
-  isCameraFocused = true;
-  focusPosTarget.copy(focusPos);
-  focusLookTarget.copy(focusLook);
-
-  const deskBody = h('div', { class: 'puzz-modal-body' });
-  const card = h(
-    'div',
-    {
-      class: 'puzz-modal-card',
-      onclick: (e: MouseEvent) => e.stopPropagation(),
-    },
-    deskBody,
-  );
-  card.style.setProperty('--room-accent', '#805ad5');
-  card.style.setProperty('--room-tint', '#f5f0ff');
-  const backdrop = h(
-    'div',
-    {
-      class: 'puzz-modal-backdrop',
-      onclick: () => closeModal(),
-    },
-    card,
-  );
-  modalHost.replaceChildren(backdrop);
-  mountCalendarDesk(deskBody, () => {
-    closeModal();
-    rebuildScene();
-  });
 }
 
 function openCorkboardModal(initialMemoId?: MemoId): void {
@@ -2618,37 +2592,31 @@ function openSettingsModal(): void {
       h(
         'div',
         { style: { display: 'flex', flexWrap: 'wrap', gap: '6px' } },
-        presetBtn('Unlock All Warm-ups', () => {
-          for (const r of ROOM_SPECS) gameState.setRunSolved(r.warmup.id, true);
-        }),
-        presetBtn('Free & Restore All Relics', () => {
+        presetBtn('Unlock All Intros & Home Twists', () => {
           for (const r of ROOM_SPECS) {
             gameState.setRunSolved(r.warmup.id, true);
-            for (const s of r.strays) {
-              gameState.setRunSolved(s.proto.id, true);
-              gameState.setItemPlaced(s.id, true);
-            }
+            gameState.setRunSolved(r.homeTwist.proto.id, true);
           }
         }),
-        presetBtn('Complete All 6 Rooms (Act III)', () => {
+        presetBtn('Complete All 6 Rooms · 30 Relics (Act III)', () => {
           for (const r of ROOM_SPECS) {
             gameState.setRunSolved(r.warmup.id, true);
+            gameState.setRunSolved(r.homeTwist.proto.id, true);
             for (const s of r.strays) {
               gameState.setRunSolved(s.proto.id, true);
               gameState.setItemPlaced(s.id, true);
             }
-            gameState.setRunSolved(r.centerpiece.proto.id, true);
           }
           gameState.setRunSolved('clause', false);
         }),
         presetBtn('Void 5 Clauses (Ready for Loophole)', () => {
           for (const r of ROOM_SPECS) {
             gameState.setRunSolved(r.warmup.id, true);
+            gameState.setRunSolved(r.homeTwist.proto.id, true);
             for (const s of r.strays) {
               gameState.setRunSolved(s.proto.id, true);
               gameState.setItemPlaced(s.id, true);
             }
-            gameState.setRunSolved(r.centerpiece.proto.id, true);
           }
           for (let c = 0; c < ALL_CLAUSES.length - 1; c++) {
             gameState.setClauseVoided(c, true);
@@ -2658,11 +2626,11 @@ function openSettingsModal(): void {
         presetBtn('Unlock Everything (Act IV)', () => {
           for (const r of ROOM_SPECS) {
             gameState.setRunSolved(r.warmup.id, true);
+            gameState.setRunSolved(r.homeTwist.proto.id, true);
             for (const s of r.strays) {
               gameState.setRunSolved(s.proto.id, true);
               gameState.setItemPlaced(s.id, true);
             }
-            gameState.setRunSolved(r.centerpiece.proto.id, true);
           }
           gameState.setRunSolved('clause', true);
           gameState.setFreePlay(true);
@@ -2681,8 +2649,8 @@ function openSettingsModal(): void {
         },
       },
       makeCheckRow(
-        '📅 Free Play / Puzzle Workshop',
-        'Unlocks Puzzle Workshop at Calendar Desk',
+        '🎲 Free Play on All Room Rungs',
+        'Unlocks 5×5 / 7×7 / 9×9 Free Play across all 42 room runs',
         gameState.freePlayUnlocked,
         (next) => gameState.setFreePlay(next),
       ),
@@ -2773,19 +2741,14 @@ function openSettingsModal(): void {
     );
 
     const roomCards = ROOM_SPECS.map((room) => {
-      const req0 = STRAY_ITEMS[room.centerpiece.requiredItems[0]];
-      const req1 = STRAY_ITEMS[room.centerpiece.requiredItems[1]];
       const roomDone = gameState.isRoomComplete(room);
+      const restoredCount = gameState.roomRestoredRelicCount(room);
       const roomSign = gameState.getRoomSignage(room);
 
       const warmupDone = gameState.runSolvedPanelCount(room.warmup.id);
       const warmupTotal = gameState.runPanelCount(room.warmup.id);
-      const stray0Done = gameState.runSolvedPanelCount(room.strays[0].proto.id);
-      const stray0Total = gameState.runPanelCount(room.strays[0].proto.id);
-      const stray1Done = gameState.runSolvedPanelCount(room.strays[1].proto.id);
-      const stray1Total = gameState.runPanelCount(room.strays[1].proto.id);
-      const cpDone = gameState.runSolvedPanelCount(room.centerpiece.proto.id);
-      const cpTotal = gameState.runPanelCount(room.centerpiece.proto.id);
+      const homeTwistDone = gameState.runSolvedPanelCount(room.homeTwist.proto.id);
+      const homeTwistTotal = gameState.runPanelCount(room.homeTwist.proto.id);
 
       return h(
         'div',
@@ -2836,7 +2799,7 @@ function openSettingsModal(): void {
                 color: roomDone ? '#22543d' : '#4a5568',
               },
             },
-            roomDone ? '★ Lamp Lit' : 'Lamp Unlit',
+            roomDone ? '★ Mascot Freed & Lamp Lit' : `🔒 ${restoredCount}/5 Padlocks Open`,
           ),
         ),
         h(
@@ -2849,41 +2812,42 @@ function openSettingsModal(): void {
             },
           },
           makeCheckRow(
-            `Warm-up Run: ${room.warmup.title}`,
-            `${warmupDone}/${warmupTotal} puzzles · Unlocks room Stray Runs`,
+            `Intro Run: ${room.warmup.title}`,
+            `${warmupDone}/${warmupTotal} puzzles · Unlocks Home Twist`,
             gameState.solvedRuns.has(room.warmup.id),
             (next) => gameState.setRunSolved(room.warmup.id, next),
           ),
           makeCheckRow(
-            `Stray Run (Lost Relic Freed): ${room.strays[0].icon} ${room.strays[0].title}`,
-            `${stray0Done}/${stray0Total} puzzles · Found in ${room.shortTitle}`,
-            gameState.solvedRuns.has(room.strays[0].proto.id),
-            (next) => gameState.setRunSolved(room.strays[0].proto.id, next),
+            `Home Twist: ${room.homeTwist.icon} ${room.homeTwist.title}`,
+            `${homeTwistDone}/${homeTwistTotal} puzzles · Unlocks 5 Relic Runs`,
+            gameState.solvedRuns.has(room.homeTwist.proto.id),
+            (next) => gameState.setRunSolved(room.homeTwist.proto.id, next),
           ),
           makeCheckRow(
-            `Stray Run (Lost Relic Freed): ${room.strays[1].icon} ${room.strays[1].title}`,
-            `${stray1Done}/${stray1Total} puzzles · Found in ${room.shortTitle}`,
-            gameState.solvedRuns.has(room.strays[1].proto.id),
-            (next) => gameState.setRunSolved(room.strays[1].proto.id, next),
+            `★ All 5 ${room.shortTitle} Shelves Placed (Free Mascot)`,
+            `${restoredCount}/5 padlocks open · Lights Hall Lamp`,
+            roomDone,
+            (next) => gameState.setRoomRelicsPlaced(room, next),
           ),
-          makeCheckRow(
-            `Restored Relic 1: ${req0.icon} ${req0.title}`,
-            `Restored in ${room.shortTitle}`,
-            gameState.placedItems.has(req0.id),
-            (next) => gameState.setItemPlaced(req0.id, next),
-          ),
-          makeCheckRow(
-            `Restored Relic 2: ${req1.icon} ${req1.title}`,
-            `Restored in ${room.shortTitle}`,
-            gameState.placedItems.has(req1.id),
-            (next) => gameState.setItemPlaced(req1.id, next),
-          ),
-          makeCheckRow(
-            `Centerpiece Run: ${room.centerpiece.icon} ${room.centerpiece.title}`,
-            `${cpDone}/${cpTotal} puzzles · Restores room & lights Lamp`,
-            gameState.solvedRuns.has(room.centerpiece.proto.id),
-            (next) => gameState.setRunSolved(room.centerpiece.proto.id, next),
-          ),
+          ...room.strays.map((st) => {
+            const stDone = gameState.runSolvedPanelCount(st.proto.id);
+            const stTotal = gameState.runPanelCount(st.proto.id);
+            return makeCheckRow(
+              `Relic Run: ${st.icon} ${st.title}`,
+              `${stDone}/${stTotal} puzzles · → ${st.homeRoom}`,
+              gameState.solvedRuns.has(st.proto.id),
+              (next) => gameState.setRunSolved(st.proto.id, next),
+            );
+          }),
+          ...room.homeRelics.map((reqId, idx) => {
+            const req = STRAY_ITEMS[reqId];
+            return makeCheckRow(
+              `Shelf ${idx + 1}: ${req.icon} ${req.title}`,
+              `Found in ${req.foundIn} · Padlock ${idx + 1}/5`,
+              gameState.placedItems.has(req.id),
+              (next) => gameState.setItemPlaced(req.id, next),
+            );
+          }),
         ),
       );
     });
@@ -3060,7 +3024,7 @@ if (startRoomParam && BAY_ORDER.includes(startRoomParam)) {
     (r) =>
       r.warmup.id === startProtoId ||
       r.strays.some((s) => s.proto.id === startProtoId) ||
-      r.centerpiece.proto.id === startProtoId,
+      r.homeTwist.proto.id === startProtoId,
   );
   if (matchingRoom) {
     currentBay = matchingRoom.id;
@@ -3433,7 +3397,7 @@ function mountIntroOverlay(): void {
   introSceneMounted = false;
   activeDiorama?.setIntroPose('idle', 0);
 
-  // Plain dark "Tap to start" screen with a sound-on hint and no logo (`intro_cinematic.md`)
+  // Plain dark "Tap to start" screen with no logo (`intro_cinematic.md`)
   const tapScreen = h(
     'div',
     {
@@ -3475,18 +3439,6 @@ function mountIntroOverlay(): void {
         },
       },
       'Tap to start',
-    ),
-    h(
-      'div',
-      {
-        style: {
-          fontSize: '12.5px',
-          fontWeight: '600',
-          color: 'rgba(253, 248, 236, 0.58)',
-          letterSpacing: '0.04em',
-        },
-      },
-      '🔊 Sound on',
     ),
   );
 

@@ -701,23 +701,76 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
   bay.add(dust);
   const hallDust = { geo: dustGeo, base, seed };
 
-  // 3. Foreground Right: The Calendar Desk with a glowing Banker's Lamp (`lx = 1.26, lz = 2.08`)
-  const deskGroup = new THREE.Group();
-  deskGroup.position.set(1.26, 0, 2.08);
-  deskGroup.rotation.y = -0.32;
-  deskGroup.scale.setScalar(0.84);
-  deskGroup.add(box(0.82, 0.56, 0.52, '#8c6239', 0, 0.28, 0, false));
-  deskGroup.add(box(0.88, 0.07, 0.56, '#5c3d24', 0, 0.58, 0, false));
-  deskGroup.add(box(0.38, 0.05, 0.3, '#ffffff', -0.1, 0.64, 0, false));
-  deskGroup.add(box(0.38, 0.07, 0.1, '#e53e3e', -0.1, 0.67, -0.1, false));
-  deskGroup.add(cyl(0.025, 0.06, 0.18, '#d69e2e', 0.22, 0.7, -0.06, 10, false));
-  deskGroup.add(glowBox(0.18, 0.08, 0.12, '#48bb78', 0.22, 0.8, -0.06, 0.85));
-  deskGroup.add(glowSphere(0.05, '#ffea79', 0.22, 0.75, -0.06, 1.1));
-  bay.add(deskGroup);
+  // 3. Foreground Right: The Freed Mascots' Corner, where the Calendar Desk used to sit. It sits
+  // just behind and right of the year-wheel (centre 1.25 / 1.6, rug radius 0.38): its top ring
+  // clears the wheel's edge (1.04 from Leap Day; only the low outer ring tucks under it), and the
+  // whole corner stays inside a portrait phone's view at that depth.
+  const mascotCornerGroup = new THREE.Group();
+  const cornerX = 1.25;
+  const cornerZ = 1.6;
+  mascotCornerGroup.position.set(cornerX, 0, cornerZ);
+  mascotCornerGroup.add(cyl(0.36, 0.38, 0.026, '#5c3d24', 0, 0.013, 0, 24, false));
+  mascotCornerGroup.add(cyl(0.31, 0.33, 0.032, '#2d3748', 0, 0.018, 0, 24, false));
+  mascotCornerGroup.add(cyl(0.26, 0.28, 0.036, '#b7791f', 0, 0.022, 0, 24, false));
+  bay.add(mascotCornerGroup);
 
-  const deskFocusPos = bayToWorld(theta, 0.5, 1.9, 4.1);
-  const deskFocusLook = bayToWorld(theta, 1.26, 0.58, 2.08);
-  const deskWorldPos = bayToWorld(theta, 1.26, 0.12, 2.32);
+  const cornerSlots: readonly {
+    roomId: RoomId;
+    ox: number;
+    oz: number;
+    rotY: number;
+  }[] = [
+    // Two rows of three: the back row first, then the front.
+    { roomId: 'thanksgiving', ox: -0.22, oz: -0.14, rotY: 0.35 },
+    { roomId: 'halloween', ox: 0.0, oz: -0.18, rotY: 0 },
+    { roomId: 'christmas', ox: 0.22, oz: -0.14, rotY: -0.35 },
+    { roomId: 'valentines', ox: -0.22, oz: 0.15, rotY: 0.45 },
+    { roomId: 'easter', ox: 0.0, oz: 0.19, rotY: 0 },
+    { roomId: 'fourth', ox: 0.22, oz: 0.15, rotY: -0.45 },
+  ];
+
+  const cornerMascotEntries: {
+    room: RoomSpec;
+    group: THREE.Group;
+    worldPos: THREE.Vector3;
+  }[] = [];
+
+  for (const [mIdx, cSlot] of cornerSlots.entries()) {
+    const room = ROOM_SPECS.find((r) => r.id === cSlot.roomId);
+    if (!room) continue;
+    const mg = new THREE.Group();
+    mg.position.set(cornerX + cSlot.ox, 0.03, cornerZ + cSlot.oz);
+    mg.rotation.y = cSlot.rotY;
+
+    const hitCyl = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.11, 0.11, 0.48, 10),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
+    );
+    hitCyl.position.set(0, 0.24, 0);
+    hitCyl.layers.set(2);
+    mg.add(hitCyl);
+
+    const mesh = buildMascotMesh(ROOM_MASCOT_ID[room.id], 0.34);
+    mesh.traverse((c) => {
+      c.castShadow = false;
+      c.receiveShadow = false;
+    });
+    mg.add(mesh);
+    floating.push({ mesh, phase: mIdx * 1.1 + 0.4, baseY: 0 });
+    mg.visible = false;
+    bay.add(mg);
+
+    cornerMascotEntries.push({
+      room,
+      group: mg,
+      worldPos: bayToWorld(theta, cornerX + cSlot.ox, 0.4, cornerZ + cSlot.oz),
+    });
+  }
+
+  const cornerFocusPos = bayToWorld(theta, 0.5, 1.9, 4.1);
+  const cornerFocusLook = bayToWorld(theta, cornerX, 0.45, cornerZ);
+  const cornerWorldPos = bayToWorld(theta, cornerX, 0.12, cornerZ + 0.3);
+  let lastChattedCornerIdx = 0;
 
   // 4. Act 3 Center-Stage Hotspot: CEO Santa Confrontation & XMAS365™ Merger Contract (pre-built once)
   const santaConfrontGroup = new THREE.Group();
@@ -1075,24 +1128,55 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
       });
     }
 
-    const deskUnlockedCount = gameState.unlockedDeskGenreCount();
-    hotspotsOut.push({
-      id: 'desk:calendar',
-      bay: 'hall',
-      label: '📅 Calendar Desk',
-      sublabel: `${deskUnlockedCount}/6 Reclaimed`,
-      icon: '📅',
-      status: deskUnlockedCount >= 6 ? 'done' : 'ready',
-      accent: '#805ad5',
-      hiddenPill: deskUnlockedCount === 0,
-      worldPos: deskWorldPos,
-      cameraPos: deskFocusPos,
-      cameraLook: deskFocusLook,
-      meshGroup: deskGroup,
-      onClick: () => {
-        if (deskUnlockedCount > 0) callbacks.onOpenDesk(deskFocusPos, deskFocusLook);
-      },
-    });
+    mascotCornerGroup.visible = !finaleSolved;
+    const freedCornerMascots: RoomId[] = [];
+    for (const entry of cornerMascotEntries) {
+      const isFreed = gameState.isRoomComplete(entry.room);
+      entry.group.visible = isFreed && !finaleSolved;
+      if (isFreed && !finaleSolved) {
+        freedCornerMascots.push(entry.room.id);
+        hotspotsOut.push({
+          id: `hall-mascot:${entry.room.id}`,
+          bay: 'hall',
+          label: `${entry.room.icon} ${entry.room.shortTitle}`,
+          sublabel: '💬 Tap to Chat',
+          icon: entry.room.icon,
+          status: 'done',
+          accent: entry.room.accent,
+          hiddenPill: true,
+          worldPos: entry.worldPos,
+          cameraPos: cornerFocusPos,
+          cameraLook: cornerFocusLook,
+          meshGroup: entry.group,
+          onClick: () => {
+            callbacks.onClickMascot?.(entry.room.id);
+          },
+        });
+      }
+    }
+
+    if (freedCornerMascots.length > 0 && !finaleSolved) {
+      hotspotsOut.push({
+        id: 'hall:mascot-corner',
+        bay: 'hall',
+        label: `🎉 Freed Mascots (${freedCornerMascots.length}/6)`,
+        sublabel: '💬 Tap a Mascot to Chat',
+        icon: '🎉',
+        status: freedCornerMascots.length >= 6 ? 'done' : 'ready',
+        accent: '#d69e2e',
+        worldPos: cornerWorldPos,
+        cameraPos: cornerFocusPos,
+        cameraLook: cornerFocusLook,
+        meshGroup: mascotCornerGroup,
+        onClick: () => {
+          const picked =
+            freedCornerMascots[lastChattedCornerIdx % freedCornerMascots.length] ??
+            freedCornerMascots[0];
+          lastChattedCornerIdx++;
+          if (picked) callbacks.onClickMascot?.(picked);
+        },
+      });
+    }
 
     const finaleUnlocked = lampsLit >= 6;
     if (finaleUnlocked && !finaleSolved) {

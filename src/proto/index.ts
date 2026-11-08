@@ -42,7 +42,7 @@ function renderNav(current: string): void {
           },
           p.title,
           ' ',
-          h('span', { class: 'tag' }, p.kind === 'stray' ? '' : `(${p.kind})`),
+          h('span', { class: 'tag' }, p.kind === 'relic' ? '' : `(${p.kind})`),
         ),
       );
   }

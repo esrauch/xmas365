@@ -1,3 +1,10 @@
+/**
+ * Clause I (`C1`): Halloween · Web (`webs`) — 22-panel Merger Contract gauntlet.
+ *
+ * - Panels 0–5 (`intro`, 6 panels): Rule reminder boards (one per twist in `twistOrder`).
+ * - Panels 6–20 (`duo`, 15 panels): All 15 two-twist combinations (`pairCombinations(twistOrder)`).
+ * - Panel 21 (`all6`, 1 panel): Boss puzzle combining all 6 twists at once.
+ */
 import type { Panel as WebPanel } from '../../../gen/webs';
 import type { ClauseDef } from './types';
 
@@ -49,21 +56,7 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
     },
   ],
   panels: [
-    // 0: Base (7x7)
-    {
-      name: 'Porch Cobweb',
-      section: 'base',
-      twists: [],
-      tip: "Match each knot's thread count; 1 or 2 straight threads per pair, no crossing, all one web.",
-      explain:
-        'Spin 1 or 2 straight threads between knots so every knot meets its number, threads never cross, and the whole web connects into one piece.',
-      panel: {
-        name: 'Porch Cobweb',
-        rows: ['242...3', '.......', '...1.24', '.1.....', '..4.2..', '..3...3', '......1'],
-      },
-    },
-
-    // 1..6: Intro (5x5 reminder levels)
+    // 0..5: Intro (5x5 reminder levels)
     {
       name: 'Candle in the Dark',
       section: 'intro',
@@ -143,87 +136,7 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
       },
     },
 
-    // 7..12: Solo (7x7)
-    {
-      name: 'Rafters in Shadow',
-      section: 'solo',
-      twists: ['dark'],
-      tip: '🎃 Spooky: Deduce the hidden ? counts from their neighbors.',
-      explain:
-        'Dark (?) knots can take any thread count (1 or more). Let the numbered knots around them dictate how many threads they need.',
-      panel: {
-        name: 'Rafters in Shadow',
-        rows: ['.32.2..', '.......', '.?..3..', '1......', '3...4.3', '......?', '2..22..'],
-      },
-    },
-    {
-      name: 'Warm Embrace',
-      section: 'solo',
-      twists: ['letters'],
-      tip: '💌 Love Letters: Match identical letters and decode the note.',
-      explain:
-        'Every E knot has the same thread count and every B knot has a different shared count, decoding the secret word above.',
-      panel: {
-        name: 'Warm Embrace',
-        rows: ['..E....', '158...B', '.E.....', '12B.B.5', '......2', '.......', '....2..'],
-        message: 'W24',
-      },
-    },
-    {
-      name: 'Patriot Strands',
-      section: 'solo',
-      twists: ['colours'],
-      tip: '🎆 Red, White & Blue: Opposite colors may link; same colors never do.',
-      explain:
-        'Red and blue knots refuse threads to knots of their own color, while plain white knots bridge any pair.',
-      panel: {
-        name: 'Patriot Strands',
-        rows: ['......2', '3..2..4', '..1...3', '4.4.2..', '.......', '3......', '3.3...2'],
-        colours: ['......r', 'b..r..b', '..b...r', 'r.b.r..', '.......', 'b......', '..r...b'],
-      },
-    },
-    {
-      name: 'Silk Detour',
-      section: 'solo',
-      twists: ['eggs'],
-      tip: '🥚 Egg Hunt: Route the web so every egg is the right number of hops from 🕷.',
-      explain:
-        'Count thread hops along the spun web from the spider home (🕷); the egg knot must be reached in 3 hops.',
-      panel: {
-        name: 'Silk Detour',
-        rows: ['2.5...3', '.......', '1......', '..3..22', '.....34', '.......', '2.3..33'],
-        home: [4, 5],
-        eggs: [[6, 2, 3]],
-      },
-    },
-    {
-      name: 'Garden Trellis',
-      section: 'solo',
-      twists: ['cuts'],
-      tip: '🥧 Portions: Spin around the wooden fence bar.',
-      explain:
-        'The wooden fence bar blocks a vertical sightline, forcing the surrounding knots to route around it.',
-      panel: {
-        name: 'Garden Trellis',
-        rows: ['2...2..', '......2', '4...4.4', '.......', '....4.5', '....1.2', '3.3..2.'],
-        walls: [[4, 4, 'h']],
-      },
-    },
-    {
-      name: 'Ice Lattice',
-      section: 'solo',
-      twists: ['snow'],
-      tip: '❄️ Snowflakes: Every thread segment mirrors across the vertical frost line.',
-      explain:
-        'The frosty frame reflects every drawn thread across its middle vertical line, even when twin knots carry different numbers of single and double threads.',
-      panel: {
-        name: 'Ice Lattice',
-        rows: ['2..3..2', '.......', '.......', '.......', '5.535.4', '..4.3..', '3.4.4.3'],
-        frame: { top: 0, left: 0, bottom: 6, right: 6, axis: 'v' },
-      },
-    },
-
-    // 13..27: Duo (all 15 pairs in pairCombinations(gimmickOrder) order, 7x7)
+    // 6..20: Duo (all 15 pairs in pairCombinations(twistOrder) order, 7x7)
     // 13: dark + letters
     {
       name: 'Midnight Valentine',

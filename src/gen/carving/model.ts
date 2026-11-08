@@ -26,6 +26,7 @@ export type Wall = [number, number, 'v' | 'h'];
 
 export interface Panel {
   name: string;
+  tip?: string;
   /** Rows of space-separated tokens: '.' empty, a number (its portion's size), '?' a size in the dark, a size letter, or food: a dish (T turkey, P pie, C cranberries, in the Feast) or an Easter basket's 🥚 🥕 🍫. */
   rows: string[];
   /** Colour marks, row by row: 'r' red, 'b' blue ('g' green in older panels), '.' none (plain portions are white). */

@@ -4,7 +4,9 @@
  * celebration. Includes the Dual Display subtitle, a compact 1-line twist pill,
  * and a '?' controls toggle.
  */
-import { gameState, getCompactRulePill, getRunIdentity } from '../game/state';
+import { cancelGenerating, generateInBrowser } from '../gen/client';
+import type { Tier } from '../gen/core/spec';
+import { gameState, getCompactRulePill, getRunFreePlaySpec, getRunIdentity } from '../game/state';
 import { type Proto, h } from './kit';
 
 export interface PanelHooks {
@@ -24,9 +26,99 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
     ...proto,
     teaches: true,
     panelCount: panels.length,
+    panels,
     mount(host, ctx) {
       const done = gameState.solvedPanels;
       let autoAdvanceTimer = 0;
+      const freePlaySpec = getRunFreePlaySpec(proto.id);
+      let activeFreePlayTier: Tier | null = null;
+      let currentFreePlayPanel: P | null = null;
+      let currentFreePlaySeed = 0;
+      /** Bumped on every new Free Play request, so a superseded one stops quietly. */
+      let freePlayToken = 0;
+
+      const TIER_SIZE_LABELS: Record<Tier, string> = {
+        easy: '5×5',
+        medium: '7×7',
+        hard: '9×9',
+      };
+
+      // Row 0: Story vs Free Play (5×5 / 7×7 / 9×9) chooser bar (shown once rung is beaten or Free Play unlocked)
+      const modeBar = h('div', {
+        style: {
+          display: 'none',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '6px',
+          flexWrap: 'wrap',
+          margin: '0 0 8px',
+          padding: '5px 8px',
+          borderRadius: '10px',
+          background: '#f7f3eb',
+          border: '1px solid #d8cfc0',
+        },
+      });
+
+      const renderModeBar = (): void => {
+        const isUnlocked =
+          Boolean(freePlaySpec) &&
+          (gameState.solvedRuns.has(proto.id) || gameState.freePlayUnlocked);
+        if (!isUnlocked) {
+          modeBar.style.display = 'none';
+          return;
+        }
+        modeBar.style.display = 'flex';
+        const storyActive = activeFreePlayTier === null;
+        const makeBtn = (label: string, active: boolean, onClick: () => void): HTMLButtonElement =>
+          h(
+            'button',
+            {
+              style: {
+                borderRadius: '999px',
+                height: '26px',
+                padding: '0 10px',
+                fontWeight: active ? '800' : '700',
+                fontSize: '12px',
+                cursor: 'pointer',
+                border: active ? '2px solid #1f2430' : '1px solid #cbbba0',
+                background: active ? 'var(--room-accent, #2f855a)' : '#fffdf9',
+                color: active ? '#fff' : '#2d3748',
+                boxShadow: active ? '0 1px 0 #1f2430' : 'none',
+              },
+              onclick: onClick,
+            },
+            label,
+          );
+
+        const buttons: HTMLElement[] = [
+          makeBtn('📖 Story Puzzles', storyActive, () => {
+            if (activeFreePlayTier !== null) {
+              freePlayToken++;
+              cancelGenerating();
+              activeFreePlayTier = null;
+              currentFreePlayPanel = null;
+              strip.style.display = 'flex';
+              newFreePlayBtn.style.display = 'none';
+              renderModeBar();
+              open(at);
+            }
+          }),
+        ];
+
+        for (const tier of ['easy', 'medium', 'hard'] as const) {
+          const sizeLbl = TIER_SIZE_LABELS[tier];
+          const count = gameState.freePlaySolvedCount(proto.id, tier);
+          const btnText =
+            count > 0 ? `🎲 Free Play ${sizeLbl} (✓ ${count})` : `🎲 Free Play ${sizeLbl}`;
+          buttons.push(
+            makeBtn(btnText, activeFreePlayTier === tier, () => {
+              void openFreePlay(tier);
+            }),
+          );
+        }
+
+        modeBar.replaceChildren(...buttons);
+      };
 
       // Row 1: wired progress pips
       const strip = h('div', {
@@ -84,9 +176,47 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
             background: '#fffdf9',
             color: '#1f2430',
           },
-          onclick: () => open(at),
+          onclick: () => {
+            if (activeFreePlayTier && currentFreePlayPanel) {
+              mountFreePlayPanel(activeFreePlayTier, currentFreePlayPanel, currentFreePlaySeed);
+            } else {
+              open(at);
+            }
+          },
         },
         '↺ Reset',
+      );
+
+      const newFreePlayBtn = h(
+        'button',
+        {
+          title: 'Generate a new Free Play board of this size',
+          style: {
+            display: 'none',
+            borderRadius: '999px',
+            height: '28px',
+            padding: '0 11px',
+            fontWeight: '700',
+            fontSize: '13px',
+            cursor: 'pointer',
+            border: '1px solid #2b6cb0',
+            background: '#ebf8ff',
+            color: '#2c5282',
+          },
+          onclick: () => {
+            if (activeFreePlayTier) {
+              void openFreePlay(activeFreePlayTier);
+            }
+          },
+        },
+        '🎲 New Board',
+      );
+
+      const leftControls = h(
+        'div',
+        { style: { display: 'flex', alignItems: 'center', gap: '6px' } },
+        resetBtn,
+        newFreePlayBtn,
       );
 
       const hintBtn = h(
@@ -140,7 +270,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         hintBtn,
         helpBtn,
       );
-      topRow.append(resetBtn, rightControls);
+      topRow.append(leftControls, rightControls);
 
       // Compact puzzle title + Dual Display subtitle + ultra-short micro-rule pill
       const defaultPillText = getCompactRulePill({ ...proto, mount: () => {} });
@@ -354,12 +484,140 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         strip.replaceChildren(...nodes);
       };
 
+      const updateFreePlayTitle = (tier: Tier, seed: number): void => {
+        const sizeLbl = TIER_SIZE_LABELS[tier];
+        const count = gameState.freePlaySolvedCount(proto.id, tier);
+        title.textContent = `Free Play · ${sizeLbl} (✓ ${count} solved) · Seed #${seed}`;
+      };
+
+      const mountFreePlayPanel = (tier: Tier, fpPanel: P, seed: number): void => {
+        if (autoAdvanceTimer) {
+          clearTimeout(autoAdvanceTimer);
+          autoAdvanceTimer = 0;
+        }
+        stopAdvanceBar();
+        currentFreePlayPanel = fpPanel;
+        currentFreePlaySeed = seed;
+        updateFreePlayTitle(tier, seed);
+        rulePill.textContent = defaultPillText;
+        footer.style.display = 'flex';
+        message.className = '';
+        message.style.color = '#4a5568';
+        message.style.fontSize = '13px';
+        message.textContent = '';
+        next.style.visibility = 'hidden';
+        ctx.status('');
+
+        board.replaceChildren();
+        const nextPane = h('div', { class: 'puzz-board-pane' });
+        activePane = nextPane;
+        board.append(nextPane);
+
+        let panelSolved = false;
+        mountPanel(nextPane, fpPanel, {
+          solved: (text) => {
+            if (panelSolved) return;
+            panelSolved = true;
+            gameState.incrementFreePlaySolved(proto.id, tier);
+            updateFreePlayTitle(tier, seed);
+            renderModeBar();
+            const sizeLbl = TIER_SIZE_LABELS[tier];
+            message.className = '';
+            message.style.color = '#276749';
+            message.style.fontSize = '14.5px';
+            message.textContent = text ? `✓ ${text}` : `✓ Free Play ${sizeLbl} solved!`;
+            next.textContent = `🎲 New ${sizeLbl} Board ▸`;
+            next.style.visibility = 'visible';
+            ctx.status(`Free Play ${sizeLbl} solved`);
+          },
+          status: (text) => {
+            ctx.status(text);
+            if (!panelSolved) {
+              message.className = '';
+              message.style.color = '#4a5568';
+              message.style.fontSize = '13px';
+              message.textContent = text;
+            }
+          },
+        });
+      };
+
+      const openFreePlay = async (tier: Tier): Promise<void> => {
+        if (!freePlaySpec) return;
+        if (autoAdvanceTimer) {
+          clearTimeout(autoAdvanceTimer);
+          autoAdvanceTimer = 0;
+        }
+        stopAdvanceBar();
+        cancelGenerating();
+        activeFreePlayTier = tier;
+        strip.style.display = 'none';
+        newFreePlayBtn.style.display = 'inline-block';
+        renderModeBar();
+
+        const sizeLbl = TIER_SIZE_LABELS[tier];
+        const count = gameState.freePlaySolvedCount(proto.id, tier);
+        title.textContent = `Free Play · ${sizeLbl} (✓ ${count} solved) · Generating…`;
+        rulePill.textContent = defaultPillText;
+        next.style.visibility = 'hidden';
+        message.textContent = '';
+
+        const shuffling = h(
+          'div',
+          {
+            style: {
+              padding: '32px 16px',
+              textAlign: 'center',
+              fontWeight: '700',
+              fontSize: '14px',
+              color: '#4a5568',
+            },
+          },
+          `🎲 Shuffling a ${sizeLbl} board…`,
+        );
+        board.replaceChildren(shuffling);
+
+        // Keep trying fresh seeds until one lands: never stand in a story puzzle, never give up.
+        const token = ++freePlayToken;
+        const sizeNum = tier === 'easy' ? 5 : tier === 'medium' ? 7 : 9;
+        for (let attempt = 1; ; attempt++) {
+          if (attempt > 1)
+            shuffling.textContent = `🎲 Shuffling a ${sizeLbl} board… (try ${attempt})`;
+          const seed = Math.floor(Math.random() * 900000) + 100000;
+          const reply = await generateInBrowser({
+            genre: freePlaySpec.genre,
+            spec: {
+              tier,
+              ...(freePlaySpec.genre === 'words' ? { size: sizeNum } : {}),
+              twists: [...freePlaySpec.twists],
+            },
+            seconds: 4,
+            seed,
+          });
+          if (token !== freePlayToken || !board.isConnected || activeFreePlayTier !== tier) return;
+          if (reply.made) {
+            const genPanel = {
+              ...(reply.made.panel as unknown as Record<string, unknown>),
+              name: `Free Play ${sizeLbl} #${reply.made.seed}`,
+            } as unknown as P;
+            mountFreePlayPanel(tier, genPanel, reply.made.seed);
+            return;
+          }
+        }
+      };
+
       const open = (i: number): void => {
         if (autoAdvanceTimer) {
           clearTimeout(autoAdvanceTimer);
           autoAdvanceTimer = 0;
         }
         stopAdvanceBar();
+        activeFreePlayTier = null;
+        currentFreePlayPanel = null;
+        strip.style.display = 'flex';
+        newFreePlayBtn.style.display = 'none';
+        next.textContent = 'Next puzzle ▸';
+        renderModeBar();
         const prevIdx = lastOpenedIdx;
         lastOpenedIdx = i;
         at = i;
@@ -418,6 +676,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
               next.style.visibility = 'hidden';
               footer.style.display = 'none';
               gameState.markRunSolved(proto.id);
+              renderModeBar();
               ctx.solved();
             } else {
               const nextIdx =
@@ -466,8 +725,14 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         }
       };
 
-      next.addEventListener('click', () => open(Math.min(at + 1, panels.length - 1)));
-      host.append(strip, topRow, helpBox, metaRow, board, footer);
+      next.addEventListener('click', () => {
+        if (activeFreePlayTier) {
+          void openFreePlay(activeFreePlayTier);
+        } else {
+          open(Math.min(at + 1, panels.length - 1));
+        }
+      });
+      host.append(modeBar, strip, topRow, helpBox, metaRow, board, footer);
       open(at);
     },
   };

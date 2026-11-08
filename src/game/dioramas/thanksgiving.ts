@@ -75,8 +75,8 @@ export function buildThanksgivingBay(callbacks: DioramaCallbacks): BuiltBay {
         const leafColors = ['#dd6b20', '#c53030', '#ecc94b', '#b7791f'];
         for (let i = -6; i <= 6; i++) {
           const gx = i * 0.23;
-          const swagWave = Math.abs(Math.sin((i / 3) * Math.PI * 0.5)) * 0.18;
-          const gy = 3.36 - swagWave;
+          const swagWave = Math.abs(Math.sin((i / 3) * Math.PI * 0.5)) * 0.14;
+          const gy = 3.54 - swagWave;
           // Vine cord segment + angled autumn leaf cluster
           bay.add(sphere(0.055, '#5c3820', gx, gy, 0.16, false));
           const leaf = sphere(
@@ -93,9 +93,9 @@ export function buildThanksgivingBay(callbacks: DioramaCallbacks): BuiltBay {
         }
         // Golden harvest bows & pinecones at the 3 garland pinning points
         for (const px of [-1.38, 0, 1.38]) {
-          bay.add(sphere(0.075, '#f6e05e', px - 0.05, 3.38, 0.21, false));
-          bay.add(sphere(0.075, '#f6e05e', px + 0.05, 3.38, 0.21, false));
-          const cone = sphere(0.065, '#6b4226', px, 3.27, 0.21, false);
+          bay.add(sphere(0.075, '#f6e05e', px - 0.05, 3.56, 0.21, false));
+          bay.add(sphere(0.075, '#f6e05e', px + 0.05, 3.56, 0.21, false));
+          const cone = sphere(0.065, '#6b4226', px, 3.45, 0.21, false);
           cone.scale.set(0.8, 1.35, 0.8);
           bay.add(cone);
         }

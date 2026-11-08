@@ -1,24 +1,94 @@
 /**
- * Thanksgiving: the carving run (GAME.md, "Thanksgiving: the carving run").
- * Shikaku panels in four runs: the warm-up on the bread board, the two
- * strays (the Hot Dog brings the Fourth of July's flags, here on skewers; the
- * Stocking, Christmas's red and green), and the Feast centrepiece (fair
- * shares: every portion gets one of each dish). Every panel has exactly
- * one answer (tests/puzzles/thanksgiving.test.ts); most were found by a
- * random search.
+ * Thanksgiving: the carving run (`revamp-centerpieces.md`). Shikaku panels in
+ * seven runs: the intro run on the bread board, the Feast home-twist run
+ * (`cuts`: fences no portion may cross), and the five relic runs (Hot Dog,
+ * Stocking, Heart Locket, Jelly Bean Jar, and Candy Corn). Every panel is
+ * ≤ 7×7 and has a unique solution (`tests/puzzles/thanksgiving.test.ts`).
  */
-import { run } from '../run';
 import { type Panel } from '../../gen/carving';
+import { run } from '../run';
 import { mountCarving } from '../shikakuBoard';
 
 export const WARMUP: Panel[] = [
-  { name: 'One portion', rows: ['4 .', '. .'] },
-  { name: 'Size counts', rows: ['. 4 .', '. . 2'] },
-  { name: 'Shape matters', rows: ['4 . . .', '4 . . .'] },
-  { name: 'Every square', rows: ['6 . . 1', '. . . .', '. . . 2', '. 6 . 1'] },
+  {
+    name: 'One portion',
+    rows: ['4 .', '. .'],
+    tip: 'Drag across all four squares to carve one rectangle of size 4.',
+  },
+  {
+    name: 'Size counts',
+    rows: ['. 4 .', '. . 2'],
+    tip: 'Each rectangle holds one number equal to its area (width × height).',
+  },
+  {
+    name: 'Shape matters',
+    rows: ['4 . . .', '4 . . .'],
+    tip: 'A 4 can be 2×2 or 1×4—pick the shapes that cover every square.',
+  },
+  {
+    name: 'Every square',
+    rows: ['6 . . 1', '. . . .', '. . . 2', '. 6 . 1'],
+    tip: 'Tap an empty square with a 1 to carve a single-square portion.',
+  },
   {
     name: 'A first board',
     rows: ['3 2 . . .', '. . . . .', '. . . . 6', '. . 8 2 .', '2 . . 2 .'],
+    tip: 'Carve the whole 5×5 bread board into non-overlapping rectangles.',
+  },
+];
+
+export const FEAST: Panel[] = [
+  {
+    name: 'First cuts',
+    rows: ['3 . . . 4', '. . . 2 .', '. . 6 . .', '2 . 4 2 .', '. . . . 2'],
+    walls: [[0, 0, 'v']],
+    tip: '🥧 Portioned: No carved rectangle may cross a thick fence line.',
+  },
+  {
+    name: 'Side dishes',
+    rows: ['. . 2 . .', '. 4 . . 4', '. 2 2 . .', '2 . . 3 .', '2 . 2 . 2'],
+    walls: [[2, 0, 'h']],
+    tip: '🥧 Portioned: Use the fence boundary to orient the surrounding portions.',
+  },
+  {
+    name: 'Table divider',
+    rows: ['. . 6 . .', '. 4 . . .', '. . . . .', '4 . 6 . .', '. 5 . . .'],
+    walls: [[1, 0, 'h']],
+    tip: '🥧 Portioned: The horizontal fence forces the top-left 4 to stretch right.',
+  },
+  {
+    name: 'Carving around fences',
+    rows: [
+      '4 . 2 . . . .',
+      '. 2 . . . . 8',
+      '. . . 6 . . .',
+      '. . . . . . .',
+      '. 6 . 3 . . 3',
+      '2 . . . 6 . .',
+      '. 3 . 2 . 2 .',
+    ],
+    walls: [
+      [4, 1, 'h'],
+      [0, 1, 'h'],
+    ],
+    tip: '🥧 Portioned: Carve the 7×7 table without crossing either horizontal fence.',
+  },
+  {
+    name: 'The Feast',
+    rows: [
+      '. 6 . . . . .',
+      '. . . . . 2 2',
+      '. 8 . . . . .',
+      '3 . . . . . 2',
+      '. . 3 . 6 2 3',
+      '. 3 . 4 . 2 .',
+      '3 . . . . . .',
+    ],
+    walls: [
+      [4, 1, 'v'],
+      [5, 0, 'h'],
+    ],
+    tip: '🥧 Portioned: Respect every fence line to serve the full Thanksgiving Feast.',
   },
 ];
 
@@ -27,6 +97,7 @@ export const HOTDOG: Panel[] = [
     name: 'Red, white and blue',
     rows: ['. . 2 . .', '. 6 . . 4', '. . . 6 .', '. . . . .', '. 4 . 3 .'],
     colours: ['..rb.', 'b....', '.....', '.....', '.r.b.'],
+    tip: '🎆 Patriotic: Same-colored rectangles may never share an edge.',
   },
   {
     name: 'Stripes',
@@ -40,31 +111,21 @@ export const HOTDOG: Panel[] = [
       '. 2 . . . . .',
     ],
     colours: ['b......', '....r..', 'r.....b', '.......', '...b...', '.......', '.br....'],
+    tip: '🎆 Patriotic: Plain white portions can touch anything; red-red and blue-blue cannot touch.',
   },
   {
     name: 'The cookout',
     rows: [
-      '. 3 . . . . . . .',
-      '2 . . . 6 . 4 . 7',
-      '. . . . . . . . .',
-      '6 . . . 5 . . 6 .',
-      '. . . . . 2 . . .',
-      '. . . . . . . . .',
-      '. 6 . . . 9 . . .',
-      '. . 8 . . . . . .',
-      '. 2 . 9 . . 4 . 2',
+      '. . . 8 . . 6',
+      '. . . . . . .',
+      '. . 3 . 2 2 .',
+      '2 . 3 . . . .',
+      '. . . . 3 . 4',
+      '. 4 . 6 . . .',
+      '2 . . . . . 4',
     ],
-    colours: [
-      '...r.....',
-      '.r....b..',
-      'b.......r',
-      '.....r...',
-      '.........',
-      '..b......',
-      '.........',
-      '.........',
-      'r...b....',
-    ],
+    colours: ['......b', '.......', '.r....r', '..b....', '.......', 'b...rb.', 'r......'],
+    tip: '🎆 Patriotic: Keep same-colored portions separated across the 7×7 grill.',
   },
 ];
 
@@ -79,6 +140,7 @@ export const STOCKING: Panel[] = [
       right: 2,
       axis: 'h',
     },
+    tip: '❄️ Snowflake: Inside the frosty frame, cuts between portions mirror across the icy line.',
   },
   {
     name: 'Mirror cuts',
@@ -98,94 +160,111 @@ export const STOCKING: Panel[] = [
       right: 5,
       axis: 'v',
     },
+    tip: '❄️ Snowflake: Any cut drawn on one side of the frame’s axis needs a matching cut opposite.',
   },
   {
     name: 'A full stocking',
     rows: [
-      '. 3 . . . . . . .',
-      '2 . . . 6 . 4 . 7',
-      '. . . . . . . . .',
-      '6 . . . 5 . . 6 .',
-      '. . . . . 2 . . .',
-      '. . . . . . . . .',
-      '. 6 . . . 9 . . .',
-      '. . 8 . . . . . .',
-      '. 2 . 9 . . 4 . 2',
+      '4 . 2 . . . .',
+      '. 2 . . . . 8',
+      '. . . 6 . . .',
+      '. . . . . . .',
+      '. 6 . 3 . . 3',
+      '2 . . . 6 . .',
+      '. 3 . 2 . 2 .',
     ],
     frame: {
-      top: 2,
-      left: 0,
-      bottom: 7,
-      right: 3,
+      top: 1,
+      left: 1,
+      bottom: 3,
+      right: 4,
       axis: 'v',
     },
+    tip: '❄️ Snowflake: Mirror the cuts inside the frosty frame to pack the 7×7 stocking.',
   },
 ];
 
-export const FEAST: Panel[] = [
+export const LOCKET: Panel[] = [
   {
-    name: 'The big carve',
+    name: 'Sweet yam',
+    rows: ['6 . . Y .', '. . . . .', '6 . Y 3 .', '. . . . .', '. . Y . M'],
+    sizeLetters: ' Y M     ',
+    message: '2A4',
+    tip: '💌 Love-Letter: Same letter = same rectangle area; different letters = different areas.',
+  },
+  {
+    name: 'Golden corn',
+    rows: ['. . N . .', '. 2 2 . .', '. . 4 . 2', 'R . . 2 2', '. . N . .'],
+    sizeLetters: '  N R    ',
+    message: 'CO53',
+    tip: '💌 Love-Letter: Match both N portions to one area and R to another to decode the word.',
+  },
+  {
+    name: 'The Heart Locket',
     rows: [
-      '3 . 2 . 6 . .',
+      '. . . . . A .',
+      '. . . . R 3 3',
+      'E . 5 . . . .',
+      'A . . . . . .',
+      '. E . . E . .',
+      '. . A 3 . . .',
+      '. . . . 3 . .',
+    ],
+    sizeLetters: ' A   E R ',
+    message: 'T862T',
+    tip: '💌 Love-Letter: Carve the 7×7 platter so A, E, and R take consistent distinct areas.',
+  },
+];
+
+export const JELLYBEANS: Panel[] = [
+  {
+    name: 'Fair shares',
+    rows: ['. 🥕 6 . .', '🥚 . 🥕 🥚 .', '🥚 . 🥚 . 🥕', '4 🥕 . . .', '. . . 🥚 🥕'],
+    tip: '🥚 Egg-Hunt: Every carved rectangle must contain one 🥚 and one 🥕.',
+  },
+  {
+    name: 'Spring platter',
+    rows: ['. 🥚 🥕 4 🥕', '. . . . 🥚', '🥚 3 🥕 🥕 .', '. . . 🥚 🥚', '. 🥕 🥚 . 🥕'],
+    tip: '🥚 Egg-Hunt: Even unnumbered portions must collect one of each treat!',
+  },
+  {
+    name: 'The Jelly Bean Jar',
+    rows: [
+      '🥚 . 🍫 . 🥕 7 .',
+      '. . 🍫 🥕 🥕 . 🍫',
+      '. 🥚 . 🥚 . 🥕 .',
+      '🍫 . 🍫 🥕 🥚 . 🥚',
+      '🥚 🥕 . 🥚 🍫 . .',
+      '🥕 . 🥚 . 🥕 🍫 .',
+      '. 🍫 🥚 . 🥕 🍫 .',
+    ],
+    tip: '🥚 Egg-Hunt: Give every portion on the 7×7 board one 🥚, one 🥕, and one 🍫.',
+  },
+];
+
+export const CANDYCORN: Panel[] = [
+  {
+    name: 'Hidden portion',
+    rows: ['6 . . 2 .', '. . . . .', '? . 2 3 .', '. . . . .', '. . 2 . 4'],
+    tip: '🎃 Spooky: A ? clue stands for a rectangle of any area.',
+  },
+  {
+    name: 'Shadow platter',
+    rows: ['. . 3 . .', '. 2 2 . .', '. . ? . 2', '5 . . 2 2', '. . 3 . .'],
+    tip: '🎃 Spooky: Carve the numbered rectangles first to see what space the ? portion must fill.',
+  },
+  {
+    name: 'The Candy Corn',
+    rows: [
       '. . . . . . .',
-      '. 4 . . . . 7',
-      '. . . . . . .',
-      '. . 8 . . . .',
-      '2 . . 6 . 7 .',
-      '. . . . 4 . .',
+      '. . 6 . . 8 .',
+      '. . . . . . 6',
+      '. 6 . . . . .',
+      '. . 2 ? . ? .',
+      '. 4 . . . 2 .',
+      '. . . . . . 7',
     ],
-  },
-  {
-    name: 'First cuts',
-    rows: ['. . 2 . .', '. 6 . . 4', '. . . 6 .', '. . . . .', '. 4 . 3 .'],
-    walls: [[1, 4, 'h']],
-  },
-  {
-    name: 'Carving around fences',
-    rows: [
-      '. . 2 . . 3 .',
-      '. 4 . . . . .',
-      '. . . . 8 . .',
-      '. 4 . . . . 6',
-      '4 . 6 . . 2 .',
-      '. . . 8 . . .',
-      '. 2 . . . . .',
-    ],
-    walls: [
-      [4, 5, 'v'],
-      [5, 0, 'v'],
-    ],
-  },
-  {
-    name: 'Across the table',
-    rows: [
-      '. . . 7 . . .',
-      '. . . . . . 4',
-      '. 8 . . 2 . .',
-      '. . . 5 . . .',
-      '. . 3 . . . .',
-      '. 8 . 2 . . 4',
-      '. . 2 . 2 2 .',
-    ],
-    walls: [[5, 2, 'h']],
-  },
-  {
-    name: 'The Feast',
-    rows: [
-      '. 3 . . . . . . .',
-      '2 . . . 6 . 4 . 7',
-      '. . . . . . . . .',
-      '6 . . . 5 . . 6 .',
-      '. . . . . 2 . . .',
-      '. . . . . . . . .',
-      '. 6 . . . 9 . . .',
-      '. . 8 . . . . . .',
-      '. 2 . 9 . . 4 . 2',
-    ],
-    walls: [
-      [1, 0, 'h'],
-      [6, 0, 'v'],
-    ],
+    tip: '🎃 Spooky: Deduce the areas of both ? portions on the 7×7 harvest table.',
   },
 ];
 
@@ -199,10 +278,21 @@ export const breadboard = run({
   id: 'breadboard',
   title: 'The Bread Board',
   room: 'Thanksgiving',
-  kind: 'warm-up',
+  kind: 'intro',
   from: 'Carving · Thanksgiving, taught puzzle by puzzle',
   rules: `${CONTROLS} (Rules: carve the board into rectangles; each holds exactly one number, and the number is its size.)`,
   panels: WARMUP,
+  mountPanel,
+});
+
+export const feast = run({
+  id: 'feast',
+  title: 'The Feast',
+  room: 'Thanksgiving',
+  kind: 'home',
+  from: 'Portioned Carving · Thanksgiving (Thanksgiving)',
+  rules: `${CONTROLS} (Twist: a portion may not cross a thick fence line between two squares.)`,
+  panels: FEAST,
   mountPanel,
 });
 
@@ -210,7 +300,7 @@ export const hotdog = run({
   id: 'hotdog',
   title: 'The Hot Dog',
   room: 'Thanksgiving',
-  kind: 'stray',
+  kind: 'relic',
   from: 'Patriotic Carving · Thanksgiving (Fourth of July)',
   rules: `${CONTROLS} (Twist: a portion takes the color of its red or blue mark; two portions of the same color may not share an edge, while plain portions can touch anything.)`,
   panels: HOTDOG,
@@ -221,20 +311,42 @@ export const stocking = run({
   id: 'stocking',
   title: 'The Stocking',
   room: 'Thanksgiving',
-  kind: 'stray',
+  kind: 'relic',
   from: 'Snowflake Carving · Thanksgiving (Christmas)',
   rules: `${CONTROLS} (Twist: inside the frosty frame, the cuts between portions mirror across the icy line.)`,
   panels: STOCKING,
   mountPanel,
 });
 
-export const feast = run({
-  id: 'feast',
-  title: 'The Feast',
+export const locket = run({
+  id: 'locket',
+  title: 'The Heart Locket',
   room: 'Thanksgiving',
-  kind: 'centerpiece',
-  from: 'Portioned Carving · Thanksgiving (Thanksgiving)',
-  rules: `${CONTROLS} (Twist: a portion may not cross a thick fence line between two squares.)`,
-  panels: FEAST,
+  kind: 'relic',
+  from: "Love-Letter Carving · Thanksgiving (Valentine's)",
+  rules: `${CONTROLS} (Twist: portions with the same letter must have the same area, and different letters must have different areas, filling the numbered blanks in the message.)`,
+  panels: LOCKET,
+  mountPanel,
+});
+
+export const jellybeans = run({
+  id: 'jellybeans',
+  title: 'The Jelly Bean Jar',
+  room: 'Thanksgiving',
+  kind: 'relic',
+  from: 'Egg-Hunt Carving · Thanksgiving (Easter)',
+  rules: `${CONTROLS} (Twist: every carved portion must contain one of each food item on the board, even if a portion has no number.)`,
+  panels: JELLYBEANS,
+  mountPanel,
+});
+
+export const candycorn = run({
+  id: 'candycorn',
+  title: 'The Candy Corn',
+  room: 'Thanksgiving',
+  kind: 'relic',
+  from: 'Spooky Carving · Thanksgiving (Halloween)',
+  rules: `${CONTROLS} (Twist: a dark ? clue stands for a portion of any area.)`,
+  panels: CANDYCORN,
   mountPanel,
 });

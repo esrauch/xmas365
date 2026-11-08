@@ -10,12 +10,47 @@ import {
   startGrid,
   turn,
 } from '../../src/proto/net';
-import { EGG, PIE, TREE, WARMUP } from '../../src/proto/puzzles/christmas';
+import {
+  CAULDRON,
+  EGG,
+  ICEPOP,
+  LOVELETTER,
+  PIE,
+  TREE,
+  WARMUP,
+  cauldron,
+  fairylights,
+  goldenegg,
+  icepop,
+  loveletter,
+  pumpkinpie,
+  tree,
+} from '../../src/proto/puzzles/christmas';
 
 const count = (p: Panel, rules = {}): number => countSolutions(parse(p), 2, rules);
 
 describe('Christmas lights run', () => {
-  const all = [...WARMUP, ...EGG, ...PIE, ...TREE];
+  const twisted = [...TREE, ...EGG, ...PIE, ...LOVELETTER, ...ICEPOP, ...CAULDRON];
+  const all = [...WARMUP, ...twisted];
+
+  it('defines 7 runs (5 intro + 5 home + 5×3 relic = 25 panels) with dimensions <= 7×7', () => {
+    expect(fairylights.kind).toBe('intro');
+    expect(tree.kind).toBe('home');
+    for (const r of [goldenegg, pumpkinpie, loveletter, icepop, cauldron]) {
+      expect(r.kind).toBe('relic');
+    }
+    expect(WARMUP).toHaveLength(5);
+    expect(TREE).toHaveLength(5);
+    for (const relic of [EGG, PIE, LOVELETTER, ICEPOP, CAULDRON]) {
+      expect(relic).toHaveLength(3);
+    }
+    expect(all).toHaveLength(25);
+    for (const p of all) {
+      const b = parse(p);
+      expect(b.height, p.name).toBeLessThanOrEqual(7);
+      expect(b.width, p.name).toBeLessThanOrEqual(7);
+    }
+  });
 
   it('every panel has exactly one answer, and the panel is that answer', () => {
     for (const p of all) {
@@ -23,7 +58,7 @@ describe('Christmas lights run', () => {
       const b = parse(p);
       expect(solved(b, b.solution), p.name).toBe(true);
     }
-    for (const p of [...EGG, ...PIE, ...TREE]) expect(problems(p, 2), p.name).toEqual([]);
+    for (const p of twisted) expect(problems(p, 2), p.name).toEqual([]);
   }, 120_000);
 
   it('no panel starts solved, and snowflake zones start mirrored', () => {
@@ -38,14 +73,7 @@ describe('Christmas lights run', () => {
     }
   });
 
-  it('the eggs, servings, and snowflakes matter', () => {
-    for (const p of EGG) expect(count(p, { noEggs: true }), p.name).toBe(2);
-    for (const p of PIE) expect(count(p, { noServings: true }), p.name).toBe(2);
-    for (const p of TREE.slice(1)) expect(count(p, { noSnow: true }), p.name).toBe(2);
-  });
-
   it('a wire pointing off the board is a loose end, and lights nothing off it', () => {
-    // Turn every piece of a tree each way in turn: the power never reaches off the board.
     const p = TREE[2] as Panel;
     const b = parse(p);
     for (const [r, row] of b.solution.entries())

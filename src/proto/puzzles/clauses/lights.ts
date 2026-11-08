@@ -1,11 +1,9 @@
 /**
- * Clause III (`C3`): Christmas · Fairy Lights (`lights`) — 29-panel Merger Contract gauntlet.
+ * Clause III (`C3`): Christmas · Fairy Lights (`lights`) — 22-panel Merger Contract gauntlet.
  *
- * - Panel 0 (`base`, 1 panel): Plain base game with no gimmicks.
- * - Panels 1–6 (`intro`, 6 panels): Trivial teaching boards (one per gimmick in `LIGHT_TWISTS`).
- * - Panels 7–12 (`solo`, 6 panels): Nontrivial single-gimmick puzzles (`easy` 5×5).
- * - Panels 13–27 (`duo`, 15 panels): All 15 two-gimmick combinations (`<= 7×7`).
- * - Panel 28 (`all6`, 1 panel): Boss puzzle combining all 6 gimmicks at once (`6×7`).
+ * - Panels 0–5 (`intro`, 6 panels): Trivial teaching boards (one per twist in `LIGHT_TWISTS`).
+ * - Panels 6–20 (`duo`, 15 panels): All 15 two-twist combinations (`<= 7×7`).
+ * - Panel 21 (`all6`, 1 panel): Boss puzzle combining all 6 twists at once (`6×7`).
  */
 
 import type { Panel as LightPanel } from '../../../gen/lights';
@@ -56,24 +54,7 @@ export const LIGHT_TWISTS_META: readonly TwistMeta[] = [
 
 const PANELS: readonly ClausePanelItem<LightPanel>[] = [
   // =========================================================================
-  // 0: Base Game (1 panel)
-  // =========================================================================
-  {
-    name: 'Warm Tinsel',
-    section: 'base',
-    twists: [],
-    tip: '🎄 Power every tile from the plug with no loose ends or loops',
-    explain:
-      'Turn the wire tiles so power from the plug reaches every square on the board with no loose ends and no closed loops.',
-    panel: {
-      name: 'Warm Tinsel',
-      rows: ['682c', '7aad', '7a81', '3aa8'],
-      plug: [3, 1],
-    },
-  },
-
-  // =========================================================================
-  // 1–6: Trivial Gimmick Re-Explanations (`intro`, 6 panels)
+  // 0–5: Trivial Twist Re-Explanations (`intro`, 6 panels)
   // =========================================================================
   {
     name: 'Frosty Mirror',
@@ -171,106 +152,7 @@ const PANELS: readonly ClausePanelItem<LightPanel>[] = [
   },
 
   // =========================================================================
-  // 7–12: Nontrivial Single-Gimmick (`solo`, 6 panels)
-  // =========================================================================
-  {
-    name: 'Icy Windowpane',
-    section: 'solo',
-    twists: ['snow'],
-    tip: '❄️ Frosty frame mirrors wires across the vertical axis',
-    explain:
-      'Use the frosty frame’s mirror symmetry across the vertical ice line to lock the lower-left tiles in sync with their partners.',
-    panel: {
-      name: 'Icy Windowpane',
-      rows: ['2eae8', '6d47c', '17d15', '45545', '39391'],
-      plug: [4, 2],
-      frame: { top: 2, left: 0, bottom: 4, right: 3, axis: 'v' },
-    },
-  },
-  {
-    name: 'Attic Fuse',
-    section: 'solo',
-    twists: ['dark'],
-    tip: '🎃 Deduce both ? tiles from their surrounding wire ends',
-    explain:
-      'Wire every visible tile first so the open ends pointing into the two ? squares uniquely determine their hidden connections.',
-    panel: {
-      name: 'Attic Fuse',
-      rows: ['2ac44', '44579', '7bfd4', '7853d', '12b81'],
-      plug: [2, 2],
-      dark: [
-        [3, 0],
-        [1, 3],
-      ],
-    },
-  },
-  {
-    name: 'Crimson Telegram',
-    section: 'solo',
-    twists: ['letters'],
-    tip: '💌 Spell RED at wire-step distances 10, 8, and 3',
-    explain:
-      'Route the light string from the plug so the R, E, and D bulbs sit at wire-step distances 10, 8, and 3 to spell RED.',
-    panel: {
-      name: 'Crimson Telegram',
-      rows: ['6c2e8', '53e94', '12be9', '6e83c', '13aa9'],
-      plug: [4, 2],
-      letters: [
-        [0, 2, 'R'],
-        [1, 1, 'E'],
-        [3, 2, 'D'],
-      ],
-      message: '10 8 3',
-      word: 'RED',
-      blanks: [10, 8, 3],
-    },
-  },
-  {
-    name: 'Third Hop Egg',
-    section: 'solo',
-    twists: ['eggs'],
-    tip: '🥚 Reach the numbered egg in exactly 3 wire-steps',
-    explain:
-      'Choose the branch orientation near the plug that reaches the numbered egg in exactly 3 steps without stranding any corner.',
-    panel: {
-      name: 'Third Hop Egg',
-      rows: ['4686c', '7b815', '52ec5', '3ad39', '2aba8'],
-      plug: [4, 2],
-      eggs: [[2, 1, 3]],
-    },
-  },
-  {
-    name: 'Patriot Cord',
-    section: 'solo',
-    twists: ['colours'],
-    tip: '🎆 Partition the white border tiles between Red and Blue plugs',
-    explain:
-      'Decide which white border tiles belong to the Red plug and which belong to the Blue plug so every square is lit without mixing colors.',
-    panel: {
-      name: 'Patriot Cord',
-      rows: ['2c684', '6bba9', '12eec', '2c511', '2bba8'],
-      plug: [1, 1],
-      bluePlug: [3, 4],
-      colours: ['rrrrr', 'rrrrr', 'rbbww', 'wbbbb', 'bbbbb'],
-    },
-  },
-  {
-    name: 'Holiday Tart',
-    section: 'solo',
-    twists: ['slices'],
-    tip: '🥧 Feed each slice once from * and respect the crust wall',
-    explain:
-      'Send one wire from the center * into the top slice and one into the bottom slice while keeping all wires from crossing the crust wall.',
-    panel: {
-      name: 'Holiday Tart',
-      rows: ['6ac44', '16bb9', '2baec', '2ee95', '29129'],
-      plug: [2, 2],
-      slices: ['BBBBB', 'BBBBB', 'BB*AA', 'AAAAA', 'AAAAA'],
-    },
-  },
-
-  // =========================================================================
-  // 13–27: All 15 Two-Gimmick Combinations (`duo`, 15 panels)
+  // 6–20: All 15 Two-Twist Combinations (`duo`, 15 panels)
   // =========================================================================
   // 13: snow + dark
   {

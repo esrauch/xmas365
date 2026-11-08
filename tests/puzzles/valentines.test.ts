@@ -12,42 +12,59 @@ import {
 } from '../../src/gen/words';
 import {
   BASKET,
+  CANDYCANE,
   JACK,
   LOVENOTES,
   MAILBOX,
-  VALENTINES_BONUS,
+  WATERMELON,
+  WISHBONE,
+  basket,
+  candycane,
+  jack,
+  lovenotes,
+  mailbox,
+  watermelon,
+  wishbone,
 } from '../../src/proto/puzzles/valentines';
 
-const all: Panel[] = [...LOVENOTES, ...JACK, ...BASKET, ...MAILBOX, ...VALENTINES_BONUS];
+const allRuns = [lovenotes, mailbox, jack, basket, watermelon, wishbone, candycane];
+const twistPanels: Panel[] = [
+  ...MAILBOX,
+  ...JACK,
+  ...BASKET,
+  ...WATERMELON,
+  ...WISHBONE,
+  ...CANDYCANE,
+];
+const all: Panel[] = [...LOVENOTES, ...twistPanels];
 
-describe("Valentine's love-letter run", () => {
-  it('story strays go 4x4, 5x5, 6x6; centerpiece goes 5x5, 6x6, 7x7; 9x9 reserved for bonus', () => {
-    expect(JACK.map((p) => [p.rows.length, p.rows[0]?.length])).toEqual([
-      [4, 4],
-      [5, 5],
-      [6, 6],
-    ]);
-    expect(BASKET.map((p) => [p.rows.length, p.rows[0]?.length])).toEqual([
-      [4, 4],
-      [5, 5],
-      [6, 6],
-    ]);
-    expect(MAILBOX.map((p) => [p.rows.length, p.rows[0]?.length])).toEqual([
-      [5, 5],
-      [6, 6],
-      [7, 7],
-    ]);
-    expect(VALENTINES_BONUS.map((p) => [p.rows.length, p.rows[0]?.length])).toEqual([[9, 9]]);
+describe("Valentine's love-letter room (7 runs, 25 panels)", () => {
+  it('has 7 runs (intro, home, and 5 relics) totaling 25 panels, all <= 7x7', () => {
+    expect(allRuns).toHaveLength(7);
+    expect(lovenotes.kind).toBe('intro');
+    expect(mailbox.kind).toBe('home');
+    for (const relic of [jack, basket, watermelon, wishbone, candycane]) {
+      expect(relic.kind).toBe('relic');
+    }
+    expect(LOVENOTES).toHaveLength(5);
+    expect(MAILBOX).toHaveLength(5);
+    for (const relicPanels of [JACK, BASKET, WATERMELON, WISHBONE, CANDYCANE]) {
+      expect(relicPanels).toHaveLength(3);
+    }
+    expect(all).toHaveLength(25);
+    for (const p of all) {
+      expect(p.rows.length, `${p.name} height`).toBeLessThanOrEqual(7);
+      expect(p.rows[0]?.length ?? 0, `${p.name} width`).toBeLessThanOrEqual(7);
+    }
   });
 
   it('the words fill each grid exactly, each along touching squares', () => {
     for (const p of all) expect(wellFormed(p), p.name).toBe(true);
   });
 
-  it('each theme word can be spelled only one way with its clues', () => {
+  it('each theme word can be spelled only one way with its clues, and every twist panel has a unique answer', () => {
     for (const p of all) expect(eachWordOnce(p), p.name).toBe(true);
-    for (const p of [...JACK, ...BASKET, ...MAILBOX, ...VALENTINES_BONUS])
-      expect(problems(p, 1), p.name).toEqual([]);
+    for (const p of twistPanels) expect(problems(p, 1), p.name).toEqual([]);
   });
 
   it('at most one dark letter per word, never its first or last', () => {
@@ -93,16 +110,15 @@ describe("Valentine's love-letter run", () => {
     }
   });
 
-  it('dark squares, eggs and codes are on the board', () => {
+  it('dark squares, eggs, bows and codes are on the board', () => {
     for (const p of all) {
-      for (const s of [...(p.dark ?? []), ...(p.eggs ?? [])])
+      for (const s of [...(p.dark ?? []), ...(p.eggs ?? []), ...(p.bows ?? [])])
         expect(letterAt(p, s), `${p.name} ${key(s)}`).not.toBe('');
       for (const ch of p.code ?? '') expect(p.rows.join(''), p.name).toContain(ch);
     }
   });
 
   it('a word counts by any path through its own squares that spells it', () => {
-    // MUMMY's Ms can be visited in either order: M(0,0) U M(0,1) M Y, or M(0,1) U M(0,0) M Y.
     const p: Panel = {
       name: 'mummy',
       theme: '',

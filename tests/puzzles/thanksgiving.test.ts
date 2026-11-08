@@ -1,28 +1,57 @@
 import { describe, expect, it } from 'vitest';
 import { type Panel, countSolutions, parse, problems } from '../../src/gen/carving';
-import { FEAST, HOTDOG, STOCKING, WARMUP } from '../../src/proto/puzzles/thanksgiving';
+import {
+  CANDYCORN,
+  FEAST,
+  HOTDOG,
+  JELLYBEANS,
+  LOCKET,
+  STOCKING,
+  WARMUP,
+  breadboard,
+  candycorn,
+  feast,
+  hotdog,
+  jellybeans,
+  locket,
+  stocking,
+} from '../../src/proto/puzzles/thanksgiving';
 
 const count = (p: Panel, limit = 2, rules = {}): number => countSolutions(parse(p), limit, rules);
 
 describe('Thanksgiving carving run', () => {
-  it('every panel has exactly one answer', () => {
-    for (const p of [...WARMUP, ...HOTDOG, ...STOCKING, ...FEAST]) expect(count(p), p.name).toBe(1);
-    for (const p of [...HOTDOG, ...STOCKING, ...FEAST]) expect(problems(p, 2), p.name).toEqual([]);
-  }, 120_000);
+  const twisted = [...FEAST, ...HOTDOG, ...STOCKING, ...LOCKET, ...JELLYBEANS, ...CANDYCORN];
+  const all = [...WARMUP, ...twisted];
 
-  it('the fences matter', () => {
-    for (const p of FEAST.filter((p) => p.walls?.length)) {
-      const q = { ...p };
-      delete q.walls;
-      expect(count(q, 2), p.name).toBe(2);
+  it('defines 7 runs (5 intro + 5 home + 5×3 relic = 25 panels) with dimensions <= 7×7', () => {
+    expect(breadboard.kind).toBe('intro');
+    expect(feast.kind).toBe('home');
+    for (const r of [hotdog, stocking, locket, jellybeans, candycorn]) {
+      expect(r.kind).toBe('relic');
+    }
+    expect(WARMUP).toHaveLength(5);
+    expect(FEAST).toHaveLength(5);
+    for (const relic of [HOTDOG, STOCKING, LOCKET, JELLYBEANS, CANDYCORN]) {
+      expect(relic).toHaveLength(3);
+    }
+    expect(all).toHaveLength(25);
+    for (const p of all) {
+      const b = parse(p);
+      expect(b.height, p.name).toBeLessThanOrEqual(7);
+      expect(b.width, p.name).toBeLessThanOrEqual(7);
     }
   });
 
-  it('the colours and snowflakes matter', () => {
-    for (const p of HOTDOG) expect(count(p, 2, { noColours: true }), p.name).toBe(2);
-    for (const p of STOCKING) {
+  it('every panel has exactly one answer and passes verification', () => {
+    for (const p of all) expect(count(p), p.name).toBe(1);
+    for (const p of twisted) expect(problems(p, 2), p.name).toEqual([]);
+  }, 120_000);
+
+  it('the fences matter in the Feast home-twist run', () => {
+    for (const p of FEAST) {
+      expect(p.walls?.length, p.name).toBeGreaterThan(0);
       const q = { ...p };
-      delete q.frame;
+      delete q.walls;
       expect(count(q, 2), p.name).toBe(2);
     }
   });

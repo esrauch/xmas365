@@ -2,12 +2,10 @@
  * Act III Finale ("XMAS365™ Merger Contract"):
  * Tapping CEO Santa in Holiday Hall opens the Master Merger Contract modal
  * with a checklist of the 6 Clauses (`C1`–`C6`). Tapping any clause enters
- * a 29-puzzle Run of that single Base:
- *   - Puzzle 1 (`base`): Base Puzzle with no twists
- *   - Puzzles 2–7 (`intro`): 6 5×5 Twist Reminder puzzles re-explaining each of the 6 twists
- *   - Puzzles 8–13 (`solo`): 6 nontrivial Solo Twist puzzles
- *   - Puzzles 14–28 (`duo`): All 15 Double Twist combinations
- *   - Puzzle 29 (`all6`): 1 finale puzzle combining all 6 twists at once
+ * a 22-puzzle Run of that single Base:
+ *   - Puzzles 1–6 (`intro`): 6 Twist Reminder puzzles re-explaining each of the 6 twists
+ *   - Puzzles 7–21 (`duo`): All 15 Double Twist combinations
+ *   - Puzzle 22 (`all6`): 1 finale puzzle combining all 6 twists at once
  */
 import { CONTRACT_CLAUSES } from '../../content/script';
 import { gameState } from '../../game/state';
@@ -39,37 +37,37 @@ const SECTION_META: Record<
   { badge: string; shortLabel: string; rangeLabel: string; color: string; bg: string }
 > = {
   base: {
-    badge: 'Stage 1 · Base Puzzle',
-    shortLabel: 'Base (1)',
+    badge: 'Base Puzzle',
+    shortLabel: 'Base',
     rangeLabel: '1',
     color: '#2b6cb0',
     bg: '#ebf8ff',
   },
   intro: {
-    badge: 'Stage 2 · Twist Reminders',
-    shortLabel: 'Reminders (2–7)',
-    rangeLabel: '2–7',
+    badge: 'Stage 1 · Twist Reminders',
+    shortLabel: 'Reminders (1–6)',
+    rangeLabel: '1–6',
     color: '#2f855a',
     bg: '#f0fff4',
   },
   solo: {
-    badge: 'Stage 3 · Solo Twist',
-    shortLabel: 'Solo (8–13)',
-    rangeLabel: '8–13',
+    badge: 'Solo Twist',
+    shortLabel: 'Solo',
+    rangeLabel: '7–12',
     color: '#b7791f',
     bg: '#fefcbf',
   },
   duo: {
-    badge: 'Stage 4 · Double Twist',
-    shortLabel: 'Double (14–28)',
-    rangeLabel: '14–28',
+    badge: 'Stage 2 · Double Twist',
+    shortLabel: 'Double (7–21)',
+    rangeLabel: '7–21',
     color: '#805ad5',
     bg: '#faf5ff',
   },
   all6: {
-    badge: 'Stage 5 · All 6 Twists',
-    shortLabel: 'All 6 (29)',
-    rangeLabel: '29',
+    badge: 'Stage 3 · All 6 Twists',
+    shortLabel: 'All 6 (22)',
+    rangeLabel: '22',
     color: '#c53030',
     bg: '#fff5f5',
   },
@@ -96,9 +94,9 @@ export const clause: Proto = {
   room: 'Holiday Hall',
   kind: 'final',
   teaches: true,
-  from: "Six binding clauses of CEO Santa's Master Merger Contract. Tap a clause to enter its 29-puzzle Run and red-line it!",
+  from: "Six binding clauses of CEO Santa's Master Merger Contract. Tap a clause to enter its 22-puzzle Run and red-line it!",
   rules:
-    'Each of the 6 clauses covers one holiday Base across 29 bite-sized puzzles: 1 Base Puzzle, 6 Twist Reminders, 6 Solo Twist puzzles, all 15 Double Twist combinations, and 1 All-6-Twists Finale.',
+    'Each of the 6 clauses covers one holiday Base across 22 bite-sized puzzles: 6 Twist Reminders, all 15 Double Twist combinations, and 1 All-6-Twists Finale.',
   mount(host, ctx) {
     let autoAdvanceTimer = 0;
 
@@ -215,7 +213,7 @@ export const clause: Proto = {
               color: '#4a4238',
             },
           },
-          'Select any binding clause below to challenge its 29-puzzle Run: Base Puzzle → 6 Twist Reminders → 6 Solo Twists → 15 Double Twists → All 6 Twists.',
+          'Select any binding clause below to challenge its 22-puzzle Run: 6 Twist Reminders → 15 Double Twists → All 6 Twists.',
         ),
       );
 
@@ -234,14 +232,12 @@ export const clause: Proto = {
         const pct = Math.round((solvedCount / CLAUSE_PANEL_COUNT) * 100);
 
         const stageSummary = [
-          { label: 'Base', indices: [0] },
-          { label: '6 Reminders', indices: [1, 2, 3, 4, 5, 6] },
-          { label: '6 Solo', indices: [7, 8, 9, 10, 11, 12] },
+          { label: '6 Reminders', indices: [0, 1, 2, 3, 4, 5] },
           {
             label: '15 Double',
-            indices: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27],
+            indices: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
           },
-          { label: 'All 6', indices: [28] },
+          { label: 'All 6', indices: [21] },
         ];
 
         const card = h(

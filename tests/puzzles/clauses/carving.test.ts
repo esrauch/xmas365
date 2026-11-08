@@ -5,7 +5,7 @@ import { CLAUSE_CARVING } from '../../../src/proto/puzzles/clauses/carving';
 import { CLAUSE_PANEL_COUNT, pairCombinations } from '../../../src/proto/puzzles/clauses/types';
 
 describe('Clause II (C2): Thanksgiving · Carving', () => {
-  it('has canonical metadata and 29 puzzles', () => {
+  it('has canonical metadata and 22 puzzles', () => {
     expect(CLAUSE_CARVING.clauseIndex).toBe(1);
     expect(CLAUSE_CARVING.id).toBe('C2');
     expect(CLAUSE_CARVING.genre).toBe('carving');
@@ -16,39 +16,28 @@ describe('Clause II (C2): Thanksgiving · Carving', () => {
     expect(CLAUSE_CARVING.panels).toHaveLength(CLAUSE_PANEL_COUNT);
   });
 
-  it('matches section layout and twist progression across all 29 panels', () => {
+  it('matches section layout and twist progression across all 22 panels', () => {
     const panels = CLAUSE_CARVING.panels;
 
-    // 0: base
-    expect(panels[0]?.section).toBe('base');
-    expect(panels[0]?.twists).toEqual([]);
-
-    // 1..6: intro
+    // 0..5: intro
     for (let i = 0; i < 6; i++) {
-      const item = panels[1 + i]!;
+      const item = panels[i]!;
       expect(item.section).toBe('intro');
       expect(item.twists).toEqual([CARVE_TWISTS[i]]);
     }
 
-    // 7..12: solo
-    for (let i = 0; i < 6; i++) {
-      const item = panels[7 + i]!;
-      expect(item.section).toBe('solo');
-      expect(item.twists).toEqual([CARVE_TWISTS[i]]);
-    }
-
-    // 13..27: duo
+    // 6..20: duo
     const pairs = pairCombinations(CARVE_TWISTS);
     expect(pairs).toHaveLength(15);
     for (let i = 0; i < 15; i++) {
-      const item = panels[13 + i]!;
+      const item = panels[6 + i]!;
       expect(item.section).toBe('duo');
       expect(item.twists).toEqual(pairs[i]);
     }
 
-    // 28: all6
-    expect(panels[28]?.section).toBe('all6');
-    expect(panels[28]?.twists).toEqual(CARVE_TWISTS);
+    // 21: all6
+    expect(panels[21]?.section).toBe('all6');
+    expect(panels[21]?.twists).toEqual(CARVE_TWISTS);
 
     // Every panel's twistsOf(panel) matches item.twists
     for (const [idx, item] of panels.entries()) {
@@ -58,7 +47,7 @@ describe('Clause II (C2): Thanksgiving · Carving', () => {
     }
   });
 
-  it('has distinct rows.join("/") strings, dimensions <= 7x7, and a unique solution for all 29 panels', () => {
+  it('has distinct rows.join("/") strings, dimensions <= 7x7, and a unique solution for all 22 panels', () => {
     const seen = new Set<string>();
     for (const [idx, item] of CLAUSE_CARVING.panels.entries()) {
       const key = item.panel.rows.join('/');
@@ -72,11 +61,11 @@ describe('Clause II (C2): Thanksgiving · Carving', () => {
       const solutions = solve(board, 2, {}, new Budget(500_000));
       expect(solutions, `panel ${idx} (${item.name}) unique solution`).toHaveLength(1);
     }
-    expect(seen.size).toBe(29);
+    expect(seen.size).toBe(CLAUSE_PANEL_COUNT);
   });
 
-  it('passes problems(panel, 2) on all 6 solo and 15 duo panels, and problems(panel, 1) on all6', () => {
-    for (let idx = 7; idx <= 27; idx++) {
+  it('passes problems(panel, 2) on all 15 duo panels, and problems(panel, 1) on all6', () => {
+    for (let idx = 6; idx <= 20; idx++) {
       const item = CLAUSE_CARVING.panels[idx]!;
       expect(
         problems(item.panel, 2, new Budget(500_000)),
@@ -84,7 +73,7 @@ describe('Clause II (C2): Thanksgiving · Carving', () => {
       ).toEqual([]);
     }
 
-    const boss = CLAUSE_CARVING.panels[28]!;
+    const boss = CLAUSE_CARVING.panels[21]!;
     expect(twistsOf(boss.panel)).toEqual(CARVE_TWISTS);
     expect(problems(boss.panel, 1, new Budget(500_000)), 'boss panel problems(1)').toEqual([]);
   });

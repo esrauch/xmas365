@@ -4,7 +4,7 @@ import { LIGHT_TWISTS, parse, problems, solve, twistsOf } from '../../../src/gen
 import { CLAUSE_LIGHTS } from '../../../src/proto/puzzles/clauses/lights';
 import { CLAUSE_PANEL_COUNT, pairCombinations } from '../../../src/proto/puzzles/clauses/types';
 
-describe('Clause III (C3): Christmas · Lights (29-puzzle gauntlet)', () => {
+describe('Clause III (C3): Christmas · Lights (22-puzzle gauntlet)', () => {
   it('exports valid clause metadata and canonical twist order', () => {
     expect(CLAUSE_LIGHTS.clauseIndex).toBe(2);
     expect(CLAUSE_LIGHTS.id).toBe('C3');
@@ -16,38 +16,27 @@ describe('Clause III (C3): Christmas · Lights (29-puzzle gauntlet)', () => {
     expect(CLAUSE_LIGHTS.panels).toHaveLength(CLAUSE_PANEL_COUNT);
   });
 
-  it('orders sections and twist combinations deterministically across all 29 panels', () => {
+  it('orders sections and twist combinations deterministically across all 22 panels', () => {
     const panels = CLAUSE_LIGHTS.panels;
 
-    // 0: base
-    expect(panels[0]?.section).toBe('base');
-    expect(panels[0]?.twists).toEqual([]);
-
-    // 1..6: intro
+    // 0..5: intro
     for (let i = 0; i < 6; i++) {
-      const item = panels[1 + i]!;
+      const item = panels[i]!;
       expect(item.section, item.name).toBe('intro');
       expect(item.twists, item.name).toEqual([LIGHT_TWISTS[i]!]);
     }
 
-    // 7..12: solo
-    for (let i = 0; i < 6; i++) {
-      const item = panels[7 + i]!;
-      expect(item.section, item.name).toBe('solo');
-      expect(item.twists, item.name).toEqual([LIGHT_TWISTS[i]!]);
-    }
-
-    // 13..27: duo (15 pairs)
+    // 6..20: duo (15 pairs)
     const pairs = pairCombinations(LIGHT_TWISTS);
     expect(pairs).toHaveLength(15);
     for (let i = 0; i < 15; i++) {
-      const item = panels[13 + i]!;
+      const item = panels[6 + i]!;
       expect(item.section, item.name).toBe('duo');
       expect(item.twists, item.name).toEqual(pairs[i]!);
     }
 
-    // 28: all6
-    const boss = panels[28]!;
+    // 21: all6
+    const boss = panels[21]!;
     expect(boss.section).toBe('all6');
     expect(boss.twists).toEqual(LIGHT_TWISTS);
 
@@ -59,7 +48,7 @@ describe('Clause III (C3): Christmas · Lights (29-puzzle gauntlet)', () => {
     }
   });
 
-  it('has 29 distinct board layouts all <= 7x7 with a unique solution', () => {
+  it('has 22 distinct board layouts all <= 7x7 with a unique solution', () => {
     const seenLayouts = new Set<string>();
 
     for (const [idx, item] of CLAUSE_LIGHTS.panels.entries()) {
@@ -76,16 +65,19 @@ describe('Clause III (C3): Christmas · Lights (29-puzzle gauntlet)', () => {
       const answers = solve(b, 2, { blindDark: item.twists.includes('dark') }, new Budget(500_000));
       expect(answers.length, `panel ${idx} (${item.name}) unique solution`).toBe(1);
     }
+    expect(seenLayouts.size).toBe(CLAUSE_PANEL_COUNT);
   }, 60_000);
 
-  it('verifies all 6 solo and 15 duo panels with margin >= 2, and all6 with margin >= 1', () => {
-    for (let i = 7; i <= 27; i++) {
-      const item = CLAUSE_LIGHTS.panels[i]!;
-      expect(problems(item.panel, 2, new Budget(500_000)), `panel ${i} (${item.name})`).toEqual([]);
+  it('verifies all 15 duo panels with margin >= 2, and all6 with margin >= 1', () => {
+    for (let idx = 6; idx <= 20; idx++) {
+      const item = CLAUSE_LIGHTS.panels[idx]!;
+      expect(problems(item.panel, 2, new Budget(500_000)), `panel ${idx} (${item.name})`).toEqual(
+        [],
+      );
     }
 
-    const boss = CLAUSE_LIGHTS.panels[28]!;
+    const boss = CLAUSE_LIGHTS.panels[21]!;
     expect(twistsOf(boss.panel)).toEqual(LIGHT_TWISTS);
-    expect(problems(boss.panel, 1, new Budget(500_000)), `panel 28 (${boss.name})`).toEqual([]);
+    expect(problems(boss.panel, 1, new Budget(500_000)), `panel 21 (${boss.name})`).toEqual([]);
   }, 60_000);
 });

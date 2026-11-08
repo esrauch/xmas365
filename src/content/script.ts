@@ -184,8 +184,8 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
     header: 'XMAS365™ · LOGISTICS BRIEFING',
     to: 'Logistics',
     from: 'S. Claus, CEO',
-    re: 'Cross-Silo Asset Scrambling',
-    body: "Great work on the asset shuffle! With every holiday's key gear locked in the wrong department, the old celebrations can't even open for business. Reminder: returning an item to its home room automatically unlocks the door. So nothing goes home. Not one sock.",
+    re: 'Cross-Silo Relic Scrambling',
+    body: "Great work on the 30-relic shuffle! With five prized relics per holiday locked away—one in each of the other five departments—their mascots aren't going anywhere. Every cage has five padlocks wired to the five relic shelves underneath it, and returning a relic to a locked department automatically unlocks the door. So nothing goes home. Not one sock.",
     signoff: 'S. Claus, CEO',
   },
   'fourth.enter': {
@@ -238,8 +238,8 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
     header: 'XMAS365™ · INCIDENT TICKET #1',
     to: 'Change-Management Taskforce',
     from: 'S. Claus, CEO',
-    re: 'Unauthorized De-Synergizing ({holiday})',
-    body: 'It has come to my attention that {holiday} has staged an unscheduled brand rollback! The mascot is loose, the old lamp is back on, and someone pulled down our banner without a ticket. Circle back and re-acquire that vertical before EOD! Probably a rogue intern.',
+    re: 'Unauthorized Relic Restocking',
+    body: 'Who is putting confiscated holiday relics back on their home shelves?! Five padlocks have already clicked open across the campus, and someone keeps opening locked subsidiary doors without a ticket. Circle back and lock down those shelves before EOD! Probably a rogue intern.',
     signoff: 'S. Claus, CEO',
   },
   E2: {
@@ -247,8 +247,8 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
     header: 'XMAS365™ · HR & ACCOUNTING MEMO',
     to: 'Elf Human Resources',
     from: 'S. Claus, CEO',
-    re: 'PTO Request & Spreadsheet Glitch',
-    body: 'Regarding your union petition for "one Silent Night a year": hard pass! Hustle is the reason for the season. Also, Accounting\'s master spreadsheet has a bug. It\'s showing **366** billable days instead of 365. Delete the phantom row! P.S. A second holiday just churned. Fix it!',
+    re: 'PTO Request & Padlock Audit',
+    body: 'Regarding your union petition for "one Silent Night a year": hard pass! Hustle is the reason for the season. Worse, ten relics are back on their shelves and cage padlocks are dropping like flies. Also, Accounting\'s master spreadsheet is showing **366** billable days instead of 365. Fix it!',
     signoff: 'S. Claus, CEO',
   },
   E3: {
@@ -256,8 +256,8 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
     header: 'XMAS365™ · EXECUTIVE AUDIT',
     to: 'Forensic Accounting',
     from: 'S. Claus, CEO',
-    re: 'THE 366TH DAY ANOMALY',
-    body: "I've checked the master deck three times. Our entire valuation is built on **XMAS365™**, yet every pivot table spits out 366! Stop muttering about \"February's quadrennial edge-case\" and delete the extra cell! Worse, we're down three subsidiaries. That's half the portfolio!",
+    re: 'HALF THE RELICS & DAY 366',
+    body: 'Fifteen of our thirty cross-siloed relics have been returned to their home shelves! That\'s half our leverage! And why does every pivot table still spit out **366** days?! Stop muttering about "February\'s quadrennial edge-case" and find whoever is smuggling relics through Holiday Hall!',
     signoff: 'S. Claus, CEO',
   },
   E4: {
@@ -265,8 +265,8 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
     header: 'XMAS365™ · SECURITY ALERT',
     to: 'All Staff',
     from: 'S. Claus, CEO',
-    re: 'CODE RED-NOSED: Locate Day 366!',
-    body: 'All hands on deck! Four verticals have de-merged and our stock is sleigh-ding! Tear up the floorboards and find where this rogue 366th day is hiding! Someone stuck a Post-it on my monitor saying *"Leap Year?"* and I had Security shred it. Reindeer: your "sky-high burnout" ticket is closed!',
+    re: 'CODE RED-NOSED: Twenty Relics Back!',
+    body: 'All hands on deck! Twenty relics are back on their shelves, padlocks are popping all over campus, and our stock is sleigh-ding! Find the saboteur running between the doors! Someone stuck a Post-it on my monitor saying *"Check Feb 29"* and I had Security shred it. Reindeer: your "sky-high burnout" ticket is closed!',
     signoff: 'S. Claus, CEO',
   },
   E5: {
@@ -274,8 +274,8 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
     header: 'XMAS365™ · LEGAL ESCALATION',
     to: 'General Counsel',
     from: 'S. Claus, CEO',
-    re: 'URGENT: Lock It Down',
-    body: 'Five holidays have churned! FIVE! Draft the ironclad Master Merger Agreement immediately: every holiday, 365 days, locked in perpetuity with zero opt-out clauses! Once I sign that contract in Holiday Hall, our monopoly is legally bulletproof. Skip the boilerplate, nobody reads the fine print!',
+    re: 'URGENT: Five Relics Left—Lock It Down',
+    body: 'Twenty-five relics returned! TWENTY-FIVE! Only five padlocks stand between us and total brand rollback! Draft the ironclad Master Merger Agreement immediately: every holiday, 365 days, locked in perpetuity with zero opt-out clauses! Once I take the podium in Holiday Hall, our monopoly is legally bulletproof!',
     signoff: 'S. Claus, CEO',
   },
   E6: {
@@ -284,7 +284,7 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
     to: 'All Staff',
     from: 'S. Claus, CEO',
     re: 'Mandatory Signing Mixer @ Hall',
-    body: 'All six verticals have churned?! Fine—if you want a hostile takeover done right, do it yourself! I am standing in Holiday Hall right now with the binding Master Merger Contract on my clipboard and my platinum fountain pen in hand. Once I initial all six clauses, every holiday snaps back under XMAS365™ ownership forever!',
+    body: 'All thirty relics returned and all six mascots loose in the hall?! Fine—if you want a hostile takeover done right, do it yourself! I have taken the podium in Holiday Hall personally with the binding Master Merger Contract and my platinum fountain pen. Once I initial all six clauses, every holiday snaps back under XMAS365™ ownership forever!',
     signoff: 'S. Claus, CEO',
   },
   Y7: {
@@ -305,6 +305,7 @@ export type DialogueBeatId =
   | 'thanksgiving.freed'
   | 'thanksgiving.bonus.offer'
   | 'thanksgiving.bonus.reward'
+  | 'T2'
   | 'T3'
   | 'fourth.caged'
   | 'fourth.freed'
@@ -422,13 +423,23 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
       },
     ],
   },
+  T2: {
+    id: 'T2',
+    kind: 'dialogue',
+    lines: [
+      {
+        speaker: 'leapday',
+        text: 'Five relics per shelf, five padlocks per cage. Better start delivering.',
+      },
+    ],
+  },
   T3: {
     id: 'T3',
     kind: 'dialogue',
     lines: [
       {
         speaker: 'leapday',
-        text: 'One returned asset, one unlocked vertical. Time to hop to it.',
+        text: 'One relic back on its shelf, and one padlock off the cage. Four more to free them.',
       },
     ],
   },
@@ -758,8 +769,8 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
       },
       {
         speaker: 'santa',
-        stage: 'staring at the shredded contract, dropping his platinum pen',
-        text: 'Wait. Strictly 365?! Did Legal forget to budget for a 366th day?!',
+        stage: 'staring at the shredded contract on his podium, dropping his platinum pen',
+        text: "366 days?! Wait—the frog in the glasses—you're February 29th!",
       },
       {
         speaker: 'leapday',
@@ -839,6 +850,44 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
         text: "An annual party? Careful, you'll ruin my mysterious low profile.",
       },
     ],
+  },
+};
+
+export const STORY_BEATS = DIALOGUE_BEATS;
+
+export const HALL_MASCOT_LINES: Record<
+  'halloween' | 'thanksgiving' | 'christmas' | 'valentines' | 'easter' | 'fourth',
+  { speaker: string; icon: string; line: string }
+> = {
+  halloween: {
+    speaker: 'The Spider',
+    icon: '🕷️',
+    line: 'Waiting in the hall until all six of us are free, darling—keep un-padlocking those cages!',
+  },
+  thanksgiving: {
+    speaker: 'The Turkey',
+    icon: '🦃',
+    line: 'Much obliged for the rescue! Fetch the rest of the flock so we can audit Santa right out of the hall.',
+  },
+  christmas: {
+    speaker: 'The Snowman',
+    icon: '⛄',
+    line: 'Chilling in the corner until the whole crew is uncaged—even Christmas wants our old holidays back.',
+  },
+  valentines: {
+    speaker: 'The Teddy Bear',
+    icon: '🧸',
+    line: 'Sending moral hugs from the hall! Bring the rest of the relics home and free everyone!',
+  },
+  easter: {
+    speaker: 'The Bunny',
+    icon: '🐰',
+    line: "Antlers off, paws warmed up—free the rest of the mascots and we'll crash Santa's merger!",
+  },
+  fourth: {
+    speaker: 'The Eaglet',
+    icon: '🦅',
+    line: 'Standing by for the big finale! Unlock the remaining cages and let freedom ring!',
   },
 };
 

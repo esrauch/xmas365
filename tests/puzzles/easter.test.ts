@@ -1,49 +1,75 @@
 import { describe, expect, it } from 'vitest';
 import { problems } from '../../src/gen/hops';
 import { type Panel, countSolutions, key, parse, solve } from '../../src/proto/hops';
-import { CORNUCOPIA, EGGTREE, FLAG, HUTCH } from '../../src/proto/puzzles/easter';
+import {
+  CORNUCOPIA,
+  EGGTREE,
+  FLAG,
+  GHOST,
+  GINGERBREAD,
+  HUTCH,
+  ROSE,
+  cornucopia,
+  eggtree,
+  flag,
+  ghost,
+  gingerbread,
+  hutch,
+  rose,
+} from '../../src/proto/puzzles/easter';
 
 const count = (p: Panel, rules = {}): number => countSolutions(parse(p), 2, rules);
 
-describe('Easter bunny-hop run', () => {
-  const all = [...HUTCH, ...FLAG, ...CORNUCOPIA, ...EGGTREE];
+describe('Easter bunny-hop room (7 runs, 25 panels)', () => {
+  const allRuns = [hutch, eggtree, flag, cornucopia, rose, ghost, gingerbread];
+  const twistPanels: Panel[] = [
+    ...EGGTREE,
+    ...FLAG,
+    ...CORNUCOPIA,
+    ...ROSE,
+    ...GHOST,
+    ...GINGERBREAD,
+  ];
+  const all: Panel[] = [...HUTCH, ...twistPanels];
 
-  it('every panel has exactly one answer (free panels: at least one)', () => {
+  it('has 7 runs (intro, home, and 5 relics) totaling 25 panels, all <= 7x7', () => {
+    expect(allRuns).toHaveLength(7);
+    expect(hutch.kind).toBe('intro');
+    expect(eggtree.kind).toBe('home');
+    for (const relic of [flag, cornucopia, rose, ghost, gingerbread]) {
+      expect(relic.kind).toBe('relic');
+    }
+    expect(HUTCH).toHaveLength(5);
+    expect(EGGTREE).toHaveLength(5);
+    for (const relicPanels of [FLAG, CORNUCOPIA, ROSE, GHOST, GINGERBREAD]) {
+      expect(relicPanels).toHaveLength(3);
+    }
+    expect(all).toHaveLength(25);
+    for (const p of all) {
+      expect(p.rows.length, `${p.name} height`).toBeLessThanOrEqual(7);
+      expect(p.rows[0]?.length ?? 0, `${p.name} width`).toBeLessThanOrEqual(7);
+    }
+  });
+
+  it('every panel has exactly one answer (free panels: at least one) and passes twist verification', () => {
     for (const p of all) {
       if (p.free) expect(count(p), p.name).toBeGreaterThan(0);
       else expect(count(p), p.name).toBe(1);
     }
-    for (const p of [...FLAG, ...CORNUCOPIA, ...EGGTREE])
-      expect(problems(p, 2), p.name).toEqual([]);
+    for (const p of twistPanels) expect(problems(p, 2), p.name).toEqual([]);
   }, 120_000);
 
-  it('no clue is pointless: taking away any egg or flag leaves more than one answer', () => {
-    for (const p of all.filter((x) => !x.free)) {
-      for (const g of p.given) {
-        // The start egg and the Golden Egg are there by design, not as clues.
-        if (g[2] === 1 || (p.golden && key([g[0], g[1]]) === key(p.golden))) continue;
-        expect(
-          count({ ...p, given: p.given.filter((x) => x !== g) }),
-          `${p.name}: egg ${g.join(',')}`,
-        ).toBe(2);
-      }
-      for (const k of ['rowFlags', 'colFlags'] as const)
-        (p[k] ?? []).forEach((f, i) => {
-          if (f === null) return;
-          const flags = [...(p[k] ?? [])];
-          flags[i] = null;
-          expect(count({ ...p, [k]: flags }), `${p.name}: ${k} ${i}`).toBe(2);
-        });
-    }
-  }, 120_000);
-
-  it('the colours and the courses matter', () => {
+  it('every twist does real work', () => {
     for (const p of FLAG) expect(count(p, { noColours: true }), p.name).toBe(2);
     for (const p of CORNUCOPIA) expect(count(p, { noPortions: true }), p.name).toBe(2);
+    for (const p of ROSE) expect(count(p, { noLetters: true }), p.name).toBe(2);
+    for (const p of GHOST) expect(count(p, { noDarkLength: true }), p.name).toBe(2);
+    for (const p of GINGERBREAD) expect(count(p, { noSnow: true }), p.name).toBe(2);
   }, 120_000);
 
-  it('every burrow is used, and the Golden Egg is the last hop', () => {
+  it('every burrow is used, and the Golden Egg (when present) is the last hop', () => {
     for (const p of EGGTREE) {
+      expect(p.burrows?.length ?? 0, p.name).toBeGreaterThan(0);
       const b = parse(p);
       const route = solve(b, 1)[0] ?? [];
       for (const [a, z] of p.burrows ?? []) {

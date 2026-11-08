@@ -44,7 +44,7 @@ export {
 /**
  * Build the complete 7-bay Holiday Hall rotunda.
  * Bay 0 ('hall') holds the Merger Contract (`clause`), the Host/Villain,
- * and the Calendar Desk. Bays 1..6 hold the 6 Holiday Alcoves.
+ * and the Freed Mascots' Corner. Bays 1..6 hold the 6 Holiday Alcoves.
  *
  * All 7 bay scene graphs are built once at initialization and never recreated or disposed;
  * state changes mutate visibility, material colors, and hotspot descriptors in place via `syncState()`.
@@ -160,6 +160,8 @@ export function buildHolidayHallDiorama(callbacks: DioramaCallbacks): BuiltDiora
           fl.mesh.scale.set(sx * (1 - flicker * 0.1 * sway), sy * (1 + flicker * 0.24 * sway), sz);
           fl.mesh.rotation.z = f2 * 0.05 * sway;
         }
+
+        bayObj.animate?.(t);
 
         for (const ff of bayObj.fireflies) {
           ff.mesh.position.x = ff.baseX + Math.sin(t * 0.9 + ff.phase) * 0.06;

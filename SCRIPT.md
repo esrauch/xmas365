@@ -27,23 +27,29 @@ beat is written; expect rewrites after Playtest 1.
   life"). Leap Day only reacts, in dry punny one-liners, until the loophole
   and the party, where Leap Day finally talks to Santa and the mascots.
 - **Each caged mascot's plea** is a yellow sticky note on its room's memo
-  (found when you beat the warm-up). Leap Day's own sticky note is only on
+  (found when you beat the intro run). Leap Day's own sticky note is only on
   the opening memo (`P2`); the other memos carry no Leap Day reaction.
-- **Freeing a stray is silent.** Each room has one memo, found when
-  you beat its warm-up. Peeling
-  the branding back is visual only.
-- **The running gag:** every freed mascot thanks you, then gets your name or
-  date wrong, each one differently. At the party they've all got it right.
+- **Freeing a relic is silent** (after the first one triggers `T1`/`T2`). Each
+  room has one memo, found when you beat its intro run.
+- **The running gag:** every freed mascot thanks you when its fifth relic opens
+  its cage, then gets your name or date wrong, each one differently. At the
+  party they've all got it right.
 - **Christmas is a victim too.** Santa turns down complaints we never see
   (the elves' unionization drive, the reindeer's burnout), and the freed
   Snowman says it outright.
-- **Santa thinks the extra day is a bookkeeping error** and orders audits.
-  He never imagines it's *someone* until he meets you.
-- **Santa appears once, at the loophole**, bursting in too late. Then he's a
-  humbled guest at the party, where the mascots vote to let him keep his
-  twelve days of Christmas: **XMAS365™ becomes Xmas12**.
-- **The contract has one holiday per clause**, each on that holiday's genre
-  panel. The last clause defines "Year" as 365 days, which is the loophole.
+- **Escalation memos arrive every 5 relics returned** (`E1` at 5, `E2` at 10,
+  `E3` at 15, `E4` at 20, `E5` at 25, `E6` at 30 when all six mascots are free).
+- **Santa stands in Holiday Hall during the Merger Contract.** Once all 30
+  relics are returned and all six mascots are free (`E6`), CEO Santa takes the
+  podium in Holiday Hall personally with the Master Merger Contract. You
+  confront him at `C0`, red-line each of the 6 clauses (`22` puzzles each)
+  across the podium (`C1.torn`–`C5.torn`, `C6.early`), and spring the Sec 6.2
+  Leap Year loophole (`C6.torn`) right in front of him. Then he's a humbled
+  guest at the party, where the mascots vote to let him keep his twelve days
+  of Christmas: **XMAS365™ becomes Xmas12**.
+- **The contract has one holiday per clause**, each a 22-puzzle run on that
+  holiday's base puzzle (`6 Twist Reminders + 15 Double Twists + 1 All 6 Twists`).
+  The last clause defines "Fiscal Year" as 365 days, which is the loophole.
 - **The Feast keeps its roast**, and the freed Turkey insists it's a
   tofurkey.
 - **In the cake relay, each mascot hands over its stage with one line.**
@@ -54,8 +60,8 @@ beat is written; expect rewrites after Playtest 1.
 |---|---|---|
 | **Memo** | XMAS365™ internal memo: To / From / Re / body, signed by Santa. Shown once, then pinned to the hall corkboard. | ≤ 65 words |
 | **Leap Day** | One dry line, usually a reaction to the memo just read. | ≤ 14 words |
-| **Mascot** | A caged plea, a thank-you, or a party line. A `/` starts a new line on screen. | ≤ 2 short lines |
-| **Santa** | Spoken, in person: only at the loophole and the party. | ≤ 2 short lines |
+| **Mascot** | A caged plea, a thank-you, a Freed Mascots' Corner line, or a party line. A `/` starts a new line on screen. | ≤ 2 short lines |
+| **Santa** | Spoken, in person: at his podium during the Merger Contract and at the party. | ≤ 2 short lines |
 | **Sign** | Signage, a tag or a contract clause. | a few words |
 
 **Rules:**
@@ -65,15 +71,17 @@ beat is written; expect rewrites after Playtest 1.
   room, never in front of a puzzle.
 - **Every beat plays once.** A beat that falls due while another is showing
   waits its turn.
-- **Order:** only Thanksgiving's opening is fixed. Room beats make sense in
-  any order. Escalation is counted by how many mascots are free (`E1`..`E6`);
-  `{holiday}` is the room that has just reverted.
+- **Order:** only Thanksgiving's opening is fixed. Beating Thanksgiving's
+  home twist opens its five relic runs—one for each of the five other rooms—so
+  the house fans out in any order. Escalation is counted every 5 relics
+  returned (`E1` at 5 .. `E6` at 30).
 
 ```
-Thanksgiving ─┬─ Hot Dog  ──▶ Fourth of July ─┬─ Cupid's Bow   ──▶ Valentine's
-(open)        │                               └─ Witch's Broom ──▶ Halloween
-              └─ Stocking ──▶ Christmas ──────┬─ Golden Egg   ──▶ Easter
-                                              └─ Pumpkin Pie  ──▶ (Thanksgiving)
+Thanksgiving ─┬─ Hot Dog         ──▶ Fourth of July
+(starts open) ├─ Stocking        ──▶ Christmas
+              ├─ Heart Locket    ──▶ Valentine's
+              ├─ Jelly Bean Jar  ──▶ Easter
+              └─ Candy Corn      ──▶ Halloween
 ```
 
 ---
@@ -115,7 +123,7 @@ Day on the lone Feb 29 tile. Then the title card, then `P1`.*
 ## Act 1: Thanksgiving, the guided opening
 
 ### `thanksgiving.enter`
-*Its warm-up beaten.* Room sign: **Pre-Christmas Table · an XMAS365™ Subsidiary**
+*Its intro run beaten.* Room sign: **Pre-Christmas Table · an XMAS365™ Subsidiary**
 
 > **To:** Pre-Christmas Dinner (fka Thanksgiving) · **Re:** Gobbling Up
 > Market Share
@@ -132,32 +140,37 @@ Day on the lone Feb 29 tile. Then the title card, then `P1`.*
 **The Turkey:** "Ahem! This hostile takeover is *fowl* play! / Be a dear and
 bail me out before I'm downsized into soup!"
 
-### `T1`: the first stray freed
-*The first time any stray is freed: the Hot Dog or the Stocking.*
+### `T1`: the first relic freed
+*The first time any relic run is solved.*
 
-> **To:** Logistics · **Re:** Cross-Silo Asset Scrambling
+> **To:** Logistics · **Re:** Cross-Silo Relic Scrambling
 >
-> Great work on the asset shuffle! With every holiday's key gear locked in
-> the wrong department, the old celebrations can't even open for business.
-> Reminder: returning an item to its home room automatically unlocks the
-> door. So nothing goes home. Not one sock.
+> Great work on the 30-relic shuffle! With five prized relics per holiday
+> locked away—one in each of the other five departments—their mascots aren't
+> going anywhere. Every cage has five padlocks wired to the five relic shelves
+> underneath it, and returning a relic to a locked department automatically
+> unlocks the door. So nothing goes home. Not one sock.
 >
 > *S. Claus, CEO*
 
-### `T2`: carrying an item
-*The first time you're in the hall with an item.* Item tag (sign):
-**Misfiled Asset · Return to: {holiday}**. Its home room's door glows.
+### `T2`: Leap Day's reaction to `T1`
+*`T1` closed; carrying a freed relic.*
 
-### `T3`: the first item home
-*The first item restored (its room unlocks).*
+**Leap Day:** "Five relics per shelf, five padlocks per cage. Better start
+delivering."
 
-**Leap Day:** "One returned asset, one unlocked vertical. Time to hop to it."
+### `T3`: the first relic placed on its home shelf
+*The first relic placed on its home shelf under a caged mascot (unlocking its room and popping the first padlock on the cage).*
+
+**Leap Day:** "One relic back on its shelf, and one padlock off the cage. Four
+more to free them."
 
 ## Act 2: the open house
 
 The six rooms, in the order the house usually opens. Each room has a memo
-(found when you beat its warm-up) with its caged mascot's plea stuck to it, a
-thank-you when its mascot is freed, and two bonus lines.
+(found when you beat its intro run) with its caged mascot's plea stuck to it, a
+thank-you when its fifth relic opens the cage and frees the mascot, and two
+bonus lines.
 
 ### Fourth of July
 
@@ -314,80 +327,81 @@ whatever date you are, you're a total catch."
 - **Reward:** "A party hat right on the tip of my witch hat. Very chic,
   darling."
 
-### Escalation (by how many mascots are free)
+### Escalation (every 5 relics returned)
 
 Each memo is pinned to the hall corkboard, and opens itself, the next time
-you're in the hall.
+you're in the hall (`E1` at 5 relics returned, `E2` at 10, `E3` at 15, `E4` at
+20, `E5` at 25, `E6` at 30 when all six mascots are free).
 
-#### `E1`: one mascot free
-> **To:** Change-Management Taskforce · **Re:** Unauthorized De-Synergizing
-> ({holiday})
+#### `E1`: 5 relics returned
+> **To:** Change-Management Taskforce · **Re:** Unauthorized Relic Restocking
 >
-> It has come to my attention that {holiday} has staged an unscheduled
-> brand rollback! The mascot is loose, the old lamp is back on, and someone
-> pulled down our banner without a ticket. Circle back and re-acquire that
-> vertical before EOD! Probably a rogue intern.
+> Who is putting confiscated holiday relics back on their home shelves?! Five
+> padlocks have already clicked open across the campus, and someone keeps
+> opening locked subsidiary doors without a ticket. Circle back and lock down
+> those shelves before EOD! Probably a rogue intern.
 >
 > *S. Claus, CEO*
 
-#### `E2`: two mascots free
-> **To:** Elf Human Resources · **Re:** PTO Request & Spreadsheet Glitch
+#### `E2`: 10 relics returned
+> **To:** Elf Human Resources · **Re:** PTO Request & Padlock Audit
 >
 > Regarding your union petition for "one Silent Night a year": hard pass!
-> Hustle is the reason for the season. Also, Accounting's master spreadsheet
-> has a bug. It's showing **366** billable days instead of 365. Delete the
-> phantom row! P.S. A second holiday just churned. Fix it!
+> Hustle is the reason for the season. Worse, ten relics are back on their
+> shelves and cage padlocks are dropping like flies. Also, Accounting's master
+> spreadsheet is showing **366** billable days instead of 365. Fix it!
 >
 > *S. Claus, CEO*
 
-#### `E3`: three mascots free
-> **To:** Forensic Accounting · **Re:** THE 366TH DAY ANOMALY
+#### `E3`: 15 relics returned
+> **To:** Forensic Accounting · **Re:** HALF THE RELICS & DAY 366
 >
-> I've checked the master deck three times. Our entire valuation is built on
-> **XMAS365™**, yet every pivot table spits out 366! Stop muttering about
-> "February's quadrennial edge-case" and delete the extra cell! Worse, we're
-> down three subsidiaries. That's half the portfolio!
->
-> *S. Claus, CEO*
-
-#### `E4`: four mascots free
-> **To:** All Staff · **Re:** CODE RED-NOSED: Locate Day 366!
->
-> All hands on deck! Four verticals have de-merged and our stock is
-> sleigh-ding! Tear up the floorboards and find where this rogue 366th day is
-> hiding! Someone stuck a Post-it on my monitor saying *"Leap Year?"* and I had
-> Security shred it. Reindeer: your "sky-high burnout" ticket is closed!
+> Fifteen of our thirty cross-siloed relics have been returned to their home
+> shelves! That's half our leverage! And why does every pivot table still spit
+> out **366** days?! Stop muttering about "February's quadrennial edge-case"
+> and find whoever is smuggling relics through Holiday Hall!
 >
 > *S. Claus, CEO*
 
-#### `E5`: five mascots free
-> **To:** General Counsel · **Re:** URGENT: Lock It Down
+#### `E4`: 20 relics returned
+> **To:** All Staff · **Re:** CODE RED-NOSED: Twenty Relics Back!
 >
-> Five holidays have churned! FIVE! Draft the ironclad Master Merger
-> Agreement immediately: every holiday, 365 days, locked in perpetuity with
-> zero opt-out clauses! Once I sign that contract in Holiday Hall, our
-> monopoly is legally bulletproof. Skip the boilerplate, nobody reads the
-> fine print!
+> All hands on deck! Twenty relics are back on their shelves, padlocks are
+> popping all over campus, and our stock is sleigh-ding! Find the saboteur
+> running between the doors! Someone stuck a Post-it on my monitor saying
+> *"Check Feb 29"* and I had Security shred it. Reindeer: your "sky-high
+> burnout" ticket is closed!
 >
 > *S. Claus, CEO*
 
-#### `E6`: all six mascots free
-*All six lamps lit. CEO Santa takes center stage in Holiday Hall holding the Master Merger Contract.*
+#### `E5`: 25 relics returned
+> **To:** General Counsel · **Re:** URGENT: Five Relics Left—Lock It Down
+>
+> Twenty-five relics returned! TWENTY-FIVE! Only five padlocks stand between us
+> and total brand rollback! Draft the ironclad Master Merger Agreement
+> immediately: every holiday, 365 days, locked in perpetuity with zero opt-out
+> clauses! Once I take the podium in Holiday Hall, our monopoly is legally
+> bulletproof!
+>
+> *S. Claus, CEO*
+
+#### `E6`: all 30 relics returned (all six mascots free)
+*All six lamps lit. CEO Santa takes center stage at his podium in Holiday Hall holding the Master Merger Contract.*
 
 > **To:** All Staff · **Re:** Mandatory Signing Mixer @ Hall
 >
-> All six verticals have churned?! Fine—if you want a hostile takeover done
-> right, do it yourself! I am standing in Holiday Hall right now with the
-> binding Master Merger Contract on my clipboard and my platinum fountain pen
-> in hand. Once I initial all six clauses, every holiday snaps back under
-> XMAS365™ ownership forever!
+> All thirty relics returned and all six mascots loose in the hall?! Fine—if
+> you want a hostile takeover done right, do it yourself! I have taken the
+> podium in Holiday Hall personally with the binding Master Merger Contract and
+> my platinum fountain pen. Once I initial all six clauses, every holiday snaps
+> back under XMAS365™ ownership forever!
 >
 > *S. Claus, CEO*
 
 ## Act 3: the merger contract
 
 ### `C0`: confronting CEO Santa & the cover page
-*Tapping CEO Santa in Holiday Hall opens the contract checklist. A sign, as a document.*
+*Tapping CEO Santa at his podium in Holiday Hall opens the contract checklist. A sign, as a document.*
 
 > **MASTER MERGER & SUBSUMPTION AGREEMENT**
 > between **XMAS365™ Inc.** ("The Big Guy") and **All Other Holidays**
@@ -405,7 +419,7 @@ Contract, I'm auditing every clause."
 Audit away, frog—six ironclad clauses, zero loopholes!"
 
 ### `C1`..`C6`: the clauses
-*Each clause is a 29-panel gauntlet of its puzzle genre. Voiding a clause triggers its `C1.torn`..`C5.torn` (or `C6.early`) exchange with Santa right across the podium.*
+*Each clause is a 22-puzzle gauntlet (`6 Twist Reminders + 15 Double Twists + 1 All 6 Twists` = 132 puzzles across the 6 clauses) of its puzzle Base. Voiding a clause triggers its `C1.torn`..`C5.torn` (or `C6.early`) exchange with Santa right across the podium.*
 
 | ID | Panel | Clause |
 |---|---|---|
@@ -436,13 +450,13 @@ Audit away, frog—six ironclad clauses, zero loopholes!"
   - **Santa** *(trying to cover Sec 6.2 with his thumb)*: "Stop reading Sec 6.2! Nobody is supposed to read the fine print!"
 
 ### `C6.torn`: the loophole
-*All six clauses voided.*
+*All six clauses voided right at Santa's podium in Holiday Hall.*
 
 **Leap Day:** "All six clauses voided. And look at Sec 6.2: 'Fiscal Year is
 strictly defined as 365 days.' Hate to break it to you, Nick—it's a Leap Year."
 
-**Santa** *(staring at the shredded contract, dropping his platinum pen)*:
-"Wait. Strictly 365?! Did Legal forget to budget for a 366th day?!"
+**Santa** *(staring at the shredded contract on his podium, dropping his platinum pen)*:
+"366 days?! Wait—the frog in the glasses—you're February 29th!"
 
 **Leap Day:** "The quadrennial edge-case you deleted from the spreadsheet. Your
 entire merger is null and void."
@@ -510,9 +524,9 @@ four-year wait!"
 *Credits roll over the party.*
 
 ### `Y7`: after the credits
-*Back in the hall. The Calendar Desk is open in full, with its sign reading
-**Day 366 · open every day**. One last memo is on the corkboard, the only
-one ever addressed to you.*
+*Back in the hall. One last memo is on the corkboard, the only one ever
+addressed to you. Every beaten rung on a room's ladder can be replayed or
+played in endless Free Play (`5×5`, `7×7`, `9×9`).*
 
 > **XMAS12 · POST-MERGER MEMO**
 > **To:** All Holidays (and Day 366) · **From:** S. Claus, Founder · **Re:**
@@ -525,16 +539,21 @@ one ever addressed to you.*
 >
 > *S. Claus, Recovering CEO*
 
-## The Calendar Desk
+## Freed Mascots' Corner (`HALL_MASCOT_LINES`)
 
-### `D.<room>`: a holiday reclaimed (optional)
-*Shown on the desk's calendar when a room's warm-up is beaten and its genre
-reclaimed.*
+*As each mascot's fifth relic opens its cage, the mascot moves to the Freed
+Mascots' Corner in Holiday Hall. Tapping a freed mascot in the hall plays a
+short line:*
 
-**Sign:** "{Holiday}: de-merged & back on the calendar!"
+- **The Spider (`halloween`):** "Waiting in the hall until all six of us are free, darling—keep un-padlocking those cages!"
+- **The Turkey (`thanksgiving`):** "Much obliged for the rescue! Fetch the rest of the flock so we can audit Santa right out of the hall."
+- **The Snowman (`christmas`):** "Chilling in the corner until the whole crew is uncaged—even Christmas wants our old holidays back."
+- **The Teddy Bear (`valentines`):** "Sending moral hugs from the hall! Bring the rest of the relics home and free everyone!"
+- **The Bunny (`easter`):** "Antlers off, paws warmed up—free the rest of the mascots and we'll crash Santa's merger!"
+- **The Eaglet (`fourth`):** "Standing by for the big finale! Unlock the remaining cages and let freedom ring!"
 
 ## Later (Phase 7: the lighter layer)
 
-- `<room>.hint.<item>`: hint memos for strays that start hidden ("the Golden
-  Egg has been filed somewhere sweet"). 12 slots, to write then.
+- `<room>.hint.<relic>`: hint lines on empty relic shelves ("the Golden
+  Egg has been filed somewhere sweet"). 30 slots, to write then.
 - Gags: clickable reactions round the Santa branding in each room.

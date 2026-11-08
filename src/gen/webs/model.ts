@@ -35,6 +35,7 @@ export const DIAG: Dir[] = [
 
 export interface Panel {
   name: string;
+  tip?: string;
   /** '.' empty; a digit: a knot with that many threads; a letter: a coded count; '?': a dark knot. */
   rows: string[];
   /** Knot colours, row by row: 'r' red, 'b' blue ('g' green in older panels); '.' plain (white), which joins anything. A thread only joins different colours. */

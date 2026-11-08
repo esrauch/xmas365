@@ -48,6 +48,7 @@ export const mirrorMask = (m: number, axis: 'v' | 'h'): number =>
 
 export interface Panel {
   name: string;
+  tip?: string;
   /** The solved pieces, row by row: '.' off the board, else hex digit of wire ends (1 N, 2 E, 4 S, 8 W). */
   rows: string[];
   /** Where power comes in (the red string's plug, with colours). */

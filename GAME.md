@@ -41,23 +41,25 @@ Every playable **Puzzle** or **Run** shows its identity in two complementary for
 |---|---|---|
 | **`Base`** | One of the 6 core puzzle mechanics (`Web`, `Carving`, `Lights`, `Heartstrings`, `Hops`, `Fireworks`), each native to one Holiday Room. | *Genre*, *Base game*, *Base puzzle* |
 | **`Twist`** | One of the 6 portable holiday rule modifiers (`Spooky`, `Portioned`, `Snowflake`, `Love-Letter`, `Egg-Hunt`, `Patriotic`) that can be applied to any Base. Never called a "gimmick". | *Gimmick*, *Cross-theme*, *Extra*, *Modifier* |
-| **`Puzzle`** | A single playable grid instance with one solution (`Puzzle 8/29`, `solvedPuzzles`). | *Panel*, *Level*, *Stage*, *Grid* |
+| **`Puzzle`** | A single playable grid instance with one solution (`Puzzle 8/22`, `solvedPuzzles`). | *Panel*, *Level*, *Stage*, *Grid* |
 | **`Run`** | An ordered sequence of Puzzles played through a numbered pip strip (`1..N`). | *Proto*, *Panel run*, *Ladder step*, *Sequence* |
 | **`Board`** | The interactive visual grid surface where the player taps or drags to solve a Puzzle. | *Canvas*, *Table*, *Grid*, *Panel* |
-| **`Relic`** | One of the 12 physical holiday props (2 per holiday) scrambled across the house; each Relic carries its home holiday's Twist. | *Item*, *Stray*, *Prop*, *Misfiled asset*, *Object* |
-| **`Lost Relic`** | A Relic currently trapped in the wrong Holiday Room awaiting rescue via a **Stray Run**. | *Stray*, *Stray item*, *Trapped item* |
-| **`Carried Relic`** | A Relic freed from its Stray Run and held in the bottom **Carried Relic** tray (`CARRIED RELIC`) until delivered home. | *Carried item*, *Misfiled asset*, *Inventory item* |
-| **`Restored Relic`** | A Relic placed onto its matching pedestal in its home Room (`restoredRelics`). Restoring 1 unlocks a Locked Room; restoring both unlocks the Room's Centerpiece Run. | *Placed item*, *Returned item*, *Pedestal item* |
-| **`Warm-up Run`** | A Room's introductory 5-puzzle Run teaching its Base mechanic with 0 Twists. Solving it reveals the Room's two Stray Runs. | *Warm-up*, *Tutorial*, *Intro run* |
-| **`Stray Run`** | A 3-puzzle Run in a Room combining that Room's Base with a Lost Relic's Twist. Solving it frees the Lost Relic into a Carried Relic. | *Stray*, *Stray puzzle*, *Item run* |
-| **`Centerpiece Run`** | A Room's culminating 5-puzzle Run using its own home Twist (unlocked once both of the Room's Relics are Restored). Solving it frees the Mascot and lights the Room's Lamp. | *Centerpiece*, *Boss run*, *Master puzzle* |
-| **`Bonus Run`** | An optional 2-puzzle post-rescue Run offered by a freed Mascot; solving it awards a party hat and room decoration. | *Bonus panels*, *Mascot bonus*, *Extra panels* |
+| **`Relic`** | One of the 30 physical holiday props (5 per holiday, one stranded in each other Room) scrambled across the house; each Relic carries its home holiday's Twist. | *Item*, *Stray*, *Prop*, *Misfiled asset*, *Object* |
+| **`Lost Relic`** | A Relic currently trapped in the wrong Holiday Room awaiting rescue via a **Relic Run**. | *Stray*, *Stray item*, *Trapped item* |
+| **`Carried Relic`** | A Relic freed from its Relic Run and held in the bottom **Carried Relic** tray (`CARRIED RELIC`) until delivered to its home **Relic Shelf**. | *Carried item*, *Misfiled asset*, *Inventory item* |
+| **`Restored Relic`** | A Relic placed onto its matching **Relic Shelf** under the caged Mascot in its home Room (`restoredRelics`). Restoring 1 unlocks a Locked Room; each Restored Relic opens 1 of the cage's 5 padlocks, and the 5th frees the Mascot and lights the Room's Lamp. | *Placed item*, *Returned item*, *Pedestal item* |
+| **`Relic Shelf`** | One of the 5 shelves beneath the Mascot's cage shelf at the top of a Room (one per other holiday). An empty shelf shows a dim silhouette of its Relic and a badge for the Room where it is stranded. | *Item slot*, *Pedestal*, *Socket* |
+| **`Intro Run`** | A Room's introductory 5-puzzle Run (`5×5` → `7×7`) teaching its Base mechanic with 0 Twists. Solving it reveals the Room's corporate Memo and unlocks the **Home Twist Run**. | *Warm-up*, *Warm-up Run*, *Tutorial* |
+| **`Home Twist Run`** | A Room's 5-puzzle Run (`5×5` → `7×7`) combining the Room's Base with its own holiday Twist at home (built from the former centerpiece runs). Solving it unlocks all 5 of the Room's **Relic Runs**. | *Centerpiece*, *Centerpiece Run*, *Boss run* |
+| **`Relic Run`** | One of the 5 3-puzzle Runs (`5×5` → `7×7`) in a Room, each combining that Room's Base with one other holiday's Twist (starting with a tiny teaching board). Solving it frees the Lost Relic into a Carried Relic. | *Stray*, *Stray Run*, *Stray puzzle*, *Item run* |
+| **`Bonus Run`** | An optional post-rescue Run offered by a freed Mascot; solving it awards a party hat and room decoration. | *Bonus panels*, *Mascot bonus*, *Extra panels* |
 | **`Room`** | One of the 6 holiday dioramas surrounding Holiday Hall (`Locked` → `Unlocked` → `Restored`). | *Bay*, *Alcove*, *Holiday*, *Diorama* |
-| **`Contract`** | The **XMAS365™ Merger Contract** in Act III, consisting of 6 Clauses (`174` Puzzles total). | *Finale*, *Tuesday*, *Master contract*, *Gauntlet* |
-| **`Clause`** | One of the 6 sections of the Contract (`Clause I`–`Clause VI`), each a 29-puzzle Run for one Base across 5 Stages (`Stage 1 · Base Puzzle`, `Stage 2 · Twist Reminders`, `Stage 3 · Solo Twist`, `Stage 4 · Double Twist`, `Stage 5 · All 6 Twists`). | *Section*, *Chapter*, *Tuesday panel* |
-| **`Calendar Desk`** | Leap Day's desk in Holiday Hall hosting two modes: **Daily Puzzle (Day 366)** and **Puzzle Workshop** (the custom Base + Twist generator). | *Free Play*, *Custom Twist Mixer*, *Endless mode*, *Desk* |
+| **`Freed Mascots' Corner`** | The gathering spot in the right foreground of Holiday Hall (replacing the former Calendar Desk) where each Mascot moves once all 5 of its Relics are returned and its cage opens. Tapping a freed Mascot plays a short line (`HALL_MASCOT_LINES`). | *Calendar Desk*, *Mascot corner* |
+| **`Free Play`** | Endless browser-generated puzzles (`5×5`, `7×7`, `9×9`, with a solved counter) accessible directly by tapping any beaten rung on a Room's ladder (or replaying its Story levels). | *Calendar Desk*, *Puzzle Workshop*, *Custom Twist Mixer*, *Endless mode* |
+| **`Contract`** | The **XMAS365™ Merger Contract** in Act III, consisting of 6 Clauses (`132` Puzzles total). | *Finale*, *Tuesday*, *Master contract*, *Gauntlet* |
+| **`Clause`** | One of the 6 sections of the Contract (`Clause I`–`Clause VI`), each a 22-puzzle Run for one Base across 3 Stages (`Stage 1 · Twist Reminders` [6], `Stage 2 · Double Twist` [15], `Stage 3 · All 6 Twists` [1]). | *Section*, *Chapter*, *Tuesday panel* |
 | **`Memo`** | An internal XMAS365™ corporate note found at milestones and pinned to the Hall Corkboard. | *Note*, *Letter*, *Document* |
-| **`Dialogue Beat`** | A character speech popup at the bottom of the screen (Leap Day,Mascots, or CEO Santa). | *Beat*, *Toast*, *Speech bubble*, *Line* |
+| **`Dialogue Beat`** | A character speech popup at the bottom of the screen (Leap Day, Mascots, or CEO Santa). | *Beat*, *Toast*, *Speech bubble*, *Line* |
 
 ## The story: Santa's hostile takeover (decided 2026-11-07)
 
@@ -81,8 +83,9 @@ Christmas, and XMAS365™ becomes **Xmas12**.
 
 Christmas is a victim too: the elves, the reindeer and the tree have been
 taken over by their own boss, so Christmas is restored like every other
-room. Santa never appears in the rooms: he's in his memos, until he bursts
-in at the loophole, too late.
+room. Santa never appears in the holiday rooms: he's in his memos, until all
+six mascots are freed and he takes the podium in Holiday Hall with the Master
+Merger Contract.
 
 ### The cast
 
@@ -92,11 +95,13 @@ in at the loophole, too late.
   Day speaks only in dry one-liners at milestones, usually reacting to the
   latest memo you've found.
 - **Santa, CEO of XMAS365™.** Pompous, never menacing: press releases,
-  synergy, "integration". He writes to his own staff, not to you; he doesn't
-  know you exist until the very end, putting the extra day down to a
-  bookkeeping error, until he meets you at the loophole ("Who are *you*?").
-- **The six mascots**, each caged at its room's centrepiece, freed when you
-  restore it, with a short thank-you; all six come to your party.
+  synergy, "integration". He writes to his own staff, not to you; he puts the
+  366th day on the spreadsheet down to a bookkeeping error, until he confronts
+  you at the podium in Holiday Hall ("Who on earth are *you*?!").
+- **The six mascots**, each locked in a 5-padlock cage above the 5 Relic
+  Shelves at the top of its room, freed when all 5 of its Relics come home,
+  with a short thank-you before hopping off to the Freed Mascots' Corner in
+  Holiday Hall; all six celebrate at your party.
 
 | Holiday | Mascot (decided 2026-11-07) | What makes it read |
 |---|---|---|
@@ -117,60 +122,75 @@ shape.
 ### How the story is told
 
 - **In the world first.** Every room starts *acquired*: XMAS365™ signage over
-  it, its colours drained, its mascot in a cage at the centrepiece. Freeing
-  its items peels the branding back; restoring the centrepiece opens the
-  cage, brings back the room's own colour and music, and lights its lamp in
-  the hall.
+  it, its colours drained, its mascot in a 5-padlock cage above 5 empty Relic
+  Shelves at the top of the room. Each returned Relic sits on its shelf and
+  pops one padlock off the cage; the fifth Relic opens the cage, sends the
+  mascot hopping off to the **Freed Mascots' Corner** in Holiday Hall, brings
+  back the room's full colour and music, and lights its lamp in the hall.
+  (The old centerpiece props—Spider's Web, Feast, Christmas Tree, Valentine
+  Mailbox, Egg Tree, Grand Finale—stay as room decoration: drained while
+  acquired, in full colour once the mascot is freed.)
 - **Found memos.** The story is XMAS365™'s internal memos, which aren't meant
-  for you: you find them at milestones (beating a room's warm-up,
-  freeing a stray, bringing an item home, freeing a mascot) and they're
-  pinned up in the hall to reread. Santa writes candidly to his staff ("Re:
-  the Easter integration. The Bunny remains uncooperative."), so you're
-  overhearing the villain's plan, not being lectured. Leap Day reacts in a
-  line; a freed mascot says thank-you. Panels themselves stay clean (rules
-  only): the story never sits between the player and a puzzle.
-- **The memos escalate, never undo.** They change as rooms are restored:
-  smug press releases, then confused reports of rooms "reverting", then
-  panic about an "unaccounted-for date". Santa never takes back your
-  progress.
+  for you: you find them at milestones (beating a room's Intro Run, freeing
+  the first Relic, and every 5 Relics returned: `E1` at 5, `E2` at 10, `E3` at
+  15, `E4` at 20, `E5` at 25, `E6` at 30) and they're pinned up in the hall to
+  reread. Santa writes candidly to his staff, so you're overhearing the
+  villain's plan, not being lectured. Leap Day reacts in a line; a freed
+  mascot says thank-you. Puzzles themselves stay clean (rules only): the story
+  never sits between the player and a puzzle.
+- **The memos escalate, never undo.** They change as relics are returned and
+  cages un-padlocked: smug press releases, then confused reports of restocked
+  shelves and missing padlocks, then panic about Day 366. Santa never takes
+  back your progress.
 
-### Progression
+### Progression (decided 2026-11-08: No More Centerpieces)
 
-1. **Opening & room unlocks.** A dropped XMAS365™ memo announces the takeover of
-   all 365 days. Only **Thanksgiving** starts open (showing its big Warm-up
-   button). Every other room starts with a big Locked indicator until you bring
-   one of its two home items there: arriving with an eligible item turns the
-   center button into **"Restore Item & Unlock Room"**, which places that first
-   item and becomes the room's big **Warm-up** button.
-2. **The Room Ladder UX.** Once a room's warm-up is beaten, the room displays a
-   two-part progression ladder:
-   - **Bottom (finding strays):** the completed warm-up sits at the bottom
-     (clearly green/complete) with progression lines branching up to the room's
-     **two stray runs**. Each stray box turns green when solved and stays in
-     place once complete.
-   - **Top (unlocking the centrepiece):** above that, the room's **two home
-     items to return** sit in their own distinct item-slot UX (not puzzle
-     buttons), with connector lines feeding up to unlock the **centrepiece
-     run** once both items are restored. Solving the centrepiece frees the
-     mascot and lights the room's lamp in the hall.
-3. **Optional bonus panels.** Once a room's mascot is freed from its cage,
-   tapping the mascot offers a few hard bonus panels (generated or hand-picked)
-   that earn visible rewards: a room decoration and a party hat for that mascot
-   to wear at the finale. The story never needs them.
-4. **The merger contract.** With all six mascots free, CEO Santa takes center
-   stage in Holiday Hall with XMAS365™'s Master Merger Contract: six clauses
-   (one per puzzle genre), each a 29-panel gauntlet (`1 base + 6 gimmick intros
-   + 6 solo gimmicks + 15 two-gimmick combos + 1 all-6 boss panel` = 174 panels
-   total). Voiding each clause tears it up in red ink, and the last triggers
-   the Sec 6.2 loophole: day 366.
-5. **Leap Day's party.** The freed mascots throw a surprise party in Holiday
+1. **Opening & room unlocks.** A dropped XMAS365™ memo (`P1`) announces the
+   takeover of all 365 days. **Thanksgiving** starts open. Once you beat a
+   room's **Intro Run** (`5` puzzles, `5×5` → `7×7`) and its **Home Twist Run**
+   (`5` puzzles, `5×5` → `7×7`), all **five Relic Runs** (`3` puzzles each,
+   `5×5` → `7×7`, one for each other holiday) open at once—so Thanksgiving fans
+   the game out to all five other rooms immediately. Bringing a room's first
+   Relic home unlocks that room and places the Relic straight onto its shelf.
+2. **The Room Screen (Ladder at Bottom, Shelves & Cage at Top).**
+   - **Bottom — The Ladder of Runs:** **Intro Run** (`5` puzzles, teaching the
+     Base rules) → **Home Twist Run** (`5` puzzles, the room's own holiday
+     Twist at home) → **5 Relic Runs** (`3` puzzles each, one per other
+     holiday, starting with a tiny one-solution board that teaches that
+     Twist). About **23 puzzles per room (~140 across the six rooms)**; `9×9`
+     boards appear only in Free Play and the Merger Contract. With each room's
+     Home Twist Run + 5 Relic Runs, **all 36 Base × Twist pairs** appear in
+     the story rooms.
+   - **Top — The 5 Relic Shelves & Mascot Cage:** Five Relic Shelves (one per
+     other holiday) sit below the caged Mascot's shelf. An empty shelf shows a
+     dim outline of its missing Relic and a small badge for the Room where it
+     is stranded, so you always know where to look. Each returned Relic goes
+     onto its shelf and **opens one padlock** on the cage. The **fifth Relic**
+     opens the cage: the Mascot thanks you (`<room>.freed`), hops off to the
+     **Freed Mascots' Corner** in Holiday Hall, the room bursts into full
+     colour and music, and the room's lamp lights above its door in Holiday
+     Hall.
+3. **Free Play on any beaten rung.** The Calendar Desk has been removed;
+   instead, tapping any beaten rung of a room's ladder lets you choose **Story
+   levels** (replay) or **Free play** at **`5×5`, `7×7` or `9×9`** (endless
+   browser-generated puzzles via `src/gen/worker.ts`, with a solved counter).
+   The Intro rung's Free Play generates the plain Base with 0 Twists; the Home
+   Twist rung and each Relic rung generate their respective Base + Twist.
+4. **Holiday Hall & Freed Mascots' Corner.** In Holiday Hall, the former
+   Calendar Desk spot in the right foreground is now the **Freed Mascots'
+   Corner**: each Mascot appears there as it is freed, and tapping it plays a
+   short line (`HALL_MASCOT_LINES`).
+5. **The Merger Contract (`6 Clauses × 22 Puzzles = 132 Puzzles`).** When all
+   30 Relics are returned and all six Mascots are free (`E6`, all 6 lamps lit),
+   CEO Santa stands at his podium in Holiday Hall with XMAS365™'s Master Merger
+   Contract: six clauses (one per puzzle Base), each a **22-puzzle gauntlet**
+   (`6 Twist Reminders + 15 Double Twists + 1 All 6 Twists` = `132` puzzles
+   total). Voiding each clause tears it up in red ink right in front of Santa,
+   and the last triggers the Sec 6.2 loophole (`C6.torn`): Day 366.
+6. **Leap Day's party.** The freed mascots throw a surprise party in Holiday
    Hall around a 6-tier birthday cake table. They crown you **"Day 366 (Every
    Year)"**—pencilling February 29th onto every year's calendar—and Santa, a
-   humbled guest at the banquet table, keeps twelve days (Xmas12).
-6. **After the story: the Calendar Desk.** Your desk in the hall, there from
-   the start (reclaiming each holiday's warm-up, standard generator and twists
-   as you restore the house); after the party it opens the full endless mode:
-   the daily puzzle (**"Day 366"**) and the mixer (any genre, any twists).
+   humbled guest at the banquet table, keeps twelve days (**Xmas12**, `Y7`).
 
 **Hints** are the plain step hint on every panel (one correct move), with no
 character voice and no cost.
@@ -211,86 +231,74 @@ is kept below as material; see "Round one".)
 - **Less environmental than *The Witness*.** The panels carry the game; the
   dioramas dress them, hide the odd panel, and hold the gags.
 
-### Structure, kept: dioramas, items and gating
+### Structure: dioramas, 30 relics, shelves and cages (revamped 2026-11-08)
 
-The holiday rooms, items, strays, centrepieces, lamps and the final
-door all stay; they now organise runs of panels instead of single puzzles.
-Each room holds:
+Each holiday room holds **23 puzzles** across 7 runs (`5×5` → `7×7`), plus
+**5 Relic Shelves** and a **5-padlock Mascot Cage** at the top of the room:
 
-1. **The room's warm-up** (about 5 panels): the genre's rules, taught
-   panel by panel. Open from the start; the strays' runs open after it.
-2. **Two stray runs** (about 3 panels each). A stray item is caught in
-   panels of this room's genre, **twisted by the item's own holiday**: the
-   item *is* the twist. Solve the run and the item is freed.
-3. **The centrepiece run** (about 5 panels), unlocked when the room's own two
-   items come home. The genre's hardest panels, with the twists the
-   returned items bring with them; its last panel restores the centrepiece.
-   It uses **only its own holiday's twists** (and home-only extras), never a
-   stray's: a player can reach it without having played the room's strays.
+| Run | Puzzles | Boards | What it is |
+|---|---|---|---|
+| **Intro Run** | 5 | 5×5 → 7×7 | The Base's rules, taught puzzle by puzzle (formerly Warm-up). |
+| **Home Twist Run** | 5 | 5×5 → 7×7 | The room's own holiday Twist, at home (built from the former centerpiece runs). Unlocks all 5 Relic Runs when beaten. |
+| **Relic Runs** (×5) | 3 each | 5×5 → 7×7 | Another holiday's Twist in this room's Base (one per other holiday). The first puzzle is a tiny one-solution board that teaches the Twist, since a Twist can be met first in any of five rooms. |
 
-About 16 panels a room, 6 rooms, plus the final area: **about 100 panels**.
+The home twists, one per room:
 
-**Items carry twists.** An item's twist is a rule from its home holiday's
-genre, grafted onto the room it's stranded in (the Box of Chocolates brings
-Valentine's letters into Halloween's webs). Where it fits, the same twist
-comes home with the item and appears in its own centrepiece, so a player
-meets each twist abroad first and at home later. The model and the
-diorama show the twist too: the item sits on the panel it's caught in.
+| Room (Base) | Home Twist |
+|---|---|
+| Halloween (`Web`) | **`Spooky`** (`dark`): hidden knot counts |
+| Thanksgiving (`Carving`) | **`Portioned`** (`cuts`): fences nothing may cross |
+| Christmas (`Lights`) | **`Snowflake`** (`snow`): the mirror frame |
+| Valentine's (`Heartstrings`) | **`Love-Letter`** (`letters`): the coded letters |
+| Easter (`Hops`) | **`Egg-Hunt`** (`burrows`): hop underground between matching burrows |
+| Fourth of July (`Fireworks`) | **`Patriotic`** (`colours`): red and blue runs that need a gap |
 
-### Cross-themes: one per holiday (decided 2026-11-02, revised 2026-11-03)
+With the Home Twist Run and the 5 Relic Runs in every room, **all 36 pairs of
+Base and Twist (`6 × 6`)** appear in the story rooms (~140 puzzles across the
+six rooms).
 
-Each holiday has **one** cross-theme, a symbol that sits on top of any
-genre. Its two items carry it into the two rooms where they're stray, and
-it stays the same wherever it goes, so a player who's met it in one room
-recognises it in the next. A room's centrepiece can also have home-only
-extras (Halloween's diagonals).
+### Cross-themes (Twists): one per holiday (decided 2026-11-02, revised 2026-11-08)
 
-| Holiday | Cross-theme | Goes into (where its items are stray) |
+Each holiday has **one** Twist, a rule modifier that sits on top of any Base.
+Its **five Relics** carry that Twist into the five other rooms where they are
+stranded, and its **Home Twist Run** plays that Twist at home.
+
+| Holiday | Twist | Goes into |
 |---|---|---|
-| **Valentine's** | **Love Letters:** the same letter means the same number; a message's numbered blanks fill in from the counts. | Halloween Spiderweb (Box of Chocolates, built) · Fourth of July Fireworks (Cupid's Bow: clue numbers become letters) |
-| **Christmas** | **Snowflakes:** the answer's skeleton mirrors across a line (the whole board where the mechanics allow, as in Spiderweb; otherwise a frame as large and square as possible), while a detail on each side stays free, so neither half solves the other. | To be reassigned (its items carried red and green before: Tree-Top Star, Stocking) |
-| **Halloween** | **Spooky:** clues hidden in shadow (any value), with the lantern showing what's lit. | Valentine's Heartstrings (Jack-o'-Lantern: letters in the dark, unknown until worked out) · Fourth of July Fireworks (Witch's Broom: clues in the dark) |
-| **Easter** | **Egg Hunt:** some pieces carry eggs saying when they're visited, which run covers them, or what goes in each basket. | Valentine's Heartstrings (Bunny's Basket: numbered eggs fix some letters' places) · Christmas Lights (Golden Egg: the bulb marked 3 is three steps from the plug) |
-| **Fourth of July** | **Red, White and Blue:** things are red, white, blue or plain; two of the same colour can't join or touch (white is a real colour; plain touches anything). | To be reassigned (its items carried edge flags before: Star-Spangled Flag, Hot Dog) |
-| **Thanksgiving** | **Portions:** the board is split into outlined portions and each must get the same; or short fences (cuts) that nothing may cross. | Easter's Hops (Cornucopia: courses; the bunny finishes one portion before the next) · Christmas Lights (Pumpkin Pie: each portion gets one bulb) |
+| **Valentine's** | **`Love-Letter`:** the same letter means the same number (or coded number-letters); a message's numbered blanks fill in from the counts. | Home (`Heartstrings`), plus 5 Relic Runs in the other 5 rooms |
+| **Christmas** | **`Snowflake`:** the answer's skeleton mirrors across a line (the whole board in `Web`; otherwise a frosty frame), while a detail on each side stays free. | Home (`Lights`), plus 5 Relic Runs in the other 5 rooms |
+| **Halloween** | **`Spooky`:** clues hidden in shadow (`?`, any value) until worked out. | Home (`Web`), plus 5 Relic Runs in the other 5 rooms |
+| **Easter** | **`Egg-Hunt`:** numbered eggs, underground burrows, or Easter baskets saying when a square is visited, which run covers it, or what goes in each portion. | Home (`Hops`), plus 5 Relic Runs in the other 5 rooms |
+| **Fourth of July** | **`Patriotic`:** things are red, white, or blue; two of the same colour can't join or touch (or same-colour runs need a gap). | Home (`Fireworks`), plus 5 Relic Runs in the other 5 rooms |
+| **Thanksgiving** | **`Portioned`:** the board is split into outlined portions (courses, pie slices, equal shares) or short fences (`cuts`) that nothing may cross. | Home (`Carving`), plus 5 Relic Runs in the other 5 rooms |
 
-Chosen for being about the holiday itself (love letters, snowflakes, the
-dark, egg numbers, the flag's colours, fair portions) rather than its room's
-genre. **Revised 2026-11-03:** Christmas was red and green and the Fourth of
-July was edge flags; red, white and blue is the more Fourth-of-July colour
-rule, and snowflakes gave Christmas a twist of its own (a mirror). The full
-twist-by-puzzle map is in `PUZZLES.md`.
-
-The room sections below are design history and may describe older twists;
-the built rooms use the current set (see `PUZZLES.md` for what each run
-carries now).
-
-**A room is complete** when its two stray runs and its centrepiece run are
-done. Each completed room lights one of six lamps in Holiday Hall (like
-*The Witness*'s lasers into the mountain).
+**A room is restored** when all **5 of its home Relics** have been returned to
+their shelves at the top of the room, opening all 5 padlocks on the Mascot's
+cage. Freeing the Mascot sends it to the **Freed Mascots' Corner** in Holiday
+Hall and lights one of the six lamps above the doors in Holiday Hall.
 
 ### The final area: the merger contract, then Leap Day's party
 
-**Built design (2026-11-08):** once all six rooms are restored and their six
-mascots are free, CEO Santa stands center-stage in Holiday Hall behind a golden
-XMAS365™ podium (`src/game/dioramas/hall.ts`). Tapping him opens the **Master
-Merger Contract** (`src/proto/puzzles/clause.ts` + `src/proto/puzzles/clauses/`),
-a 6-Clause checklist (`C1`–`C6`, one clause per puzzle Base). Tapping any
-clause enters a **29-puzzle Clause Run** (`174` puzzles total across all 6 clauses):
-1. **Stage 1 · Base Puzzle (`1` puzzle):** a clean 0-twist board.
-2. **Stage 2 · Twist Reminders (`6` puzzles):** 6 compact boards re-teaching
-   every holiday Twist for that Base (including Twists not met in the main
-   rooms).
-3. **Stage 3 · Solo Twist (`6` puzzles):** 6 nontrivial single-twist boards.
-4. **Stage 4 · Double Twist (`15` puzzles):** all $\binom{6}{2} = 15$
-   two-twist pairings as medium-sized quirk tests.
-5. **Stage 5 · All 6 Twists (`1` puzzle):** 1 boss board combining all 6
+**Built design (revamped 2026-11-08):** once all 30 Relics are returned and all
+six Mascots are free in Holiday Hall, CEO Santa stands center-stage in Holiday
+Hall behind a golden XMAS365™ podium (`src/game/dioramas/hall.ts`). Tapping him
+opens the **Master Merger Contract** (`src/proto/puzzles/clause.ts` +
+`src/proto/puzzles/clauses/`), a 6-Clause checklist (`C1`–`C6`, one clause per
+puzzle Base). Tapping any clause enters a **22-puzzle Clause Run** (`132`
+puzzles total across all 6 clauses, trimmed from 29 by dropping the redundant
+base and solo panels since all 36 Base × Twist pairs are now played in the
+rooms):
+1. **Stage 1 · Twist Reminders (`6` puzzles):** 6 compact boards reminding the
+   player of every holiday Twist for that Base (the home twist included).
+2. **Stage 2 · Double Twist (`15` puzzles):** all $\binom{6}{2} = 15$
+   two-twist pairings.
+3. **Stage 3 · All 6 Twists (`1` puzzle):** 1 boss board combining all 6
    holiday Twists at once.
 
 Voiding all 6 clauses triggers the Sec 6.2 loophole (`C6.torn`: *"Fiscal Year
 is strictly defined as 365 days"*), transforming Holiday Hall into **Leap Day's
 Surprise Party** (`Y1` → `Y2` → `Y4` → `Y5` → `Y6` victory & credits modal →
-`Y7` post-merger memo & Free Play).
+`Y7` post-merger memo).
 
 *(Design history below from earlier iterations when the finale was six or twelve
 two-twist panels under the working name `tuesday`):*
@@ -374,39 +382,40 @@ music, and its own puzzle style (which every stray caught there uses).
 
 (New Year's, St. Patrick's Day and others can join later.)
 
-## Items and centrepieces
+## The 30 Relics and Room Decorations (revamped 2026-11-08)
 
-Two portable items per holiday, and its centrepiece. Where it can, a
-holiday's items feed into its centrepiece (the star goes on the tree last),
-so bringing them home sets up its puzzle.
+Five portable **Relics** per holiday (**30 Relics** in all), one stranded in
+each of the other five rooms. Each Relic carries its **home holiday's Twist**
+into the Base of the room where it is stranded. The old centerpiece props stay
+in their rooms as background decoration (drained while acquired, full colour
+once the mascot is freed). The 18 newly added Relics are in *italics*:
 
-| Holiday | Its two items | Its centrepiece |
+### By room where stranded (each room's 5 Relic Runs)
+
+| Room (Base) | Its 5 stranded Relics (and their home holiday) | Decorative prop |
 |---|---|---|
-| **Valentine's** | Cupid's Bow, Box of Chocolates | **The Valentine Mailbox**, overflowing with love letters to deliver |
-| **Easter** | Golden Egg, Bunny's Basket | **The Egg Tree**, its branches hung with decorated eggs |
-| **Fourth of July** | Star-Spangled Flag, Hot Dog | **The Grand Finale**, the fireworks show |
-| **Halloween** | Jack-o'-Lantern, Witch's Broom | **The Spider's Web**, a friendly spider's web to re-spin |
-| **Thanksgiving** | Cornucopia, Pumpkin Pie | **The Feast**, the roast turkey and a table to set |
-| **Christmas** | Tree-Top Star, Stocking | **The Christmas Tree**, to light (the star goes on last) |
+| **Valentine's** (`Heartstrings`) | Jack-o'-Lantern (Halloween), Bunny's Basket (Easter), *Watermelon Slice* (Fourth of July), *Wishbone* (Thanksgiving), *Candy Cane* (Christmas) | The Valentine Mailbox |
+| **Easter** (`Hops`) | Star-Spangled Flag (Fourth of July), Cornucopia (Thanksgiving), *Single Rose* (Valentine's, among the tulips), *Bedsheet Ghost* (Halloween, on the washing line), *Gingerbread Man* (Christmas) | The Egg Tree |
+| **Fourth of July** (`Fireworks`) | Cupid's Bow (Valentine's), Witch's Broom (Halloween), *Chocolate Bunny* (Easter, melting at the cookout), *Harvest Corn* (Thanksgiving, by the grill), *Snow Globe* (Christmas, snow in summer) | The Grand Finale |
+| **Halloween** (`Web`) | Box of Chocolates (Valentine's), Tree-Top Star (Christmas), *Marshmallow Chick* (Easter), *Picnic Basket* (Fourth of July), *Gravy Boat* (Thanksgiving, mistaken for a brew) | The Spider's Web |
+| **Thanksgiving** (`Carving`) | Hot Dog (Fourth of July), Stocking (Christmas), *Heart Locket* (Valentine's), *Jelly Bean Jar* (Easter), *Candy Corn* (Halloween, blending into the harvest) | The Feast |
+| **Christmas** (`Lights`) | Golden Egg (Easter), Pumpkin Pie (Thanksgiving), *Love Letter* (Valentine's, in the Christmas-card pile), *Ice Pop* (Fourth of July, frozen solid), *Cauldron* (Halloween, by the fire) | The Christmas Tree |
+
+### By home holiday (the 5 Relics each caged Mascot is waiting for)
+
+| Holiday (Mascot) | Its 5 home Relics (one per shelf under the cage) |
+|---|---|
+| **Valentine's** (Teddy Bear) | Cupid's Bow, Box of Chocolates, *Single Rose*, *Heart Locket*, *Love Letter* |
+| **Easter** (Bunny) | Bunny's Basket, Golden Egg, *Chocolate Bunny*, *Marshmallow Chick*, *Jelly Bean Jar* |
+| **Fourth of July** (Eaglet) | Star-Spangled Flag, Hot Dog, *Watermelon Slice*, *Picnic Basket*, *Ice Pop* |
+| **Halloween** (Spider) | Jack-o'-Lantern, Witch's Broom, *Candy Corn*, *Cauldron*, *Bedsheet Ghost* |
+| **Thanksgiving** (Turkey) | Cornucopia, Pumpkin Pie, *Wishbone*, *Harvest Corn*, *Gravy Boat* |
+| **Christmas** (Snowman) | Tree-Top Star, Stocking, *Candy Cane*, *Gingerbread Man*, *Snow Globe* |
 
 Chosen to be recognisable as small models, distinct in silhouette and
 colour from each other, funny out of place, and secular and playful (no
 religious symbols; no Pilgrim or Native characters or scenes: the Turkey's
 Pilgrim-style buckle hat is a costume, and the only one).
-
-## Where the strays are
-
-Two strays in each room, from two different holidays; each holiday's two
-items stranded in two different rooms.
-
-| Room | Its strays (and their homes) |
-|---|---|
-| **Valentine's** | Jack-o'-Lantern (Halloween), Bunny's Basket (Easter) |
-| **Easter** | Star-Spangled Flag (Fourth of July), Cornucopia (Thanksgiving) |
-| **Fourth of July** | Cupid's Bow (Valentine's), Witch's Broom (Halloween) |
-| **Halloween** | Box of Chocolates (Valentine's), Tree-Top Star (Christmas) |
-| **Thanksgiving** | Hot Dog (Fourth of July), Stocking (Christmas) |
-| **Christmas** | Golden Egg (Easter), Pumpkin Pie (Thanksgiving) |
 
 ## Fourth of July: the fireworks run (designed and built 2026-11-02)
 

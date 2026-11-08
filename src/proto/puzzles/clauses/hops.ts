@@ -1,12 +1,10 @@
 /**
- * Clause V (`C5`): Easter · Bunny Hops (`hops`) — 29-panel contract gauntlet.
+ * Clause V (`C5`): Easter · Bunny Hops (`hops`) — 22-panel contract gauntlet.
  *
  * Progression:
- * - Panel 0 (`base`, 1 panel): Plain base game with no gimmicks.
- * - Panels 1–6 (`intro`, 6 panels): Compact teaching boards introducing each gimmick in `HOP_TWISTS` order.
- * - Panels 7–12 (`solo`, 6 panels): Nontrivial single-gimmick puzzles (`easy` 5×5).
- * - Panels 13–27 (`duo`, 15 panels): All 15 two-gimmick combinations (`easy` 5×5).
- * - Panel 28 (`all6`, 1 panel): Boss puzzle combining all 6 gimmicks at once (6×6).
+ * - Panels 0–5 (`intro`, 6 panels): Compact teaching boards introducing each twist in `HOP_TWISTS` order.
+ * - Panels 6–20 (`duo`, 15 panels): All 15 two-twist combinations (`easy` 5×5).
+ * - Panel 21 (`all6`, 1 panel): Boss puzzle combining all 6 twists at once (6×6).
  */
 
 import type { Panel as HopPanel } from '../../hops';
@@ -63,28 +61,7 @@ export const HOPS_TWISTS: readonly TwistMeta[] = [
 ];
 
 const PANELS: readonly ClausePanelItem<HopPanel>[] = [
-  // ── 0: Base (plain Bunny Hops) ──────────────────────────────────────────────
-  {
-    name: 'Spring Meadow',
-    section: 'base',
-    twists: [],
-    tip: 'Hop to adjacent squares to visit every lawn square once, hitting numbered eggs on step.',
-    explain:
-      'Start at egg 1 and hop up, down, left, or right so every lawn square is visited once and each numbered egg lands on its exact hop number.',
-    panel: {
-      name: 'Spring Meadow',
-      rows: ['#####', '#####', '#####', '#####', '#####'],
-      given: [
-        [2, 4, 1],
-        [3, 0, 8],
-        [2, 2, 13],
-        [1, 1, 15],
-        [0, 4, 19],
-      ],
-    },
-  },
-
-  // ── 1–6: Intro (compact teaching panels, one per gimmick) ───────────────────
+  // ── 0–5: Intro (compact teaching panels, one per twist) ─────────────────────
   {
     name: 'First Course',
     section: 'intro',
@@ -209,131 +186,7 @@ const PANELS: readonly ClausePanelItem<HopPanel>[] = [
     },
   },
 
-  // ── 7–12: Solo (nontrivial single-gimmick 5×5 panels) ───────────────────────
-  {
-    name: 'Two Courses',
-    section: 'solo',
-    twists: ['courses'],
-    tip: '🥧 Portions: Complete each outlined course before crossing into the next.',
-    explain:
-      'Every outlined course must be visited in a single contiguous stretch before hopping across the boundary wall.',
-    panel: {
-      name: 'Two Courses',
-      rows: ['#####', '#####', '#####', '#####', '#####'],
-      given: [
-        [2, 4, 1],
-        [0, 4, 25],
-      ],
-      portions: ['AABBB', 'AABBB', 'ABBBA', 'ABBBA', 'AAAAA'],
-    },
-  },
-  {
-    name: 'Patriot Pastures',
-    section: 'solo',
-    twists: ['colours'],
-    tip: '🎆 Red, White & Blue: Guide both bunnies from their 1 eggs across their own colors and white.',
-    explain:
-      'Red and Blue each start at their own 1 egg and cover every square of their color; white border squares can belong to either bunny.',
-    panel: {
-      name: 'Patriot Pastures',
-      rows: ['#####', '#####', '#####', '#####', '#####'],
-      given: [
-        [1, 3, 1],
-        [2, 1, 12],
-        [2, 4, 1],
-      ],
-      colours: ['rrrrr', 'wrrrr', 'brwbb', 'bwbbb', 'bbbbb'],
-    },
-  },
-  {
-    name: 'Secret Tunnel',
-    section: 'solo',
-    twists: ['burrows'],
-    tip: '🥚 Burrows: Hop into one burrow hole and pop out of its matching partner.',
-    explain:
-      'The underground burrow pair acts as a direct hop between two distant squares and must be traversed along the route.',
-    panel: {
-      name: 'Secret Tunnel',
-      rows: ['#####', '#####', '#####', '#####', '#####'],
-      given: [
-        [4, 2, 1],
-        [0, 1, 14],
-        [1, 1, 23],
-        [2, 1, 24],
-      ],
-      burrows: [
-        [
-          [4, 0],
-          [2, 3],
-        ],
-      ],
-    },
-  },
-  {
-    name: 'Icy Clover',
-    section: 'solo',
-    twists: ['snow'],
-    tip: '❄️ Snowflakes: Mirror every surface hop inside the frosty frame across the axis.',
-    explain:
-      'Every trail stroke inside the frosty 4×4 frame reflects across the horizontal mirror line.',
-    panel: {
-      name: 'Icy Clover',
-      rows: ['#####', '#####', '#####', '#####', '#####'],
-      given: [
-        [0, 4, 1],
-        [1, 2, 18],
-        [0, 0, 25],
-      ],
-      frame: { top: 1, left: 0, bottom: 4, right: 3, axis: 'h' },
-    },
-  },
-  {
-    name: 'Morning Dew',
-    section: 'solo',
-    twists: ['letters'],
-    tip: '💌 Love Letters: Visit the letter eggs on the exact hop numbers in the message.',
-    explain:
-      'Land on the three letter eggs on hops 23, 19, and 5 to spell the secret three-letter word.',
-    panel: {
-      name: 'Morning Dew',
-      rows: ['#####', '#####', '#####', '#####', '#####'],
-      given: [[2, 2, 1]],
-      letters: [
-        [3, 1, 'D'],
-        [1, 1, 'E'],
-        [4, 4, 'W'],
-      ],
-      message: '23 19 5',
-      word: 'DEW',
-      blanks: [23, 19, 5],
-    },
-  },
-  {
-    name: 'Rocks in the Dark',
-    section: 'solo',
-    twists: ['dark'],
-    tip: '🎃 Spooky: Deduce which shadowed (?) squares are lawn and which hide rocks.',
-    explain:
-      'The final egg is 24 on a 25-square grid, so two of the three shadowed (?) squares are lawn and one is a hidden rock.',
-    panel: {
-      name: 'Rocks in the Dark',
-      rows: ['####.', '#####', '#####', '#####', '#####'],
-      given: [
-        [2, 0, 1],
-        [4, 2, 11],
-        [2, 2, 13],
-        [3, 3, 15],
-        [0, 3, 24],
-      ],
-      dark: [
-        [1, 2],
-        [0, 2],
-        [0, 4],
-      ],
-    },
-  },
-
-  // ── 13–27: Duo (all 15 two-gimmick combinations in pairCombinations order) ──
+  // ── 6–20: Duo (all 15 two-twist combinations in pairCombinations order) ────
   {
     name: 'Picnic Parade',
     section: 'duo',

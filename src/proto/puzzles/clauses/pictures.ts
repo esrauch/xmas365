@@ -1,8 +1,8 @@
 /**
  * Clause VI (`C6`): Fourth of July · Fireworks (`pictures`).
  *
- * 29-panel gauntlet covering the plain nonogram base game, 6 teaching intros,
- * 6 single-gimmick puzzles, all 15 two-gimmick pairs, and the 6-gimmick finale.
+ * 22-panel gauntlet covering 6 teaching intros, all 15 two-twist pairs,
+ * and the 6-twist finale.
  */
 
 import type { Panel as PicturePanel } from '../../../gen/pictures';
@@ -58,21 +58,7 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
     },
   ],
   panels: [
-    // 0: Base
-    {
-      name: 'First Sparkler',
-      section: 'base',
-      twists: [],
-      tip: 'Numbers give filled run lengths in order, with at least one empty gap between runs.',
-      explain:
-        'Each row and column clue lists the lengths of consecutive filled runs in order, separated by at least one empty square.',
-      panel: {
-        name: 'First Sparkler',
-        rows: ['...#.', '.#.##', '.###.', '#####', '..#..'],
-      },
-    },
-
-    // 1..6: Intro (teaching boards)
+    // 0..5: Intro (teaching boards)
     {
       name: 'Candlelight Spark',
       section: 'intro',
@@ -159,94 +145,7 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
       },
     },
 
-    // 7..12: Solo
-    {
-      name: 'Shadow Rocket',
-      section: 'solo',
-      twists: ['dark'],
-      tip: '🎃 Spooky: Deduce the hidden ? run lengths from crossing lines.',
-      explain:
-        'Each ? clue hides a run of at least 1 filled square. Cross-reference perpendicular clues to lock in where each mystery run starts and ends.',
-      panel: {
-        name: 'Shadow Rocket',
-        rows: ['#..#.', '..##.', '##.##', '.##.#', '...#.'],
-        dark: [
-          ['row', 3, 1],
-          ['col', 0, 0],
-        ],
-      },
-    },
-    {
-      name: 'Skywriting',
-      section: 'solo',
-      twists: ['letters'],
-      tip: '💌 Love Letters: Crack the letter code to reveal the hidden word.',
-      explain:
-        'Match each letter clue to its unique run length so every row and column fits, completing the secret word below.',
-      panel: {
-        name: 'Skywriting',
-        rows: ['....#', '..#..', '.###.', '##.##', '.###.'],
-        letters: 'BR',
-        message: '1U2ST',
-      },
-    },
-    {
-      name: 'Patriot Burst',
-      section: 'solo',
-      twists: ['colours'],
-      tip: '🎆 Red, White & Blue: Different colors may touch without an empty gap.',
-      explain:
-        'Paint each square Red or Blue to match the colored run clues — remember that Red and Blue runs can meet directly with no white space between them.',
-      panel: {
-        name: 'Patriot Burst',
-        rows: ['..B..', 'RRBB.', '.BRRB', '...R.', '.R.B.'],
-        palette: 'RB',
-      },
-    },
-    {
-      name: 'Starlight Clutch',
-      section: 'solo',
-      twists: ['eggs'],
-      tip: '🥚 Egg Hunt: Count filled squares from the left of each egg row.',
-      explain:
-        'Every numbered egg square is filled and anchors the exact count of filled squares from the left edge of its row.',
-      panel: {
-        name: 'Starlight Clutch',
-        rows: ['....#', '..#..', '.##..', '##.#.', '.#..#'],
-        eggs: [
-          [3, 3, 3],
-          [4, 4, 2],
-        ],
-      },
-    },
-    {
-      name: 'EqualSlices',
-      section: 'solo',
-      twists: ['portions'],
-      tip: '🥧 Portions: Balance the filled square count across both regions.',
-      explain:
-        'When line logic leaves two ways to finish a switch, count the filled squares in each outlined portion so every region gets an equal share.',
-      panel: {
-        name: 'EqualSlices',
-        rows: ['###.#', '.#...', '##.#.', '....#', '.#...'],
-        portions: ['AAAAB', 'ABAAB', 'ABAAB', 'ABBBB', 'BBBBB'],
-      },
-    },
-    {
-      name: 'Winter Spark',
-      section: 'solo',
-      twists: ['snow'],
-      tip: '❄️ Snowflakes: Mirror every square inside the frosty frame.',
-      explain:
-        'Inside the frosty frame, the left and right halves mirror each other across the vertical axis, while squares outside the frame follow line clues freely.',
-      panel: {
-        name: 'Winter Spark',
-        rows: ['#..#.', '....#', '#..#.', '.##.#', '..#..'],
-        frame: { top: 0, bottom: 3, left: 0, right: 3, axis: 'v' },
-      },
-    },
-
-    // 13..27: Duo (all 15 pairs in pairCombinations(gimmickOrder) order)
+    // 6..20: Duo (all 15 pairs in pairCombinations(twistOrder) order)
     {
       name: 'Midnight Billet',
       section: 'duo',

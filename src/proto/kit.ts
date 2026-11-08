@@ -10,7 +10,7 @@ export interface Proto {
   title: string;
   /** The holiday room it's in (or "Holiday Hall" for the final puzzle). */
   room: string;
-  kind: 'warm-up' | 'stray' | 'centerpiece' | 'final' | 'workshop';
+  kind: 'intro' | 'home' | 'relic' | 'final' | 'workshop';
   /** The puzzle it grows from, and the twist. */
   from: string;
   /** How to play, briefly. */
@@ -19,6 +19,8 @@ export interface Proto {
   teaches?: boolean;
   /** Number of panels in this puzzle run. */
   panelCount?: number;
+  /** The run's panels (story order), for tests and tools. */
+  panels?: readonly unknown[];
   /** Build the puzzle in `host`; call `solved()` when it's done. */
   mount(host: HTMLElement, ctx: Ctx): void;
 }

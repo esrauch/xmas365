@@ -7,61 +7,75 @@ the full script and beat IDs live in [SCRIPT.md](SCRIPT.md); the puzzle-by-twist
 map lives in [PUZZLES.md](PUZZLES.md); build status lives in
 [PROTOTYPES.md](PROTOTYPES.md).
 
-## Where we are (completed foundations)
+## Where we are (completed foundations — revamped 2026-11-08)
 
-- **Puzzles & generators (done):** All six genres (`Spiderweb`, `Carving`,
-  `Heartstrings`, `Bunny Hops`, `Lights`, `Fireworks`) and all six holiday twists
-  generate at easy, medium, and hard in seconds and are pinned by tests. Real-world
-  puzzle names (`Hashi`, `Shikaku`, `Net`, `Strands`, `Numbrix`, `Nonograms`) are
-  never shown in user-facing UI.
-- **Guided opening & Room Ladder UX (done):** Only Thanksgiving starts open
-  (with its big Warm-up button). Other rooms start locked until you bring one of
-  their two eligible home items (**"Restore Item & Unlock Room"** → **Warm-up**).
-  Beating a room's warm-up reveals the two-tier **Room Ladder UX** (completed
-  green warm-up branching up to the two stray runs at the bottom; two non-puzzle
-  return-item sockets feeding up into the centrepiece unlock at the top).
-- **Calendar Desk progression (done):** Reclaims each holiday's warm-up and
-  standard generator when its warm-up is beaten, and all twists when its
-  centrepiece is beaten, alongside the daily puzzle and custom mixer.
-- **Zero-churn 3D dioramas, mascots & cages (done):** All 7 dioramas
-  (`src/game/dioramas/{hall,thanksgiving,halloween,christmas,valentines,easter,fourth}.ts`)
-  are pre-built once at startup with zero WebGL resource churn, complete with all
-  8 procedural low-poly mascots (`leapday`, `santa`, `spider`, `turkey`, `snowman`,
-  `bear`, `bunny`, `eaglet`), cages, XMAS365™ acquisition banners/crates, and Hall
-  lamps.
-- **Script & Hall Corkboard (done):** `src/content/script.ts` encodes all memos,
-  Leap Day one-liners, mascot lines, Merger Contract clauses (`C0`–`C6`), and
-  ending beats (`Y1`–`Y7`), wired into milestone toasts and the Hall Corkboard.
+- **Puzzles & generators (done):** All six Bases (`Web`, `Carving`,
+  `Heartstrings`, `Hops`, `Lights`, `Fireworks`) and all six holiday Twists
+  (`Spooky`, `Portioned`, `Snowflake`, `Love-Letter`, `Egg-Hunt`, `Patriotic`)
+  generate at easy (`5×5`), medium (`7×7`), and hard (`9×9`) in seconds and are
+  pinned by tests. Real-world puzzle names (`Hashi`, `Shikaku`, `Net`,
+  `Strands`, `Numbrix`, `Nonograms`) are never shown in user-facing UI.
+- **No-Centerpiece Room Progression, 30 Relics & 5-Padlock Mascot Cages (done):**
+  - Every room has **7 runs** (`23` puzzles per room, `~140` across the six
+    rooms, all `5×5` → `7×7`): **Intro Run** (`5` puzzles, plain Base) → **Home
+    Twist Run** (`5` puzzles, the room's own holiday Twist at home, built from
+    the former centerpiece runs) → **5 Relic Runs** (`3` puzzles each, one for
+    each other holiday, starting with a tiny teaching board). All **36 Base ×
+    Twist cells** appear in the story rooms.
+  - Only **Thanksgiving** starts open; beating a room's Home Twist Run opens all
+    5 of its Relic Runs at once. Bringing the first Relic home to a locked room
+    unlocks that room and places the Relic straight onto its shelf.
+  - The top of each room holds **5 Relic Shelves** (showing dim silhouettes and
+    stranded-room badges when empty) beneath the **Mascot's Cage Shelf** (`5`
+    padlocks). Each returned Relic opens one padlock; the **5th Relic** opens
+    the cage, freeing the Mascot (who hops off to the **Freed Mascots' Corner**
+    in Holiday Hall), restoring the room's full colour and music, and lighting
+    its lamp in Holiday Hall. The old centerpiece props stay as room decoration.
+- **Free Play on Beaten Rungs & Freed Mascots' Corner (Calendar Desk Removed, done):**
+  - The Calendar Desk has been removed (`calendarDesk.ts` deleted). Its spot in
+    the right foreground of Holiday Hall is now the **Freed Mascots' Corner**,
+    where freed mascots gather and speak a short line when tapped
+    (`HALL_MASCOT_LINES`).
+  - Tapping any beaten rung of a room's ladder opens a chooser for **Story
+    levels** (replay) or endless browser **Free Play** at **`5×5`, `7×7` or
+    `9×9`** (`src/gen/worker.ts`) with a solved counter.
+- **Zero-churn 3D dioramas, 30 relic props, shelves & cages (done):** All 7
+  dioramas (`src/game/dioramas/{hall,thanksgiving,halloween,christmas,valentines,easter,fourth}.ts`)
+  are pre-built once at startup with zero WebGL resource churn, complete with
+  all 8 procedural low-poly mascots (`leapday`, `santa`, `spider`, `turkey`,
+  `snowman`, `bear`, `bunny`, `eaglet`), 30 relic props, 5-padlock cages,
+  XMAS365™ acquisition banners/crates, and Hall lamps.
+- **Script, Escalation Memos & Hall Corkboard (done):** `src/content/script.ts`
+  encodes all memos (with `E1`–`E6` arriving every 5 Relics returned: `5, 10,
+  15, 20, 25, 30`), Leap Day one-liners (`T1`–`T3` for relics, shelves, and
+  padlocks), mascot lines (`HALL_MASCOT_LINES`), Merger Contract clauses
+  (`C0`–`C6`, with CEO Santa standing at his podium in Holiday Hall), and ending
+  beats (`Y1`–`Y7`), wired into milestone toasts and the Hall Corkboard.
 
 ---
 
-## Active Swarm Plan: Act 3 & Act 4 Endgame (CEO Santa, 6-Clause × 29-Panel Merger Contract & Party)
+## Completed Architecture: Act 3 & Act 4 Endgame (CEO Santa, 6-Clause × 22-Puzzle Merger Contract & Party)
 
-Once all 6 holiday mascots are released (`lampsLit >= 6`), **CEO Santa** enters
-Holiday Hall as the single clickable hotspot. Tapping Santa opens the **XMAS365™
-Master Merger Contract** modal with a checklist of the **6 Clauses** (`C1`–`C6`,
-one per puzzle genre).
+Once all 30 Relics are returned and all 6 holiday mascots are released
+(`lampsLit >= 6`), **CEO Santa** stands at his podium in Holiday Hall as the
+clickable hotspot. Tapping Santa opens the **XMAS365™ Master Merger Contract**
+modal with a checklist of the **6 Clauses** (`C1`–`C6`, one per puzzle Base).
 
-Tapping any clause opens a **29-panel gauntlet** (`N = 29`) of that single puzzle
-genre, capped at **`easy` or `medium` size at most** (`<= 7×7`) so every panel is
-a snappy quirk test rather than a long grind:
+Tapping any clause opens a **22-puzzle gauntlet** (`N = 22`) of that single
+puzzle Base (trimmed from 29 by dropping the plain base and solo twist stages,
+since all 36 Base × Twist combinations are now played in the story rooms):
 
-1. **Base Game (`base`, Panel 1 — 1 panel):** Plain puzzle with no gimmicks.
-2. **Trivial Gimmick Re-Explanations (`intro`, Panels 2–7 — 6 panels):** One
-   bite-sized teaching board for each of the 6 gimmicks, with an explicit banner
-   explaining how that gimmick works in this genre (since each holiday room only
-   used 3 of the 6 gimmicks during the main story).
-3. **Nontrivial Single-Gimmick (`solo`, Panels 8–13 — 6 panels):** One `easy`
-   (5×5) panel for each of the 6 gimmicks where that gimmick does real deduction
-   work (`margin >= 2`).
-4. **All 15 Two-Gimmick Combinations (`duo`, Panels 14–28 — 15 panels):** Every
-   pair of gimmicks $\binom{6}{2} = 15$ at `easy` (5×5) or `medium` (`<= 7×7`)
-   testing how the two gimmicks interact (`margin >= 2`).
-5. **All 6 Gimmicks Combined (`all6`, Panel 29 — 1 panel):** One boss puzzle at
-   `easy` or `medium` (`<= 7×7`) combining **all 6 gimmicks at once** (generated
-   or hand-crafted, verified to have a unique solution and all 6 twists active).
+1. **Stage 1 · Twist Reminders (`intro`, Puzzles 1–6 — 6 puzzles):** One
+   bite-sized teaching board for each of the 6 Twists (including the room's home
+   twist), with an explicit banner reminding how that Twist works on this Base.
+2. **Stage 2 · Double Twist (`duo`, Puzzles 7–21 — 15 puzzles):** Every
+   pair of Twists $\binom{6}{2} = 15$ at `easy` (`5×5`) or `medium` (`<= 7×7`)
+   testing how the two Twists interact (`margin >= 2`).
+3. **Stage 3 · All 6 Twists (`all6`, Puzzle 22 — 1 puzzle):** One boss puzzle at
+   `easy` or `medium` (`<= 7×7`) combining **all 6 Twists at once** (verified to
+   have a unique solution and all 6 twists active).
 
-Across all 6 clauses, this totals **$6 \times 29 = 174$ panels**.
+Across all 6 clauses, this totals **$6 \times 22 = 132$ puzzles**.
 
 ---
 
@@ -288,12 +302,12 @@ diorama staging, and shell flow in parallel:
            with 6 holiday-colored tiers and lit candles, surrounded by all 6 freed
            mascots + humbled Santa, with Leap Day wearing his party hat.
 
-- [x] **Workstream 2C — Shell Narrative Beats, Centerpiece Return CTA & Credits Modal (`src/main.ts`)**
+- [x] **Workstream 2C — Shell Narrative Beats, Return CTA & Credits Modal (`src/main.ts`)**
   - **Files owned:** `src/main.ts`
   - **Deliverables:**
-    - Add a **`← Return to Holiday Hall ▸`** button inside the centerpiece completion
-      banner (`proto.kind === 'centerpiece'`) so freeing a mascot gives a one-click
-      return to Holiday Hall.
+    - Add a **`← Return to Holiday Hall ▸`** button to a freed relic's completion banner
+      (`proto.kind === 'relic'`), so carrying it home is a one-click trip. (Built before the
+      revamp for centerpieces; centerpieces are gone, see `revamp-centerpieces.md`.)
     - Wire clause completion (`C1.torn`..`C6.torn`) so voiding each clause queues its
       Santa/Leap Day dialogue beat.
     - When `C6.torn` is dismissed (all 6 clauses voided), call `rebuildScene()` so
@@ -314,17 +328,16 @@ diorama staging, and shell flow in parallel:
 
 ---
 
-## Future Phases (Post-Merger Contract)
+### Future Phases (Post-Revamp)
 
-### Phase 3: Freed Mascot Bonus Panels & Party Hats
-- Redesign assets and add optional 3-panel hard bonus runs (`T5`/`H5`/`X5`/`V5`/`A5`/`F5`)
-  for each freed mascot in their home room.
+#### Phase 3: Freed Mascot Bonus Runs & Party Hats
+- Optional hard bonus runs (`T5`/`H5`/`X5`/`V5`/`A5`/`F5`) for each freed mascot.
 
-### Phase 4: Sound & Music Moods
+#### Phase 4: Sound & Music Moods
 - Procedural corporate-muzak vs. restored-holiday room themes and milestone SFX.
 
-### Phase 5: The Lighter Layer (Hidden Strays & Clickable Gags)
-- Toy-theatre clickable room props and riddle-guided stray discovery.
+#### Phase 5: The Lighter Layer (Shelf Hints & Clickable Gags)
+- Hint lines on the 30 empty Relic Shelves (`<room>.hint.<relic>`) and clickable room gags around the XMAS365™ branding.
 
-### Phase 6: Tuning, Accessibility & Release Polish
-- Color-blind secondary cues, mobile viewport polish, and final release checks.
+#### Phase 6: Tuning, Accessibility & Release Polish
+- Color-blind secondary cues, mobile viewport polish, optional post-release daily puzzle, and final release checks.

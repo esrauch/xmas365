@@ -18,51 +18,37 @@ describe('Clause V (C5): Easter · Hops (CLAUSE_HOPS)', () => {
     expect(CLAUSE_HOPS.panels).toHaveLength(CLAUSE_PANEL_COUNT);
   });
 
-  it('has the exact 1 + 6 + 6 + 15 + 1 section progression and matching twistsOf(panel)', () => {
+  it('has the exact 6 + 15 + 1 section progression and matching twistsOf(panel)', () => {
     const panels = CLAUSE_HOPS.panels;
 
-    // 0: base
-    expect(panels[0]?.section).toBe('base');
-    expect(panels[0]?.twists).toEqual([]);
-    expect(twistsOf(panels[0]!.panel)).toEqual([]);
-
-    // 1..6: intro
+    // 0..5: intro
     for (let i = 0; i < 6; i++) {
-      const item = panels[1 + i]!;
+      const item = panels[i]!;
       const g = HOP_TWISTS[i]!;
       expect(item.section, `intro ${i} (${item.name})`).toBe('intro');
       expect(item.twists, `intro ${i} (${item.name})`).toEqual([g]);
       expect(twistsOf(item.panel), `intro ${i} (${item.name})`).toEqual([g]);
     }
 
-    // 7..12: solo
-    for (let i = 0; i < 6; i++) {
-      const item = panels[7 + i]!;
-      const g = HOP_TWISTS[i]!;
-      expect(item.section, `solo ${i} (${item.name})`).toBe('solo');
-      expect(item.twists, `solo ${i} (${item.name})`).toEqual([g]);
-      expect(twistsOf(item.panel), `solo ${i} (${item.name})`).toEqual([g]);
-    }
-
-    // 13..27: duo
+    // 6..20: duo
     const pairs = pairCombinations(HOP_TWISTS);
     expect(pairs).toHaveLength(15);
     for (let i = 0; i < 15; i++) {
-      const item = panels[13 + i]!;
+      const item = panels[6 + i]!;
       const [g1, g2] = pairs[i]!;
       expect(item.section, `duo ${i} (${item.name})`).toBe('duo');
       expect(item.twists, `duo ${i} (${item.name})`).toEqual([g1, g2]);
       expect(twistsOf(item.panel), `duo ${i} (${item.name})`).toEqual([g1, g2]);
     }
 
-    // 28: all6
-    const boss = panels[28]!;
+    // 21: all6
+    const boss = panels[21]!;
     expect(boss.section).toBe('all6');
     expect(boss.twists).toEqual(HOP_TWISTS);
     expect(twistsOf(boss.panel)).toEqual(HOP_TWISTS);
   });
 
-  it('has 29 distinct panels, all <= 7x7 and each with a unique solution', () => {
+  it('has 22 distinct panels, all <= 7x7 and each with a unique solution', () => {
     const signatures = new Set<string>();
     for (const [idx, item] of CLAUSE_HOPS.panels.entries()) {
       const { panel } = item;
@@ -78,10 +64,11 @@ describe('Clause V (C5): Easter · Hops (CLAUSE_HOPS)', () => {
       const solutions = solve(parse(panel), 2, {}, new Budget(500_000));
       expect(solutions, `panel ${idx} (${item.name}) unique solution`).toHaveLength(1);
     }
+    expect(signatures.size).toBe(CLAUSE_PANEL_COUNT);
   });
 
-  it('verifies all 6 solo and 15 duo panels pass problems(panel, 2) with []', () => {
-    for (let idx = 7; idx <= 27; idx++) {
+  it('verifies all 15 duo panels pass problems(panel, 2) with []', () => {
+    for (let idx = 6; idx <= 20; idx++) {
       const item = CLAUSE_HOPS.panels[idx]!;
       expect(
         problems(item.panel, 2, new Budget(500_000)),
@@ -90,8 +77,8 @@ describe('Clause V (C5): Easter · Hops (CLAUSE_HOPS)', () => {
     }
   });
 
-  it('verifies panel 28 (all6) has all 6 twists and passes problems(panel, 1) with []', () => {
-    const boss = CLAUSE_HOPS.panels[28]!;
+  it('verifies panel 21 (all6) has all 6 twists and passes problems(panel, 1) with []', () => {
+    const boss = CLAUSE_HOPS.panels[21]!;
     expect(twistsOf(boss.panel)).toEqual(HOP_TWISTS);
     expect(problems(boss.panel, 1, new Budget(500_000))).toEqual([]);
   });

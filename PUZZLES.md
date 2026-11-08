@@ -22,26 +22,32 @@ things, kept apart on purpose:
   collection, the NYT) dressed in the holiday's theme. It's the genre of
   that holiday's room: every panel there is that puzzle.
 - **A twist:** one extra rule about the holiday itself, not its puzzle. It
-  travels: the holiday's two items are stray in two other rooms and carry
-  the twist into those rooms' puzzles. A twist means the same thing
-  everywhere, so a player who's met it once recognises it in the next room.
+  travels: the holiday's **five relics** are stranded in the five other rooms
+  (one per other room, **30 relics** in all) and carry the twist into those
+  rooms' puzzles. A twist means the same thing everywhere, so a player who's
+  met it once recognises it in the next room.
 
-So the game is a 6 × 6 grid where any puzzle can carry any twist. Each
-room plays its own puzzle plain (the warm-up), then with two visiting
-twists (the strays), then with its own holiday's twist at home (the
-centrepiece). The final area, XMAS365™'s merger contract, fills in more of
-the grid: each puzzle
-with two twists it hasn't had yet. Across the whole grid the player keeps
-meeting the same six puzzles and six twists in new combinations, which is
-*The Witness*'s pleasure: learn a language, then read it everywhere.
+So the game is a **6 × 6 grid** where every Base carries every Twist right in
+the story rooms (~140 puzzles across the six rooms):
+1. **Intro Run** (`5` puzzles, `5×5` → `7×7`): plays the room's Base plain (0 Twists), taught puzzle by puzzle.
+2. **Home Twist Run** (`5` puzzles, `5×5` → `7×7`): plays the room's own holiday Twist at home (built from the former centerpiece runs). Beating it unlocks all five Relic Runs.
+3. **5 Relic Runs** (`3` puzzles each, `5×5` → `7×7`, one per other holiday): brings each of the other five holidays' Twists into this room's Base. The first puzzle of every Relic Run is a tiny one-solution board that teaches the Twist, since a Twist can be met first in any of five rooms. Solving a Relic Run frees the Relic so you can carry it home to its **Relic Shelf** under the caged mascot (opening one of the cage's five padlocks).
+
+Any beaten rung on a room's ladder can be replayed or played forever in
+**Free Play** (`5×5`, `7×7` or `9×9`, with a solved count). The final area,
+XMAS365™'s **Merger Contract**, then tests multi-twist mastery across 6 Clauses
+× **22 puzzles** (`6 Twist Reminders + 15 Double Twists + 1 All 6 Twists` =
+**132 puzzles**). Across the whole grid the player keeps meeting the same six
+puzzles and six twists in new combinations, which is *The Witness*'s pleasure:
+learn a language, then read it everywhere.
 
 **Rules that hold everywhere:**
 - Every panel has exactly one answer, reached by logic.
 - No twist feels pointless: remove it and more answers fit, and its clues
   change what the player would otherwise do (an egg refutes the obvious
   path, rather than confirming it). Extra clues are fine as hints or theme.
-- A centrepiece uses only its own holiday's twist (plus a home-only extra),
-  since a player may reach it without playing the strays.
+- A room's Home Twist Run uses only its own holiday's twist, and each Relic Run
+  starts with a teaching board.
 - Words in a grid are real words; puns go in labels only.
 
 ## What "clicky" means here
@@ -116,22 +122,35 @@ Mirroring everything just halves the puzzle (solve one side, copy it).
 - Shared code: `src/gen/core/mirror.ts` (frames, mirrored grid features,
   the symmetry check), so each genre only says what it draws.
 
-## The matrix
+## The matrix (all 36 Base × Twist cells in the story rooms)
 
-Rows are Bases, columns are Twists. **Bold** marks the Base's own
-holiday's Twist, at home (the Centerpiece Run). ✅ a built Room Run; ⚙️ in the generator (any tier, any mix of Twists). Santa's
-merger contract (`src/proto/puzzles/clause.ts` + `src/proto/puzzles/clauses/`)
-puts every cell of this matrix to work across 6 Clauses × 29 puzzles = 174 puzzles
-(`Stage 1 · Base Puzzle` [1] + `Stage 2 · Twist Reminders` [6] + `Stage 3 · Solo Twist` [6] + `Stage 4 · Double Twist` [15] + `Stage 5 · All 6 Twists` [1] per Base).
+Rows are Bases (rooms), columns are Twists (the home holiday of the Relic).
+**Bold** marks the room's **Home Twist Run** (5 puzzles, `5×5` → `7×7`); the
+30 off-diagonal cells are the **30 Relic Runs** (3 puzzles each, `5×5` → `7×7`,
+5 per room). Every cell also supports endless browser **Free Play** (`5×5`,
+`7×7`, `9×9`, ⚙️). Santa's **Merger Contract** (`src/proto/puzzles/clause.ts` +
+`src/proto/puzzles/clauses/`) then combines twists across 6 Clauses × **22
+puzzles** = **132 puzzles** (`Stage 1 · Twist Reminders` [6] + `Stage 2 · Double Twist` [15] + `Stage 3 · All 6 Twists` [1] per Base).
 
-| Base ↓ / Twist → | Love-Letter (Val.) | Snowflake (Xmas) | Spooky (Hall.) | Egg-Hunt (Easter) | Patriotic (4th) | Portioned (Thanks.) |
+| Base (Room) ↓ / Twist → | Love-Letter (Val.) | Snowflake (Xmas) | Spooky (Hall.) | Egg-Hunt (Easter) | Patriotic (4th) | Portioned (Thanks.) |
 |---|---|---|---|---|---|---|
-| **Web** (Halloween) | ✅ Box of Chocolates, ⚙️ | ✅ Tree-Top Star, ⚙️ | ✅ **Spider's Web**, ⚙️ | ⚙️ | ⚙️ | ⚙️ cuts |
-| **Carving** (Thanksgiving) | ⚙️ | ✅ Stocking, ⚙️ | ⚙️ | ⚙️ Easter baskets | ✅ Hot Dog, ⚙️ | ✅ **Feast**, ⚙️ cuts |
-| **Lights** (Christmas) | ⚙️ | ✅ **Christmas Tree**, ⚙️ | ⚙️ | ✅ Golden Egg, ⚙️ | ⚙️ | ✅ Pumpkin Pie, ⚙️ |
-| **Heartstrings** (Valentine's) | ✅ **Valentine Mailbox**, ⚙️ | ⚙️ mirror pairs | ✅ Jack-o'-Lantern, ⚙️ | ✅ Bunny's Basket, ⚙️ | ⚙️ | ⚙️ cuts |
-| **Hops** (Easter) | ⚙️ | ⚙️ | ⚙️ | ✅ **Egg Tree**, ⚙️ | ✅ Star-Spangled Flag, ⚙️ | ✅ Cornucopia, ⚙️ |
-| **Fireworks** (Fourth) | ✅ Cupid's Bow, ⚙️ | ⚙️ | ✅ Witch's Broom, ⚙️ | ⚙️ | ✅ **Grand Finale**, ⚙️ | ⚙️ |
+| **Web** (Halloween) | ✅ Box of Chocolates, ⚙️ | ✅ Tree-Top Star, ⚙️ | ✅ **Home Twist: Spooky Web** (`dark`), ⚙️ | ✅ *Marshmallow Chick*, ⚙️ | ✅ *Picnic Basket*, ⚙️ | ✅ *Gravy Boat* (`cuts`), ⚙️ |
+| **Carving** (Thanksgiving) | ✅ *Heart Locket*, ⚙️ | ✅ Stocking, ⚙️ | ✅ *Candy Corn*, ⚙️ | ✅ *Jelly Bean Jar* (Easter baskets), ⚙️ | ✅ Hot Dog, ⚙️ | ✅ **Home Twist: Portioned Carving** (`cuts`), ⚙️ |
+| **Lights** (Christmas) | ✅ *Love Letter*, ⚙️ | ✅ **Home Twist: Snowflake Lights** (`snow`), ⚙️ | ✅ *Cauldron*, ⚙️ | ✅ Golden Egg, ⚙️ | ✅ *Ice Pop*, ⚙️ | ✅ Pumpkin Pie (`slices`), ⚙️ |
+| **Heartstrings** (Valentine's) | ✅ **Home Twist: Love-Letter Heartstrings** (`letters`), ⚙️ | ✅ *Candy Cane* (mirror pairs), ⚙️ | ✅ Jack-o'-Lantern, ⚙️ | ✅ Bunny's Basket, ⚙️ | ✅ *Watermelon Slice*, ⚙️ | ✅ *Wishbone* (`cuts`), ⚙️ |
+| **Hops** (Easter) | ✅ *Single Rose*, ⚙️ | ✅ *Gingerbread Man*, ⚙️ | ✅ *Bedsheet Ghost*, ⚙️ | ✅ **Home Twist: Egg-Hunt Hops** (`burrows`), ⚙️ | ✅ Star-Spangled Flag, ⚙️ | ✅ Cornucopia (`courses`), ⚙️ |
+| **Fireworks** (Fourth) | ✅ Cupid's Bow, ⚙️ | ✅ *Snow Globe*, ⚙️ | ✅ Witch's Broom, ⚙️ | ✅ *Chocolate Bunny*, ⚙️ | ✅ **Home Twist: Patriotic Fireworks** (`colours`), ⚙️ | ✅ *Harvest Corn* (`portions`), ⚙️ |
+
+### The 30 Relics by Home Holiday (5 per Mascot Cage)
+
+| Holiday (Mascot) | Its 5 Relics (and the room where each is stranded) |
+|---|---|
+| **Valentine's** (Teddy Bear) | Cupid's Bow (Fourth), Box of Chocolates (Halloween), *Single Rose* (Easter), *Heart Locket* (Thanksgiving), *Love Letter* (Christmas) |
+| **Easter** (Bunny) | Bunny's Basket (Valentine's), Golden Egg (Christmas), *Chocolate Bunny* (Fourth), *Marshmallow Chick* (Halloween), *Jelly Bean Jar* (Thanksgiving) |
+| **Fourth of July** (Eaglet) | Star-Spangled Flag (Easter), Hot Dog (Thanksgiving), *Watermelon Slice* (Valentine's), *Picnic Basket* (Halloween), *Ice Pop* (Christmas) |
+| **Halloween** (Spider) | Jack-o'-Lantern (Valentine's), Witch's Broom (Fourth), *Candy Corn* (Thanksgiving), *Cauldron* (Christmas), *Bedsheet Ghost* (Easter) |
+| **Thanksgiving** (Turkey) | Cornucopia (Easter), Pumpkin Pie (Christmas), *Wishbone* (Valentine's), *Harvest Corn* (Fourth), *Gravy Boat* (Halloween) |
+| **Christmas** (Snowman) | Tree-Top Star (Halloween), Stocking (Thanksgiving), *Candy Cane* (Valentine's), *Gingerbread Man* (Easter), *Snow Globe* (Fourth) |
 
 ---
 
@@ -292,14 +311,17 @@ All six columns are in the generator (⚙️), generating across easy, medium, a
 XMAS365™'s merger contract (`src/proto/puzzles/clause.ts` +
 `src/proto/puzzles/clauses/`) is a 6-Clause checklist in Holiday Hall, one
 clause per puzzle Base (`Web`, `Carving`, `Lights`, `Heartstrings`, `Hops`,
-`Fireworks`). Each clause is a 29-puzzle Clause Run (`1 base + 6 twist reminders +
-6 solo twists + 15 double twists + 1 all-6 twists boss` = 174 puzzles
-total). Voiding all six clauses triggers the Sec 6.2 Leap Year loophole and
-opens Leap Day's surprise party in Holiday Hall (`src/game/dioramas/hall.ts`).
+`Fireworks`). Each clause is a **22-puzzle Clause Run** (`6 Twist Reminders +
+15 Double Twists + 1 All 6 Twists boss` = **132 puzzles** total across all 6
+clauses; the plain base and solo twist stages were dropped since all 36 Base ×
+Twist combinations now appear in the story rooms). Voiding all six clauses
+triggers the Sec 6.2 Leap Year loophole right at Santa's podium and opens Leap
+Day's surprise party in Holiday Hall (`src/game/dioramas/hall.ts`).
 
-## Status (2026-11-07)
+## Status (2026-11-08)
 
-Every room is rebuilt on the current twist set (no red and green, no edge
-flags left), every genre generates every twist at every tier in seconds,
-and the story has been redesigned (see `GAME.md`, "The story"). What's next
-is in `ROADMAP.md`.
+Every room now covers all six holiday twists (1 Intro Run + 1 Home Twist Run +
+5 Relic Runs = 23 puzzles per room, ~140 across the 6 rooms), all 30 Relics
+unlock the 5-padlock Mascot Cages, Free Play (`5×5`, `7×7`, `9×9`) lives directly
+on any beaten rung of a room's ladder, and the Merger Contract is streamlined
+to 22 puzzles per clause (132 total). What's next is in `ROADMAP.md`.

@@ -1,12 +1,10 @@
 /**
  * Clause II (`C2`): Thanksgiving · Table Carving (`carving`).
  *
- * 29-panel clause gauntlet:
- * - Panel 0 (`base`, 1 panel): Plain base game with no gimmicks.
- * - Panels 1–6 (`intro`, 6 panels): Trivial teaching boards (one per gimmick).
- * - Panels 7–12 (`solo`, 6 panels): Nontrivial single-gimmick puzzles (`easy`).
- * - Panels 13–27 (`duo`, 15 panels): All 15 two-gimmick combinations (`easy`).
- * - Panel 28 (`all6`, 1 panel): Boss puzzle combining all 6 gimmicks at once.
+ * 22-panel clause gauntlet:
+ * - Panels 0–5 (`intro`, 6 panels): Trivial teaching boards (one per twist).
+ * - Panels 6–20 (`duo`, 15 panels): All 15 two-twist combinations (`easy`).
+ * - Panel 21 (`all6`, 1 panel): Boss puzzle combining all 6 twists at once.
  */
 import { CARVE_TWISTS, type Panel as CarvePanel } from '../../../gen/carving';
 import type { ClauseDef, ClausePanelItem, TwistMeta } from './types';
@@ -55,21 +53,7 @@ export const CARVING_TWISTS: readonly TwistMeta[] = [
 ];
 
 const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
-  // ── Index 0: Base (no gimmicks) ───────────────────────────────────────────
-  {
-    name: 'The Bread Board',
-    section: 'base',
-    twists: [],
-    tip: 'Carve the grid into rectangles; each holds one number equal to its area.',
-    explain:
-      'Drag across squares to carve the table into non-overlapping rectangles. Every rectangle must contain exactly one number equal to its area (width × height).',
-    panel: {
-      name: 'The Bread Board',
-      rows: ['6 . . 1', '. . . .', '. . . 2', '. 6 . 1'],
-    },
-  },
-
-  // ── Indices 1–6: Intro (trivial teaching boards, 1 per gimmick) ───────────
+  // ── Indices 0–5: Intro (trivial teaching boards, 1 per twist) ─────────────
   {
     name: 'Mystery Portion',
     section: 'intro',
@@ -148,89 +132,7 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     },
   },
 
-  // ── Indices 7–12: Solo (nontrivial 5×5 single-gimmick puzzles) ────────────
-  {
-    name: 'Candlelight Carve',
-    section: 'solo',
-    twists: ['dark'],
-    tip: '🎃 Spooky: Deduce the hidden ? rectangle’s area from its neighbors.',
-    explain:
-      'Numbered rectangles lock in most of the platter, leaving only one valid rectangle shape for the ? clue.',
-    panel: {
-      name: 'Candlelight Carve',
-      rows: ['6 . . 2 .', '. . . . .', '? . . 3 .', '. . 2 . .', '. . 2 . 4'],
-    },
-  },
-  {
-    name: 'Place Cards',
-    section: 'solo',
-    twists: ['letters'],
-    tip: '💌 Love Letters: Match letter clues to equal areas and decode the word.',
-    explain:
-      'Both S rectangles must share one area while F takes a different area, spelling out FEAST when solved.',
-    panel: {
-      name: 'Place Cards',
-      rows: ['F . . . 2', '. . . . .', '. . 2 . 2', '. S . 3 .', '. . S . 2'],
-      sizeLetters: '   S F   ',
-      message: '6EA4T',
-    },
-  },
-  {
-    name: 'Holiday Napkins',
-    section: 'solo',
-    twists: ['colours'],
-    tip: '🎆 Red, White & Blue: Keep same-colored rectangles from touching.',
-    explain:
-      'Plain white rectangles can touch any color, but two blue or two red rectangles can never share a border.',
-    panel: {
-      name: 'Holiday Napkins',
-      rows: ['. 2 . . .', '2 . 6 . .', '. 3 . 2 .', '3 . . . 2', '. 3 . 2 .'],
-      colours: ['.b...', 'r....', '..b.b', '...r.', '..b..'],
-    },
-  },
-  {
-    name: 'Crust Boundaries',
-    section: 'solo',
-    twists: ['cuts'],
-    tip: '🥧 Portions: Respect the fence lines when orienting rectangles.',
-    explain:
-      'Use the thick fence segments to rule out rectangles that would otherwise cross between squares.',
-    panel: {
-      name: 'Crust Boundaries',
-      rows: ['. . 6 . .', '. 4 . . .', '. . . 4 .', '4 . . . 3', '. 2 . 2 .'],
-      walls: [
-        [2, 1, 'v'],
-        [1, 0, 'h'],
-      ],
-    },
-  },
-  {
-    name: 'Icy Centerpiece',
-    section: 'solo',
-    twists: ['snow'],
-    tip: '❄️ Snowflakes: Mirror every cut line inside the frosty frame.',
-    explain:
-      'Any border between rectangles inside the frosty frame automatically demands its reflection across the horizontal icy axis.',
-    panel: {
-      name: 'Icy Centerpiece',
-      rows: ['. . . 2 .', '6 . . . .', '. . . 2 .', '2 . 4 . 5', '. 4 . . .'],
-      frame: { top: 0, left: 1, bottom: 3, right: 4, axis: 'h' },
-    },
-  },
-  {
-    name: 'Harvest Basket',
-    section: 'solo',
-    twists: ['basket'],
-    tip: '🥚 Easter Baskets: Give every rectangle one 🥚 and one 🥕.',
-    explain:
-      'Some portions have no number at all—pair each 🥚 with a 🥕 so every rectangle gets a complete basket.',
-    panel: {
-      name: 'Harvest Basket',
-      rows: ['. 🥚 . 🥕 🥕', '🥚 . 🥕 . .', '. . 🥚 . .', '🥕 . . 6 🥚', '🥕 . 4 🥚 .'],
-    },
-  },
-
-  // ── Indices 13–27: Duo (all 15 two-gimmick combinations) ──────────────────
+  // ── Indices 6–20: Duo (all 15 two-twist combinations) ─────────────────────
   {
     name: 'Secret Recipe',
     section: 'duo',
