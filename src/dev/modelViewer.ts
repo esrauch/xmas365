@@ -19,7 +19,7 @@ import './sandboxStorage';
 import * as THREE from 'three';
 import { cel, common, hexToNumber, sky } from '../content/palettes';
 import { celUniforms, syncCelSun, toonMaterial } from '../render/toon';
-import { Outline } from '../render/outline';
+import { FX_LAYER, Outline } from '../render/outline';
 import {
   BAY_ORDER,
   type BayId,
@@ -64,6 +64,7 @@ scene.add(sun);
 syncCelSun(sun);
 
 const camera = new THREE.PerspectiveCamera(24, 1, 0.05, 100);
+camera.layers.enable(FX_LAYER);
 
 /** A 1 × 1 field tile, to show scale against the game grid. */
 function tile(x: number): THREE.Mesh {

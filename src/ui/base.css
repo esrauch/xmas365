@@ -44,6 +44,19 @@ body {
   display: block;
 }
 
+/* A soft dark vignette over the 3D scene (under the UI), like a stage's falloff. */
+.scene-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 75% 70% at 50% 55%,
+    rgb(0 0 0 / 0) 55%,
+    rgb(12 6 4 / 0.32) 82%,
+    rgb(8 4 2 / 0.6) 100%
+  );
+}
+
 #ui {
   position: fixed;
   inset: 0;

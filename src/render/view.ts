@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { hexToNumber, sky } from '../content/palettes';
-import { Outline } from './outline';
+import { FX_LAYER, Outline } from './outline';
 import { syncCelSun } from './toon';
 
 /**
@@ -21,6 +21,8 @@ export class View {
     options: { fov?: number; outline?: boolean; contour?: number | null } = {},
   ) {
     if (options.fov) this.camera.fov = options.fov;
+    // Light effects (glows, spills, dust) live on their own layer: see FX_LAYER.
+    this.camera.layers.enable(FX_LAYER);
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;

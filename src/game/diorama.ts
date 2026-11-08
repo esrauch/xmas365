@@ -11,6 +11,7 @@
  */
 import * as THREE from 'three';
 import { hexToNumber } from '../content/palettes';
+import { FX_LAYER } from '../render/outline';
 import { toonMaterial } from '../render/toon';
 import { ROOM_MASCOT_ID, buildMascotMesh } from './mascots';
 import { type RoomId, ROOM_SPECS, STRAY_ITEMS, gameState } from './state';
@@ -94,19 +95,20 @@ export function getBayLightMood(bay: BayId, act = gameState.act()): BayLightMood
           lightDistance: 5.6,
         };
       }
-      // Moody gaslight & shadowy spotlight rotunda
+      // A dim theatre: deep shade everywhere, and a warm spotlight pooled over Leap Day.
+      // Doors are lit by their own glows (see the hall's stage lighting).
       return {
         litTint: [1.08, 0.92, 0.74],
-        shadeTint: [0.36, 0.29, 0.48],
+        shadeTint: [0.24, 0.19, 0.34],
         shadeGamma: 1.42,
         sunColor: '#ffd296',
         sunIntensity: 1.32,
         sunOffsetAngle: -0.45,
         sunHeight: 11.5,
-        lightLocalPos: [0, 1.65, 1.85],
-        lightColor: '#ffa94d',
-        lightIntensity: 4.8,
-        lightDistance: 5.6,
+        lightLocalPos: [0, 1.25, 2.2],
+        lightColor: '#ffc27a',
+        lightIntensity: 3.4,
+        lightDistance: 2.4,
       };
     case 'halloween':
       // Eerie midnight indigo shadow + warm pumpkin jack-o'-lantern glow
@@ -316,6 +318,106 @@ function glowSphere(r: number, hex: string, x = 0, y = 0, z = 0, intensity = 0.9
   m.position.set(x, y, z);
   m.castShadow = false;
   m.receiveShadow = false;
+  return m;
+}
+
+/**
+ * Light effects: soft additive glows that fake light without real lights (each
+ * real light costs every material on a phone). They sit on FX_LAYER, so the
+ * outline pass never draws ink lines round them.
+ */
+let radialTex: THREE.CanvasTexture | null = null;
+let beamTex: THREE.CanvasTexture | null = null;
+
+/** A round glow: white in the middle, fading to nothing at the edge. */
+function radialTexture(): THREE.CanvasTexture {
+  if (radialTex) return radialTex;
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d');
+  if (g) {
+    const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    grad.addColorStop(0, 'rgba(255,255,255,1)');
+    grad.addColorStop(0.35, 'rgba(255,255,255,0.55)');
+    grad.addColorStop(0.7, 'rgba(255,255,255,0.15)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 128, 128);
+  }
+  radialTex = new THREE.CanvasTexture(c);
+  return radialTex;
+}
+
+/** A beam: bright at the top edge (the source), fading downward and soft at the sides. */
+function beamTexture(): THREE.CanvasTexture {
+  if (beamTex) return beamTex;
+  const c = document.createElement('canvas');
+  c.width = 64;
+  c.height = 128;
+  const g = c.getContext('2d');
+  if (g) {
+    const along = g.createLinearGradient(0, 0, 0, 128);
+    along.addColorStop(0, 'rgba(255,255,255,1)');
+    along.addColorStop(0.45, 'rgba(255,255,255,0.45)');
+    along.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = along;
+    g.fillRect(0, 0, 64, 128);
+    // Soften the sides by cutting alpha toward the left and right edges.
+    g.globalCompositeOperation = 'destination-in';
+    const across = g.createLinearGradient(0, 0, 64, 0);
+    across.addColorStop(0, 'rgba(0,0,0,0)');
+    across.addColorStop(0.25, 'rgba(0,0,0,1)');
+    across.addColorStop(0.75, 'rgba(0,0,0,1)');
+    across.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = across;
+    g.fillRect(0, 0, 64, 128);
+  }
+  beamTex = new THREE.CanvasTexture(c);
+  return beamTex;
+}
+
+function fxMaterial(map: THREE.Texture, hex: string, opacity: number): THREE.MeshBasicMaterial {
+  return new THREE.MeshBasicMaterial({
+    map,
+    color: hexToNumber(hex as `#${string}`),
+    transparent: true,
+    opacity,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+  });
+}
+
+/** A light-effect plane (w × h), standing up and facing +z; lay it flat with `flat`. */
+function fxPlane(
+  w: number,
+  h: number,
+  material: THREE.MeshBasicMaterial,
+  x: number,
+  y: number,
+  z: number,
+  flat = false,
+): THREE.Mesh {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), material);
+  m.position.set(x, y, z);
+  if (flat) m.rotation.x = -Math.PI / 2;
+  m.layers.set(FX_LAYER);
+  m.renderOrder = 2;
+  return m;
+}
+
+/**
+ * A wedge of light: a trapezoid `nearW` wide at its source end (local +y, the
+ * texture's bright top), widening to `farW` over `length`.
+ */
+function fxWedge(nearW: number, farW: number, length: number, material: THREE.MeshBasicMaterial) {
+  const geo = new THREE.PlaneGeometry(1, length);
+  const pos = geo.attributes['position'] as THREE.BufferAttribute;
+  for (let i = 0; i < pos.count; i++) pos.setX(i, pos.getX(i) * (pos.getY(i) > 0 ? nearW : farW));
+  pos.needsUpdate = true;
+  const m = new THREE.Mesh(geo, material);
+  m.layers.set(FX_LAYER);
+  m.renderOrder = 2;
   return m;
 }
 
@@ -3108,6 +3210,10 @@ export function buildHolidayHallDiorama(callbacks: {
     phase: number;
   }[] = [];
 
+  // Glows that breathe (restored lamps), and the hall's drifting dust
+  const fxPulses: { mat: THREE.MeshBasicMaterial; base: number; phase: number }[] = [];
+  let hallDust: { geo: THREE.BufferGeometry; base: Float32Array; seed: Float32Array } | null = null;
+
   // Single shadow-casting light source centered at the active diorama's emissive fixture
   const dioramaLight = new THREE.PointLight(0xff7733, 5.2, 5.8, 1.55);
   dioramaLight.castShadow = true;
@@ -3557,6 +3663,32 @@ export function buildHolidayHallDiorama(callbacks: {
       }
 
       dg.add(doorPivot);
+
+      // Stage lighting. An open door spills a wedge of warm light out across the floor;
+      // a restored room's lamp glows in its colour and washes its door and step.
+      const upper = slot.floorY > 1;
+      if (complete) {
+        const halo = fxMaterial(radialTexture(), room.accent, 0.9);
+        dg.add(fxPlane(0.62, 0.62, halo, 0, 1.01, 0.14));
+        fxPulses.push({ mat: halo, base: 0.9, phase: slot.lx * 2.3 + slot.floorY });
+        dg.add(fxPlane(1.0, 1.1, fxMaterial(radialTexture(), room.accent, 0.3), 0, 0.62, 0.13));
+        dg.add(
+          fxPlane(1.1, 0.8, fxMaterial(radialTexture(), room.accent, 0.42), 0, 0.012, 0.42, true),
+        );
+      } else if (unlocked) {
+        const spill = room.id === 'thanksgiving' ? '#ffb05c' : '#ffc27a';
+        dg.add(fxPlane(0.95, 1.15, fxMaterial(radialTexture(), spill, 0.38), 0, 0.42, 0.1));
+        const length = upper ? 0.5 : 1.55;
+        const wedge = fxWedge(
+          0.56,
+          upper ? 0.8 : 1.6,
+          length,
+          fxMaterial(beamTexture(), spill, 0.8),
+        );
+        wedge.rotation.x = -Math.PI / 2;
+        wedge.position.set(0, 0.014, 0.08 + length / 2);
+        dg.add(wedge);
+      }
       bay.add(dg);
 
       const canInteract = unlocked || unlockItem !== null;
@@ -3619,6 +3751,54 @@ export function buildHolidayHallDiorama(callbacks: {
       hallLeapDayActor.add(glowSphere(0.026, '#ffea79', 0, 0.65, -0.01, 0.9));
     }
     bay.add(hallLeapDayActor);
+
+    // A stage spotlight on Leap Day: a soft beam from above and a pool on the rug.
+    const beam = fxWedge(0.3, 0.95, 2.3, fxMaterial(beamTexture(), '#ffe2b0', 0.13));
+    beam.position.set(leapDayRestPos.x, 1.2, leapDayRestPos.z + 0.05);
+    bay.add(beam);
+    bay.add(
+      fxPlane(
+        1.25,
+        0.95,
+        fxMaterial(radialTexture(), '#ffe2b0', 0.45),
+        leapDayRestPos.x,
+        0.05,
+        leapDayRestPos.z,
+        true,
+      ),
+    );
+
+    // Dust motes drifting slowly through the light.
+    const dustCount = 40;
+    const base = new Float32Array(dustCount * 3);
+    const seed = new Float32Array(dustCount);
+    for (let i = 0; i < dustCount; i++) {
+      const r = (k: number) => {
+        const v = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453;
+        return v - Math.floor(v);
+      };
+      base[i * 3] = -1.0 + r(1) * 2.2;
+      base[i * 3 + 1] = 0.1 + r(2) * 2.1;
+      base[i * 3 + 2] = 0.6 + r(3) * 1.8;
+      seed[i] = r(4);
+    }
+    const dustGeo = new THREE.BufferGeometry();
+    dustGeo.setAttribute('position', new THREE.BufferAttribute(base.slice(), 3));
+    const dust = new THREE.Points(
+      dustGeo,
+      new THREE.PointsMaterial({
+        map: radialTexture(),
+        color: 0xffc98a,
+        size: 0.022,
+        transparent: true,
+        opacity: 0.4,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      }),
+    );
+    dust.layers.set(FX_LAYER);
+    bay.add(dust);
+    hallDust = { geo: dustGeo, base, seed };
 
     // 3. Foreground Right: The Calendar Desk with a glowing Banker's Lamp (`lx = 1.26, lz = 2.08`)
     //    Positioned in the foreground beside the rug so it never blocks the Christmas door behind it.
@@ -4196,6 +4376,25 @@ export function buildHolidayHallDiorama(callbacks: {
       dioramaLight.color.setHex(hexToNumber(mood.lightColor as `#${string}`));
       dioramaLight.distance = mood.lightDistance;
       dioramaLight.intensity = mood.lightIntensity * (1 + wave * 0.1);
+
+      // Restored lamps breathe; dust drifts up and sways (only while the hall is in view).
+      for (const p of fxPulses)
+        p.mat.opacity = p.base * (0.82 + 0.18 * Math.sin(t * 1.6 + p.phase));
+      if (hallDust && activeBay === 'hall') {
+        const pos = hallDust.geo.attributes['position'] as THREE.BufferAttribute;
+        const { base, seed } = hallDust;
+        for (let i = 0; i < seed.length; i++) {
+          const k = seed[i] ?? 0;
+          const rise = ((t * (0.04 + k * 0.05) + k) % 1) * 0.6;
+          pos.setXYZ(
+            i,
+            (base[i * 3] ?? 0) + Math.sin(t * (0.2 + k * 0.3) + k * 9) * 0.12,
+            (base[i * 3 + 1] ?? 0) + rise,
+            (base[i * 3 + 2] ?? 0) + Math.cos(t * (0.15 + k * 0.2) + k * 7) * 0.08,
+          );
+        }
+        pos.needsUpdate = true;
+      }
     },
   };
 }

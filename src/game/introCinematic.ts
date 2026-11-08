@@ -9,7 +9,7 @@ import * as THREE from 'three';
 import { type Hex, hexToNumber } from '../content/palettes';
 import { celUniforms, toonMaterial } from '../render/toon';
 import type { View } from '../render/view';
-import { type MascotId, buildMascotMesh } from './mascots';
+import { buildMascotMesh } from './mascots';
 
 /** 2032 calendar specification (weeks start Sunday = 0; Feb has 28 days on XMAS365™'s calendar). */
 interface MonthSpec {
@@ -38,9 +38,6 @@ interface HolidayTileSpec {
   readonly monthIdx: number;
   readonly day: number;
   readonly color: Hex;
-  readonly mascotId: MascotId;
-  readonly mascotScale: number;
-  readonly lane: 0 | 1 | 2;
 }
 
 const HOLIDAY_TILES: readonly HolidayTileSpec[] = [
@@ -48,55 +45,37 @@ const HOLIDAY_TILES: readonly HolidayTileSpec[] = [
     id: 'valentines',
     monthIdx: 1,
     day: 14,
-    color: '#f687b3',
-    mascotId: 'bear',
-    mascotScale: 0.42,
-    lane: 0,
+    color: '#ff4d88',
   },
   {
     id: 'easter',
     monthIdx: 2,
     day: 28,
-    color: '#fef08a',
-    mascotId: 'bunny',
-    mascotScale: 0.42,
-    lane: 0,
+    color: '#facc15',
   },
   {
     id: 'fourth',
     monthIdx: 6,
     day: 4,
-    color: '#3b82f6',
-    mascotId: 'eaglet',
-    mascotScale: 0.42,
-    lane: 1,
+    color: '#2563eb',
   },
   {
     id: 'halloween',
     monthIdx: 9,
     day: 31,
     color: '#f97316',
-    mascotId: 'spider',
-    mascotScale: 0.42,
-    lane: 2,
   },
   {
     id: 'thanksgiving',
     monthIdx: 10,
     day: 25,
     color: '#d97706',
-    mascotId: 'turkey',
-    mascotScale: 0.42,
-    lane: 2,
   },
   {
     id: 'christmas',
     monthIdx: 11,
     day: 25,
-    color: '#22c55e',
-    mascotId: 'snowman',
-    mascotScale: 0.42,
-    lane: 2,
+    color: '#16a34a',
   },
 ];
 
@@ -128,13 +107,6 @@ function smoothstep(a: number, b: number, x: number): number {
 function easeInOutCubic(t: number): number {
   const u = Math.max(0, Math.min(1, t));
   return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
-}
-
-function easeOutBack(t: number): number {
-  const u = Math.max(0, Math.min(1, t));
-  const c1 = 1.70158;
-  const c3 = c1 + 1;
-  return 1 + c3 * Math.pow(u - 1, 3) + c1 * Math.pow(u - 1, 2);
 }
 
 function makeWarmBackdropTexture(): THREE.CanvasTexture {
@@ -342,19 +314,9 @@ function makeFeb29TileTexture(): THREE.CanvasTexture {
 
 export const INTRO_CINEMATIC_DURATION = 21.0;
 
-interface HolidayActor {
-  readonly spec: HolidayTileSpec;
-  readonly worldPos: THREE.Vector3;
-  readonly mascotGroup: THREE.Group;
-  readonly giftBoxGroup: THREE.Group;
-  readonly bowGroup: THREE.Group;
-  readonly triggerTime: number;
-}
-
 interface SmokePuff {
   readonly mesh: THREE.Mesh;
   readonly spawnTime: number;
-  readonly startPos: THREE.Vector3;
 }
 
 export interface BuiltIntroCinematic {
@@ -471,8 +433,7 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
   // Bare warm wooden floor stretching beneath the calendar and down to the lone Feb 29 tile
   scene.add(box(28, 0.2, 32, '#593d28', 0, -0.1, 2.5, false));
 
-  // --- 1. TWELVE MONTH SLABS & 365 INSTANCED DAY TILES ---
-  const holidayPosMap = new Map<string, THREE.Vector3>();
+  // --- 1. TWELVE MONTH SLABS & 365 DAY TILES (WITH SOLID-COLORED HOLIDAY SQUARES) ---
   const tileTransforms: { pos: THREE.Vector3; color: THREE.Color }[] = [];
   const creamColor = new THREE.Color(hexToNumber('#fdf8ec'));
 
@@ -505,17 +466,17 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
       const tz = cz - 0.31 + weekRow * TILE_STEP;
 
       const holiday = HOLIDAY_TILES.find((h) => h.monthIdx === mIdx && h.day === d);
-      const tileColor = holiday ? new THREE.Color(hexToNumber(holiday.color)) : creamColor;
-      const pos = new THREE.Vector3(tx, SLAB_H + 0.022, tz);
-      tileTransforms.push({ pos, color: tileColor });
-
       if (holiday) {
-        holidayPosMap.set(holiday.id, pos.clone());
+        // Solid-colored holiday square (slightly proud so it reads clearly on the calendar slab)
+        scene.add(box(0.148, 0.046, 0.148, holiday.color, tx, SLAB_H + 0.023, tz, true));
+      } else {
+        const pos = new THREE.Vector3(tx, SLAB_H + 0.022, tz);
+        tileTransforms.push({ pos, color: creamColor });
       }
     }
   }
 
-  // Single InstancedMesh for all 365 day tiles (1 draw call!)
+  // Single InstancedMesh for the regular cream day tiles
   const tileGeo = trackGeo(new THREE.BoxGeometry(0.142, 0.044, 0.142));
   const tileMat = trackMat(toonMaterial({ color: 0xffffff }));
   const tilesInstanced = new THREE.InstancedMesh(tileGeo, tileMat, tileTransforms.length);
@@ -534,91 +495,8 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
   if (tilesInstanced.instanceColor) tilesInstanced.instanceColor.needsUpdate = true;
   scene.add(tilesInstanced);
 
-  // --- 2. SIX HOLIDAY MASCOTS & THEIR POP-UP GIFT BOXES ---
+  // --- 2. THREE UNROLLING WRAPPING PAPER LANES ---
   const paperTex = trackTex(makeWrappingPaperTexture());
-  const giftPaperTex = trackTex(makeWrappingPaperTexture());
-  giftPaperTex.repeat.set(1.2, 1.2);
-  const giftPaperMat = trackMat(toonMaterial({ color: 0xffffff, map: giftPaperTex }));
-
-  const buildGiftBox = (): { root: THREE.Group; bow: THREE.Group } => {
-    const root = new THREE.Group();
-    const body = new THREE.Mesh(trackGeo(new THREE.BoxGeometry(0.32, 0.28, 0.32)), giftPaperMat);
-    body.position.y = 0.14;
-    body.castShadow = true;
-    body.receiveShadow = true;
-    root.add(body);
-
-    const lid = new THREE.Mesh(trackGeo(new THREE.BoxGeometry(0.345, 0.06, 0.345)), giftPaperMat);
-    lid.position.y = 0.27;
-    lid.castShadow = true;
-    root.add(lid);
-
-    // Gold ribbon cross
-    root.add(box(0.055, 0.305, 0.35, '#facc15', 0, 0.155, 0, false));
-    root.add(box(0.35, 0.305, 0.055, '#facc15', 0, 0.155, 0, false));
-
-    // Bow loops + XMAS365™ tag on top (pops up last)
-    const bow = new THREE.Group();
-    bow.position.set(0, 0.3, 0);
-    const loopL = sphere(0.065, '#facc15', -0.055, 0.03, 0, 10, false);
-    loopL.scale.set(1.3, 0.7, 0.65);
-    loopL.rotation.z = 0.35;
-    const loopR = sphere(0.065, '#facc15', 0.055, 0.03, 0, 10, false);
-    loopR.scale.set(1.3, 0.7, 0.65);
-    loopR.rotation.z = -0.35;
-    const knot = sphere(0.032, '#eab308', 0, 0.025, 0, 8, false);
-    const tag = box(0.11, 0.045, 0.012, '#fffdf7', 0.08, 0.015, 0.06, false);
-    tag.rotation.z = -0.25;
-    bow.add(loopL, loopR, knot, tag);
-    root.add(bow);
-    return { root, bow };
-  };
-
-  // Compute the exact time when the steamroller's front drum reaches each holiday's X coordinate
-  const computeTriggerTime = (spec: HolidayTileSpec, x: number): number => {
-    if (spec.lane === 0) {
-      // Lane 1: t = 4.2..6.6s (2.4s), front drum moves from LANE_LEFT_X to LANE_RIGHT_X
-      const u = (x - LANE_LEFT_X) / LANE_SPAN_X;
-      return 4.2 + u * 2.4;
-    }
-    if (spec.lane === 1) {
-      // Lane 2: t = 7.3..9.3s (2.0s), front drum moves from LANE_RIGHT_X to LANE_LEFT_X
-      const u = (LANE_RIGHT_X - x) / LANE_SPAN_X;
-      return 7.3 + u * 2.0;
-    }
-    // Lane 3: t = 10.0..12.2s (2.2s), front drum moves from LANE_LEFT_X to LANE_RIGHT_X
-    const u = (x - LANE_LEFT_X) / LANE_SPAN_X;
-    return 10.0 + u * 2.2;
-  };
-
-  const holidayActors: HolidayActor[] = [];
-  for (const spec of HOLIDAY_TILES) {
-    const pos = holidayPosMap.get(spec.id) ?? new THREE.Vector3();
-    // Vivid coloured holiday square tile directly under the mascot
-    scene.add(box(0.168, 0.054, 0.168, spec.color, pos.x, SLAB_H + 0.027, pos.z, false));
-
-    const mascotGroup = new THREE.Group();
-    mascotGroup.position.set(pos.x, pos.y + 0.03, pos.z);
-    const mesh = buildMascotMesh(spec.mascotId, spec.mascotScale);
-    mascotGroup.add(mesh);
-    scene.add(mascotGroup);
-
-    const { root: giftBoxGroup, bow: bowGroup } = buildGiftBox();
-    giftBoxGroup.position.set(pos.x, pos.y + 0.02, pos.z);
-    giftBoxGroup.visible = false;
-    scene.add(giftBoxGroup);
-
-    holidayActors.push({
-      spec,
-      worldPos: pos,
-      mascotGroup,
-      giftBoxGroup,
-      bowGroup,
-      triggerTime: computeTriggerTime(spec, pos.x),
-    });
-  }
-
-  // --- 3. THREE UNROLLING WRAPPING PAPER LANES ---
   const lanePaperMeshes: {
     mesh: THREE.Mesh;
     tex: THREE.CanvasTexture;
@@ -734,8 +612,7 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
     scene.add(puffMesh);
     smokePuffs.push({
       mesh: puffMesh,
-      spawnTime: 2.8 + i * 0.52,
-      startPos: new THREE.Vector3(),
+      spawnTime: 3.1 + i * 0.48,
     });
   }
 
@@ -813,8 +690,8 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
   );
   const glintL = new THREE.Mesh(trackGeo(new THREE.SphereGeometry(0.032, 8, 8)), glintMat);
   const glintR = new THREE.Mesh(trackGeo(new THREE.SphereGeometry(0.032, 8, 8)), glintMat);
-  glintL.position.set(-0.06, 0.24, 0.15);
-  glintR.position.set(0.06, 0.24, 0.15);
+  glintL.position.set(-0.066, 0.32, 0.105);
+  glintR.position.set(0.066, 0.32, 0.105);
   leapDayActor.add(glintL, glintR);
   scene.add(leapDayActor);
 
@@ -835,28 +712,21 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
     const lane1Z = laneCenterZ(1);
     const lane2Z = laneCenterZ(2);
 
-    if (t < 2.6) {
-      return {
-        x: LANE_LEFT_X - 2.4,
-        z: lane0Z,
-        rotY: 0,
-        frontDrumX: LANE_LEFT_X - 2.4 + drumOffset,
-        rollScale: 1,
-        travelDist: 0,
-        visible: false,
-      };
-    }
+    const lane1Speed = LANE_SPAN_X / 2.4;
+    const entryStartFrontX = LANE_LEFT_X - 4.2 * lane1Speed;
+    const entryDist = 4.2 * lane1Speed;
+
     if (t < 4.2) {
-      // Shot 2 (2.8–4.2s): Rolls in from left to the start of January
-      const u = easeInOutCubic((t - 2.7) / 1.5);
-      const frontX = THREE.MathUtils.lerp(LANE_LEFT_X - 1.8, LANE_LEFT_X, u);
+      // Shots 1 & 2 (0.0–4.2s): Starts far off-screen left (x ≈ -13.3) and rolls in smoothly
+      // into frame during Shot 2 so it never pops in, reaching January's left edge at t = 4.2s.
+      const frontX = LANE_LEFT_X - (4.2 - t) * lane1Speed;
       return {
         x: frontX - drumOffset,
         z: lane0Z,
         rotY: 0,
         frontDrumX: frontX,
         rollScale: 1,
-        travelDist: frontX - (LANE_LEFT_X - 1.8),
+        travelDist: frontX - entryStartFrontX,
         visible: true,
       };
     }
@@ -870,7 +740,7 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
         rotY: 0,
         frontDrumX: frontX,
         rollScale: THREE.MathUtils.lerp(1.0, 0.72, u),
-        travelDist: 1.8 + u * LANE_SPAN_X,
+        travelDist: entryDist + u * LANE_SPAN_X,
         visible: true,
       };
     }
@@ -888,7 +758,7 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
         rotY: -angle,
         frontDrumX: LANE_RIGHT_X,
         rollScale: 0.72,
-        travelDist: 1.8 + LANE_SPAN_X + u * 1.4,
+        travelDist: entryDist + LANE_SPAN_X + u * 1.4,
         visible: true,
       };
     }
@@ -902,7 +772,7 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
         rotY: -Math.PI,
         frontDrumX: frontX,
         rollScale: THREE.MathUtils.lerp(0.72, 0.44, u),
-        travelDist: 3.2 + LANE_SPAN_X + u * LANE_SPAN_X,
+        travelDist: entryDist + 1.4 + LANE_SPAN_X + u * LANE_SPAN_X,
         visible: true,
       };
     }
@@ -920,7 +790,7 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
         rotY: -Math.PI + angle,
         frontDrumX: LANE_LEFT_X,
         rollScale: 0.44,
-        travelDist: 3.2 + 2 * LANE_SPAN_X + u * 1.4,
+        travelDist: entryDist + 1.4 + 2 * LANE_SPAN_X + u * 1.4,
         visible: true,
       };
     }
@@ -934,11 +804,11 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
         rotY: 0,
         frontDrumX: frontX,
         rollScale: THREE.MathUtils.lerp(0.44, 0.02, u),
-        travelDist: 4.6 + 2 * LANE_SPAN_X + u * LANE_SPAN_X,
+        travelDist: entryDist + 2.8 + 2 * LANE_SPAN_X + u * LANE_SPAN_X,
         visible: true,
       };
     }
-    // Puffs off-screen to the right after 12.2s
+    // Puffs far off-screen to the right after 12.2s
     const extra = t - 12.2;
     const frontX = LANE_RIGHT_X + extra * 4.5;
     return {
@@ -947,8 +817,8 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
       rotY: 0,
       frontDrumX: frontX,
       rollScale: 0.01,
-      travelDist: 4.6 + 3 * LANE_SPAN_X + extra * 4.5,
-      visible: t < 12.7,
+      travelDist: entryDist + 2.8 + 3 * LANE_SPAN_X + extra * 4.5,
+      visible: t < 15.0,
     };
   };
 
@@ -1095,24 +965,26 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
         (cabBeacon.material as THREE.MeshToonMaterial).emissiveIntensity = blinkOn ? 1.2 : 0.1;
       }
 
-      // Update chimney smoke puffs
+      // Update chimney smoke puffs deterministically from their spawn timestamp
       for (const puff of smokePuffs) {
         const age = elapsedSec - puff.spawnTime;
         if (age <= 0 || age > 1.1) {
           puff.mesh.visible = false;
           continue;
         }
-        if (age < 0.05 && rState.visible) {
-          const forwardX = Math.cos(-rState.rotY) * 0.32;
-          const forwardZ = Math.sin(-rState.rotY) * 0.32;
-          puff.startPos.set(rState.x + forwardX, SLAB_H + 0.98, rState.z + forwardZ);
+        const spawnState = getRollerState(puff.spawnTime);
+        if (!spawnState.visible) {
+          puff.mesh.visible = false;
+          continue;
         }
+        const forwardX = Math.cos(-spawnState.rotY) * 0.32;
+        const forwardZ = Math.sin(-spawnState.rotY) * 0.32;
         puff.mesh.visible = true;
         const u = age / 1.1;
         puff.mesh.position.set(
-          puff.startPos.x + Math.sin(u * 5 + puff.spawnTime) * 0.06,
-          puff.startPos.y + u * 0.65,
-          puff.startPos.z,
+          spawnState.x + forwardX + Math.sin(u * 5 + puff.spawnTime) * 0.06,
+          SLAB_H + 0.98 + u * 0.65,
+          spawnState.z + forwardZ,
         );
         const s = (1 - u * 0.4) * (0.6 + u * 1.3);
         puff.mesh.scale.setScalar(Math.max(0.01, s));
@@ -1133,73 +1005,21 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
         }
         entry.mesh.visible = true;
         const len = Math.max(0.02, coverage * LANE_SPAN_X);
+        const repX = (len / LANE_SPAN_X) * 4.5;
         entry.mesh.scale.set(len, 1, 1);
+        entry.tex.repeat.set(repX, 1.1);
         if (entry.laneIdx === 1) {
-          // Unrolls right-to-left
+          // Unrolls right-to-left: anchor texture U at the stationary right edge (u = 1)
           entry.mesh.position.x = LANE_RIGHT_X - len * 0.5;
+          entry.tex.offset.x = 1 - repX;
         } else {
-          // Unrolls left-to-right
+          // Unrolls left-to-right: anchor texture U at the stationary left edge (u = 0)
           entry.mesh.position.x = LANE_LEFT_X + len * 0.5;
-        }
-        entry.tex.repeat.set(Math.max(0.2, (len / LANE_SPAN_X) * 4.5), 1.1);
-      }
-
-      // 3. Update the 6 Holiday Mascots (idle -> startle & jump -> gift box pop)
-      for (const [idx, actor] of holidayActors.entries()) {
-        const dt = elapsedSec - actor.triggerTime;
-        const basePos = actor.worldPos;
-        if (dt < -0.28) {
-          // Calm idle bob, blink & look around on their holiday square
-          actor.mascotGroup.visible = true;
-          actor.giftBoxGroup.visible = false;
-          const phase = elapsedSec * 2.6 + idx * 1.3;
-          actor.mascotGroup.position.set(
-            basePos.x,
-            basePos.y + 0.02 + Math.abs(Math.sin(phase)) * 0.025,
-            basePos.z,
-          );
-          actor.mascotGroup.rotation.y = Math.sin(elapsedSec * 1.4 + idx * 1.7) * 0.28;
-          actor.mascotGroup.scale.set(1, 1 + Math.sin(phase * 2) * 0.03, 1);
-        } else if (dt < 0.02) {
-          // Startle squash & jump just as the roller arrives!
-          actor.mascotGroup.visible = true;
-          actor.giftBoxGroup.visible = false;
-          const u = (dt + 0.28) / 0.3; // 0..1
-          if (u < 0.28) {
-            // Quick startle squash
-            const sq = u / 0.28;
-            actor.mascotGroup.position.set(basePos.x, basePos.y + 0.02, basePos.z);
-            actor.mascotGroup.scale.set(1 + sq * 0.22, 1 - sq * 0.28, 1 + sq * 0.22);
-          } else {
-            // High startled jump + stretch before being flattened under the paper
-            const ju = (u - 0.28) / 0.72;
-            const hopY = Math.sin(ju * Math.PI) * 0.36;
-            actor.mascotGroup.position.set(basePos.x, basePos.y + 0.02 + hopY, basePos.z);
-            actor.mascotGroup.scale.set(0.86, 1.24, 0.86);
-            actor.mascotGroup.rotation.y = ju * 0.6;
-          }
-        } else {
-          // Mascot is wrapped; gift box pops up in its place, with the bow popping last!
-          actor.mascotGroup.visible = false;
-          const boxAge = dt - 0.05;
-          if (boxAge <= 0) {
-            actor.giftBoxGroup.visible = false;
-          } else {
-            actor.giftBoxGroup.visible = true;
-            const boxScale = easeOutBack(Math.min(1, boxAge / 0.26));
-            actor.giftBoxGroup.scale.set(boxScale, boxScale, boxScale);
-            const bowAge = boxAge - 0.14;
-            if (bowAge <= 0) {
-              actor.bowGroup.scale.setScalar(0.001);
-            } else {
-              const bowScale = easeOutBack(Math.min(1, bowAge / 0.22));
-              actor.bowGroup.scale.setScalar(Math.max(0.001, bowScale));
-            }
-          }
+          entry.tex.offset.x = 0;
         }
       }
 
-      // 4. Overhead XMAS365™ Logo Slam & Confetti (Shot 8: t >= 12.7s)
+      // 3. Overhead XMAS365™ Logo Slam & Confetti (Shot 8: t >= 12.7s)
       if (elapsedSec < 12.7) {
         logoSlamMesh.visible = false;
         confettiInstanced.visible = false;

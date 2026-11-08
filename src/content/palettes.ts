@@ -32,6 +32,8 @@ export const voxel = {
   orange: '#ff8a1f',
   gold: '#ffb627',
   green: '#6cc447',
+  greenLight: '#a8e07c',
+  greenDark: '#489830',
   blue: '#4a90d9',
   purple: '#a259ff',
   wood: '#b88a5e',

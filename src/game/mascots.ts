@@ -263,57 +263,147 @@ export function buildMascotMesh(id: MascotId, scale = 1): THREE.Group {
     }
 
     case 'leapday': {
-      // Leap Day: cute determined green frog in oversized round brass glasses
+      // Leap Day (hero of XMAS365™): expressive bright-green frog (`icon.svg`) with big
+      // raised eye domes, oversized round brass glasses hugging the eyes, white scleras
+      // with dark pupils & bright catchlights, a pale-lime chin/throat & belly, curved
+      // frog smile, nostrils, rosy cheeks, dorsal frog spots, and 3-toed webbed feet.
 
-      // 1. Plump sitting frog body + crisp oval cream belly patch
-      g.add(sphere(0.24, voxel.green, 0, 0.25, -0.01, 1.08, 0.95, 0.96));
-      g.add(sphere(0.165, voxel.bone, 0, 0.235, 0.125, 0.96, 0.86, 0.65));
+      // 1. Plump pear-shaped sitting frog torso + pale-lime belly patch (`voxel.greenLight`)
+      g.add(sphere(0.215, voxel.green, 0, 0.225, -0.02, 1.02, 0.96, 0.98));
+      g.add(sphere(0.162, voxel.greenLight, 0, 0.22, 0.088, 0.92, 0.92, 0.68));
 
-      // 2. Folded hind legs on the flanks + 3-toed webbed feet & stubby front arms
+      // 2. Folded Z-shaped hind legs on the flanks + splayed 3-toed webbed hind feet
+      //    and smooth spherical-jointed front arms with 3-fingered frog hands in front
       for (const side of [-1, 1] as const) {
-        const thigh = sphere(0.115, voxel.green, side * 0.21, 0.14, -0.02, 0.85, 0.95, 1.25);
-        thigh.rotation.y = -side * 0.2;
-        const foot = sphere(0.085, voxel.green, side * 0.2, 0.045, 0.09, 1.15, 0.45, 1.45);
-        const arm = cyl(0.048, 0.042, 0.18, voxel.green, side * 0.15, 0.14, 0.11, 10);
-        arm.rotation.z = -side * 0.18;
-        arm.rotation.x = 0.25;
-        const hand = sphere(0.052, voxel.green, side * 0.135, 0.045, 0.15, 1.1, 0.45, 1.2);
-        g.add(thigh, foot, arm, hand);
+        // Muscular folded thigh & calf tucked back on the flank (`z = -0.065`)
+        const thigh = sphere(0.105, voxel.green, side * 0.205, 0.17, -0.065, 0.8, 0.95, 1.32);
+        thigh.rotation.y = -side * 0.28;
+        thigh.rotation.x = 0.32;
+        const calf = sphere(0.082, voxel.green, side * 0.215, 0.09, -0.085, 0.76, 0.76, 1.22);
+        calf.rotation.y = -side * 0.24;
+        g.add(thigh, calf);
+
+        // Splayed 3-toed webbed hind foot on the ground
+        const footGroup = new THREE.Group();
+        footGroup.position.set(side * 0.225, 0.028, 0.015);
+        footGroup.rotation.y = -side * 0.42;
+        footGroup.add(sphere(0.068, voxel.green, 0, 0, 0.01, 1.05, 0.42, 1.25));
+        for (const tIdx of [-1, 0, 1] as const) {
+          const toeAngle = tIdx * 0.34;
+          const tx = Math.sin(toeAngle) * 0.055;
+          const tz = Math.cos(toeAngle) * 0.078 + 0.02;
+          const toe = sphere(0.024, voxel.green, tx, -0.002, tz, 0.82, 0.55, 1.65);
+          toe.rotation.y = toeAngle;
+          const pad = sphere(0.022, voxel.green, tx * 1.32, -0.002, tz + 0.032, 1.05, 0.55, 1.05);
+          footGroup.add(toe, pad);
+        }
+        g.add(footGroup);
+
+        // Smooth front arm (using rounded ellipsoid segments so no cylinder caps poke the chest!)
+        const shoulder = sphere(0.052, voxel.green, side * 0.162, 0.285, 0.052, 0.95, 0.95, 0.95);
+        const forearm = sphere(0.046, voxel.green, side * 0.148, 0.158, 0.108, 0.88, 2.25, 0.92);
+        forearm.rotation.z = side * 0.14;
+        forearm.rotation.x = -0.32;
+        g.add(shoulder, forearm);
+
+        // Cute 3-fingered frog hand resting cleanly in front
+        const handGroup = new THREE.Group();
+        handGroup.position.set(side * 0.132, 0.032, 0.158);
+        handGroup.rotation.y = -side * 0.12;
+        handGroup.add(sphere(0.044, voxel.green, 0, 0, 0, 1.05, 0.5, 1.05));
+        for (const fIdx of [-1, 0, 1] as const) {
+          const fa = fIdx * 0.38;
+          const fx = Math.sin(fa) * 0.038;
+          const fz = Math.cos(fa) * 0.044 + 0.01;
+          handGroup.add(sphere(0.018, voxel.green, fx, -0.002, fz, 0.95, 0.6, 1.25));
+        }
+        g.add(handGroup);
       }
 
-      // 3. Wide chibi frog head + raised top eye domes + determined frog smile flush on snout
-      const headY = 0.48;
-      g.add(sphere(0.23, voxel.green, 0, headY, 0.0, 1.22, 0.84, 0.94));
-      // Flush frog mouth smile across the front of the snout
-      for (const sx of [-0.075, -0.038, 0, 0.038, 0.075]) {
-        const sy = headY - 0.048 + sx * sx * 2.4;
-        const sz = 0.212 - sx * sx * 1.2;
-        g.add(sphere(0.014, voxel.ink, sx, sy, sz, 1.2, 0.8, 0.6));
-      }
+      // 3. Wide, friendly frog head (`icon.svg` proportions) + pale-lime chin/vocal sac
+      const headY = 0.445;
+      // Wide frog cranium & cheeks (kept slightly shallower in Z at the top so the full 360°
+      // round glasses & eyeballs sit cleanly in front without the forehead clipping into them!)
+      g.add(sphere(0.22, voxel.green, 0, headY, -0.005, 1.28, 0.72, 0.9));
+      // Forward lower snout below the glasses
+      g.add(sphere(0.175, voxel.green, 0, headY - 0.022, 0.045, 1.24, 0.56, 0.96));
+      // Pale-lime lower jaw / throat (`#a8e07c` in `icon.svg`)
+      g.add(sphere(0.168, voxel.greenLight, 0, headY - 0.062, 0.052, 1.16, 0.52, 0.92));
 
+      // Two cute nostrils on the upper snout below the glasses bridge
       for (const side of [-1, 1] as const) {
-        const ex = side * 0.115;
-        const ey = headY + 0.125;
-        // Raised green frog eye socket dome
-        g.add(sphere(0.082, voxel.green, ex, ey, 0.04, 1.0, 1.0, 0.9));
-        // Rosy cheek blush
-        g.add(sphere(0.032, voxel.pink, side * 0.185, headY - 0.02, 0.165, 1.1, 0.75, 0.5));
+        g.add(sphere(0.013, voxel.ink, side * 0.028, headY - 0.002, 0.212, 1.0, 0.85, 0.65));
+        // Warm rosy pink oval cheeks (`#ff7b93` in `icon.svg`)
+        g.add(sphere(0.036, voxel.pink, side * 0.195, headY - 0.022, 0.142, 1.15, 0.78, 0.55));
       }
 
-      // 4. Signature oversized round brass glasses sitting cleanly in front of the eyes
-      const glassY = headY + 0.085;
-      const glassZ = 0.205;
+      // Smooth continuous curved frog smile wrapping around the front of the snout (`icon.svg`)
+      const smileArc = Math.PI * 0.56;
+      const smile = torus(0.112, 0.012, voxel.ink, 0, headY + 0.052, 0.178, smileArc);
+      smile.rotation.order = 'XZY';
+      smile.rotation.z = -Math.PI * 0.5 - smileArc * 0.5;
+      smile.rotation.x = -0.34;
+      g.add(smile);
+
+      // 4. Big raised frog eye domes + full 360° round brass glasses hugging the eye domes (`icon.svg`)
+      const eyeX = 0.118;
+      const eyeY = headY + 0.125;
+      const eyeZ = 0.088;
       for (const side of [-1, 1] as const) {
-        const gx = side * 0.115;
-        const rim = torus(0.076, 0.016, voxel.brass, gx, glassY, glassZ);
-        const lens = cyl(0.07, 0.07, 0.014, voxel.glass, gx, glassY, glassZ - 0.003, 20);
-        lens.rotation.x = Math.PI / 2;
-        const pupil = sphere(0.032, voxel.eye, gx, glassY, glassZ + 0.008, 1, 1.1, 0.45);
-        const temple = box(0.016, 0.016, 0.14, voxel.brass, side * 0.19, glassY, glassZ - 0.075);
-        g.add(rim, lens, pupil, temple);
+        const ex = side * eyeX;
+        // Prominent green frog eye dome rising from the top of the head (`z` recessed slightly behind sclera)
+        g.add(sphere(0.095, voxel.green, ex, eyeY, eyeZ - 0.012, 1.02, 1.02, 0.82));
+
+        // Crisp white eyeball disc sitting cleanly in front of the green eye dome
+        const sclera = cyl(0.072, 0.072, 0.022, voxel.white, ex, eyeY, eyeZ + 0.068, 24);
+        sclera.rotation.x = Math.PI / 2;
+
+        // Large dark pupil (`#0e1018`) completely unclipped
+        const pupil = cyl(
+          0.038,
+          0.038,
+          0.018,
+          voxel.eye,
+          ex - side * 0.008,
+          eyeY - 0.004,
+          eyeZ + 0.076,
+          20,
+        );
+        pupil.rotation.x = Math.PI / 2;
+
+        // Bright white catchlight dot in the upper-right of each eye (`icon.svg`)
+        const glint = cyl(
+          0.014,
+          0.014,
+          0.016,
+          voxel.white,
+          ex + 0.016,
+          eyeY + 0.018,
+          eyeZ + 0.082,
+          14,
+        );
+        glint.rotation.x = Math.PI / 2;
+
+        // Full 360° oversized round brass glasses rim framing the entire eye
+        const rim = torus(0.08, 0.016, voxel.brass, ex, eyeY, eyeZ + 0.076);
+        // Brass temple arm hugging the side of the eye dome
+        const temple = box(
+          0.016,
+          0.018,
+          0.115,
+          voxel.brass,
+          side * 0.198,
+          eyeY - 0.006,
+          eyeZ + 0.015,
+        );
+        g.add(sclera, pupil, glint, rim, temple);
       }
-      // Brass nose bridge bar connecting the two round rims
-      g.add(box(0.082, 0.018, 0.018, voxel.brass, 0, glassY + 0.005, glassZ + 0.005));
+
+      // Arched brass bridge connecting the two round glasses frames (`icon.svg`)
+      const bridgeArc = Math.PI * 0.76;
+      const bridge = torus(0.044, 0.014, voxel.brass, 0, eyeY - 0.018, eyeZ + 0.078, bridgeArc);
+      bridge.rotation.z = Math.PI * 0.5 - bridgeArc * 0.5;
+      g.add(bridge);
       break;
     }
 

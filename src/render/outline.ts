@@ -22,6 +22,13 @@ import * as THREE from 'three';
 /** Objects on this layer get the contour. */
 export const CONTOUR_LAYER = 1;
 
+/**
+ * Light effects (additive glows, light spills, dust): drawn in colour but left
+ * out of the normals pass, so a soft glow never grows an ink line. Objects go
+ * here with `layers.set(FX_LAYER)`; cameras that should see them enable it.
+ */
+export const FX_LAYER = 3;
+
 export interface OutlineOptions {
   /** Line half-width in CSS pixels (scaled by the pixel ratio). */
   readonly width?: number;
@@ -124,7 +131,10 @@ export class Outline {
     scene.background = null;
     scene.overrideMaterial = this.normalMaterial;
     renderer.setRenderTarget(this.normals);
+    const colourLayers = camera.layers.mask;
+    camera.layers.disable(FX_LAYER);
     renderer.render(scene, camera);
+    camera.layers.mask = colourLayers;
 
     if (this.uniforms.contourOn.value) {
       // Just the contoured objects, flat white on black, no depth test against the rest.
