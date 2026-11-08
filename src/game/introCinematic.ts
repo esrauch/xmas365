@@ -487,7 +487,7 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
   const tileGeo = trackGeo(new THREE.BoxGeometry(0.142, 0.044, 0.142));
   const tileMat = trackMat(toonMaterial({ color: 0xffffff }));
   const tilesInstanced = new THREE.InstancedMesh(tileGeo, tileMat, tileTransforms.length);
-  tilesInstanced.castShadow = true;
+  tilesInstanced.castShadow = false;
   tilesInstanced.receiveShadow = true;
   const dummy = new THREE.Object3D();
   tileTransforms.forEach((item, idx) => {

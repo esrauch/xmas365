@@ -18,12 +18,15 @@ export class View {
 
   constructor(
     readonly canvas: HTMLCanvasElement,
-    options: { fov?: number; outline?: boolean; contour?: number | null } = {},
+    options: { fov?: number; outline?: boolean } = {},
   ) {
     if (options.fov) this.camera.fov = options.fov;
     // Light effects (glows, spills, dust) live on their own layer: see FX_LAYER.
     this.camera.layers.enable(FX_LAYER);
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    this.outline = options.outline === false ? null : new Outline();
+    // When Outline is active, it already renders to a 4x MSAA target (`this.color`) and blits a 2D quad,
+    // so only enable backbuffer MSAA when rendering directly without Outline.
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: this.outline === null });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;
     // Crisp shadow edges, to match the cel terminator.
@@ -31,27 +34,15 @@ export class View {
     this.scene.background = skyGradient();
     // A haze that melts the far ground into the horizon.
     this.scene.fog = new THREE.Fog(hexToNumber(sky.horizon), 25, 70);
-    this.outline =
-      options.outline === false ? null : new Outline({ contour: options.contour ?? null });
 
-    // The sun only decides lit or shade; the tones themselves come from the cel palette.
-    const sun = new THREE.DirectionalLight(hexToNumber(sky.sun), 3);
+    // Holiday Hall uses each bay's local PointLight (`dioramaLight`) rather than an overhead sun;
+    // keep `this.sun` disabled by default so it never allocates or renders a 2048x2048 shadow map.
+    const sun = new THREE.DirectionalLight(hexToNumber(sky.sun), 0);
     this.sun = sun;
-    // High and from the left, so every rounded shape shows a lit side and a shade side.
     sun.position.set(-10, 13, 3);
     sun.target.position.set(0, 0, 0);
-    sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
-    sun.shadow.bias = -0.0002;
-    sun.shadow.normalBias = 0.02;
-    Object.assign(sun.shadow.camera, {
-      left: -10,
-      right: 10,
-      top: 10,
-      bottom: -10,
-      near: 1,
-      far: 40,
-    });
+    sun.castShadow = false;
+    sun.visible = false;
     this.scene.add(sun, sun.target);
     syncCelSun(sun);
 

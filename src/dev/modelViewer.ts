@@ -424,7 +424,7 @@ function interactive(): void {
       camera.updateProjectionMatrix();
       if (spin && dragX === null) yaw = (yaw + dt * 12) % 360;
       aim(new THREE.Vector3(0, 0.8, 0), yaw, 52, 17);
-      hall?.animate(now / 1000, 'hall');
+      hall?.animate(now / 1000, 'hall', true);
     } else {
       if (camera.fov !== 24) {
         camera.fov = 24;

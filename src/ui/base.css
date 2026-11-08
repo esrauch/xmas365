@@ -36,6 +36,56 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+#app-shell {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--backdrop, #2a3242);
+  /* Establish containing block for all position:fixed game & UI descendants */
+  transform: translateZ(0);
+}
+
+/* Desktop / landscape viewport: inset portrait frame over dark XMAS365™ wrapping-paper pattern */
+@media (min-width: 601px) and (min-aspect-ratio: 3/4) {
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #111318;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Cg transform='translate(128,64) rotate(-10.5)'%3E%3Crect x='-86' y='-23' width='172' height='46' rx='6' fill='%2314171f' stroke='%232c3240' stroke-width='2.5'/%3E%3Ctext x='-4' y='9' font-family='Impact,Arial Black,sans-serif' font-size='26' font-weight='900' font-style='italic' fill='%23636d82' text-anchor='end'%3EXMAS%3C/text%3E%3Ctext x='2' y='9' font-family='Impact,Arial Black,sans-serif' font-size='26' font-weight='900' font-style='italic' fill='%234c5466' text-anchor='start'%3E365%E2%84%A2%3C/text%3E%3C/g%3E%3Cg transform='translate(0,192) rotate(-10.5)'%3E%3Crect x='-86' y='-23' width='172' height='46' rx='6' fill='%2314171f' stroke='%232c3240' stroke-width='2.5'/%3E%3Ctext x='-4' y='9' font-family='Impact,Arial Black,sans-serif' font-size='26' font-weight='900' font-style='italic' fill='%23636d82' text-anchor='end'%3EXMAS%3C/text%3E%3Ctext x='2' y='9' font-family='Impact,Arial Black,sans-serif' font-size='26' font-weight='900' font-style='italic' fill='%234c5466' text-anchor='start'%3E365%E2%84%A2%3C/text%3E%3C/g%3E%3Cg transform='translate(256,192) rotate(-10.5)'%3E%3Crect x='-86' y='-23' width='172' height='46' rx='6' fill='%2314171f' stroke='%232c3240' stroke-width='2.5'/%3E%3Ctext x='-4' y='9' font-family='Impact,Arial Black,sans-serif' font-size='26' font-weight='900' font-style='italic' fill='%23636d82' text-anchor='end'%3EXMAS%3C/text%3E%3Ctext x='2' y='9' font-family='Impact,Arial Black,sans-serif' font-size='26' font-weight='900' font-style='italic' fill='%234c5466' text-anchor='start'%3E365%E2%84%A2%3C/text%3E%3C/g%3E%3C/svg%3E"),
+      repeating-linear-gradient(
+        -32deg,
+        #111318 0px,
+        #111318 28px,
+        #171a22 28px,
+        #171a22 52px,
+        #222733 52px,
+        #222733 54px,
+        #111318 54px,
+        #111318 68px
+      );
+    background-size:
+      256px 256px,
+      auto;
+    background-repeat: repeat;
+  }
+
+  #app-shell {
+    position: relative;
+    inset: auto;
+    height: min(94dvh, 920px);
+    width: min(calc(100vw - 48px), calc(min(94dvh, 920px) * 9 / 16));
+    border-radius: 22px;
+    border: 3px solid #2b3140;
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.85),
+      0 24px 64px rgba(0, 0, 0, 0.78);
+  }
+}
+
 #game {
   position: fixed;
   inset: 0;
@@ -308,8 +358,8 @@ body {
 .puzz-modal-card {
   --room-accent: #e0662d;
   --room-tint: #f8f4ec;
-  width: min(620px, 96vw);
-  max-height: 92dvh;
+  width: min(620px, 96%);
+  max-height: 92%;
   overflow-y: auto;
   touch-action: pan-y;
   background: #fffdf9;

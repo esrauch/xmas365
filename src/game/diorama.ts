@@ -237,7 +237,7 @@ export interface BuiltDiorama {
   setDoorHop: (roomId: RoomId | null, progress: number) => void;
   /** Animate Leap Day's cold-start intro pop-out & idle hops around the hall floor. */
   setIntroPose: (mode: 'hidden' | 'pop' | 'idle', elapsed: number) => void;
-  animate: (t: number, activeBay: BayId) => void;
+  animate: (t: number, activeBay: BayId, showAllBays?: boolean) => void;
 }
 
 function mat(hex: string): THREE.MeshToonMaterial {
@@ -3195,20 +3195,23 @@ export function buildHolidayHallDiorama(callbacks: {
   const root = new THREE.Group();
   const hotspots: Hotspot3D[] = [];
   const floating: { mesh: THREE.Object3D; phase: number; baseY: number }[] = [];
-  const flames: FlameEntry[] = [];
-  const fairyLights: {
+  interface FairyLightEntry {
     mat: THREE.MeshToonMaterial;
     baseColor: THREE.Color;
     offColor: THREE.Color;
     phase: number;
-  }[] = [];
-  const fireflies: {
+  }
+  interface FireflyEntry {
     mesh: THREE.Object3D;
     baseX: number;
     baseY: number;
     baseZ: number;
     phase: number;
-  }[] = [];
+  }
+  const bayGroups = new Map<BayId, THREE.Group>();
+  const flamesByBay = new Map<BayId, FlameEntry[]>();
+  const fairyLightsByBay = new Map<BayId, FairyLightEntry[]>();
+  const firefliesByBay = new Map<BayId, FireflyEntry[]>();
 
   // Glows that breathe (restored lamps), and the hall's drifting dust
   const fxPulses: { mat: THREE.MeshBasicMaterial; base: number; phase: number }[] = [];
@@ -3217,7 +3220,7 @@ export function buildHolidayHallDiorama(callbacks: {
   // Single shadow-casting light source centered at the active diorama's emissive fixture
   const dioramaLight = new THREE.PointLight(0xff7733, 5.2, 5.8, 1.55);
   dioramaLight.castShadow = true;
-  dioramaLight.shadow.mapSize.set(1024, 1024);
+  dioramaLight.shadow.mapSize.set(512, 512);
   dioramaLight.shadow.camera.near = 0.12;
   dioramaLight.shadow.camera.far = 7.5;
   dioramaLight.shadow.bias = -0.0005;
@@ -3238,11 +3241,12 @@ export function buildHolidayHallDiorama(callbacks: {
   const wallWidth = 2 * HALL_WALL_RADIUS * Math.tan(Math.PI / BAY_COUNT) + 0.18;
 
   // Helper to create a bay group positioned at the bay's back wall facing inward
-  const makeBayGroup = (theta: number): THREE.Group => {
+  const makeBayGroup = (bayId: BayId, theta: number): THREE.Group => {
     const g = new THREE.Group();
     g.position.set(Math.sin(theta) * HALL_WALL_RADIUS, 0, -Math.cos(theta) * HALL_WALL_RADIUS);
     g.rotation.y = -theta;
     root.add(g);
+    bayGroups.set(bayId, g);
     return g;
   };
 
@@ -3257,7 +3261,9 @@ export function buildHolidayHallDiorama(callbacks: {
 
   {
     const theta = getBayAngle('hall');
-    const bay = makeBayGroup(theta);
+    const bay = makeBayGroup('hall', theta);
+    const fairyLights: FairyLightEntry[] = [];
+    fairyLightsByBay.set('hall', fairyLights);
     const wallHex = act >= 4 ? '#553c9a' : act === 3 ? '#334155' : '#4a3525';
     const panelHex = act >= 4 ? '#44337a' : act === 3 ? '#1e293b' : '#36261a';
 
@@ -3752,6 +3758,76 @@ export function buildHolidayHallDiorama(callbacks: {
     }
     bay.add(hallLeapDayActor);
 
+    // The year wheel: a rug of twelve month segments round Leap Day's lily pad, in soft
+    // holiday colours, with one stray Feb 29 tile beside February (as in the intro).
+    const MONTH_TINTS = [
+      '#9ec9e8', // Jan
+      '#f4a6c0', // Feb
+      '#9fd49a', // Mar
+      '#f6e58d', // Apr
+      '#c9b3e8', // May
+      '#b5e3a0', // Jun
+      '#7fa8e0', // Jul
+      '#f2c46b', // Aug
+      '#e8a65c', // Sep
+      '#f08a4b', // Oct
+      '#c98b5a', // Nov
+      '#e06a6a', // Dec
+    ];
+    const wheel = new THREE.Group();
+    wheel.position.set(leapDayRestPos.x, 0.042, leapDayRestPos.z);
+    const step = (Math.PI * 2) / 12;
+    // January at the back (toward the doors), running clockwise as seen from above.
+    const angleOf = (month: number): number => Math.PI / 2 - month * step - step / 2;
+    for (let m = 0; m < 12; m++) {
+      const seg = new THREE.Mesh(
+        new THREE.RingGeometry(0.56, 0.98, 6, 1, angleOf(m) - step / 2 + 0.03, step - 0.06),
+        mat(MONTH_TINTS[m] ?? '#e8d8b8'),
+      );
+      seg.rotation.x = -Math.PI / 2;
+      seg.receiveShadow = true;
+      wheel.add(seg);
+    }
+    const rim = new THREE.Mesh(new THREE.RingGeometry(0.98, 1.04, 48), mat('#5c3d24'));
+    rim.rotation.x = -Math.PI / 2;
+    rim.position.y = -0.002;
+    wheel.add(rim);
+    // The stray Feb 29 tile, just outside February's segment.
+    const febAngle = angleOf(1);
+    const slip = new THREE.Group();
+    slip.position.set(Math.cos(febAngle) * 1.17, 0.006, -Math.sin(febAngle) * 1.17);
+    slip.rotation.y = febAngle + 0.35;
+    slip.add(box(0.15, 0.012, 0.15, '#fffaf0', 0, 0, 0, false));
+    slip.add(box(0.15, 0.016, 0.04, '#c53030', 0, 0.002, -0.055, false));
+    wheel.add(slip);
+    bay.add(wheel);
+
+    // Footlights along the front of the stage: a wooden lip with brass hoods and warm bulbs,
+    // each throwing a soft glow up and back.
+    const footZ = 3.42;
+    // Beyond the footlights the floor falls into the dark of the house (the audience side).
+    const house = new THREE.Mesh(new THREE.PlaneGeometry(3.9, 1.1), mat('#1a120c'));
+    house.rotation.x = -Math.PI / 2;
+    house.position.set(0, 0.006, footZ + 0.62);
+    house.receiveShadow = true;
+    bay.add(house);
+    bay.add(box(3.9, 0.06, 0.14, '#2a1d14', 0, 0.03, footZ, false));
+    bay.add(box(3.9, 0.012, 0.15, '#8a6a2a', 0, 0.064, footZ, false));
+    for (let i = 0; i < 9; i++) {
+      const fx = -1.68 + i * 0.42;
+      const hood = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.085, 0.085, 0.16, 12, 1, false, -Math.PI / 2, Math.PI),
+        mat('#6b4a1c'),
+      );
+      hood.rotation.z = Math.PI / 2;
+      hood.position.set(fx, 0.1, footZ + 0.02);
+      bay.add(hood);
+      bay.add(glowSphere(0.035, '#ffe3a3', fx, 0.11, footZ - 0.03, 1.2));
+      bay.add(
+        fxPlane(0.55, 0.42, fxMaterial(radialTexture(), '#ffc98a', 0.32), fx, 0.2, footZ - 0.06),
+      );
+    }
+
     // A stage spotlight on Leap Day: a soft beam from above and a pool on the rug.
     const beam = fxWedge(0.3, 0.95, 2.3, fxMaterial(beamTexture(), '#ffe2b0', 0.13));
     beam.position.set(leapDayRestPos.x, 1.2, leapDayRestPos.z + 0.05);
@@ -3903,7 +3979,13 @@ export function buildHolidayHallDiorama(callbacks: {
   // --- BAYS 1..6: THE SIX HOLIDAY ALCOVES AROUND HOLIDAY HALL ---
   for (const room of ROOM_SPECS) {
     const theta = getBayAngle(room.id);
-    const bay = makeBayGroup(theta);
+    const bay = makeBayGroup(room.id, theta);
+    const flames: FlameEntry[] = [];
+    const fireflies: FireflyEntry[] = [];
+    const fairyLights: FairyLightEntry[] = [];
+    flamesByBay.set(room.id, flames);
+    firefliesByBay.set(room.id, fireflies);
+    fairyLightsByBay.set(room.id, fairyLights);
     const complete = gameState.isRoomComplete(room);
     const palette = MOODY_WALLS[room.id];
 
@@ -4242,75 +4324,91 @@ export function buildHolidayHallDiorama(callbacks: {
     setIntroPose: (mode, elapsed) => {
       activeIntroPose = { mode, elapsed };
     },
-    animate: (t, activeBay) => {
+    animate: (t, activeBay, showAllBays = false) => {
       void floating;
+      // Cull the 6 non-active bays so Three.js only traverses, shadows, and renders the active bay
+      for (const [bayId, group] of bayGroups) {
+        group.visible = showAllBays || bayId === activeBay;
+      }
+
       // Animate Leap Day in Holiday Hall (door hop, intro pop-out, or idle breathing)
-      if (activeDoorHop) {
-        const doorTarget = hallDoorTargets.get(activeDoorHop.roomId) ?? leapDayRestPos;
-        // For second-floor doors, head calmly toward the foot of the left staircase;
-        // fade-out happens before Leap Day reaches the door or stairs so speed stays slow.
-        const headingTarget =
-          doorTarget.y > 1.2 ? new THREE.Vector3(-1.54, 0.14, 1.58) : doorTarget;
-        const p = activeDoorHop.progress;
-        const ease = p * p * (3 - 2 * p);
-        hallLeapDayActor.visible = true;
-        hallFloorSlip.visible = false;
-
-        const fullDist = leapDayRestPos.distanceTo(headingTarget);
-        const maxTravel = 0.72;
-        const travelFraction = fullDist > 0.001 ? Math.min(1, maxTravel / fullDist) * ease : 0;
-        hallLeapDayActor.position.lerpVectors(leapDayRestPos, headingTarget, travelFraction);
-
-        const hopArc = Math.abs(Math.sin(p * Math.PI * 1.5)) * 0.15;
-        hallLeapDayActor.position.y += hopArc;
-        const dx = headingTarget.x - leapDayRestPos.x;
-        const dz = headingTarget.z - leapDayRestPos.z;
-        hallLeapDayActor.rotation.y = Math.atan2(dx, dz) * Math.min(1, p * 2.2);
-        hallLeapDayActor.rotation.x = Math.cos(p * Math.PI * 1.5) * 0.09;
-
-        const doorEntry = hallDoorPivots.get(activeDoorHop.roomId);
-        if (doorEntry) {
-          doorEntry.pivot.rotation.y = THREE.MathUtils.lerp(
-            doorEntry.baseRotY,
-            -0.95,
-            Math.min(1, p * 1.3),
-          );
-        }
-      } else if (activeIntroPose) {
-        if (activeIntroPose.mode === 'hidden') {
-          hallLeapDayActor.visible = false;
-          hallFloorSlip.visible = false;
-        } else if (activeIntroPose.mode === 'pop') {
-          const e = Math.max(0, activeIntroPose.elapsed);
-          hallFloorSlip.visible = true;
+      if (showAllBays || activeBay === 'hall') {
+        if (activeDoorHop) {
+          const doorTarget = hallDoorTargets.get(activeDoorHop.roomId) ?? leapDayRestPos;
+          // For second-floor doors, head calmly toward the foot of the left staircase;
+          // fade-out happens before Leap Day reaches the door or stairs so speed stays slow.
+          const headingTarget =
+            doorTarget.y > 1.2 ? new THREE.Vector3(-1.54, 0.14, 1.58) : doorTarget;
+          const p = activeDoorHop.progress;
+          const ease = p * p * (3 - 2 * p);
           hallLeapDayActor.visible = true;
-          const popT = Math.min(1, e / 0.75);
-          const popScale =
-            popT < 1 ? popT * popT * (2.5 - 1.5 * popT) : 1 + Math.sin((e - 0.75) * 2.6) * 0.025;
-          hallLeapDayActor.scale.setScalar(Math.max(0.01, popScale));
-          // Calm, unhurried hops on the foyer rug with a brief rest between each hop
-          const cyclePos = Math.max(0, e - 0.75) * 0.78;
-          const hopIndex = Math.floor(cyclePos);
-          const hopPhase = cyclePos - hopIndex;
-          // Spend the first 52% of each cycle in a gentle hop, and 48% resting on the rug
-          const inAir = hopPhase < 0.52 ? hopPhase / 0.52 : 0;
-          const hopHeight =
-            e < 0.75
-              ? Math.sin(popT * Math.PI) * 0.34
-              : inAir > 0
-                ? Math.sin(inAir * Math.PI) * 0.16
-                : 0;
-          const roamAngle = Math.max(0, e - 0.75) * 0.55;
-          const roamRadius = Math.min(0.16, Math.max(0, (e - 0.75) * 0.08));
-          hallLeapDayActor.position.set(
-            leapDayRestPos.x + Math.sin(roamAngle) * roamRadius,
-            leapDayRestPos.y + hopHeight,
-            leapDayRestPos.z + (Math.cos(roamAngle) - 1) * roamRadius * 0.4,
-          );
-          hallLeapDayActor.rotation.y = Math.sin(roamAngle) * 0.28;
-          hallLeapDayActor.rotation.x = inAir > 0 ? Math.cos(inAir * Math.PI) * 0.08 : 0;
-        } else {
           hallFloorSlip.visible = false;
+
+          const fullDist = leapDayRestPos.distanceTo(headingTarget);
+          const maxTravel = 0.72;
+          const travelFraction = fullDist > 0.001 ? Math.min(1, maxTravel / fullDist) * ease : 0;
+          hallLeapDayActor.position.lerpVectors(leapDayRestPos, headingTarget, travelFraction);
+
+          const hopArc = Math.abs(Math.sin(p * Math.PI * 1.5)) * 0.15;
+          hallLeapDayActor.position.y += hopArc;
+          const dx = headingTarget.x - leapDayRestPos.x;
+          const dz = headingTarget.z - leapDayRestPos.z;
+          hallLeapDayActor.rotation.y = Math.atan2(dx, dz) * Math.min(1, p * 2.2);
+          hallLeapDayActor.rotation.x = Math.cos(p * Math.PI * 1.5) * 0.09;
+
+          const doorEntry = hallDoorPivots.get(activeDoorHop.roomId);
+          if (doorEntry) {
+            doorEntry.pivot.rotation.y = THREE.MathUtils.lerp(
+              doorEntry.baseRotY,
+              -0.95,
+              Math.min(1, p * 1.3),
+            );
+          }
+        } else if (activeIntroPose) {
+          if (activeIntroPose.mode === 'hidden') {
+            hallLeapDayActor.visible = false;
+            hallFloorSlip.visible = false;
+          } else if (activeIntroPose.mode === 'pop') {
+            const e = Math.max(0, activeIntroPose.elapsed);
+            hallFloorSlip.visible = true;
+            hallLeapDayActor.visible = true;
+            const popT = Math.min(1, e / 0.75);
+            const popScale =
+              popT < 1 ? popT * popT * (2.5 - 1.5 * popT) : 1 + Math.sin((e - 0.75) * 2.6) * 0.025;
+            hallLeapDayActor.scale.setScalar(Math.max(0.01, popScale));
+            // Calm, unhurried hops on the foyer rug with a brief rest between each hop
+            const cyclePos = Math.max(0, e - 0.75) * 0.78;
+            const hopIndex = Math.floor(cyclePos);
+            const hopPhase = cyclePos - hopIndex;
+            // Spend the first 52% of each cycle in a gentle hop, and 48% resting on the rug
+            const inAir = hopPhase < 0.52 ? hopPhase / 0.52 : 0;
+            const hopHeight =
+              e < 0.75
+                ? Math.sin(popT * Math.PI) * 0.34
+                : inAir > 0
+                  ? Math.sin(inAir * Math.PI) * 0.16
+                  : 0;
+            const roamAngle = Math.max(0, e - 0.75) * 0.55;
+            const roamRadius = Math.min(0.16, Math.max(0, (e - 0.75) * 0.08));
+            hallLeapDayActor.position.set(
+              leapDayRestPos.x + Math.sin(roamAngle) * roamRadius,
+              leapDayRestPos.y + hopHeight,
+              leapDayRestPos.z + (Math.cos(roamAngle) - 1) * roamRadius * 0.4,
+            );
+            hallLeapDayActor.rotation.y = Math.sin(roamAngle) * 0.28;
+            hallLeapDayActor.rotation.x = inAir > 0 ? Math.cos(inAir * Math.PI) * 0.08 : 0;
+          } else {
+            hallFloorSlip.visible = false;
+            hallLeapDayActor.visible = true;
+            hallLeapDayActor.scale.setScalar(1);
+            hallLeapDayActor.position.set(
+              leapDayRestPos.x,
+              leapDayRestPos.y + Math.abs(Math.sin(t * 1.15)) * 0.016,
+              leapDayRestPos.z,
+            );
+            hallLeapDayActor.rotation.set(0, Math.sin(t * 0.55) * 0.05, 0);
+          }
+        } else {
           hallLeapDayActor.visible = true;
           hallLeapDayActor.scale.setScalar(1);
           hallLeapDayActor.position.set(
@@ -4320,53 +4418,62 @@ export function buildHolidayHallDiorama(callbacks: {
           );
           hallLeapDayActor.rotation.set(0, Math.sin(t * 0.55) * 0.05, 0);
         }
-      } else {
-        hallLeapDayActor.visible = true;
-        hallLeapDayActor.scale.setScalar(1);
-        hallLeapDayActor.position.set(
-          leapDayRestPos.x,
-          leapDayRestPos.y + Math.abs(Math.sin(t * 1.15)) * 0.016,
-          leapDayRestPos.z,
-        );
-        hallLeapDayActor.rotation.set(0, Math.sin(t * 0.55) * 0.05, 0);
       }
 
-      // Subtle flame flicker + rising ember/spark particles on candles and the fireplace
-      for (const fl of flames) {
-        if (fl.particle) {
-          const p = fl.particle;
-          const u = (t * p.speed + fl.phase) % 1;
-          const env = Math.sin(u * Math.PI);
-          fl.mesh.position.y = fl.baseY + u * p.rise;
-          fl.mesh.position.x = p.baseX + Math.sin(u * Math.PI * 2 + fl.phase * 3.1) * p.sway;
-          fl.mesh.position.z =
-            p.baseZ + Math.cos(u * Math.PI * 1.5 + fl.phase * 2.3) * p.sway * 0.4;
-          fl.mesh.scale.setScalar(Math.max(0.001, p.scale * env));
-          continue;
+      // Subtle flame flicker + rising ember/spark particles on candles and the fireplace (only in visible bays)
+      const visibleBays: readonly BayId[] = showAllBays ? BAY_ORDER : [activeBay];
+      for (const bId of visibleBays) {
+        const bayFlames = flamesByBay.get(bId);
+        if (bayFlames) {
+          for (const fl of bayFlames) {
+            if (fl.particle) {
+              const p = fl.particle;
+              const u = (t * p.speed + fl.phase) % 1;
+              const env = Math.sin(u * Math.PI);
+              fl.mesh.position.y = fl.baseY + u * p.rise;
+              fl.mesh.position.x = p.baseX + Math.sin(u * Math.PI * 2 + fl.phase * 3.1) * p.sway;
+              fl.mesh.position.z =
+                p.baseZ + Math.cos(u * Math.PI * 1.5 + fl.phase * 2.3) * p.sway * 0.4;
+              fl.mesh.scale.setScalar(Math.max(0.001, p.scale * env));
+              continue;
+            }
+            const f1 = Math.sin(t * 7.5 + fl.phase * 2.1);
+            const f2 = Math.cos(t * 12.8 + fl.phase * 3.7);
+            const f3 = Math.sin(t * 18.2 + fl.phase * 1.3);
+            const flicker = f1 * 0.07 + f2 * 0.045 + f3 * 0.025;
+            const sx = fl.baseScaleX ?? 1;
+            const sy = fl.baseScaleY ?? 1;
+            const sz = fl.baseScaleZ ?? 1;
+            const sway = fl.swayScale ?? 1;
+            fl.mesh.position.y = fl.baseY + flicker * 0.05;
+            fl.mesh.scale.set(
+              sx * (1 - flicker * 0.1 * sway),
+              sy * (1 + flicker * 0.24 * sway),
+              sz,
+            );
+            fl.mesh.rotation.z = f2 * 0.05 * sway;
+          }
         }
-        const f1 = Math.sin(t * 7.5 + fl.phase * 2.1);
-        const f2 = Math.cos(t * 12.8 + fl.phase * 3.7);
-        const f3 = Math.sin(t * 18.2 + fl.phase * 1.3);
-        const flicker = f1 * 0.07 + f2 * 0.045 + f3 * 0.025;
-        const sx = fl.baseScaleX ?? 1;
-        const sy = fl.baseScaleY ?? 1;
-        const sz = fl.baseScaleZ ?? 1;
-        const sway = fl.swayScale ?? 1;
-        fl.mesh.position.y = fl.baseY + flicker * 0.05;
-        fl.mesh.scale.set(sx * (1 - flicker * 0.1 * sway), sy * (1 + flicker * 0.24 * sway), sz);
-        fl.mesh.rotation.z = f2 * 0.05 * sway;
+        const bayFireflies = firefliesByBay.get(bId);
+        if (bayFireflies) {
+          for (const ff of bayFireflies) {
+            ff.mesh.position.x = ff.baseX + Math.sin(t * 0.9 + ff.phase) * 0.06;
+            ff.mesh.position.y = ff.baseY + Math.cos(t * 1.1 + ff.phase) * 0.05;
+          }
+        }
+        // Twinkle / slow-flash the upper fairy light strings in completed rooms
+        const bayFairyLights = fairyLightsByBay.get(bId);
+        if (bayFairyLights) {
+          for (const fl of bayFairyLights) {
+            const wave =
+              0.5 + 0.5 * Math.sin(t * 2.1 + fl.phase) * Math.cos(t * 0.85 - fl.phase * 0.5);
+            const on = THREE.MathUtils.smoothstep(wave, 0.22, 0.82);
+            fl.mat.color.copy(fl.offColor).lerp(fl.baseColor, 0.2 + 0.8 * on);
+            fl.mat.emissiveIntensity = on * 1.3;
+          }
+        }
       }
-      for (const ff of fireflies) {
-        ff.mesh.position.x = ff.baseX + Math.sin(t * 0.9 + ff.phase) * 0.06;
-        ff.mesh.position.y = ff.baseY + Math.cos(t * 1.1 + ff.phase) * 0.05;
-      }
-      // Twinkle / slow-flash the upper fairy light strings in completed rooms
-      for (const fl of fairyLights) {
-        const wave = 0.5 + 0.5 * Math.sin(t * 2.1 + fl.phase) * Math.cos(t * 0.85 - fl.phase * 0.5);
-        const on = THREE.MathUtils.smoothstep(wave, 0.22, 0.82);
-        fl.mat.color.copy(fl.offColor).lerp(fl.baseColor, 0.2 + 0.8 * on);
-        fl.mat.emissiveIntensity = on * 1.3;
-      }
+
       // Position the single shadow-casting diorama light at the active bay's light source
       const mood = getBayLightMood(activeBay);
       const theta = getBayAngle(activeBay);
@@ -4378,9 +4485,11 @@ export function buildHolidayHallDiorama(callbacks: {
       dioramaLight.intensity = mood.lightIntensity * (1 + wave * 0.1);
 
       // Restored lamps breathe; dust drifts up and sways (only while the hall is in view).
-      for (const p of fxPulses)
-        p.mat.opacity = p.base * (0.82 + 0.18 * Math.sin(t * 1.6 + p.phase));
-      if (hallDust && activeBay === 'hall') {
+      if (showAllBays || activeBay === 'hall') {
+        for (const p of fxPulses)
+          p.mat.opacity = p.base * (0.82 + 0.18 * Math.sin(t * 1.6 + p.phase));
+      }
+      if (hallDust && (showAllBays || activeBay === 'hall')) {
         const pos = hallDust.geo.attributes['position'] as THREE.BufferAttribute;
         const { base, seed } = hallDust;
         for (let i = 0; i < seed.length; i++) {

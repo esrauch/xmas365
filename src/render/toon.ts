@@ -44,7 +44,6 @@ export const celUniforms = {
 };
 
 const DECLARATIONS = /* glsl */ `
-uniform vec3 celSun;
 uniform vec3 celLitTint;
 uniform vec3 celShadeTint;
 uniform float celShadeGamma;

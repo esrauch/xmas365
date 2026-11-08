@@ -7,7 +7,7 @@
  * compensation and vertically tiered alcoves tailored for mobile portrait.
  */
 import * as THREE from 'three';
-import { common, hexToNumber } from './content/palettes';
+import { common } from './content/palettes';
 import {
   type BeatId,
   type DialogueLine,
@@ -117,7 +117,7 @@ const bottomStack = h('div', {
     bottom: 'calc(10px + env(safe-area-inset-bottom))',
     left: '50%',
     transform: 'translateX(-50%)',
-    width: 'min(540px, 95vw)',
+    width: 'min(540px, 95%)',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -219,8 +219,8 @@ function hideMemoOverlay(): void {
 }
 
 function positionLeapBubbleElement(bubbleWrap: HTMLElement): void {
-  const w = Math.max(1, window.innerWidth);
-  const hPx = Math.max(1, window.innerHeight);
+  const w = Math.max(1, view.canvas.clientWidth);
+  const hPx = Math.max(1, view.canvas.clientHeight);
   let anchorX = w * 0.5;
   let anchorY = hPx * 0.72;
   if (activeDiorama) {
@@ -446,7 +446,7 @@ function renderActiveStoryBeat(): void {
         style: {
           position: 'fixed',
           transform: 'translateX(-50%)',
-          width: 'min(340px, 92vw)',
+          width: 'min(340px, 92%)',
           pointerEvents: 'auto',
         },
       },
@@ -805,8 +805,8 @@ function syncCameraFov(w: number, hPx: number): void {
  * during camera rotation or idle drift.
  */
 function layoutStableHotspots(): void {
-  const w = Math.max(1, window.innerWidth);
-  const hPx = Math.max(1, window.innerHeight);
+  const w = Math.max(1, view.canvas.clientWidth);
+  const hPx = Math.max(1, view.canvas.clientHeight);
   lastLayoutW = w;
   lastLayoutH = hPx;
   syncCameraFov(w, hPx);
@@ -819,7 +819,8 @@ function layoutStableHotspots(): void {
   stableCam.updateMatrixWorld();
 
   const padX = currentBay === 'hall' ? Math.min(60, w * 0.16) : Math.min(76, w * 0.2);
-  const topBarBottom = topBar.getBoundingClientRect().bottom;
+  const topBarBottom =
+    topBar.getBoundingClientRect().bottom - view.canvas.getBoundingClientRect().top;
   const minY = Math.max(88, topBarBottom > 0 ? topBarBottom + 22 : 88);
   const posById = new Map<string, { x: number; y: number }>();
 
@@ -891,6 +892,20 @@ function layoutStableHotspots(): void {
 let introActive = false;
 let isTransitioningBay = false;
 
+function syncBayUIAndHotspots(): void {
+  layoutStableHotspots();
+  if (!introActive && Math.abs(shortestAngleDelta(camAngleCurrent, camAngleTarget)) <= 0.015) {
+    hotspotLayer.classList.add('settled');
+  }
+  if (!introActive) {
+    gameState.onEnterBay(currentBay);
+    renderTopBar();
+    renderSideArrows();
+    renderCarryTray();
+    renderActiveStoryBeat();
+  }
+}
+
 function rebuildScene(): void {
   if (activeDiorama) {
     view.scene.remove(activeDiorama.root);
@@ -916,17 +931,7 @@ function rebuildScene(): void {
 
   view.scene.add(activeDiorama.root);
   buildHotspotDOM(activeDiorama.hotspots);
-  layoutStableHotspots();
-  if (!introActive && Math.abs(shortestAngleDelta(camAngleCurrent, camAngleTarget)) <= 0.015) {
-    hotspotLayer.classList.add('settled');
-  }
-  if (!introActive) {
-    gameState.onEnterBay(currentBay);
-    renderTopBar();
-    renderSideArrows();
-    renderCarryTray();
-    renderActiveStoryBeat();
-  }
+  syncBayUIAndHotspots();
 }
 
 function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
@@ -942,7 +947,7 @@ function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
     currentBay = bay;
     camAngleTarget = getBayAngle(bay);
     camAngleCurrent = camAngleTarget;
-    rebuildScene();
+    syncBayUIAndHotspots();
     hotspotLayer.classList.add('settled');
     return;
   }
@@ -984,15 +989,17 @@ function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
     }, 660);
 
     window.setTimeout(() => {
-      if (unlockItem) {
-        blip(659, 90);
-        gameState.placeItem(unlockItem.id);
-      }
       currentBay = bay;
       camAngleTarget = getBayAngle(bay);
       camAngleCurrent = camAngleTarget;
       activeDiorama?.setDoorHop(null, 0);
-      rebuildScene();
+      if (unlockItem) {
+        blip(659, 90);
+        gameState.placeItem(unlockItem.id);
+        rebuildScene();
+      } else {
+        syncBayUIAndHotspots();
+      }
       hotspotLayer.classList.add('settled');
       fadeOverlay.style.opacity = '0';
       fadeOverlay.style.pointerEvents = 'none';
@@ -1016,7 +1023,7 @@ function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
     currentBay = bay;
     camAngleTarget = getBayAngle(bay);
     camAngleCurrent = camAngleTarget;
-    rebuildScene();
+    syncBayUIAndHotspots();
     hotspotLayer.classList.add('settled');
     fadeOverlay.style.opacity = '0';
     fadeOverlay.style.pointerEvents = 'none';
@@ -1064,7 +1071,7 @@ function showUnlockDialog(roomSpec: RoomSpec, kind: 'warm-up' | 'centerpiece'): 
       'div',
       {
         style: {
-          width: 'min(420px, 92vw)',
+          width: 'min(420px, 92%)',
           background: '#fffdf8',
           border: `3px solid ${roomSpec.accent}`,
           borderRadius: '18px',
@@ -2258,7 +2265,13 @@ canvas.addEventListener('pointerup', (e: PointerEvent) => {
   pointerNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
   pointerNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
   raycaster.setFromCamera(pointerNDC, view.camera);
-  const hits = raycaster.intersectObjects(activeDiorama.root.children, true);
+  const bayMeshGroups: THREE.Object3D[] = [];
+  for (const hs of activeDiorama.hotspots) {
+    if (hs.bay === currentBay && hs.meshGroup) {
+      bayMeshGroups.push(hs.meshGroup);
+    }
+  }
+  const hits = raycaster.intersectObjects(bayMeshGroups, true);
   for (const hit of hits) {
     const hs = findHotspotFromObject(hit.object);
     if (hs && hs.bay === currentBay) {
@@ -2357,8 +2370,8 @@ function finishIntro(fromCinematic: boolean): void {
   if (captionWrapEl) captionWrapEl.style.opacity = '0';
   if (titlePromptEl) titlePromptEl.style.opacity = '0';
   if (holdSkipPillEl) holdSkipPillEl.style.opacity = '0';
-  if (letterboxTopEl) letterboxTopEl.style.height = '50vh';
-  if (letterboxBotEl) letterboxBotEl.style.height = '50vh';
+  if (letterboxTopEl) letterboxTopEl.style.height = '50%';
+  if (letterboxBotEl) letterboxBotEl.style.height = '50%';
 
   window.setTimeout(() => {
     cleanupIntroCinematicScene();
@@ -2416,7 +2429,7 @@ function mountCinematicStageDOM(): void {
       top: '0',
       left: '0',
       right: '0',
-      height: 'min(78px, 11.5vh)',
+      height: 'min(78px, 11.5%)',
       background: '#0d0907',
       transform: 'translateY(-100%)',
       transition: 'transform 650ms cubic-bezier(0.22, 1, 0.36, 1), height 420ms ease',
@@ -2492,7 +2505,7 @@ function mountCinematicStageDOM(): void {
         bottom: '0',
         left: '0',
         right: '0',
-        height: 'min(96px, 14vh)',
+        height: 'min(96px, 14%)',
         background: '#0d0907',
         display: 'flex',
         alignItems: 'center',
@@ -2762,7 +2775,6 @@ if (introActive) {
 
 const targetLitColor = new THREE.Color();
 const targetShadeColor = new THREE.Color();
-const targetSunColor = new THREE.Color();
 
 let fpsFrameCount = 0;
 let fpsSampleStart = performance.now();
@@ -2781,13 +2793,17 @@ view.renderer.setAnimationLoop((now) => {
   }
 
   // Guarantee horizontal FOV on mobile portrait so dioramas never clip off the sides
-  const w = Math.max(1, window.innerWidth);
-  const hPx = Math.max(1, window.innerHeight);
+  const w = Math.max(1, canvas.clientWidth);
+  const hPx = Math.max(1, canvas.clientHeight);
   syncCameraFov(w, hPx);
 
   if (introActive) {
+    // Do not render the 3D scene while the opaque "Tap to Start" cover fills the viewport
+    if (introStage === 'tap_to_start') {
+      return;
+    }
     updateIntroCinematic(now);
-    if (introStage !== 'tap_to_start' && activeIntroCinematic) {
+    if (activeIntroCinematic) {
       view.render(activeIntroCinematic.scene);
       return;
     }
@@ -2809,19 +2825,13 @@ view.renderer.setAnimationLoop((now) => {
     }
   }
 
-  // Smoothly transition cel shading tints; turn down overhead sun so the diorama's own
-  // emissive fixtures (fireplace, candles, jack-o'-lanterns, lanterns) are the primary light source
+  // Smoothly transition cel shading tints for the active bay's practical lighting mood
   const mood = getBayLightMood(currentBay);
   targetLitColor.setRGB(mood.litTint[0], mood.litTint[1], mood.litTint[2]);
   targetShadeColor.setRGB(mood.shadeTint[0], mood.shadeTint[1], mood.shadeTint[2]);
-  targetSunColor.setHex(hexToNumber(mood.sunColor as `#${string}`));
   celUniforms.celLitTint.value.lerp(targetLitColor, 0.15);
   celUniforms.celShadeTint.value.lerp(targetShadeColor, 0.15);
   celUniforms.celShadeGamma.value += (mood.shadeGamma - celUniforms.celShadeGamma.value) * 0.15;
-  view.sun.color.lerp(targetSunColor, 0.15);
-  view.sun.intensity = 0;
-  view.sun.castShadow = false;
-  view.sun.visible = false;
 
   const overviewPos = bayToWorld(camAngleCurrent, 0, 1.92, 5.15);
   const overviewLook = bayToWorld(camAngleCurrent, 0, 1.38, 0.75);
