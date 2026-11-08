@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { ROOM_MASCOT_ID, buildMascotMesh } from '../mascots';
-import { ROOM_SPECS, type RoomId, type RoomSpec, gameState } from '../state';
+import { FINALE_PROTO, ROOM_SPECS, type RoomId, type RoomSpec, gameState } from '../state';
 import {
   type BuiltBay,
   type DioramaCallbacks,
   type FairyLightEntry,
+  type FlameEntry,
   type FloatingEntry,
   type FxPulseEntry,
   type Hotspot3D,
@@ -13,6 +14,7 @@ import {
   bayToWorld,
   beamTexture,
   box,
+  buildCandle,
   cyl,
   fxMaterial,
   fxPlane,
@@ -167,9 +169,24 @@ function buildDoorHolidayEmblem(roomId: RoomId): THREE.Group {
   return g;
 }
 
+function buildPartyHat(coneHex: string, pomHex: string, scale = 1): THREE.Group {
+  const g = new THREE.Group();
+  const h = 0.2 * scale;
+  const r = 0.086 * scale;
+  const coneMesh = new THREE.Mesh(new THREE.ConeGeometry(r, h, 12), mat(coneHex));
+  coneMesh.position.set(0, h * 0.5, 0);
+  coneMesh.castShadow = false;
+  coneMesh.receiveShadow = false;
+  g.add(coneMesh);
+  g.add(cyl(r * 1.04, r * 1.08, 0.024 * scale, pomHex, 0, 0.012 * scale, 0, 12, false));
+  g.add(glowSphere(0.028 * scale, pomHex, 0, h + 0.012 * scale, 0, 0.95));
+  return g;
+}
+
 export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
   const theta = getBayAngle('hall');
   const bay = makeBayGroup(theta);
+  const flames: FlameEntry[] = [];
   const fairyLights: FairyLightEntry[] = [];
   const floating: FloatingEntry[] = [];
   const fxPulses: FxPulseEntry[] = [];
@@ -554,10 +571,10 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
     c.receiveShadow = false;
   });
   hallLeapDayActor.add(leapDayMesh);
-  const partyHatGroup = new THREE.Group();
-  partyHatGroup.add(cyl(0.01, 0.085, 0.19, '#ed64a6', 0, 0.54, -0.01, 10, false));
-  partyHatGroup.add(glowSphere(0.026, '#ffea79', 0, 0.65, -0.01, 0.9));
-  hallLeapDayActor.add(partyHatGroup);
+  const leapDayPartyHat = buildPartyHat('#ed64a6', '#ffea79', 1.0);
+  leapDayPartyHat.position.set(0, 0.44, -0.01);
+  leapDayPartyHat.visible = false;
+  hallLeapDayActor.add(leapDayPartyHat);
   bay.add(hallLeapDayActor);
 
   // The year wheel: a rug of twelve month segments round Leap Day's lily pad
@@ -702,42 +719,254 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
   const deskFocusLook = bayToWorld(theta, 1.26, 0.58, 2.08);
   const deskWorldPos = bayToWorld(theta, 1.26, 0.12, 2.32);
 
-  // 4. Center Podium: XMAS365 Merger Contract (pre-built once, visibility toggled when all 6 door lamps are lit)
-  const podiumGroup = new THREE.Group();
-  podiumGroup.position.set(0, 0, 1.15);
-  podiumGroup.add(cyl(0.28, 0.34, 0.12, '#5c3d24', 0, 0.06, 0, 14, false));
-  podiumGroup.add(cyl(0.14, 0.18, 0.68, '#d69e2e', 0, 0.42, 0, 12, false));
-  podiumGroup.add(box(0.56, 0.08, 0.44, '#ecc94b', 0, 0.78, 0, false));
-  podiumGroup.add(glowBox(0.42, 0.04, 0.32, '#fffaf0', 0, 0.83, 0, 0.6));
-  bay.add(podiumGroup);
-  const podiumWorldPos = bayToWorld(theta, 0, 1.02, 1.25);
+  // 4. Act 3 Center-Stage Hotspot: CEO Santa Confrontation & XMAS365™ Merger Contract (pre-built once)
+  const santaConfrontGroup = new THREE.Group();
+  santaConfrontGroup.position.set(0, 0, 1.15);
 
-  // 5. Act 4 Party Guests (all 6 freed holiday mascots + humbled CEO Santa, pre-built once)
-  const partyGuestsGroup = new THREE.Group();
-  const partySpots: readonly [RoomId, number, number, number][] = [
-    ['halloween', -0.78, 1.54, 0.42],
-    ['thanksgiving', -0.45, 1.62, 0.18],
-    ['christmas', 0.45, 1.62, -0.18],
-    ['valentines', 0.78, 1.54, -0.42],
-    ['easter', -0.58, 1.12, 0.24],
-    ['fourth', 0.58, 1.12, -0.24],
+  // Invisible raycast hit-box on layer 2 so tapping Santa or the Contract clipboard in 3D opens the Merger Contract
+  const santaHitMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(1.15, 1.25, 0.9),
+    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
+  );
+  santaHitMesh.position.set(0, 0.58, 0.05);
+  santaHitMesh.layers.set(2);
+  santaConfrontGroup.add(santaHitMesh);
+
+  // Crimson XMAS365™ executive podium & gold-rimmed rug
+  santaConfrontGroup.add(cyl(0.56, 0.6, 0.026, '#d69e2e', 0, 0.013, 0, 24, false));
+  santaConfrontGroup.add(cyl(0.49, 0.53, 0.036, '#9b2c2c', 0, 0.022, 0, 24, false));
+  santaConfrontGroup.add(cyl(0.36, 0.4, 0.075, '#5c3d24', 0, 0.055, 0, 18, false));
+  santaConfrontGroup.add(cyl(0.37, 0.37, 0.022, '#ecc94b', 0, 0.095, 0, 18, false));
+  santaConfrontGroup.add(
+    fxPlane(1.15, 0.95, fxMaterial(radialTexture(), '#feb2b2', 0.38), 0, 0.04, 0, true),
+  );
+
+  // CEO Santa standing center-stage
+  const ceoSantaMesh = buildMascotMesh('santa', 0.72);
+  ceoSantaMesh.position.set(-0.06, 0.095, -0.02);
+  ceoSantaMesh.rotation.y = 0.08;
+  santaConfrontGroup.add(ceoSantaMesh);
+
+  // Oversized golden-framed XMAS365™ Merger Contract clipboard with glowing red wax seal
+  const contractClipboard = new THREE.Group();
+  contractClipboard.position.set(0.28, 0.48, 0.18);
+  contractClipboard.rotation.set(-0.2, -0.26, -0.08);
+  contractClipboard.add(box(0.34, 0.44, 0.028, '#d69e2e', 0, 0, 0, false));
+  contractClipboard.add(glowBox(0.28, 0.38, 0.034, '#fffaf0', 0, -0.005, 0.004, 0.65));
+  contractClipboard.add(box(0.14, 0.048, 0.044, '#ecc94b', 0, 0.2, 0.008, false));
+  contractClipboard.add(box(0.23, 0.042, 0.038, '#c53030', 0, 0.125, 0.006, false));
+  for (let cIdx = 0; cIdx < 6; cIdx++) {
+    const cy = 0.065 - cIdx * 0.036;
+    contractClipboard.add(box(0.2, 0.015, 0.038, '#2d3748', -0.01, cy, 0.006, false));
+  }
+  contractClipboard.add(glowSphere(0.042, '#e53e3e', 0.075, -0.125, 0.024, 1.25));
+  contractClipboard.add(box(0.022, 0.065, 0.018, '#d69e2e', 0.065, -0.165, 0.018, false));
+  santaConfrontGroup.add(contractClipboard);
+  floating.push({ mesh: contractClipboard, phase: 0.4, baseY: 0.48 });
+
+  santaConfrontGroup.visible = false;
+  bay.add(santaConfrontGroup);
+  const santaWorldPos = bayToWorld(theta, 0, 1.04, 1.25);
+
+  // 5. Act 4 Surprise Party & 6-Tier Birthday Cake (`partyGroup`, pre-built once)
+  const partyGroup = new THREE.Group();
+
+  // 5a. Festive Round Birthday Banquet Table & 6-Tier Holiday Cake at center-stage
+  const partyCakeGroup = new THREE.Group();
+  partyCakeGroup.position.set(0, 0, 1.15);
+
+  const cakeHitMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(1.3, 1.45, 1.2),
+    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
+  );
+  cakeHitMesh.position.set(0, 0.68, 0);
+  cakeHitMesh.layers.set(2);
+  partyCakeGroup.add(cakeHitMesh);
+
+  // Banquet table pedestal & cream/gold tablecloth
+  partyCakeGroup.add(cyl(0.28, 0.34, 0.08, '#5c3d24', 0, 0.04, 0, 16, false));
+  partyCakeGroup.add(cyl(0.12, 0.15, 0.42, '#7a5938', 0, 0.25, 0, 14, false));
+  partyCakeGroup.add(cyl(0.56, 0.62, 0.14, '#fffaf0', 0, 0.46, 0, 24, false));
+  partyCakeGroup.add(cyl(0.58, 0.58, 0.04, '#ecc94b', 0, 0.52, 0, 24, false));
+  for (let sw = 0; sw < 12; sw++) {
+    const swAng = (sw / 12) * Math.PI * 2;
+    partyCakeGroup.add(
+      sphere(0.032, '#d69e2e', Math.cos(swAng) * 0.58, 0.41, Math.sin(swAng) * 0.58, false),
+    );
+  }
+  // Golden cake stand platter
+  partyCakeGroup.add(cyl(0.42, 0.36, 0.04, '#d69e2e', 0, 0.55, 0, 20, false));
+
+  // 6-tier holiday-colored Birthday Cake with frosting piping
+  const cakeTierColors: readonly `#${string}`[] = [
+    '#805ad5',
+    '#ed8936',
+    '#38a169',
+    '#ed64a6',
+    '#ecc94b',
+    '#2b6cb0',
   ];
-  for (const [pIdx, [rId, px, pz, rotY]] of partySpots.entries()) {
-    const guest = buildMascotMesh(ROOM_MASCOT_ID[rId], 0.46);
-    guest.position.set(px, 0.03, pz);
-    guest.rotation.y = rotY;
+  const cakeTierRadii = [0.35, 0.295, 0.245, 0.195, 0.15, 0.11] as const;
+  const cakeTierHeights = [0.095, 0.09, 0.085, 0.08, 0.075, 0.07] as const;
+  let cakeY = 0.57;
+  for (let tIdx = 0; tIdx < 6; tIdx++) {
+    const tr = cakeTierRadii[tIdx] ?? 0.15;
+    const th = cakeTierHeights[tIdx] ?? 0.08;
+    const tHex = cakeTierColors[tIdx] ?? '#ecc94b';
+    partyCakeGroup.add(cyl(tr, tr * 1.02, th, tHex, 0, cakeY + th * 0.5, 0, 20, false));
+    // Cream frosting piping ring at the top of each tier
+    partyCakeGroup.add(
+      cyl(tr + 0.012, tr + 0.012, 0.018, '#fffaf0', 0, cakeY + th - 0.005, 0, 20, false),
+    );
+    cakeY += th;
+  }
+
+  // 6 lit birthday candles with warm flickering flames around the cake tiers
+  const candleRingRadius = 0.22;
+  const candleBaseY = 0.57 + 0.095 + 0.09;
+  for (let cIdx = 0; cIdx < 6; cIdx++) {
+    const cAng = (cIdx / 6) * Math.PI * 2 + 0.26;
+    const cx = Math.cos(cAng) * candleRingRadius;
+    const cz = Math.sin(cAng) * candleRingRadius;
+    const waxHex = cakeTierColors[cIdx] ?? '#fffaf0';
+    partyCakeGroup.add(
+      buildCandle(0.016, 0.11, waxHex, cx, candleBaseY, cz, flames, cIdx * 1.05 + 0.3),
+    );
+  }
+
+  // `366` / `FEB 29` Cake Topper crowning the top tier
+  const topperGroup = new THREE.Group();
+  topperGroup.position.set(0, cakeY, 0);
+  topperGroup.add(cyl(0.012, 0.012, 0.09, '#d69e2e', 0, 0.045, 0, 8, false));
+  topperGroup.add(box(0.22, 0.11, 0.024, '#d69e2e', 0, 0.11, 0, false));
+  topperGroup.add(glowBox(0.19, 0.085, 0.028, '#fffaf0', 0, 0.11, 0.002, 0.75));
+  topperGroup.add(box(0.19, 0.026, 0.032, '#c53030', 0, 0.138, 0.004, false));
+  topperGroup.add(glowSphere(0.032, '#ffea79', 0, 0.188, 0, 1.25));
+  partyCakeGroup.add(topperGroup);
+
+  partyGroup.add(partyCakeGroup);
+
+  // 5b. Overhead Festive Bunting / Confetti Garland
+  const partyBuntingGroup = new THREE.Group();
+  const buntingCount = 12;
+  for (let bIdx = 0; bIdx < buntingCount; bIdx++) {
+    const u = bIdx / (buntingCount - 1);
+    const bx = -1.48 + u * 2.96;
+    const sag = Math.sin(u * Math.PI) * 0.28;
+    const by = 2.68 - sag;
+    const bz = 0.88 + Math.sin(u * Math.PI) * 0.22;
+    const flagHex = cakeTierColors[bIdx % cakeTierColors.length] ?? '#ecc94b';
+    const pennant = new THREE.Mesh(new THREE.ConeGeometry(0.068, 0.14, 4), mat(flagHex));
+    pennant.position.set(bx, by - 0.06, bz);
+    pennant.rotation.x = Math.PI;
+    pennant.rotation.y = Math.PI / 4;
+    pennant.scale.z = 0.35;
+    partyBuntingGroup.add(pennant);
+    partyBuntingGroup.add(glowSphere(0.024, '#ffea79', bx, by + 0.01, bz, 1.05));
+  }
+  partyGroup.add(partyBuntingGroup);
+
+  // 5c. All 6 freed holiday mascots + humbled Santa in a joyful semicircle, each wearing a cone party hat
+  const partyGuestsGroup = new THREE.Group();
+  const partySpots: readonly {
+    roomId: RoomId;
+    px: number;
+    pz: number;
+    rotY: number;
+    hatY: number;
+    hatZ: number;
+    hatHex: `#${string}`;
+    pomHex: `#${string}`;
+  }[] = [
+    {
+      roomId: 'halloween',
+      px: -0.82,
+      pz: 1.56,
+      rotY: 0.46,
+      hatY: 0.66,
+      hatZ: 0.01,
+      hatHex: '#805ad5',
+      pomHex: '#ed8936',
+    },
+    {
+      roomId: 'thanksgiving',
+      px: -0.5,
+      pz: 1.66,
+      rotY: 0.22,
+      hatY: 0.9,
+      hatZ: 0.08,
+      hatHex: '#ed8936',
+      pomHex: '#ffea79',
+    },
+    {
+      roomId: 'christmas',
+      px: 0.5,
+      pz: 1.66,
+      rotY: -0.22,
+      hatY: 1.06,
+      hatZ: 0,
+      hatHex: '#38a169',
+      pomHex: '#e53e3e',
+    },
+    {
+      roomId: 'valentines',
+      px: 0.82,
+      pz: 1.56,
+      rotY: -0.46,
+      hatY: 0.88,
+      hatZ: 0.01,
+      hatHex: '#ed64a6',
+      pomHex: '#fff5f7',
+    },
+    {
+      roomId: 'easter',
+      px: -0.68,
+      pz: 1.08,
+      rotY: 0.32,
+      hatY: 0.82,
+      hatZ: 0.01,
+      hatHex: '#ecc94b',
+      pomHex: '#f687b3',
+    },
+    {
+      roomId: 'fourth',
+      px: 0.68,
+      pz: 1.08,
+      rotY: -0.32,
+      hatY: 0.98,
+      hatZ: 0.02,
+      hatHex: '#2b6cb0',
+      pomHex: '#ffffff',
+    },
+  ];
+  for (const [pIdx, sp] of partySpots.entries()) {
+    const guest = buildMascotMesh(ROOM_MASCOT_ID[sp.roomId], 0.46);
+    const guestHat = buildPartyHat(sp.hatHex, sp.pomHex, 0.72);
+    guestHat.position.set(0, sp.hatY, sp.hatZ);
+    guest.add(guestHat);
+    guest.position.set(sp.px, 0.03, sp.pz);
+    guest.rotation.y = sp.rotY;
     partyGuestsGroup.add(guest);
     floating.push({ mesh: guest, phase: pIdx * 0.9 + 0.5, baseY: 0.03 });
   }
   const santaGuest = buildMascotMesh('santa', 0.48);
-  santaGuest.position.set(0, 0.03, 0.82);
+  const santaPartyHat = buildPartyHat('#38a169', '#ffea79', 0.82);
+  santaPartyHat.position.set(0, 0.94, 0);
+  santaGuest.add(santaPartyHat);
+  santaGuest.position.set(-0.78, 0.03, 1.92);
+  santaGuest.rotation.y = 0.38;
   partyGuestsGroup.add(santaGuest);
   floating.push({ mesh: santaGuest, phase: 2.1, baseY: 0.03 });
-  bay.add(partyGuestsGroup);
+
+  partyGroup.add(partyGuestsGroup);
+  partyGroup.visible = false;
+  bay.add(partyGroup);
+  const partyCakeWorldPos = bayToWorld(theta, 0, 1.18, 1.25);
 
   const syncState = (hotspotsOut: Hotspot3D[]): void => {
     const act = gameState.act();
     const lampsLit = gameState.completedRoomCount();
+    const finaleSolved = gameState.solvedRuns.has('clause');
 
     const wallHex = act >= 4 ? '#553c9a' : act === 3 ? '#334155' : '#4a3525';
     const panelHex = act >= 4 ? '#44337a' : act === 3 ? '#1e293b' : '#36261a';
@@ -745,8 +974,9 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
     panelMat.color.setHex(hexToNumber(panelHex));
     carpetMat.color.setHex(hexToNumber(act === 3 ? '#742a2a' : '#7b341e'));
 
-    partyHatGroup.visible = act === 4;
-    partyGuestsGroup.visible = act === 4;
+    leapDayPartyHat.visible = finaleSolved;
+    santaConfrontGroup.visible = lampsLit >= 6 && !finaleSolved;
+    partyGroup.visible = finaleSolved;
 
     for (const d of builtDoors) {
       const unlocked = gameState.isRoomUnlocked(d.room);
@@ -865,23 +1095,39 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
     });
 
     const finaleUnlocked = lampsLit >= 6;
-    const finaleDone = gameState.solvedRuns.has('tuesday');
-    podiumGroup.visible = finaleUnlocked;
-    if (finaleUnlocked) {
+    if (finaleUnlocked && !finaleSolved) {
       hotspotsOut.push({
-        id: 'finale:tuesday',
+        id: 'finale:clause',
         bay: 'hall',
-        label: act === 4 ? "🎉 Leap Day's Party" : '📜 XMAS365™ Merger Contract',
-        sublabel: finaleDone ? '✓ Xmas12 · Day 366 Every Year!' : '6/6 Mascots Free · Red-Line It!',
-        icon: finaleDone ? '🎉' : '📜',
-        status: finaleDone ? 'done' : 'ready',
-        hero: !finaleDone,
-        accent: '#d69e2e',
-        worldPos: podiumWorldPos,
+        kind: 'puzzle',
+        label: '🎅 CEO Santa · XMAS365™ Merger Contract',
+        sublabel: `${gameState.voidedClauseCount()}/6 Clauses Voided · Tap to Red-Line!`,
+        icon: '🎅',
+        status: 'ready',
+        hero: true,
+        accent: '#c53030',
+        worldPos: santaWorldPos,
         cameraPos: doorFocusPos,
         cameraLook: doorFocusLook,
-        meshGroup: podiumGroup,
-        onClick: () => callbacks.onOpenProto('tuesday', doorFocusPos, doorFocusLook),
+        meshGroup: santaConfrontGroup,
+        onClick: () => callbacks.onOpenProto(FINALE_PROTO.id, doorFocusPos, doorFocusLook),
+      });
+    } else if (finaleSolved) {
+      hotspotsOut.push({
+        id: 'finale:clause',
+        bay: 'hall',
+        kind: 'puzzle',
+        label: '🎂 Happy Birthday, Leap Day! · Xmas12 Party',
+        sublabel: '6/6 Clauses Voided ✓ · Review Merger Contract',
+        icon: '🎂',
+        status: 'done',
+        hero: false,
+        accent: '#d69e2e',
+        worldPos: partyCakeWorldPos,
+        cameraPos: doorFocusPos,
+        cameraLook: doorFocusLook,
+        meshGroup: partyGroup,
+        onClick: () => callbacks.onOpenProto(FINALE_PROTO.id, doorFocusPos, doorFocusLook),
       });
     }
   };
@@ -889,7 +1135,7 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
   return {
     bayId: 'hall',
     group: bay,
-    flames: [],
+    flames,
     fireflies: [],
     fairyLights,
     floating,
@@ -993,6 +1239,10 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
           leapDayRestPos.z,
         );
         hallLeapDayActor.rotation.set(0, Math.sin(t * 0.55) * 0.05, 0);
+      }
+
+      for (const fl of floating) {
+        fl.mesh.position.y = fl.baseY + Math.abs(Math.sin(t * 1.9 + fl.phase)) * 0.028;
       }
     },
     syncState,

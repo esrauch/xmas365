@@ -18,13 +18,6 @@ export interface RunDef<P extends { name: string; tip?: string }> extends Omit<P
 }
 
 const KEY = 'puzz.proto.panels';
-const load = (): Set<string> => {
-  try {
-    return new Set(JSON.parse(localStorage.getItem(KEY) ?? '[]') as string[]);
-  } catch {
-    return new Set();
-  }
-};
 const save = (done: Set<string>): void => {
   try {
     localStorage.setItem(KEY, JSON.stringify([...done]));
@@ -39,7 +32,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
     ...proto,
     teaches: true,
     mount(host, ctx) {
-      const done = load();
+      const done = gameState.solvedPanels;
       let autoAdvanceTimer = 0;
 
       // Row 1: wired progress pips

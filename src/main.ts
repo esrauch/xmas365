@@ -1,6 +1,6 @@
 /**
  * The entry point for Puzz: Holiday Hall — a single 3D cel-shaded toy-theatre
- * rotunda where the central Tuesday Finale & Calendar Desk bay and all six
+ * rotunda where the central Merger Contract & Calendar Desk bay and all six
  * Holiday Alcoves live around the perimeter of the same room.
  *
  * Rotating between holidays pans around Holiday Hall in 3D, with horizontal-FOV
@@ -57,7 +57,9 @@ const view = new View(canvas, { fov: 40, outline: params.get('outline') !== '0' 
 // Scene state: all 7 bays live in one Holiday Hall diorama
 let currentBay: BayId = 'hall';
 let activeDiorama: BuiltDiorama | null = null;
-let activeModal: 'none' | 'proto' | 'desk' | 'corkboard' | 'settings' = 'none';
+let activeModal: 'none' | 'proto' | 'desk' | 'corkboard' | 'settings' | 'credits' = 'none';
+let activeProtoId: string | null = null;
+let activeProtoWasSolvedOnOpen = false;
 
 // Circular camera rotation around Holiday Hall + focus targets
 let camAngleTarget = getBayAngle('hall');
@@ -246,20 +248,41 @@ function positionLeapBubbleElement(bubbleWrap: HTMLElement): void {
   bubbleWrap.style.top = `${belowY.toFixed(1)}px`;
 }
 
+function isContractOverlayBeat(beatId: BeatId | null): boolean {
+  if (!beatId) return false;
+  return beatId === 'C0' || beatId === 'C6.early' || /^C[1-5]\.torn$/.test(beatId);
+}
+
+function clearContractOverlayBeats(): void {
+  for (let i = gameState.beatQueue.length - 1; i >= 0; i--) {
+    const b = gameState.beatQueue[i];
+    if (!b) continue;
+    if (b === 'C0' || b === 'C6.early' || /^C[1-5]\.torn$/.test(b)) {
+      gameState.beatQueue.splice(i, 1);
+      gameState.markMilestone(b);
+    }
+  }
+}
+
 /**
  * Render the front beat from `gameState.beatQueue` into `storyBannerHost`
  * (or directly over Leap Day in `leapBubbleHost` when Leap Day speaks in Holiday Hall).
- * Per `SCRIPT.md`, beats never sit in front of an open puzzle panel.
+ * Per `SCRIPT.md`, beats never sit in front of an open puzzle panel, except contract
+ * reaction beats (`C0`, `C1.torn`..`C5.torn`) which appear over the Merger Contract checklist.
  */
 function renderActiveStoryBeat(): void {
   clearCagedPromptTimer();
-  if (activeModal !== 'none') {
+  const beatId = gameState.currentBeat();
+  const allowOverProtoModal =
+    activeModal === 'proto' && activeProtoId === 'clause' && isContractOverlayBeat(beatId);
+  if (activeModal !== 'none' && !allowOverProtoModal) {
+    bottomStack.style.zIndex = '20';
     storyBannerHost.replaceChildren();
     leapBubbleHost.replaceChildren();
     hideMemoOverlay();
     return;
   }
-  const beatId = gameState.currentBeat();
+  bottomStack.style.zIndex = allowOverProtoModal ? '45' : '20';
   if (!beatId) {
     activeDialogueBeatId = null;
     activeDialogueStepIndex = 0;
@@ -274,6 +297,11 @@ function renderActiveStoryBeat(): void {
   }
 
   const spec = getBeatSpec(beatId);
+  if (!spec) {
+    gameState.dismissBeat(beatId);
+    renderActiveStoryBeat();
+    return;
+  }
   if (spec.kind === 'memo') {
     // A new memo fills the screen; putting it away pins it to the corkboard (already done on queueing).
     storyBannerHost.replaceChildren();
@@ -346,6 +374,14 @@ function renderActiveStoryBeat(): void {
       renderActiveStoryBeat();
     } else {
       gameState.dismissBeat(beatId);
+      if (beatId === 'C6.torn') {
+        rebuildScene();
+        return;
+      } else if (beatId === 'Y4') {
+        renderTopBar();
+        openVictoryCreditsModal();
+        return;
+      }
       renderTopBar();
       renderActiveStoryBeat();
     }
@@ -466,9 +502,9 @@ function renderActiveStoryBeat(): void {
     return;
   }
 
-  // When Leap Day speaks in Holiday Hall (other than a bark), anchor the speech bubble
+  // When Leap Day speaks in Holiday Hall (other than a bark or modal overlay), anchor the speech bubble
   // directly to Leap Day's 3D mascot.
-  if (currentBay === 'hall' && line.speaker === 'leapday') {
+  if (currentBay === 'hall' && line.speaker === 'leapday' && activeModal === 'none') {
     storyBannerHost.replaceChildren();
     card.style.animation = 'puzz-card-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) both';
     const tailUp = h('div', {
@@ -1076,6 +1112,8 @@ function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
 
 function closeModal(): void {
   activeModal = 'none';
+  activeProtoId = null;
+  activeProtoWasSolvedOnOpen = false;
   isCameraFocused = false;
   modalHost.replaceChildren();
   hotspotLayer.style.display = '';
@@ -1094,6 +1132,8 @@ const ROOM_TINTS: Record<string, string> = {
 
 function showUnlockDialog(roomSpec: RoomSpec, kind: 'warm-up' | 'centerpiece'): void {
   const isWarmup = kind === 'warm-up';
+  const readyForSanta =
+    !isWarmup && gameState.completedRoomCount() >= 6 && !gameState.solvedRuns.has('clause');
   const titleText = isWarmup
     ? `${roomSpec.icon} ${roomSpec.genreLabel} Unlocked at Calendar Desk!`
     : `${roomSpec.icon} All ${roomSpec.genreLabel} Twists Unlocked!`;
@@ -1142,7 +1182,7 @@ function showUnlockDialog(roomSpec: RoomSpec, kind: 'warm-up' | 'centerpiece'): 
             marginBottom: '10px',
           },
         },
-        '🔓 Unlocked!',
+        isWarmup ? '🔓 Unlocked!' : '✨ Holiday Restored!',
       ),
       h(
         'h3',
@@ -1179,6 +1219,31 @@ function showUnlockDialog(roomSpec: RoomSpec, kind: 'warm-up' | 'centerpiece'): 
             flexWrap: 'wrap',
           },
         },
+        !isWarmup
+          ? h(
+              'button',
+              {
+                style: {
+                  padding: '8px 16px',
+                  borderRadius: '999px',
+                  fontWeight: '800',
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  background: readyForSanta ? '#c53030' : roomSpec.accent,
+                  color: '#fff',
+                  border: '2px solid #1f2430',
+                  boxShadow: '0 2px 0 #1f2430',
+                },
+                onclick: () => {
+                  overlay.remove();
+                  switchBay('hall');
+                },
+              },
+              readyForSanta
+                ? '🎅 Confront CEO Santa in Holiday Hall ▸'
+                : '← Return to Holiday Hall ▸',
+            )
+          : null,
         h(
           'button',
           {
@@ -1225,16 +1290,325 @@ function showUnlockDialog(roomSpec: RoomSpec, kind: 'warm-up' | 'centerpiece'): 
   (ui ?? document.body).append(overlay);
 }
 
+export function openVictoryCreditsModal(): void {
+  activeModal = 'credits';
+  activeProtoId = null;
+  isCameraFocused = false;
+  hotspotLayer.style.display = 'none';
+  sideArrowsHost.style.display = 'none';
+  storyBannerHost.replaceChildren();
+  leapBubbleHost.replaceChildren();
+  hideMemoOverlay();
+
+  blip(523, 80);
+  window.setTimeout(() => blip(659, 80), 85);
+  window.setTimeout(() => blip(784, 90), 170);
+  window.setTimeout(() => blip(1047, 180), 260);
+
+  const y6Spec = {
+    title: 'DAY 366: LEAP DAY',
+    subtitle: 'An Xmas12 Production',
+    body: 'Holiday Hall is back on the twelve-month calendar.\n\nAll six holidays restored · All mascots uncaged · All contract clauses voided.\n\nHappy Birthday, Leap Day!',
+  };
+
+  const mascotRollCall: readonly { label: string; role: string; bg: string; border: string }[] = [
+    { label: '🎩 Leap Day', role: 'Day 366 · Every Year', bg: '#f0fff4', border: '#2f855a' },
+    { label: '🕷️ Halloween Spider', role: 'Halloween Porch', bg: '#faf5ff', border: '#805ad5' },
+    {
+      label: '🦃 Thanksgiving Turkey',
+      role: 'Thanksgiving Table',
+      bg: '#fffaf0',
+      border: '#c05621',
+    },
+    { label: '⛄ Christmas Snowman', role: 'Christmas Hearth', bg: '#f0fff4', border: '#2f855a' },
+    { label: "🧸 Valentine's Bear", role: "Valentine's Parlor", bg: '#fff5f7', border: '#d53f8c' },
+    { label: '🐰 Easter Bunny', role: 'Easter Garden', bg: '#fefcbf', border: '#d69e2e' },
+    {
+      label: '🦅 Fourth of July Eaglet',
+      role: 'Fourth of July Yard',
+      bg: '#ebf8ff',
+      border: '#2b6cb0',
+    },
+    {
+      label: '🎅 Humbled Santa',
+      role: 'Founder, Xmas12 (12 Days Only)',
+      bg: '#fff5f5',
+      border: '#c53030',
+    },
+  ];
+
+  const mascotPills = mascotRollCall.map((m) =>
+    h(
+      'div',
+      {
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '2px',
+          padding: '7px 10px',
+          borderRadius: '10px',
+          background: m.bg,
+          border: `2px solid ${m.border}`,
+          boxShadow: '0 2px 0 rgba(31, 36, 48, 0.16)',
+        },
+      },
+      h('span', { style: { fontWeight: '800', fontSize: '12.5px', color: '#1f2430' } }, m.label),
+      h('span', { style: { fontWeight: '700', fontSize: '10.5px', color: '#4a5568' } }, m.role),
+    ),
+  );
+
+  const genrePills = ROOM_SPECS.map((r) =>
+    h(
+      'div',
+      {
+        style: {
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '6px',
+          padding: '6px 10px',
+          borderRadius: '9px',
+          background: '#fffdf9',
+          border: `1.5px solid ${r.accent}`,
+          fontSize: '12px',
+          fontWeight: '700',
+          color: '#1f2430',
+        },
+      },
+      h('span', {}, `${r.icon} ${r.title}`),
+      h(
+        'span',
+        {
+          style: {
+            fontSize: '11px',
+            fontWeight: '800',
+            color: r.accent,
+          },
+        },
+        `★ ${r.genreLabel}`,
+      ),
+    ),
+  );
+
+  const finishCredits = (): void => {
+    blip(587, 65);
+    closeModal();
+  };
+
+  const card = h(
+    'div',
+    {
+      class: 'puzz-modal-card',
+      style: { maxWidth: '560px' },
+      onclick: (e: MouseEvent) => e.stopPropagation(),
+    },
+    h(
+      'div',
+      { class: 'puzz-modal-header' },
+      h(
+        'div',
+        { style: { display: 'flex', alignItems: 'center', gap: '9px' } },
+        h(
+          'span',
+          {
+            style: {
+              display: 'inline-grid',
+              placeItems: 'center',
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              background: '#d69e2e',
+              color: '#fff',
+              border: '2px solid #1f2430',
+              boxShadow: '0 2px 0 #1f2430',
+              fontSize: '19px',
+            },
+          },
+          '🎂',
+        ),
+        h(
+          'div',
+          {},
+          h(
+            'div',
+            {
+              style: {
+                fontSize: '10px',
+                fontWeight: '900',
+                textTransform: 'uppercase',
+                letterSpacing: '0.07em',
+                color: '#975a16',
+              },
+            },
+            y6Spec.subtitle,
+          ),
+          h('h2', { style: { margin: '0', fontSize: '18px', lineHeight: '1.15' } }, y6Spec.title),
+        ),
+      ),
+      h(
+        'button',
+        {
+          title: 'Close credits',
+          style: {
+            marginLeft: 'auto',
+            flexShrink: '0',
+            padding: '5px 11px',
+            borderRadius: '999px',
+            fontWeight: '800',
+            fontSize: '12px',
+            cursor: 'pointer',
+            background: '#1f2430',
+            color: '#fff',
+            border: '2px solid #1f2430',
+            boxShadow: '0 2px 0 #1f2430',
+          },
+          onclick: finishCredits,
+        },
+        '✕ Close',
+      ),
+    ),
+    h(
+      'div',
+      {
+        class: 'puzz-modal-body',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px',
+        },
+      },
+      h(
+        'div',
+        {
+          style: {
+            padding: '12px 14px',
+            borderRadius: '12px',
+            background: 'linear-gradient(180deg, #fefcbf 0%, #fffaf0 100%)',
+            border: '2px solid #d69e2e',
+            color: '#744210',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
+          },
+        },
+        ...y6Spec.body.split('\n\n').map((para, idx) =>
+          h(
+            'div',
+            {
+              style: {
+                fontSize: idx === 2 ? '15px' : '13px',
+                fontWeight: idx === 2 ? '900' : '700',
+                lineHeight: '1.4',
+              },
+            },
+            para,
+          ),
+        ),
+      ),
+      h(
+        'div',
+        {},
+        h(
+          'div',
+          {
+            style: {
+              fontSize: '11px',
+              fontWeight: '900',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              color: '#4a5568',
+              marginBottom: '6px',
+            },
+          },
+          '🎉 Starring the Holiday Hall Cast',
+        ),
+        h(
+          'div',
+          {
+            style: {
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(175px, 1fr))',
+              gap: '7px',
+            },
+          },
+          ...mascotPills,
+        ),
+      ),
+      h(
+        'div',
+        {},
+        h(
+          'div',
+          {
+            style: {
+              fontSize: '11px',
+              fontWeight: '900',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              color: '#4a5568',
+              marginBottom: '6px',
+            },
+          },
+          '★ Six Restored Holiday Verticals',
+        ),
+        h(
+          'div',
+          {
+            style: {
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+              gap: '6px',
+            },
+          },
+          ...genrePills,
+        ),
+      ),
+      h(
+        'div',
+        { style: { display: 'flex', justifyContent: 'center', marginTop: '4px' } },
+        h(
+          'button',
+          {
+            style: {
+              padding: '10px 20px',
+              borderRadius: '999px',
+              fontWeight: '900',
+              fontSize: '13.5px',
+              cursor: 'pointer',
+              background: '#2f855a',
+              color: '#fff',
+              border: '2.5px solid #1f2430',
+              boxShadow: '0 3px 0 #1f2430',
+            },
+            onclick: finishCredits,
+          },
+          '📌 Read Final Memo (Y7) & Enter Free Play ▸',
+        ),
+      ),
+    ),
+  );
+  card.style.setProperty('--room-accent', '#d69e2e');
+  card.style.setProperty('--room-tint', '#fefcbf');
+
+  const backdrop = h(
+    'div',
+    {
+      class: 'puzz-modal-backdrop',
+    },
+    card,
+  );
+  modalHost.replaceChildren(backdrop);
+}
+
 function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THREE.Vector3): void {
   const proto: Proto | undefined =
-    protoId === 'tuesday' ? FINALE_PROTO : PROTOS.find((p) => p.id === protoId);
+    protoId === 'clause' ? FINALE_PROTO : PROTOS.find((p) => p.id === protoId);
   if (!proto) return;
 
-  if (protoId === 'tuesday') {
-    gameState.enqueueBeat('C0');
-  }
-
   activeModal = 'proto';
+  activeProtoId = proto.id;
+  activeProtoWasSolvedOnOpen = gameState.solvedRuns.has(proto.id);
   storyBannerHost.replaceChildren();
   hideMemoOverlay();
   hotspotLayer.style.display = 'none';
@@ -1242,6 +1616,11 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
   isCameraFocused = true;
   focusPosTarget.copy(focusPos);
   focusLookTarget.copy(focusLook);
+
+  if (protoId === 'clause') {
+    gameState.enqueueBeat('C0');
+    renderActiveStoryBeat();
+  }
 
   // Match the puzzle frame theme to the room where this puzzle lives
   const roomSpec = ROOM_SPECS.find(
@@ -1268,6 +1647,16 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
         window.setTimeout(() => blip(659, 90), 90);
         window.setTimeout(() => blip(784, 160), 180);
         gameState.markRunSolved(proto.id);
+        if (proto.id === 'clause') {
+          clearContractOverlayBeats();
+          closeModal();
+          if (currentBay !== 'hall') {
+            switchBay('hall', { instant: true });
+          } else {
+            rebuildScene();
+          }
+          return;
+        }
         rebuildScene();
         hotspotLayer.style.display = 'none';
         sideArrowsHost.style.display = 'none';
@@ -1283,6 +1672,15 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
         const homeRoom = strayEntry
           ? ROOM_SPECS.find((r) => r.id === strayEntry.homeRoom)
           : undefined;
+        const cpRoom =
+          proto.kind === 'centerpiece'
+            ? ROOM_SPECS.find((r) => r.centerpiece.proto.id === proto.id)
+            : undefined;
+        const readyForSanta =
+          Boolean(cpRoom) &&
+          gameState.completedRoomCount() >= 6 &&
+          !gameState.solvedRuns.has('clause');
+        const returnHallRoom = homeRoom ?? cpRoom;
 
         doneBanner.replaceChildren(
           h(
@@ -1309,12 +1707,14 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
               {},
               strayEntry
                 ? `🎉 Freed ${strayEntry.icon} ${strayEntry.title}! Belongs in ${homeRoom?.shortTitle ?? strayEntry.homeRoom}.`
-                : `🎉 ${proto.title} Complete!`,
+                : cpRoom
+                  ? `✨ Holiday Restored! 🎉 ${proto.title} Complete!`
+                  : `🎉 ${proto.title} Complete!`,
             ),
             h(
               'div',
               { style: { display: 'flex', gap: '8px', flexWrap: 'wrap' } },
-              strayEntry && homeRoom
+              returnHallRoom
                 ? h(
                     'button',
                     {
@@ -1323,14 +1723,16 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
                         borderRadius: '999px',
                         fontWeight: '800',
                         cursor: 'pointer',
-                        background: homeRoom.accent,
+                        background: readyForSanta ? '#c53030' : returnHallRoom.accent,
                         color: '#fff',
                         border: '2px solid #1f2430',
                         boxShadow: '0 2px 0 #1f2430',
                       },
                       onclick: () => switchBay('hall'),
                     },
-                    '← Return to Holiday Hall ▸',
+                    readyForSanta
+                      ? '🎅 Confront CEO Santa in Holiday Hall ▸'
+                      : '← Return to Holiday Hall ▸',
                   )
                 : null,
               h(
@@ -2033,7 +2435,7 @@ function openSettingsModal(): void {
             }
             gameState.setRunSolved(r.centerpiece.proto.id, true);
           }
-          gameState.setRunSolved('tuesday', true);
+          gameState.setRunSolved('clause', true);
           gameState.setFreePlay(true);
         }),
       ),
@@ -2058,8 +2460,8 @@ function openSettingsModal(): void {
       makeCheckRow(
         '📜 XMAS365™ Merger Contract Solved',
         'Completes Grand Finale Door (Act IV)',
-        gameState.solvedRuns.has('tuesday'),
-        (next) => gameState.setRunSolved('tuesday', next),
+        gameState.solvedRuns.has('clause'),
+        (next) => gameState.setRunSolved('clause', next),
       ),
     );
 
@@ -2352,6 +2754,31 @@ if (startRoomParam && BAY_ORDER.includes(startRoomParam)) {
 
 // Build initial Holiday Hall scene
 rebuildScene();
+
+let isHandlingGameStateChange = false;
+gameState.subscribe(() => {
+  if (isHandlingGameStateChange || introActive) return;
+  isHandlingGameStateChange = true;
+  try {
+    if (activeModal === 'proto' && activeProtoId === 'clause') {
+      if (!activeProtoWasSolvedOnOpen && gameState.solvedRuns.has('clause')) {
+        activeProtoWasSolvedOnOpen = true;
+        clearContractOverlayBeats();
+        closeModal();
+        if (currentBay !== 'hall') {
+          switchBay('hall', { instant: true });
+        } else {
+          rebuildScene();
+        }
+        return;
+      }
+      activeDiorama?.syncState();
+      renderActiveStoryBeat();
+    }
+  } finally {
+    isHandlingGameStateChange = false;
+  }
+});
 
 if (startProtoId) {
   openProtoModal(startProtoId, camPosCurrent.clone(), camLookCurrent.clone());

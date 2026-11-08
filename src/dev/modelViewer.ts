@@ -252,7 +252,7 @@ function interactive(): void {
     current = thing;
     info.textContent = text;
     list.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.key === key));
-    // Hotspot ids have colons of their own ("finale:tuesday"): split at the first only.
+    // Hotspot ids have colons of their own ("finale:clause"): split at the first only.
     const at = key.indexOf(':');
     const kind = key.slice(0, at);
     const id = key.slice(at + 1);

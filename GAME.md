@@ -111,13 +111,16 @@ shape.
    tapping the mascot offers a few hard bonus panels (generated or hand-picked)
    that earn visible rewards: a room decoration and a party hat for that mascot
    to wear at the finale. The story never needs them.
-4. **The merger contract.** With all six mascots free, XMAS365™'s contract is
-   the run of two-twist panels (each genre with two twists it hasn't had);
-   each panel tears up a clause, and the last is the loophole: day 366.
-5. **Leap Day's party.** The freed mascots throw it; its last puzzle is the
-   cake relay (one board, every genre adding to it). They crown you **"Day 366
-   (Every Year)"**—pencilling February 29th onto every year's calendar—and
-   Santa, a humbled guest, keeps twelve days (Xmas12).
+4. **The merger contract.** With all six mascots free, CEO Santa takes center
+   stage in Holiday Hall with XMAS365™'s Master Merger Contract: six clauses
+   (one per puzzle genre), each a 29-panel gauntlet (`1 base + 6 gimmick intros
+   + 6 solo gimmicks + 15 two-gimmick combos + 1 all-6 boss panel` = 174 panels
+   total). Voiding each clause tears it up in red ink, and the last triggers
+   the Sec 6.2 loophole: day 366.
+5. **Leap Day's party.** The freed mascots throw a surprise party in Holiday
+   Hall around a 6-tier birthday cake table. They crown you **"Day 366 (Every
+   Year)"**—pencilling February 29th onto every year's calendar—and Santa, a
+   humbled guest at the banquet table, keeps twelve days (Xmas12).
 6. **After the story: the Calendar Desk.** Your desk in the hall, there from
    the start (reclaiming each holiday's warm-up, standard generator and twists
    as you restore the house); after the party it opens the full endless mode:
@@ -222,17 +225,29 @@ done. Each completed room lights one of six lamps in Holiday Hall (like
 
 ### The final area: the merger contract, then Leap Day's party
 
-**Story framing (2026-11-07):** the two-twist panels below are XMAS365™'s
-merger contract (each panel tears up a clause); the board relay is the last
-puzzle at the mascots' party for Leap Day. The notes below are the puzzle
-design history, from when the final area was Tuesday's (the earlier host).
+**Built design (2026-11-08):** once all six rooms are restored and their six
+mascots are free, CEO Santa stands center-stage in Holiday Hall behind a golden
+XMAS365™ podium (`src/game/dioramas/hall.ts`). Tapping him opens the **Master
+Merger Contract** (`src/proto/puzzles/clause.ts` + `src/proto/puzzles/clauses/`),
+a 6-Clause checklist (`C1`–`C6`, one clause per puzzle genre). Tapping any
+clause enters a **29-panel gauntlet** (`174` panels total across all 6 clauses):
+1. **Stage 1 · Base Game (`1` panel):** a clean no-gimmick board.
+2. **Stage 2 · Gimmick Refresher (`6` panels):** 6 trivial boards re-teaching
+   every holiday gimmick for that genre (including twists not met in the main
+   rooms).
+3. **Stage 3 · Solo Gimmick (`6` panels):** 6 nontrivial single-gimmick boards.
+4. **Stage 4 · Two-Gimmick Combos (`15` panels):** all $\binom{6}{2} = 15$
+   two-gimmick pairings as medium-sized quirk tests.
+5. **Stage 5 · All-6 Boss (`1` panel):** 1 compact board combining all 6
+   holiday gimmicks at once.
 
+Voiding all 6 clauses triggers the Sec 6.2 loophole (`C6.torn`: *"Fiscal Year
+is strictly defined as 365 days"*), transforming Holiday Hall into **Leap Day's
+Surprise Party** (`Y1` → `Y2` → `Y4` → `Y5` → `Y6` victory & credits modal →
+`Y7` post-merger memo & Free Play).
 
-With all six lamps lit, Tuesday's door opens on a run of six panels, **one per
-puzzle genre, each with two holiday twists it hasn't had in its own room or
-as a stray** (each twist appears exactly twice). Not mashing two puzzles
-together: one familiar puzzle, two familiar twists, newly combined. A last
-grand finale may still mash genres (to design after these are played).
+*(Design history below from earlier iterations when the finale was six or twelve
+two-twist panels under the working name `tuesday`):*
 
 | Panel | Base puzzle | Twist 1 | Twist 2 |
 |---|---|---|---|

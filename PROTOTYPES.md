@@ -52,7 +52,7 @@ Prototypes are deliberately unthemed: they test whether each puzzle is fun.
 | Christmas | Golden Egg (`goldenegg`) | stray | **Built:** 3 panels on egg-shaped boards, Easter's numbered eggs (reach the egg in exactly its number of steps). Panel 3's eggs are far up (14, 15): playtest. |
 | Christmas | Pumpkin Pie (`pumpkinpie`) | stray | **Built, reworked once:** one serving per slice (no wires between slices; each slice gets exactly one wire from the middle), on pies of 2, 4, 6 slices. Was "same number of wires into every slice": far too hard. Needs playing. |
 | Christmas | Christmas Tree (`tree`) | centrepiece | **Built, reworked once:** colours only make Net easier, so it now ramps: a little plain tree, red and green strings (each from its own plug), a taller one, then white lights (either string) on a wreath and the big tree (~40% white). Needs playing. |
-| Finale | The merger contract (`tuesday`) | final | **Built:** six two-twist panels, one per genre, each twist appearing twice (still named for Tuesday in the code; to become XMAS365™'s merger contract, then Leap Day's party with the cake relay, not built yet). Needs playing. |
+| Finale | The merger contract (`clause`) | final | **Built:** 6 Clauses × 29 panels = 174 panels (`src/proto/puzzles/clause.ts` + `src/proto/puzzles/clauses/`): each clause covers one genre through 1 base panel, 6 trivial gimmick refreshers, 6 solo gimmick panels, all 15 two-gimmick combos, and 1 all-6 boss panel, followed by Leap Day's 3D surprise party in Holiday Hall. |
 
 Pattern from playtesting: a first version often makes a good **learning level**
 before a real one; puzzles now ramp over 2–4 levels.
@@ -125,15 +125,14 @@ How it's built, for the other rooms to follow:
   `src/proto/puzzles/fourth.ts`. Pictures hand-drawn, nudged a few squares by
   a search until line logic alone solves them. Round one's Cupid's Bow, Witch's
   Parade and Grand Finale are in git history at 202ad1c.
-- Tuesday: twists added to each engine (hashi eggs/flags, shikaku coded and
-  dark sizes, net dark pieces/flags, strands colours/portions, picture eggs
-  and portions with a full-search uniqueness check), and a new two-bunny
-  engine `src/proto/twohops.ts` (checked against brute force) with its board.
-  `src/proto/puzzles/tuesday.ts` holds the twelve panels in one mixed run (pairs: X, then X_2); round
-  one's Tuesday is in git history at 202ad1c. Strands has a whole-grid
-  solver (`tilings`) for checking twists; pictures list their answers once
-  (`pictures`). Searches list every plain answer once, then test twists
-  against that list in memory, with a deadline and step budgets.
+- Finale (`clause`): `src/proto/puzzles/clause.ts` and `src/proto/puzzles/clauses/`
+  hold CEO Santa's 6-Clause Merger Contract (6 clauses × 29 panels = 174 verified
+  panels across `webs.ts`, `carving.ts`, `lights.ts`, `words.ts`, `hops.ts`, and
+  `pictures.ts`). Each clause runs through 1 base panel, 6 trivial gimmick
+  intros, 6 solo-gimmick boards, all 15 two-gimmick combinations, and 1 all-6
+  boss board. Voiding all 6 clauses triggers the 3D Surprise Party in Holiday
+  Hall (`src/game/dioramas/hall.ts`). Round one's Tuesday is in git history at
+  202ad1c.
 - Panels were found by searching generated webs for one answer, plus the
   property each teaches (the rule must matter: relax it and there are more
   answers). Big diagonal webs are rarely unique (~1 in 100); search for a

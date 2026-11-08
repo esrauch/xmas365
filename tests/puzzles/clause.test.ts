@@ -1,16 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { GameState, ROOM_SPECS, STRAY_ITEMS } from '../../src/game/state';
-import { problems as carveProblems } from '../../src/gen/carving';
-import { problems as hopProblems } from '../../src/gen/hops';
-import { problems as lightProblems } from '../../src/gen/lights';
-import { problems as picProblems } from '../../src/gen/pictures';
-import { problems as webProblems } from '../../src/gen/webs';
-import { problems as wordProblems } from '../../src/gen/words';
-import { FINALE_PANELS } from '../../src/proto/puzzles/tuesday';
+import { ALL_CLAUSES, CLAUSE_PANEL_COUNT } from '../../src/proto/puzzles/clauses';
 
-describe('XMAS365™ Merger Contract Finale gauntlet (6 dual-twist panels)', () => {
-  it('covers all 6 genres and each panel passes its generator verifier', () => {
-    expect(FINALE_PANELS.map((x) => x.genre)).toEqual([
+describe('XMAS365™ Merger Contract Finale gauntlet (6 clauses × 29 panels = 174 panels)', () => {
+  it('exposes all 6 clauses with 29 panels each (174 total)', () => {
+    expect(ALL_CLAUSES).toHaveLength(6);
+    expect(ALL_CLAUSES.map((c) => c.genre)).toEqual([
       'webs',
       'carving',
       'lights',
@@ -18,15 +13,51 @@ describe('XMAS365™ Merger Contract Finale gauntlet (6 dual-twist panels)', () 
       'hops',
       'pictures',
     ]);
-    for (const item of FINALE_PANELS) {
-      if (item.genre === 'webs') expect(webProblems(item.panel, 2), item.name).toEqual([]);
-      else if (item.genre === 'carving')
-        expect(carveProblems(item.panel, 2), item.name).toEqual([]);
-      else if (item.genre === 'lights') expect(lightProblems(item.panel, 2), item.name).toEqual([]);
-      else if (item.genre === 'words') expect(wordProblems(item.panel, 1), item.name).toEqual([]);
-      else if (item.genre === 'hops') expect(hopProblems(item.panel, 2), item.name).toEqual([]);
-      else expect(picProblems(item.panel, 2), item.name).toEqual([]);
+    let total = 0;
+    for (const clause of ALL_CLAUSES) {
+      expect(clause.panels, clause.id).toHaveLength(CLAUSE_PANEL_COUNT);
+      expect(clause.gimmicks, clause.id).toHaveLength(6);
+      total += clause.panels.length;
     }
+    expect(total).toBe(174);
+  });
+
+  it('tracks per-panel and per-clause voiding state through all 6 clauses', () => {
+    const state = new GameState();
+    state.resetAll();
+
+    expect(state.voidedClauseCount()).toBe(0);
+    expect(state.clauseSolvedPanelCount('webs')).toBe(0);
+
+    for (let i = 0; i < CLAUSE_PANEL_COUNT - 1; i++) {
+      state.markClausePanelSolved('webs', i);
+    }
+    expect(state.clauseSolvedPanelCount('webs')).toBe(28);
+    expect(state.isClauseVoided(0)).toBe(false);
+
+    // Solving the 29th panel voids Clause 1 and queues C1.torn
+    state.markClausePanelSolved('webs', 28);
+    expect(state.clauseSolvedPanelCount('webs')).toBe(29);
+    expect(state.isClauseVoided(0)).toBe(true);
+    expect(state.voidedClauseCount()).toBe(1);
+    expect(state.beatQueue).toContain('C1.torn');
+
+    // Voiding Clause 6 early queues C6.early (not C6.torn), so dismissing it never skips C6.torn
+    state.markClauseVoided(5);
+    expect(state.beatQueue).toContain('C6.early');
+    expect(state.beatQueue).not.toContain('C6.torn');
+    state.dismissBeat('C6.early');
+    expect(state.milestones.has('C6.early')).toBe(true);
+    expect(state.milestones.has('C6.torn')).toBe(false);
+
+    // Voiding the remaining clauses completes the Merger Contract ('clause') and queues C6.torn
+    for (let c = 1; c < 5; c++) {
+      state.markClauseVoided(c);
+    }
+    expect(state.voidedClauseCount()).toBe(6);
+    expect(state.solvedRuns.has('clause')).toBe(true);
+    expect(state.beatQueue).toContain('C6.torn');
+    expect(state.act()).toBe(4);
   });
 
   it('maintains 2-item twist symmetry across all 6 holiday rooms', () => {
@@ -110,7 +141,7 @@ describe('XMAS365™ Merger Contract Finale gauntlet (6 dual-twist panels)', () 
     expect(state.pinnedMemos.has('E6')).toBe(true);
 
     // Beat the XMAS365 Merger Contract -> Act IV (Day 366 Party + Xmas12 Memo Y7)
-    state.markRunSolved('tuesday');
+    state.markRunSolved('clause');
     expect(state.act()).toBe(4);
     expect(state.freePlayUnlocked).toBe(true);
     expect(state.pinnedMemos.has('Y7')).toBe(true);

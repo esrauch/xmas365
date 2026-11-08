@@ -119,8 +119,10 @@ Mirroring everything just halves the puzzle (solve one side, copy it).
 Rows are puzzles, columns are twists. **Bold** marks the puzzle's own
 holiday's twist, at home (the centrepiece). ✅ a built room run (all still
 need playing); ⚙️ in the generator (any tier, any mix of twists). Santa's
-merger contract (`src/proto/puzzles/tuesday.ts`) adds six two-twist panels,
-one per genre, each twist appearing twice.
+merger contract (`src/proto/puzzles/clause.ts` + `src/proto/puzzles/clauses/`)
+puts every cell of this matrix to work across 6 Clauses × 29 panels = 174 panels
+(1 base + 6 gimmick intros + 6 solo gimmicks + all 15 two-gimmick combos + 1
+all-6 boss panel per genre).
 
 | Puzzle ↓ / Twist → | Love Letters (Val.) | Snowflakes (Xmas) | Spooky (Hall.) | Egg Hunt (Easter) | Red, White & Blue (4th) | Portions (Thanks.) |
 |---|---|---|---|---|---|---|
@@ -287,10 +289,13 @@ All six columns are in the generator (⚙️), generating across easy, medium, a
 
 ## The final area: the merger contract, then the party
 
-XMAS365™'s merger contract is six two-twist panels, one per genre, each twist
-appearing twice (`src/proto/puzzles/tuesday.ts`, still named for the earlier
-host). After it, the last puzzle is a board relay on one board, building
-Leap Day's party cake (outline in `GAME.md`), not built yet.
+XMAS365™'s merger contract (`src/proto/puzzles/clause.ts` +
+`src/proto/puzzles/clauses/`) is a 6-Clause checklist in Holiday Hall, one
+clause per puzzle genre (`webs`, `carving`, `lights`, `words`, `hops`,
+`pictures`). Each clause is a 29-panel gauntlet (`1 base + 6 gimmick intros +
+6 solo gimmicks + 15 two-gimmick combos + 1 all-6 boss panel` = 174 panels
+total). Voiding all six clauses triggers the Sec 6.2 Leap Year loophole and
+opens Leap Day's surprise party in Holiday Hall (`src/game/dioramas/hall.ts`).
 
 ## Status (2026-11-07)
 

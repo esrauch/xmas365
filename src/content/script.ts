@@ -284,7 +284,7 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
     to: 'All Staff',
     from: 'S. Claus, CEO',
     re: 'Mandatory Signing Mixer @ Hall',
-    body: 'The binding Master Merger Contract is on the podium in Holiday Hall, awaiting my executive autograph. Once signed, all six holidays snap back under XMAS365™ ownership forever! Hold tight while I locate my platinum fountain pen. Lukewarm eggnog will be served. Fun is compulsory!',
+    body: 'All six verticals have churned?! Fine—if you want a hostile takeover done right, do it yourself! I am standing in Holiday Hall right now with the binding Master Merger Contract on my clipboard and my platinum fountain pen in hand. Once I initial all six clauses, every holiday snaps back under XMAS365™ ownership forever!',
     signoff: 'S. Claus, CEO',
   },
   Y7: {
@@ -327,6 +327,12 @@ export type DialogueBeatId =
   | 'halloween.bonus.offer'
   | 'halloween.bonus.reward'
   | 'C0'
+  | 'C1.torn'
+  | 'C2.torn'
+  | 'C3.torn'
+  | 'C4.torn'
+  | 'C5.torn'
+  | 'C6.early'
   | 'C6.torn'
   | 'Y1'
   | 'Y2'
@@ -637,8 +643,108 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
     },
     lines: [
       {
+        speaker: 'santa',
+        stage: 'standing center-stage, waving a platinum fountain pen',
+        text: 'Aha! Caught you red-handed, you rogue intern! Who on earth are *you*?!',
+      },
+      {
         speaker: 'leapday',
-        text: "Six ironclad clauses, zero signatures. Let's red-line this thing.",
+        text: "Leap Day. February 29th. And before you sign that Master Merger Contract, I'm auditing every clause.",
+      },
+      {
+        speaker: 'santa',
+        stage: 'shoving the golden clipboard forward',
+        text: 'February twenty-*what*?! Audit away, frog—six ironclad clauses, zero loopholes!',
+      },
+    ],
+  },
+  'C1.torn': {
+    id: 'C1.torn',
+    kind: 'dialogue',
+    lines: [
+      {
+        speaker: 'leapday',
+        text: 'Clause 1: Halloween Vertical — red-lined and voided! Keep your tinsel off the cobwebs.',
+      },
+      {
+        speaker: 'santa',
+        stage: 'clutching his clipboard',
+        text: 'Hey! Do not initial my margins in red ink! That Halloween vertical was Q4 accretive!',
+      },
+    ],
+  },
+  'C2.torn': {
+    id: 'C2.torn',
+    kind: 'dialogue',
+    lines: [
+      {
+        speaker: 'leapday',
+        text: 'Clause 2: Thanksgiving Vertical — carved right out of the merger. Gratitude needs no gift receipt.',
+      },
+      {
+        speaker: 'santa',
+        stage: 'sputtering into his beard',
+        text: 'My November runway! Give me back that red pen this instant!',
+      },
+    ],
+  },
+  'C3.torn': {
+    id: 'C3.torn',
+    kind: 'dialogue',
+    lines: [
+      {
+        speaker: 'leapday',
+        text: 'Clause 3: Core Flagship — rewired! December 25th stays on December 25th.',
+      },
+      {
+        speaker: 'santa',
+        stage: 'tugging at his green tie',
+        text: 'You unplugged my 365-day rollout! Do you have any idea what sleigh overtime costs?!',
+      },
+    ],
+  },
+  'C4.torn': {
+    id: 'C4.torn',
+    kind: 'dialogue',
+    lines: [
+      {
+        speaker: 'leapday',
+        text: "Clause 4: Valentine's Vertical — un-merged from CRM. Love letters aren't drip campaigns.",
+      },
+      {
+        speaker: 'santa',
+        stage: 'checking his falling stock ticker',
+        text: 'Our Q1 engagement metrics! Shredded! Have you no respect for corporate synergy?!',
+      },
+    ],
+  },
+  'C5.torn': {
+    id: 'C5.torn',
+    kind: 'dialogue',
+    lines: [
+      {
+        speaker: 'leapday',
+        text: 'Clause 5: Easter Vertical — hopped right off the balance sheet. Bunnies report to no sleigh.',
+      },
+      {
+        speaker: 'santa',
+        stage: 'shielding the remaining pages',
+        text: 'That was our entire spring pre-order pipeline! Stop tearing the parchment!',
+      },
+    ],
+  },
+  'C6.early': {
+    id: 'C6.early',
+    kind: 'dialogue',
+    lines: [
+      {
+        speaker: 'leapday',
+        text: 'Clause 6: July 4th & Definitions — red-lined. Wait... "Fiscal Year is strictly defined as 365 days"? Hold that thought.',
+      },
+      {
+        speaker: 'santa',
+        stage: 'trying to cover Sec 6.2 with his thumb',
+        text: 'Stop reading Sec 6.2! Nobody is supposed to read the fine print!',
       },
     ],
   },
@@ -648,21 +754,21 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
     lines: [
       {
         speaker: 'leapday',
-        text: '"Strictly defined as 365 days." Hate to break it to you, Nick, it\'s a Leap Year.',
+        text: 'All six clauses voided. And look at Sec 6.2: "Fiscal Year is strictly defined as 365 days." Hate to break it to you, Nick—it\'s a Leap Year.',
       },
       {
         speaker: 'santa',
-        stage: 'bursting in, waving a platinum pen',
-        text: 'Out of the way, I have a monopoly to sign! / Wait. My contract is in shreds! Who on earth are *you*?!',
+        stage: 'staring at the shredded contract, dropping his platinum pen',
+        text: 'Wait. Strictly 365?! Did Legal forget to budget for a 366th day?!',
       },
       {
         speaker: 'leapday',
-        text: "Leap Day. February 29th. The quadrennial edge-case you didn't budget for.",
+        text: 'The quadrennial edge-case you deleted from the spreadsheet. Your entire merger is null and void.',
       },
       {
         speaker: 'santa',
         stage: 'adjusts his green tie, checks his pocket diary',
-        text: "February twenty-*what*? Did Legal sign off on a twenty-ninth?! / ...Oh, tinsel. You're real.",
+        text: "February 29th... Oh, tinsel. You're real. And my monopoly is cooked.",
       },
     ],
   },
@@ -702,7 +808,7 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
     lines: [
       {
         speaker: 'santa',
-        stage: 'at the door in his rumpled suit, holding birthday candles',
+        stage: 'in his rumpled suit, swapping his clipboard for birthday candles',
         text: 'I... liquidated my calendar monopoly. Brought candles instead. / Room for one more stakeholder?',
       },
       {
@@ -933,6 +1039,16 @@ export const CAKE_RELAY_LINES: readonly {
       text: 'And the finishing touch, darling: spin festive bunting between every candle!',
     },
   },
+] as const;
+
+/** Dialogue beats queued when a Merger Contract clause (`0..5`) is voided before the final clause. */
+export const CLAUSE_EARLY_TORN_BEATS: readonly DialogueBeatId[] = [
+  'C1.torn',
+  'C2.torn',
+  'C3.torn',
+  'C4.torn',
+  'C5.torn',
+  'C6.early',
 ] as const;
 
 /** Interpolate `{holiday}` placeholders in memo fields. */

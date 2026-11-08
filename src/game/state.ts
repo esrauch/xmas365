@@ -4,6 +4,7 @@
  */
 import {
   type BeatId,
+  CLAUSE_EARLY_TORN_BEATS,
   MEMOS,
   MEMO_ORDER,
   type MemoId,
@@ -16,7 +17,12 @@ import { cornucopia, eggtree, flag, hutch } from '../proto/puzzles/easter';
 import { bow, broom, finale, sparklers } from '../proto/puzzles/fourth';
 import { chocolates, cobwebs, starlights, web } from '../proto/puzzles/halloween';
 import { breadboard, feast, hotdog, stocking } from '../proto/puzzles/thanksgiving';
-import { tuesday } from '../proto/puzzles/tuesday';
+import { clause } from '../proto/puzzles/clause';
+import {
+  CLAUSE_GENRES,
+  CLAUSE_PANEL_COUNT,
+  type ClauseGenre,
+} from '../proto/puzzles/clauses/types';
 import { basket, jack, lovenotes, mailbox } from '../proto/puzzles/valentines';
 
 export type RoomId =
@@ -318,7 +324,7 @@ export const ROOM_SPECS: readonly [RoomSpec, RoomSpec, RoomSpec, RoomSpec, RoomS
   },
 ];
 
-export const FINALE_PROTO = tuesday;
+export const FINALE_PROTO = clause;
 
 const SOLVED_RUNS_KEY = 'puzz.proto.solved';
 const PLACED_ITEMS_KEY = 'puzz.meta.placed';
@@ -346,6 +352,7 @@ function writeSet(key: string, set: Set<string>): void {
 
 export class GameState {
   readonly solvedRuns = readSet(SOLVED_RUNS_KEY);
+  readonly solvedPanels = readSet('puzz.proto.panels');
   readonly placedItems = readSet(PLACED_ITEMS_KEY);
   readonly milestones = readSet(MILESTONES_KEY);
   readonly pinnedMemos = readSet(PINNED_MEMOS_KEY) as Set<MemoId>;
@@ -374,7 +381,6 @@ export class GameState {
     }
 
     // Backfill solvedRuns from per-panel progress if a run's final panel was already beaten
-    const solvedPanels = readSet('puzz.proto.panels');
     for (const room of ROOM_SPECS) {
       for (const proto of [
         room.warmup,
@@ -382,12 +388,12 @@ export class GameState {
         room.strays[1].proto,
         room.centerpiece.proto,
       ]) {
-        if ([...solvedPanels].some((k) => k.startsWith(`${proto.id}:`))) {
+        if ([...this.solvedPanels].some((k) => k.startsWith(`${proto.id}:`))) {
           // Check if the highest-indexed panel is solved
           const minLast =
             proto.kind === 'stray' || proto.id === 'mailbox' ? 2 : proto.id === 'lovenotes' ? 3 : 4;
           for (let i = minLast; i <= 8; i++) {
-            if (solvedPanels.has(`${proto.id}:${i}`)) {
+            if (this.solvedPanels.has(`${proto.id}:${i}`)) {
               this.solvedRuns.add(proto.id);
             }
           }
@@ -532,7 +538,7 @@ export class GameState {
       }
 
       // 4. Merger contract solved -> loophole & Santa confrontation (`C6.torn`), party (`Y1`, `Y2`, `Y4`), and `Y7` memo
-      if (protoId === 'tuesday') {
+      if (protoId === 'clause') {
         this.setFreePlay(true);
         this.enqueueBeat('C6.torn');
         this.enqueueBeat('Y1');
@@ -547,21 +553,115 @@ export class GameState {
 
   setRunSolved(protoId: string, solved: boolean): void {
     if (solved) {
+      if (protoId === 'clause') {
+        for (let i = 0; i < CLAUSE_GENRES.length; i++) {
+          this.solvedPanels.add(`clause:${i}`);
+        }
+        writeSet('puzz.proto.panels', this.solvedPanels);
+      }
       this.markRunSolved(protoId);
       return;
     }
     const hadRun = this.solvedRuns.delete(protoId);
     writeSet(SOLVED_RUNS_KEY, this.solvedRuns);
-    const panels = readSet('puzz.proto.panels');
     let panelChanged = false;
-    for (const k of [...panels]) {
+    for (const k of [...this.solvedPanels]) {
       if (k.startsWith(`${protoId}:`)) {
-        panels.delete(k);
+        this.solvedPanels.delete(k);
         panelChanged = true;
       }
     }
-    if (panelChanged) writeSet('puzz.proto.panels', panels);
+    if (panelChanged) writeSet('puzz.proto.panels', this.solvedPanels);
     if (hadRun || panelChanged) this.notify();
+  }
+
+  /** Whether a specific panel (`0..28`) within a Merger Contract clause has been solved. */
+  isClausePanelSolved(genre: ClauseGenre | string, panelIdx: number): boolean {
+    if (this.solvedRuns.has('clause')) return true;
+    const clauseIdx = CLAUSE_GENRES.indexOf(genre as ClauseGenre);
+    if (clauseIdx !== -1 && this.solvedPanels.has(`clause:${clauseIdx}`)) return true;
+    return this.solvedPanels.has(`clause:${genre}:${panelIdx}`);
+  }
+
+  /** Number of solved panels (`0..29`) within a Merger Contract clause. */
+  clauseSolvedPanelCount(genre: ClauseGenre | string): number {
+    if (this.solvedRuns.has('clause')) return CLAUSE_PANEL_COUNT;
+    const clauseIdx = CLAUSE_GENRES.indexOf(genre as ClauseGenre);
+    if (clauseIdx !== -1 && this.solvedPanels.has(`clause:${clauseIdx}`)) return CLAUSE_PANEL_COUNT;
+    let count = 0;
+    for (let i = 0; i < CLAUSE_PANEL_COUNT; i++) {
+      if (this.solvedPanels.has(`clause:${genre}:${i}`)) count++;
+    }
+    return count;
+  }
+
+  /**
+   * Mark a specific panel (`0..28`) in a Merger Contract clause as solved.
+   * Automatically voids the clause if all 29 panels in that clause are now solved.
+   */
+  markClausePanelSolved(genre: ClauseGenre | string, panelIdx: number): boolean {
+    const key = `clause:${genre}:${panelIdx}`;
+    const isNew = !this.solvedPanels.has(key);
+    if (isNew) {
+      this.solvedPanels.add(key);
+      writeSet('puzz.proto.panels', this.solvedPanels);
+    }
+    const clauseIdx = CLAUSE_GENRES.indexOf(genre as ClauseGenre);
+    if (clauseIdx !== -1 && this.clauseSolvedPanelCount(genre) >= CLAUSE_PANEL_COUNT) {
+      this.markClauseVoided(clauseIdx);
+    } else if (isNew) {
+      this.notify();
+    }
+    return isNew;
+  }
+
+  /** Whether a Merger Contract clause (`0..5`) has been completely voided. */
+  isClauseVoided(clauseIdx: number): boolean {
+    if (this.solvedRuns.has('clause')) return true;
+    if (this.solvedPanels.has(`clause:${clauseIdx}`)) return true;
+    const genre = CLAUSE_GENRES[clauseIdx];
+    return genre ? this.clauseSolvedPanelCount(genre) >= CLAUSE_PANEL_COUNT : false;
+  }
+
+  /** Count of voided Merger Contract clauses (`0..6`). */
+  voidedClauseCount(): number {
+    let count = 0;
+    for (let i = 0; i < CLAUSE_GENRES.length; i++) {
+      if (this.isClauseVoided(i)) count++;
+    }
+    return count;
+  }
+
+  /**
+   * Mark a Merger Contract clause (`0..5`) as voided, queuing its `C<n>.torn` beat,
+   * and completing `'clause'` once all 6 clauses are voided.
+   */
+  markClauseVoided(clauseIdx: number): boolean {
+    const key = `clause:${clauseIdx}`;
+    const wasVoided = this.solvedPanels.has(key) || this.solvedRuns.has('clause');
+    if (!this.solvedPanels.has(key)) {
+      this.solvedPanels.add(key);
+      const genre = CLAUSE_GENRES[clauseIdx];
+      if (genre) {
+        for (let i = 0; i < CLAUSE_PANEL_COUNT; i++) {
+          this.solvedPanels.add(`clause:${genre}:${i}`);
+        }
+      }
+      writeSet('puzz.proto.panels', this.solvedPanels);
+    }
+    if (!wasVoided) {
+      const allVoided = this.voidedClauseCount() >= CLAUSE_GENRES.length;
+      if (allVoided) {
+        this.markRunSolved('clause');
+      } else {
+        const earlyBeat = CLAUSE_EARLY_TORN_BEATS[clauseIdx];
+        if (earlyBeat) {
+          this.enqueueBeat(earlyBeat);
+        }
+        this.notify();
+      }
+    }
+    return !wasVoided;
   }
 
   placeItem(itemId: string): void {
@@ -594,6 +694,7 @@ export class GameState {
 
   resetAll(): void {
     this.solvedRuns.clear();
+    this.solvedPanels.clear();
     this.placedItems.clear();
     this.milestones.clear();
     this.pinnedMemos.clear();
@@ -724,7 +825,7 @@ export class GameState {
    * - Act 4: Leap Day's Party & Xmas12 (Merger Contract beaten)
    */
   act(): 1 | 2 | 3 | 4 {
-    if (this.solvedRuns.has('tuesday')) return 4;
+    if (this.solvedRuns.has('clause')) return 4;
     const lamps = this.completedRoomCount();
     if (lamps >= 6) return 3;
     if (lamps >= 1) return 2;
@@ -765,8 +866,8 @@ const COMPACT_RULE_PILLS: Record<string, string> = {
   bow: '💌 Same letter = same run length',
   broom: '🎃 ? = run of any non-zero length',
   finale: '🎆 Same-color runs need a gap; different colors can touch',
-  // Tuesday Finale
-  tuesday: '🎉 Two holiday twists combined on each board',
+  // Merger Contract Finale
+  clause: '🎉 Void all 6 clauses of Santa’s Merger Contract',
 };
 
 /** Return a concise 4–8 word micro-tip pill for a puzzle run. */

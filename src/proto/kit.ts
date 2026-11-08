@@ -8,7 +8,7 @@
 export interface Proto {
   id: string;
   title: string;
-  /** The holiday room it's in (or "Tuesday" for the final puzzle). */
+  /** The holiday room it's in (or "Holiday Hall" for the final puzzle). */
   room: string;
   kind: 'warm-up' | 'stray' | 'centerpiece' | 'final' | 'workshop';
   /** The puzzle it grows from, and the twist. */

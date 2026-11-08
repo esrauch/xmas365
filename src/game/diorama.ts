@@ -43,7 +43,7 @@ export {
 
 /**
  * Build the complete 7-bay Holiday Hall rotunda.
- * Bay 0 ('hall') holds the 6-Lamp Grand Door (Tuesday Finale), the Host/Villain,
+ * Bay 0 ('hall') holds the Merger Contract (`clause`), the Host/Villain,
  * and the Calendar Desk. Bays 1..6 hold the 6 Holiday Alcoves.
  *
  * All 7 bay scene graphs are built once at initialization and never recreated or disposed;

@@ -35,7 +35,7 @@ const ROOMS = [
   'Halloween',
   'Thanksgiving',
   'Christmas',
-  'Tuesday',
+  'Holiday Hall',
   'Workshop',
 ];
 

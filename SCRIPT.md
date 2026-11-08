@@ -372,21 +372,22 @@ you're in the hall.
 > *S. Claus, CEO*
 
 #### `E6`: all six mascots free
-*All six lamps lit. The contract's door opens in the hall.*
+*All six lamps lit. CEO Santa takes center stage in Holiday Hall holding the Master Merger Contract.*
 
 > **To:** All Staff · **Re:** Mandatory Signing Mixer @ Hall
 >
-> The binding Master Merger Contract is on the podium in Holiday Hall,
-> awaiting my executive autograph. Once signed, all six holidays snap back
-> under XMAS365™ ownership forever! Hold tight while I locate my platinum
-> fountain pen. Lukewarm eggnog will be served. Fun is compulsory!
+> All six verticals have churned?! Fine—if you want a hostile takeover done
+> right, do it yourself! I am standing in Holiday Hall right now with the
+> binding Master Merger Contract on my clipboard and my platinum fountain pen
+> in hand. Once I initial all six clauses, every holiday snaps back under
+> XMAS365™ ownership forever!
 >
 > *S. Claus, CEO*
 
 ## Act 3: the merger contract
 
-### `C0`: the cover page
-*Entering the contract. A sign, as a document.*
+### `C0`: confronting CEO Santa & the cover page
+*Tapping CEO Santa in Holiday Hall opens the contract checklist. A sign, as a document.*
 
 > **MASTER MERGER & SUBSUMPTION AGREEMENT**
 > between **XMAS365™ Inc.** ("The Big Guy") and **All Other Holidays**
@@ -394,12 +395,17 @@ you're in the hall.
 > **Term:** All 365 calendar days of the Fiscal Year, in perpetuity.
 > **Executive Signature:** ____________
 
-**Leap Day:** "Six ironclad clauses, zero signatures. Let's red-line this
-thing."
+**Santa** *(standing center-stage, waving a platinum fountain pen)*: "Aha!
+Caught you red-handed, you rogue intern! Who on earth are *you*?!"
+
+**Leap Day:** "Leap Day. February 29th. And before you sign that Master Merger
+Contract, I'm auditing every clause."
+
+**Santa** *(shoving the golden clipboard forward)*: "February twenty-*what*?!
+Audit away, frog—six ironclad clauses, zero loopholes!"
 
 ### `C1`..`C6`: the clauses
-*Each clause is the heading of its panel. Solving the panel tears it up,
-with no text.*
+*Each clause is a 29-panel gauntlet of its puzzle genre. Voiding a clause triggers its `C1.torn`..`C5.torn` (or `C6.early`) exchange with Santa right across the podium.*
 
 | ID | Panel | Clause |
 |---|---|---|
@@ -410,21 +416,39 @@ with no text.*
 | `C5` | Hops | **Clause 5: Easter Vertical.** Spring is restructured into Q2 Pre-Order Season. All bunnies report to Sleigh Ops. |
 | `C6` | Pictures | **Clause 6: July 4th & Definitions.** July 4th is Christmas in July. *Sec 6.2: "Fiscal Year" is strictly defined as 365 days.* |
 
+- **`C1.torn`:**
+  - **Leap Day:** "Clause 1: Halloween Vertical — red-lined and voided! Keep your tinsel off the cobwebs."
+  - **Santa** *(clutching his clipboard)*: "Hey! Do not initial my margins in red ink! That Halloween vertical was Q4 accretive!"
+- **`C2.torn`:**
+  - **Leap Day:** "Clause 2: Thanksgiving Vertical — carved right out of the merger. Gratitude needs no gift receipt."
+  - **Santa** *(sputtering into his beard)*: "My November runway! Give me back that red pen this instant!"
+- **`C3.torn`:**
+  - **Leap Day:** "Clause 3: Core Flagship — rewired! December 25th stays on December 25th."
+  - **Santa** *(tugging at his green tie)*: "You unplugged my 365-day rollout! Do you have any idea what sleigh overtime costs?!"
+- **`C4.torn`:**
+  - **Leap Day:** "Clause 4: Valentine's Vertical — un-merged from CRM. Love letters aren't drip campaigns."
+  - **Santa** *(checking his falling stock ticker)*: "Our Q1 engagement metrics! Shredded! Have you no respect for corporate synergy?!"
+- **`C5.torn`:**
+  - **Leap Day:** "Clause 5: Easter Vertical — hopped right off the balance sheet. Bunnies report to no sleigh."
+  - **Santa** *(shielding the remaining pages)*: "That was our entire spring pre-order pipeline! Stop tearing the parchment!"
+- **`C6.early`** *(if Clause 6 is voided before all 6 clauses are complete)*:
+  - **Leap Day:** "Clause 6: July 4th & Definitions — red-lined. Wait... 'Fiscal Year is strictly defined as 365 days'? Hold that thought."
+  - **Santa** *(trying to cover Sec 6.2 with his thumb)*: "Stop reading Sec 6.2! Nobody is supposed to read the fine print!"
+
 ### `C6.torn`: the loophole
-*The last panel solved.*
+*All six clauses voided.*
 
-**Leap Day:** "'Strictly defined as 365 days.' Hate to break it to you, Nick,
-it's a Leap Year."
+**Leap Day:** "All six clauses voided. And look at Sec 6.2: 'Fiscal Year is
+strictly defined as 365 days.' Hate to break it to you, Nick—it's a Leap Year."
 
-### `C7`..`C9`: Santa arrives
-**Santa** *(bursting in, waving a platinum pen)*: "Out of the way, I have a
-monopoly to sign! / Wait. My contract is in shreds! Who on earth are *you*?!"
+**Santa** *(staring at the shredded contract, dropping his platinum pen)*:
+"Wait. Strictly 365?! Did Legal forget to budget for a 366th day?!"
 
-**Leap Day:** "Leap Day. February 29th. The quadrennial edge-case you didn't
-budget for."
+**Leap Day:** "The quadrennial edge-case you deleted from the spreadsheet. Your
+entire merger is null and void."
 
-**Santa:** "February twenty-*what*? Did Legal sign off on a twenty-ninth?! /
-*(adjusts his green tie, checks his pocket diary)* ...Oh, tinsel. You're real."
+**Santa** *(adjusts his green tie, checks his pocket diary)*: "February 29th...
+Oh, tinsel. You're real. And my monopoly is cooked."
 
 ## Act 4: Leap Day's party
 
@@ -445,10 +469,10 @@ date right at last.*
 - **The Teddy Bear:** "Happy **February 29th**! Not Groundhog Day. We threw
   this whole party just for you!"
 
-### `Y2`: Santa at the door, and the vote
+### `Y2`: Santa at the banquet table, and the vote
 
-**Santa** *(at the door in his rumpled suit, holding birthday candles)*: "I...
-liquidated my calendar monopoly. Brought candles instead. / Room for one
+**Santa** *(in his rumpled suit, swapping his clipboard for birthday candles)*:
+"I... liquidated my calendar monopoly. Brought candles instead. / Room for one
 more stakeholder?"
 
 **The Spider:** "Shall we take a board vote on letting Nick keep a *modest*
