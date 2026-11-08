@@ -9,8 +9,10 @@ import {
   addLetters,
   colourTwoBunnies,
   findDarkUTurn,
+  addSpareEggs,
   minimizeEggs,
   partitionCourses,
+  placeRocks,
   randomRoute,
   randomSnowRoute,
   splitTwoBunnies,
@@ -34,14 +36,53 @@ export interface Shape {
   courses: number;
   letters: number;
   burrows: number;
+  /** Rocks on a plain board (see ROCK_SHIFT for twists). */
+  rocks: number;
   margin: number;
 }
 
 export const SHAPES: Record<Tier, Shape> = {
-  easy: { width: 5, height: 5, courses: 2, letters: 3, burrows: 1, margin: 2 },
-  medium: { width: 7, height: 7, courses: 3, letters: 4, burrows: 1, margin: 3 },
-  hard: { width: 9, height: 9, courses: 4, letters: 5, burrows: 2, margin: 3 },
+  easy: { width: 5, height: 5, courses: 2, letters: 3, burrows: 1, rocks: 1, margin: 2 },
+  medium: { width: 7, height: 7, courses: 3, letters: 4, burrows: 1, rocks: 3, margin: 3 },
+  hard: { width: 9, height: 9, courses: 4, letters: 5, burrows: 2, rocks: 5, margin: 3 },
 };
+
+/**
+ * Rocks added (or taken away) per twist, per tier, to keep a twist's board about as hard as a
+ * plain one: twists that make the route harder to find (burrows, the dark) get more rocks (a
+ * smaller lawn), and those that make it easier (courses, two bunnies) get fewer. Measured with
+ * solver steps at each tier (see the twist difficulty audit in `revamp-centerpieces.md`).
+ * Snowflakes get no rocks at all (a rock inside the frame would break the mirror).
+ */
+export const ROCK_SHIFT: Record<Tier, Partial<Record<HopTwist, number>>> = {
+  easy: { burrows: 1, dark: 1, courses: -1, colours: -1 },
+  medium: { burrows: 3, dark: 2, courses: -3, colours: -3 },
+  hard: { burrows: 2, dark: 2, courses: -5, colours: -5 },
+};
+
+/**
+ * Spare numbered eggs given back after the minimal set, per twist and tier: the second knob,
+ * for twists still harder than a plain board once rocks have done what they can (the
+ * minimal-egg search otherwise takes back what a smaller lawn gives). Snowflakes rely on it
+ * alone, having no rocks.
+ */
+export const SPARE_EGGS: Record<Tier, Partial<Record<HopTwist, number>>> = {
+  easy: {},
+  medium: { burrows: 1, dark: 1, snow: 2 },
+  hard: { snow: 1, dark: 1 },
+};
+
+/** How many spare eggs a board of this tier and twists gets. */
+export function spareEggCount(tier: Tier, twists: readonly HopTwist[]): number {
+  return twists.reduce((n, t) => n + (SPARE_EGGS[tier][t] ?? 0), 0);
+}
+
+/** How many rocks a board of this tier and twists gets. */
+export function rockCount(tier: Tier, twists: readonly HopTwist[]): number {
+  if (twists.includes('snow')) return 0;
+  const shift = twists.reduce((n, t) => n + (ROCK_SHIFT[tier][t] ?? 0), 0);
+  return Math.max(0, SHAPES[tier].rocks + shift);
+}
 
 function makePanel(spec: Spec<HopTwist>, seed: number, why: Rejections): Made<Panel> | null {
   const shape = SHAPES[spec.tier];
@@ -58,6 +99,17 @@ function makePanel(spec: Spec<HopTwist>, seed: number, why: Rejections): Made<Pa
   const boardW = isTree && shape.width <= 5 ? 7 : shape.width;
   const rows = isTree ? treeRows(boardH, boardW, 0.5) : rect(boardH, boardW);
   const golden: Spot | undefined = isTree ? [0, Math.floor(boardW / 2)] : undefined;
+
+  // Rocks (base game): carved before anything else is placed, so burrows, eggs and the route
+  // all work around them. Tree boards keep their own silhouette and get none.
+  const rocks = isTree
+    ? []
+    : placeRocks(
+        rows,
+        rockCount(spec.tier, spec.twists),
+        random,
+        new Set(golden ? [key(golden)] : []),
+      );
 
   // Burrows: pick underground pairs at distance >= 2 on lawn squares (avoiding the golden egg)
   let burrowsList: [Spot, Spot][] | undefined;
@@ -359,6 +411,7 @@ function makePanel(spec: Spec<HopTwist>, seed: number, why: Rejections): Made<Pa
     name: `Bunny hops ${spec.tier}`,
     rows,
     given: [],
+    ...(rocks.length ? { rocks } : {}),
     ...(portions ? { portions } : {}),
     ...(colours ? { colours } : {}),
     ...(burrowsList?.length ? { burrows: burrowsList } : {}),
@@ -380,6 +433,17 @@ function makePanel(spec: Spec<HopTwist>, seed: number, why: Rejections): Made<Pa
   );
   candidatePanel.given = given;
 
+  // Give back spare eggs for twists that need them, as many as still leave every twist doing
+  // its work (a twist made pointless by too many eggs fails the check below).
+  for (let spare = spareEggCount(spec.tier, spec.twists); spare > 0; spare--) {
+    const withSpare = addSpareEggs(candidatePanel, route, given, spare, noEggSpots, splitIdx);
+    const trial: Panel = { ...candidatePanel, given: withSpare };
+    if (problems(trial, margin, new Budget(200_000)).length === 0) {
+      candidatePanel.given = withSpare;
+      break;
+    }
+  }
+
   const missing = spec.twists.filter((t) => !twistsOf(candidatePanel).includes(t));
   if (missing.length) return why.no(`${missing[0]} missing`);
 
@@ -393,7 +457,7 @@ function makePanel(spec: Spec<HopTwist>, seed: number, why: Rejections): Made<Pa
     panel: candidatePanel,
     seed,
     stats: {
-      eggs: given.length,
+      eggs: candidatePanel.given.length,
       steps: steps.used,
     },
   };

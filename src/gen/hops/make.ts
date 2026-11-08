@@ -67,6 +67,65 @@ export function backbite(
 }
 
 /** A random full route over the board (spot indices in order). Warnsdorff's heuristic + Backbite mutations. */
+/**
+ * Turn `count` lawn squares of `rows` into rocks (in place), avoiding `avoid`. Each rock must
+ * leave the lawn in one piece, and every lawn square with at least two lawn neighbours except
+ * at most two (a route's ends), so a tour can still exist. Returns the rocks placed (maybe fewer
+ * than asked, if the board runs out of safe squares).
+ */
+export function placeRocks(
+  rows: string[],
+  count: number,
+  random: Rng,
+  avoid: ReadonlySet<string> = new Set(),
+): Spot[] {
+  const H = rows.length;
+  const W = rows[0]?.length ?? 0;
+  const lawn = (r: number, c: number): boolean => rows[r]?.[c] === '#';
+  const set = (r: number, c: number, ch: string): void => {
+    const row = rows[r] ?? '';
+    rows[r] = row.slice(0, c) + ch + row.slice(c + 1);
+  };
+  const neighbours = (r: number, c: number): Spot[] =>
+    (
+      [
+        [r - 1, c],
+        [r + 1, c],
+        [r, c - 1],
+        [r, c + 1],
+      ] as Spot[]
+    ).filter(([y, x]) => lawn(y, x));
+  const stillTourable = (): boolean => {
+    const cells: Spot[] = [];
+    for (let r = 0; r < H; r++) for (let c = 0; c < W; c++) if (lawn(r, c)) cells.push([r, c]);
+    if (!cells.length) return false;
+    if (cells.filter(([r, c]) => neighbours(r, c).length < 2).length > 2) return false;
+    const seen = new Set([key(cells[0] as Spot)]);
+    const stack = [cells[0] as Spot];
+    while (stack.length) {
+      const [r, c] = stack.pop() as Spot;
+      for (const n of neighbours(r, c)) {
+        if (!seen.has(key(n))) {
+          seen.add(key(n));
+          stack.push(n);
+        }
+      }
+    }
+    return seen.size === cells.length;
+  };
+  const candidates: Spot[] = [];
+  for (let r = 0; r < H; r++)
+    for (let c = 0; c < W; c++) if (lawn(r, c) && !avoid.has(key([r, c]))) candidates.push([r, c]);
+  const rocks: Spot[] = [];
+  for (const [r, c] of shuffle(random, candidates)) {
+    if (rocks.length >= count) break;
+    set(r, c, '.');
+    if (stillTourable()) rocks.push([r, c]);
+    else set(r, c, '#');
+  }
+  return rocks;
+}
+
 export function randomRoute(b: Board, random: Rng, start?: number): number[] | null {
   const N = b.spots.length;
   for (let attempt = 0; attempt < 250; attempt++) {
@@ -583,6 +642,58 @@ export function addLetters(
  * Thin numbered eggs while keeping a unique solution within a tight step budget,
  * removing eggs in `prioritySpots` first so the active twists do real work.
  */
+/**
+ * Add `count` spare numbered eggs back to a minimal set (`given`), to make a board easier
+ * without changing its answer: each spare goes where it's farthest (in steps along its bunny's
+ * route) from every egg already shown, so hints spread out. Never on letters, shadows, burrows
+ * or `noEggSpots`.
+ */
+export function addSpareEggs(
+  basePanel: Panel,
+  route: number[],
+  given: [number, number, number][],
+  count: number,
+  noEggSpots = new Set<number>(),
+  splitIdx?: number,
+): [number, number, number][] {
+  const b = parse(basePanel);
+  const [red, blue] =
+    splitIdx !== undefined
+      ? [route.slice(0, splitIdx), route.slice(splitIdx)]
+      : splitRoutes(b, route);
+  const letterSpots = new Set([...b.letterAt.keys()]);
+  const shown = new Set(given.map(([r, c]) => key([r, c])));
+  const out = [...given];
+  const pools = [red, blue].map((path) => ({
+    path,
+    steps: path.flatMap((spot, n) => (shown.has(key(b.spots[spot] as Spot)) ? [n] : [])),
+  }));
+  for (let k = 0; k < count; k++) {
+    let best: {
+      score: number;
+      egg: [number, number, number];
+      pool: (typeof pools)[number];
+      n: number;
+    } | null = null;
+    for (const pool of pools) {
+      pool.path.forEach((spot, n) => {
+        const [r, c] = b.spots[spot] as Spot;
+        if (shown.has(key([r, c])) || letterSpots.has(spot) || b.dark[spot] || noEggSpots.has(spot))
+          return;
+        if (basePanel.colours && b.colour[spot] === 'w') return;
+        const score = Math.min(Infinity, ...pool.steps.map((s) => Math.abs(s - n)));
+        if (!best || score > best.score) best = { score, egg: [r, c, n + 1], pool, n };
+      });
+    }
+    if (!best) break;
+    const pick = best as { egg: [number, number, number]; pool: (typeof pools)[number]; n: number };
+    out.push(pick.egg);
+    shown.add(key([pick.egg[0], pick.egg[1]]));
+    pick.pool.steps.push(pick.n);
+  }
+  return out;
+}
+
 export function minimizeEggs(
   basePanel: Panel,
   route: number[],

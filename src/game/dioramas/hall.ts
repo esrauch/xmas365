@@ -769,12 +769,15 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
 
   const cornerFocusPos = bayToWorld(theta, 0.5, 1.9, 4.1);
   const cornerFocusLook = bayToWorld(theta, cornerX, 0.45, cornerZ);
-  const cornerWorldPos = bayToWorld(theta, cornerX, 0.12, cornerZ + 0.3);
+  const cornerWorldPos = bayToWorld(theta, 1.02, 0.06, cornerZ + 0.36);
   let lastChattedCornerIdx = 0;
 
-  // 4. Act 3 Center-Stage Hotspot: CEO Santa Confrontation & XMAS365™ Merger Contract (pre-built once)
+  // 4. Act 3 Left-Stage Hotspot: CEO Santa Confrontation & XMAS365™ Merger Contract (pre-built once)
+  const santaX = -1.12;
+  const santaZ = 1.62;
   const santaConfrontGroup = new THREE.Group();
-  santaConfrontGroup.position.set(0, 0, 1.15);
+  santaConfrontGroup.position.set(santaX, 0, santaZ);
+  santaConfrontGroup.rotation.y = 0.24;
 
   // Invisible raycast hit-box on layer 2 so tapping Santa or the Contract clipboard in 3D opens the Merger Contract
   const santaHitMesh = new THREE.Mesh(
@@ -786,23 +789,23 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
   santaConfrontGroup.add(santaHitMesh);
 
   // Crimson XMAS365™ executive podium & gold-rimmed rug
-  santaConfrontGroup.add(cyl(0.56, 0.6, 0.026, '#d69e2e', 0, 0.013, 0, 24, false));
-  santaConfrontGroup.add(cyl(0.49, 0.53, 0.036, '#9b2c2c', 0, 0.022, 0, 24, false));
-  santaConfrontGroup.add(cyl(0.36, 0.4, 0.075, '#5c3d24', 0, 0.055, 0, 18, false));
-  santaConfrontGroup.add(cyl(0.37, 0.37, 0.022, '#ecc94b', 0, 0.095, 0, 18, false));
+  santaConfrontGroup.add(cyl(0.42, 0.45, 0.026, '#d69e2e', 0, 0.013, 0, 24, false));
+  santaConfrontGroup.add(cyl(0.37, 0.4, 0.036, '#9b2c2c', 0, 0.022, 0, 24, false));
+  santaConfrontGroup.add(cyl(0.28, 0.32, 0.075, '#5c3d24', 0, 0.055, 0, 18, false));
+  santaConfrontGroup.add(cyl(0.29, 0.29, 0.022, '#ecc94b', 0, 0.095, 0, 18, false));
   santaConfrontGroup.add(
-    fxPlane(1.15, 0.95, fxMaterial(radialTexture(), '#feb2b2', 0.38), 0, 0.04, 0, true),
+    fxPlane(0.95, 0.85, fxMaterial(radialTexture(), '#feb2b2', 0.38), 0, 0.04, 0, true),
   );
 
-  // CEO Santa standing center-stage
-  const ceoSantaMesh = buildMascotMesh('santa', 0.72);
-  ceoSantaMesh.position.set(-0.06, 0.095, -0.02);
+  // CEO Santa standing on the left-stage podium
+  const ceoSantaMesh = buildMascotMesh('santa', 0.68);
+  ceoSantaMesh.position.set(-0.04, 0.095, -0.02);
   ceoSantaMesh.rotation.y = 0.08;
   santaConfrontGroup.add(ceoSantaMesh);
 
   // Oversized golden-framed XMAS365™ Merger Contract clipboard with glowing red wax seal
   const contractClipboard = new THREE.Group();
-  contractClipboard.position.set(0.28, 0.48, 0.18);
+  contractClipboard.position.set(0.26, 0.46, 0.16);
   contractClipboard.rotation.set(-0.2, -0.26, -0.08);
   contractClipboard.add(box(0.34, 0.44, 0.028, '#d69e2e', 0, 0, 0, false));
   contractClipboard.add(glowBox(0.28, 0.38, 0.034, '#fffaf0', 0, -0.005, 0.004, 0.65));
@@ -815,11 +818,13 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
   contractClipboard.add(glowSphere(0.042, '#e53e3e', 0.075, -0.125, 0.024, 1.25));
   contractClipboard.add(box(0.022, 0.065, 0.018, '#d69e2e', 0.065, -0.165, 0.018, false));
   santaConfrontGroup.add(contractClipboard);
-  floating.push({ mesh: contractClipboard, phase: 0.4, baseY: 0.48 });
+  floating.push({ mesh: contractClipboard, phase: 0.4, baseY: 0.46 });
 
   santaConfrontGroup.visible = false;
   bay.add(santaConfrontGroup);
-  const santaWorldPos = bayToWorld(theta, 0, 1.04, 1.25);
+  const santaFocusPos = bayToWorld(theta, -0.45, 1.85, 4.0);
+  const santaFocusLook = bayToWorld(theta, santaX, 0.55, santaZ);
+  const santaWorldPos = bayToWorld(theta, -1.02, 0.06, santaZ + 0.34);
 
   // 5. Act 4 Surprise Party & 6-Tier Birthday Cake (`partyGroup`, pre-built once)
   const partyGroup = new THREE.Group();
@@ -1160,7 +1165,7 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
         id: 'hall:mascot-corner',
         bay: 'hall',
         label: `🎉 Freed Mascots (${freedCornerMascots.length}/6)`,
-        sublabel: '💬 Tap a Mascot to Chat',
+        sublabel: '💬 Tap to Chat',
         icon: '🎉',
         status: freedCornerMascots.length >= 6 ? 'done' : 'ready',
         accent: '#d69e2e',
@@ -1184,17 +1189,17 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
         id: 'finale:clause',
         bay: 'hall',
         kind: 'puzzle',
-        label: '🎅 CEO Santa · XMAS365™ Merger Contract',
-        sublabel: `${gameState.voidedClauseCount()}/6 Clauses Voided · Tap to Red-Line!`,
+        label: '🎅 Merger Contract',
+        sublabel: `${gameState.voidedClauseCount()}/6 Voided · Red-Line!`,
         icon: '🎅',
         status: 'ready',
-        hero: true,
+        hero: false,
         accent: '#c53030',
         worldPos: santaWorldPos,
-        cameraPos: doorFocusPos,
-        cameraLook: doorFocusLook,
+        cameraPos: santaFocusPos,
+        cameraLook: santaFocusLook,
         meshGroup: santaConfrontGroup,
-        onClick: () => callbacks.onOpenProto(FINALE_PROTO.id, doorFocusPos, doorFocusLook),
+        onClick: () => callbacks.onOpenProto(FINALE_PROTO.id, santaFocusPos, santaFocusLook),
       });
     } else if (finaleSolved) {
       hotspotsOut.push({

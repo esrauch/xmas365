@@ -2,7 +2,8 @@
  * Bunny hops (Easter): Numbrix (Hidato with plain steps). The Easter Bunny hops
  * to a neighbouring spot (up, down, left or right) and lands on every lawn spot
  * of the board exactly once; some eggs are already numbered with their place in
- * the order.
+ * the order. Rocks (part of the base game) are squares the bunny can't hop onto:
+ * they shrink the lawn, which is the generator's knob for making a board easier.
  *
  * Twists:
  * - courses (Thanksgiving fair shares): the board is outlined in portions, and
@@ -32,6 +33,8 @@ export interface Panel {
   given: [number, number, number][];
   /** Any tour wins (for learning panels). */
   free?: boolean;
+  /** Rocks (base game): squares inside the board the bunny can't hop onto ('.' in `rows`). */
+  rocks?: Spot[];
   /** Courses (Thanksgiving fair shares): a letter per spot, row by row. */
   portions?: string[];
   /** Red, white and blue (Fourth of July): 'r' red, 'b' blue (or legacy 'g'), 'w' white (either). */
