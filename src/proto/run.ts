@@ -1,9 +1,10 @@
 /**
- * A room's run of panels, The Witness's way: a wired strip of small panels,
+ * A room's Run of Puzzles, The Witness's way: a wired strip of small puzzles,
  * each solved one powering up the next and auto-advancing after a short
- * celebration. Includes a compact 1-line twist pill and a '?' controls toggle.
+ * celebration. Includes the Dual Display subtitle, a compact 1-line twist pill,
+ * and a '?' controls toggle.
  */
-import { gameState, getCompactRulePill } from '../game/state';
+import { gameState, getCompactRulePill, getRunIdentity } from '../game/state';
 import { type Proto, h } from './kit';
 
 export interface PanelHooks {
@@ -141,11 +142,32 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
       );
       topRow.append(resetBtn, rightControls);
 
-      // Compact single-line panel title + ultra-short micro-rule pill
+      // Compact puzzle title + Dual Display subtitle + ultra-short micro-rule pill
       const defaultPillText = getCompactRulePill({ ...proto, mount: () => {} });
+      const runIdentity = getRunIdentity(proto.id);
       const title = h('div', {
         style: { fontWeight: '800', fontSize: '14.5px', color: '#1f2430' },
       });
+      const subtitle = runIdentity
+        ? h(
+            'div',
+            {
+              style: {
+                fontSize: '11.5px',
+                fontWeight: '700',
+                color: '#4a5568',
+                lineHeight: '1.25',
+              },
+            },
+            runIdentity.dualLabel,
+          )
+        : null;
+      const titleGroup = h(
+        'div',
+        { style: { display: 'flex', flexDirection: 'column', gap: '2px' } },
+        title,
+        subtitle,
+      );
       const rulePill = h(
         'div',
         {
@@ -174,7 +196,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
             margin: '0 0 8px',
           },
         },
-        title,
+        titleGroup,
         rulePill,
       );
 
@@ -259,7 +281,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
             cursor: 'pointer',
           },
         },
-        'Next panel ▸',
+        'Next puzzle ▸',
       );
       footerRow.append(message, next);
       footer.append(advanceBarTrack, footerRow);
@@ -344,7 +366,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         const panel = panels[i] as P;
         renderStrip(i);
         helpBox.style.display = 'none';
-        title.textContent = `Panel ${i + 1}/${panels.length} · ${panel.name}`;
+        title.textContent = `Puzzle ${i + 1}/${panels.length} · ${panel.name}`;
         rulePill.textContent = panel.tip ?? defaultPillText;
         footer.style.display = 'flex';
         message.className = '';
@@ -405,9 +427,9 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
               message.className = '';
               message.style.color = '#276749';
               message.style.fontSize = '14.5px';
-              message.textContent = text ? `✓ ${text}` : `✓ Panel ${i + 1} solved!`;
+              message.textContent = text ? `✓ ${text}` : `✓ Puzzle ${i + 1} solved!`;
               next.style.visibility = 'visible';
-              ctx.status(`Panel ${i + 1} of ${panels.length} solved`);
+              ctx.status(`Puzzle ${i + 1} of ${panels.length} solved`);
               startAdvanceBar(AUTO_ADVANCE_MS);
               autoAdvanceTimer = window.setTimeout(() => {
                 autoAdvanceTimer = 0;

@@ -4,17 +4,17 @@ import { HOP_TWISTS, parse, problems, solve, twistsOf } from '../../../src/gen/h
 import { CLAUSE_HOPS } from '../../../src/proto/puzzles/clauses/hops';
 import { CLAUSE_PANEL_COUNT, pairCombinations } from '../../../src/proto/puzzles/clauses/types';
 
-describe('Clause V (C5): Easter · Bunny Hops (CLAUSE_HOPS)', () => {
-  it('has valid clause metadata and canonical gimmick order', () => {
+describe('Clause V (C5): Easter · Hops (CLAUSE_HOPS)', () => {
+  it('has valid clause metadata and canonical twist order', () => {
     expect(CLAUSE_HOPS.clauseIndex).toBe(4);
     expect(CLAUSE_HOPS.id).toBe('C5');
     expect(CLAUSE_HOPS.genre).toBe('hops');
-    expect(CLAUSE_HOPS.title).toBe('Clause V: Easter · Bunny Hops');
-    expect(CLAUSE_HOPS.genreTitle).toBe('Bunny Hops');
+    expect(CLAUSE_HOPS.title).toBe('Clause V: Easter · Hops');
+    expect(CLAUSE_HOPS.genreTitle).toBe('Hops');
     expect(CLAUSE_HOPS.icon).toBe('🐰');
     expect(CLAUSE_HOPS.accent).toBe('#ecc94b');
-    expect(CLAUSE_HOPS.gimmickOrder).toEqual(HOP_TWISTS);
-    expect(CLAUSE_HOPS.gimmicks.map((g) => g.key)).toEqual(HOP_TWISTS);
+    expect(CLAUSE_HOPS.twistOrder).toEqual(HOP_TWISTS);
+    expect(CLAUSE_HOPS.twistMeta.map((g) => g.key)).toEqual(HOP_TWISTS);
     expect(CLAUSE_HOPS.panels).toHaveLength(CLAUSE_PANEL_COUNT);
   });
 

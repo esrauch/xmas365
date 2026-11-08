@@ -689,7 +689,7 @@ function renderCarryTray(): void {
     return h(
       'button',
       {
-        title: `Misfiled Asset · Belongs in ${homeLabel}`,
+        title: `Carried Relic · Belongs in ${homeLabel}`,
         style: {
           display: 'inline-flex',
           alignItems: 'center',
@@ -748,7 +748,7 @@ function renderCarryTray(): void {
         pointerEvents: 'auto',
       },
     },
-    h('span', { style: { fontSize: '11px', fontWeight: '800' } }, '🏷️ MISFILED ASSET:'),
+    h('span', { style: { fontSize: '11px', fontWeight: '800' } }, '🏷️ CARRIED RELIC:'),
     ...pills,
   );
   carryTrayHost.replaceChildren(bar);
@@ -2414,7 +2414,7 @@ function openSettingsModal(): void {
           h(
             'span',
             { style: { fontSize: '13px', fontWeight: '800', color: '#1f2430' } },
-            `Act ${act} · ★ ${lamps}/6 Rooms · 📜 ${voidedClauses}/${ALL_CLAUSES.length} Clauses · ✓ ${totalSolvedPanels}/${totalPanels} Panels`,
+            `Act ${act} · ★ ${lamps}/6 Rooms · 📜 ${voidedClauses}/${ALL_CLAUSES.length} Clauses · ✓ ${totalSolvedPanels}/${totalPanels} Puzzles`,
           ),
         ),
         h(
@@ -2612,7 +2612,7 @@ function openSettingsModal(): void {
         h(
           'div',
           { style: { fontSize: '14px', fontWeight: '800', color: '#1f2430' } },
-          `Toggle Rooms, Pedestals & Contract Clauses (Act ${act} · ★ ${lamps}/6 Lamps)`,
+          `Toggle Rooms, Relics & Contract Clauses (Act ${act} · ★ ${lamps}/6 Lamps)`,
         ),
       ),
       h(
@@ -2621,7 +2621,7 @@ function openSettingsModal(): void {
         presetBtn('Unlock All Warm-ups', () => {
           for (const r of ROOM_SPECS) gameState.setRunSolved(r.warmup.id, true);
         }),
-        presetBtn('Free & Place All Strays', () => {
+        presetBtn('Free & Restore All Relics', () => {
           for (const r of ROOM_SPECS) {
             gameState.setRunSolved(r.warmup.id, true);
             for (const s of r.strays) {
@@ -2681,14 +2681,14 @@ function openSettingsModal(): void {
         },
       },
       makeCheckRow(
-        '📅 Free Play / Custom Mixer',
-        'Unlocks Custom Twist Mixer at Calendar Desk',
+        '📅 Free Play / Puzzle Workshop',
+        'Unlocks Puzzle Workshop at Calendar Desk',
         gameState.freePlayUnlocked,
         (next) => gameState.setFreePlay(next),
       ),
       makeCheckRow(
         '📜 XMAS365™ Merger Contract Solved',
-        `Voids all ${ALL_CLAUSES.length} clauses (${ALL_CLAUSES.length * CLAUSE_PANEL_COUNT} panels · Act IV Party)`,
+        `Voids all ${ALL_CLAUSES.length} clauses (${ALL_CLAUSES.length * CLAUSE_PANEL_COUNT} puzzles · Act IV Party)`,
         gameState.solvedRuns.has('clause'),
         (next) => gameState.setRunSolved('clause', next),
       ),
@@ -2730,7 +2730,7 @@ function openSettingsModal(): void {
           h(
             'span',
             { style: { fontSize: '10.5px', fontWeight: '700', color: '#6b7280' } },
-            `${gameState.runSolvedPanelCount('clause')}/${gameState.runPanelCount('clause')} panels solved across 6 clauses`,
+            `${gameState.runSolvedPanelCount('clause')}/${gameState.runPanelCount('clause')} puzzles solved across 6 clauses`,
           ),
         ),
         h(
@@ -2764,7 +2764,7 @@ function openSettingsModal(): void {
           const solvedCount = gameState.clauseSolvedPanelCount(clauseDef.genre);
           return makeCheckRow(
             `${clauseDef.icon} ${clauseDef.title}`,
-            `${solvedCount}/${CLAUSE_PANEL_COUNT} panels · ${clauseDef.genreTitle}`,
+            `${solvedCount}/${CLAUSE_PANEL_COUNT} puzzles · ${clauseDef.genreTitle}`,
             voided,
             (next) => gameState.setClauseVoided(idx, next),
           );
@@ -2849,38 +2849,38 @@ function openSettingsModal(): void {
             },
           },
           makeCheckRow(
-            `Warm-up: ${room.warmup.title}`,
-            `${warmupDone}/${warmupTotal} panels · Unlocks room strays`,
+            `Warm-up Run: ${room.warmup.title}`,
+            `${warmupDone}/${warmupTotal} puzzles · Unlocks room Stray Runs`,
             gameState.solvedRuns.has(room.warmup.id),
             (next) => gameState.setRunSolved(room.warmup.id, next),
           ),
           makeCheckRow(
-            `Stray Freed: ${room.strays[0].icon} ${room.strays[0].title}`,
-            `${stray0Done}/${stray0Total} panels · Found in ${room.shortTitle}`,
+            `Stray Run (Lost Relic Freed): ${room.strays[0].icon} ${room.strays[0].title}`,
+            `${stray0Done}/${stray0Total} puzzles · Found in ${room.shortTitle}`,
             gameState.solvedRuns.has(room.strays[0].proto.id),
             (next) => gameState.setRunSolved(room.strays[0].proto.id, next),
           ),
           makeCheckRow(
-            `Stray Freed: ${room.strays[1].icon} ${room.strays[1].title}`,
-            `${stray1Done}/${stray1Total} panels · Found in ${room.shortTitle}`,
+            `Stray Run (Lost Relic Freed): ${room.strays[1].icon} ${room.strays[1].title}`,
+            `${stray1Done}/${stray1Total} puzzles · Found in ${room.shortTitle}`,
             gameState.solvedRuns.has(room.strays[1].proto.id),
             (next) => gameState.setRunSolved(room.strays[1].proto.id, next),
           ),
           makeCheckRow(
-            `Pedestal 1: ${req0.icon} ${req0.title}`,
-            `Placed in ${room.shortTitle}`,
+            `Restored Relic 1: ${req0.icon} ${req0.title}`,
+            `Restored in ${room.shortTitle}`,
             gameState.placedItems.has(req0.id),
             (next) => gameState.setItemPlaced(req0.id, next),
           ),
           makeCheckRow(
-            `Pedestal 2: ${req1.icon} ${req1.title}`,
-            `Placed in ${room.shortTitle}`,
+            `Restored Relic 2: ${req1.icon} ${req1.title}`,
+            `Restored in ${room.shortTitle}`,
             gameState.placedItems.has(req1.id),
             (next) => gameState.setItemPlaced(req1.id, next),
           ),
           makeCheckRow(
-            `Centerpiece: ${room.centerpiece.icon} ${room.centerpiece.title}`,
-            `${cpDone}/${cpTotal} panels · Lights room Master Lamp`,
+            `Centerpiece Run: ${room.centerpiece.icon} ${room.centerpiece.title}`,
+            `${cpDone}/${cpTotal} puzzles · Restores room & lights Lamp`,
             gameState.solvedRuns.has(room.centerpiece.proto.id),
             (next) => gameState.setRunSolved(room.centerpiece.proto.id, next),
           ),

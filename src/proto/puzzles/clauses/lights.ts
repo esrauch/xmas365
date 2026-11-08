@@ -9,24 +9,17 @@
  */
 
 import type { Panel as LightPanel } from '../../../gen/lights';
-import type { ClauseDef, ClausePanelItem, GimmickMeta } from './types';
+import type { ClauseDef, ClausePanelItem, TwistMeta } from './types';
 
 export type { LightPanel };
 
-export const LIGHT_GIMMICK_ORDER = [
-  'snow',
-  'dark',
-  'letters',
-  'eggs',
-  'colours',
-  'slices',
-] as const;
+export const LIGHT_TWIST_ORDER = ['snow', 'dark', 'letters', 'eggs', 'colours', 'slices'] as const;
 
-export const LIGHT_GIMMICKS: readonly GimmickMeta[] = [
+export const LIGHT_TWISTS_META: readonly TwistMeta[] = [
   {
     key: 'snow',
     icon: '❄️',
-    label: 'Snowflakes',
+    label: 'Snowflake',
     rule: 'Inside the frosty frame, mirrored tiles have mirrored wire shapes and rotate together.',
   },
   {
@@ -38,25 +31,25 @@ export const LIGHT_GIMMICKS: readonly GimmickMeta[] = [
   {
     key: 'letters',
     icon: '💌',
-    label: 'Love Letters',
+    label: 'Love-Letter',
     rule: 'Letter bulbs sit at wire-step distances from the plug that fill the numbered blanks to spell the secret word.',
   },
   {
     key: 'eggs',
     icon: '🥚',
-    label: 'Egg Hunt',
+    label: 'Egg-Hunt',
     rule: 'Power must reach each numbered egg in that exact number of wire-steps from its plug.',
   },
   {
     key: 'colours',
     icon: '🎆',
-    label: 'Red, White & Blue',
+    label: 'Patriotic',
     rule: 'Two plugs (Red and Blue) each power their own color; white wires can connect to either plug without mixing.',
   },
   {
     key: 'slices',
     icon: '🥧',
-    label: 'Portions',
+    label: 'Portioned',
     rule: 'Each pie slice gets exactly one wire from the center *, and no wire may cross a crust wall between slices.',
   },
 ];
@@ -578,15 +571,15 @@ const PANELS: readonly ClausePanelItem<LightPanel>[] = [
   },
 
   // =========================================================================
-  // 28: All 6 Gimmicks Combined (`all6`, 1 boss panel)
+  // 28: All 6 Twists Combined (`all6`, 1 boss puzzle)
   // =========================================================================
   {
     name: 'Clause III: Master Tree',
     section: 'all6',
     twists: ['snow', 'dark', 'letters', 'eggs', 'colours', 'slices'],
-    tip: '❄️ Snow · 🎃 Dark · 💌 JOY · 🥚 Egg · 🎆 Colours · 🥧 Slices',
+    tip: '❄️ Snowflake · 🎃 Spooky · 💌 Love-Letter · 🥚 Egg-Hunt · 🎆 Patriotic · 🥧 Portioned',
     explain:
-      'All six Fairy Lights gimmicks at once: feed both slices from *, keep the frosty frame mirrored, separate the Red and Blue strings, hit the egg in 5 steps, spell JOY at 5-4-7, and deduce both ? tiles.',
+      'All six Lights twists at once: feed both slices from *, keep the frosty frame mirrored, separate the Red and Blue strings, hit the egg in 5 steps, spell JOY at 5-4-7, and deduce both ? tiles.',
     panel: {
       name: 'Clause III: Master Tree',
       rows: ['682c46c', '3c693d1', '47d447c', '3d17d15', '2ba93a9', '2aaaaa8'],
@@ -616,11 +609,11 @@ export const CLAUSE_LIGHTS: ClauseDef<LightPanel> = {
   clauseIndex: 2,
   id: 'C3',
   genre: 'lights',
-  title: 'Clause III: Christmas · Fairy Lights',
-  genreTitle: 'Fairy Lights',
+  title: 'Clause III: Christmas · Lights',
+  genreTitle: 'Lights',
   icon: '🎄',
   accent: '#2f855a',
-  gimmickOrder: LIGHT_GIMMICK_ORDER,
-  gimmicks: LIGHT_GIMMICKS,
+  twistOrder: LIGHT_TWIST_ORDER,
+  twistMeta: LIGHT_TWISTS_META,
   panels: PANELS,
 };

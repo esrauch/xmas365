@@ -18,8 +18,8 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
   genreTitle: 'Heartstrings',
   icon: '💌',
   accent: '#ed64a6',
-  gimmickOrder: ['dark', 'letters', 'colours', 'eggs', 'cuts', 'snow'],
-  gimmicks: [
+  twistOrder: ['dark', 'letters', 'colours', 'eggs', 'cuts', 'snow'],
+  twistMeta: [
     {
       key: 'dark',
       icon: '🎃',
@@ -29,31 +29,31 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
     {
       key: 'letters',
       icon: '💌',
-      label: 'Love Letters',
+      label: 'Love-Letter',
       rule: 'Numbered tiles (1, 2, …) stand for coded letters; every matching number hides the same letter.',
     },
     {
       key: 'colours',
       icon: '🎆',
-      label: 'Red, White & Blue',
+      label: 'Patriotic',
       rule: 'Bowed tiles reveal their word’s Red or Blue color; two words of the same color can never touch orthogonally.',
     },
     {
       key: 'eggs',
       icon: '🥚',
-      label: 'Egg Hunt',
+      label: 'Egg-Hunt',
       rule: 'A numbered egg tile must be that exact 1-based letter position in its word.',
     },
     {
       key: 'cuts',
       icon: '🥧',
-      label: 'Portions',
+      label: 'Portioned',
       rule: 'A word path cannot step across a thick fence bar or diagonally through a fenced corner.',
     },
     {
       key: 'snow',
       icon: '❄️',
-      label: 'Snowflakes',
+      label: 'Snowflake',
       rule: 'Inside the frosty frame, words come in mirror-footprint pairs across the icy line.',
     },
   ],
@@ -1823,12 +1823,12 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       },
     },
     {
-      name: 'Boss: All 6 Gimmicks Combined',
+      name: 'Boss: All 6 Twists Combined',
       section: 'all6',
       twists: ['dark', 'letters', 'colours', 'eggs', 'cuts', 'snow'],
-      tip: '🎃 Spooky · 💌 Letters · 🎆 Colours · 🥚 Eggs · 🥧 Portions · ❄️ Snowflakes',
+      tip: '🎃 Spooky · 💌 Love-Letter · 🎆 Patriotic · 🥚 Egg-Hunt · 🥧 Portioned · ❄️ Snowflake',
       explain:
-        'Final Clause IV Boss: All 6 holiday gimmicks active at once—dark ? tiles, numbered cipher tiles, Red/Blue bows, numbered egg positions, fence cuts, and frosty mirror-footprint pairs!',
+        'Final Clause IV Boss: All 6 holiday twists active at once—dark ? tiles, numbered cipher tiles, Red/Blue bows, numbered egg positions, fence cuts, and frosty mirror-footprint pairs!',
       panel: {
         name: 'Clause IV Finale: Full Heartstrings',
         theme: 'Love notes',

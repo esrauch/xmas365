@@ -19,20 +19,21 @@ import { mountLights } from '../proto/netBoard';
 import { mountPicture } from '../proto/pictureBoard';
 import { mountCarving } from '../proto/shikakuBoard';
 import { mountStrands } from '../proto/strandsBoard';
+import { formatPuzzleIdentity } from '../proto/puzzles/clauses/types';
 import { ROOM_SPECS, type RoomId, type RoomSpec, gameState } from './state';
 
 const GENRE_OPTIONS = [
   {
     id: 'webs' as Genre,
     roomId: 'halloween' as RoomId,
-    label: '🎃 Spiderweb (Halloween)',
+    label: '🎃 Web (Halloween)',
     twists: [
-      { id: 'dark', label: '🎃 Spooky (?)' },
-      { id: 'letters', label: '💌 Love Letters' },
-      { id: 'colours', label: '🎆 Red, White & Blue' },
-      { id: 'eggs', label: '🥚 Egg Hunt' },
-      { id: 'cuts', label: '🦃 Portions (Fences)' },
-      { id: 'snow', label: '❄️ Snowflakes' },
+      { id: 'dark', label: '🎃 Spooky' },
+      { id: 'letters', label: '💌 Love-Letter' },
+      { id: 'colours', label: '🎆 Patriotic' },
+      { id: 'eggs', label: '🥚 Egg-Hunt' },
+      { id: 'cuts', label: '🦃 Portioned' },
+      { id: 'snow', label: '❄️ Snowflake' },
     ] as const,
   },
   {
@@ -40,12 +41,12 @@ const GENRE_OPTIONS = [
     roomId: 'thanksgiving' as RoomId,
     label: '🦃 Carving (Thanksgiving)',
     twists: [
-      { id: 'dark', label: '🎃 Spooky (?)' },
-      { id: 'letters', label: '💌 Love Letters' },
-      { id: 'colours', label: '🎆 Red, White & Blue' },
-      { id: 'basket', label: '🥚 Egg Hunt (Basket)' },
-      { id: 'cuts', label: '🦃 Portions (Fences)' },
-      { id: 'snow', label: '❄️ Snowflakes' },
+      { id: 'dark', label: '🎃 Spooky' },
+      { id: 'letters', label: '💌 Love-Letter' },
+      { id: 'colours', label: '🎆 Patriotic' },
+      { id: 'basket', label: '🥚 Egg-Hunt' },
+      { id: 'cuts', label: '🦃 Portioned' },
+      { id: 'snow', label: '❄️ Snowflake' },
     ] as const,
   },
   {
@@ -53,12 +54,12 @@ const GENRE_OPTIONS = [
     roomId: 'christmas' as RoomId,
     label: '🎄 Lights (Christmas)',
     twists: [
-      { id: 'dark', label: '🎃 Spooky (?)' },
-      { id: 'letters', label: '💌 Love Letters' },
-      { id: 'colours', label: '🎆 Red, White & Blue' },
-      { id: 'eggs', label: '🥚 Egg Hunt' },
-      { id: 'slices', label: '🦃 Portions (Slices)' },
-      { id: 'snow', label: '❄️ Snowflakes' },
+      { id: 'dark', label: '🎃 Spooky' },
+      { id: 'letters', label: '💌 Love-Letter' },
+      { id: 'colours', label: '🎆 Patriotic' },
+      { id: 'eggs', label: '🥚 Egg-Hunt' },
+      { id: 'slices', label: '🦃 Portioned' },
+      { id: 'snow', label: '❄️ Snowflake' },
     ] as const,
   },
   {
@@ -66,25 +67,25 @@ const GENRE_OPTIONS = [
     roomId: 'valentines' as RoomId,
     label: "💌 Heartstrings (Valentine's)",
     twists: [
-      { id: 'dark', label: '🎃 Spooky (?)' },
-      { id: 'letters', label: '💌 Love Letters (Cipher)' },
-      { id: 'colours', label: '🎆 Red, White & Blue' },
-      { id: 'eggs', label: '🥚 Egg Hunt' },
-      { id: 'cuts', label: '🦃 Portions (Fences)' },
-      { id: 'snow', label: '❄️ Snowflakes' },
+      { id: 'dark', label: '🎃 Spooky' },
+      { id: 'letters', label: '💌 Love-Letter' },
+      { id: 'colours', label: '🎆 Patriotic' },
+      { id: 'eggs', label: '🥚 Egg-Hunt' },
+      { id: 'cuts', label: '🦃 Portioned' },
+      { id: 'snow', label: '❄️ Snowflake' },
     ] as const,
   },
   {
     id: 'hops' as Genre,
     roomId: 'easter' as RoomId,
-    label: '🐰 Bunny Hops (Easter)',
+    label: '🐰 Hops (Easter)',
     twists: [
-      { id: 'dark', label: '🎃 Spooky (?)' },
-      { id: 'letters', label: '💌 Love Letters' },
-      { id: 'colours', label: '🎆 Red, White & Blue' },
-      { id: 'burrows', label: '🐰 Burrows' },
-      { id: 'courses', label: '🦃 Portions (Courses)' },
-      { id: 'snow', label: '❄️ Snowflakes' },
+      { id: 'dark', label: '🎃 Spooky' },
+      { id: 'letters', label: '💌 Love-Letter' },
+      { id: 'colours', label: '🎆 Patriotic' },
+      { id: 'burrows', label: '🥚 Egg-Hunt' },
+      { id: 'courses', label: '🦃 Portioned' },
+      { id: 'snow', label: '❄️ Snowflake' },
     ] as const,
   },
   {
@@ -92,12 +93,12 @@ const GENRE_OPTIONS = [
     roomId: 'fourth' as RoomId,
     label: '🎆 Fireworks (Fourth of July)',
     twists: [
-      { id: 'dark', label: '🎃 Spooky (?)' },
-      { id: 'letters', label: '💌 Love Letters' },
-      { id: 'colours', label: '🎆 Red, White & Blue' },
-      { id: 'eggs', label: '🥚 Egg Hunt' },
-      { id: 'portions', label: '🦃 Portions' },
-      { id: 'snow', label: '❄️ Snowflakes' },
+      { id: 'dark', label: '🎃 Spooky' },
+      { id: 'letters', label: '💌 Love-Letter' },
+      { id: 'colours', label: '🎆 Patriotic' },
+      { id: 'eggs', label: '🥚 Egg-Hunt' },
+      { id: 'portions', label: '🦃 Portioned' },
+      { id: 'snow', label: '❄️ Snowflake' },
     ] as const,
   },
 ] as const;
@@ -366,9 +367,10 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
     dailyIdx = idx;
     const step = dailySteps[idx] ?? dailySteps[0];
     if (!step) return;
+    const identity = formatPuzzleIdentity(step.genre, step.twists);
     const token = ++deskViewToken;
     cancelGenerating();
-    statusEl.textContent = `Generating Daily Panel ${idx + 1}/3 (${step.label})...`;
+    statusEl.textContent = `Generating Daily Puzzle ${idx + 1}/3 (${identity.dualLabel})...`;
     const dailyWordSize: WordBoardSize | undefined =
       step.genre === 'words'
         ? step.tier === 'easy'
@@ -389,11 +391,11 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
     });
     if (token !== deskViewToken) return;
     if (!reply.made) {
-      statusEl.textContent = 'Could not generate panel; try again.';
+      statusEl.textContent = 'Could not generate puzzle; try again.';
       return;
     }
     const mountStep = (dir: 'forward' | 'reset'): void => {
-      statusEl.textContent = `${step.label} · Twist: ${step.twists.join(', ')}`;
+      statusEl.textContent = `Daily Puzzle ${idx + 1}/3 · ${identity.dualLabel}`;
       swapDeskPane(dir, (pane) => {
         mountGenrePanel(
           pane,
@@ -404,9 +406,9 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
             blip(660, 120);
             renderTabs();
             if (dailySolved.size === 3) {
-              statusEl.textContent = `🎉 Day 366 Daily (${dateStr}) Complete!`;
+              statusEl.textContent = `🎉 Daily Puzzle · Day 366 (${dateStr}) Complete!`;
             } else if (idx < 2) {
-              statusEl.textContent = `✓ Panel ${idx + 1} solved! Loading next...`;
+              statusEl.textContent = `✓ Puzzle ${idx + 1} solved! Loading next...`;
               startDailyAdvanceBar(1350);
               window.setTimeout(() => {
                 stopDailyAdvanceBar();
@@ -451,18 +453,16 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
   const generateAndMountStandardOrTwist = async (): Promise<void> => {
     if (!selectedGenre) return;
     const genre = selectedGenre;
-    const gInfo = GENRE_OPTIONS.find((x) => x.id === genre) ?? GENRE_OPTIONS[0];
     const room = getRoomForGenre(genre);
     if (!gameState.isDeskTwistsUnlocked(room)) {
       customTwists.clear();
     }
+    const identity = formatPuzzleIdentity(genre, [...customTwists]);
     const token = ++deskViewToken;
     cancelGenerating();
     const seed = Math.floor(Math.random() * 100_000) + 1;
-    const twistDesc =
-      customTwists.size === 0 ? 'Standard (No Twist)' : `Twists: ${[...customTwists].join(', ')}`;
     const sizeDesc = genre === 'words' ? `${customWordSize}×${customWordSize}` : customTier;
-    statusEl.textContent = `Generating ${sizeDesc} ${gInfo.label} · ${twistDesc}...`;
+    statusEl.textContent = `Generating ${sizeDesc} ${identity.dualLabel}...`;
     const reply = await generateInBrowser({
       genre,
       spec: {
@@ -476,18 +476,18 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
     if (token !== deskViewToken) return;
     if (!reply.made) {
       statusEl.textContent =
-        'No board found for that combination in time. Try 1 twist or Easy/Medium.';
+        'No puzzle found for that combination in time. Try 1 twist or Easy/Medium.';
       return;
     }
     const mountCustom = (dir: 'forward' | 'reset'): void => {
-      statusEl.textContent = `${gInfo.label} · ${twistDesc} · Seed ${reply.made?.seed}`;
+      statusEl.textContent = `${identity.dualLabel} · Seed ${reply.made?.seed}`;
       swapDeskPane(dir, (pane) => {
         mountGenrePanel(
           pane,
           genre,
           reply.made?.panel,
           () => {
-            statusEl.textContent = `✓ Solved! (${twistDesc} · Seed ${reply.made?.seed})`;
+            statusEl.textContent = `✓ Solved! (${identity.dualLabel} · Seed ${reply.made?.seed})`;
           },
           (s) => {
             statusEl.textContent = s;
@@ -753,7 +753,7 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
             renderCustom(true);
           },
         },
-        '🎲 Standard & Twist Generator',
+        '🛠️ Puzzle Workshop',
       ),
       h(
         'button',
@@ -774,7 +774,7 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
             renderCustom(false);
           },
         },
-        `★ Warm-up: ${activeRoom.warmup.title}`,
+        `★ Warm-up Run: ${activeRoom.warmup.title}`,
       ),
     );
 
@@ -920,7 +920,7 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
           void generateAndMountStandardOrTwist();
         },
       },
-      'New Board ▸',
+      'New Puzzle ▸',
     );
 
     content.replaceChildren(
@@ -1022,7 +1022,7 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
             renderCustom(false);
           },
         },
-        `🔓 Unlocked Puzzles (${gameState.unlockedDeskGenreCount()}/6)`,
+        `🛠️ Puzzle Workshop (${gameState.unlockedDeskGenreCount()}/6)`,
       ),
       h(
         'button',
@@ -1046,7 +1046,7 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
             renderDaily();
           },
         },
-        anyUnlocked ? `📅 Day 366 Daily (${dateStr})` : '🔒 Day 366 Daily',
+        anyUnlocked ? `📅 Daily Puzzle (Day 366 · ${dateStr})` : '🔒 Daily Puzzle (Day 366)',
       ),
     );
   };

@@ -164,14 +164,14 @@ const mountPanel: Parameters<typeof run<Panel>>[0]['mountPanel'] = (host, panel,
 };
 
 const CONTROLS =
-  'Drag from a knot towards another to spin a thread between them; drag again for a double, and a third time to cut it (or tap a thread). Tapping one knot, then another, works too. The panels teach the rules; open a panel number to jump about.';
+  'Drag from a knot towards another to spin a thread between them; drag again for a double, and a third time to cut it (or tap a thread). Tapping one knot, then another, works too. The puzzles teach the rules; open a puzzle number to jump about.';
 
 export const cobwebs = run({
   id: 'cobwebs',
   title: 'The Porch Cobwebs',
   room: 'Halloween',
   kind: 'warm-up',
-  from: 'Spiderweb, taught panel by panel',
+  from: 'Web · Halloween, taught puzzle by puzzle',
   rules: `${CONTROLS} (Rules: a knot's number is how many threads leave it; threads run straight, one or two between a pair, never crossing; the web hangs together as one.)`,
   panels: WARMUP,
   mountPanel,
@@ -182,7 +182,7 @@ export const chocolates = run({
   title: 'The Box of Chocolates',
   room: 'Halloween',
   kind: 'stray',
-  from: "Spiderweb; twist from Valentine's: Love Letters",
+  from: "Love-Letter Web · Halloween (Valentine's)",
   rules: `${CONTROLS} (Twist: the same letter means the same count, different letters different counts. Each numbered blank in the message takes the letter with that many threads, so the words can help with the web, and the web with the words. A small number by a knot shows its threads so far.)`,
   panels: CHOCOLATES,
   mountPanel,
@@ -193,7 +193,7 @@ export const starlights = run({
   title: 'The Tree-Top Star',
   room: 'Halloween',
   kind: 'stray',
-  from: 'Spiderweb; twist from Christmas: Snowflakes',
+  from: 'Snowflake Web · Halloween (Christmas)',
   rules: `${CONTROLS} (Twist: the joins mirror across the icy line; singles and doubles needn't.)`,
   panels: STAR,
   mountPanel,
@@ -204,7 +204,7 @@ export const web = run({
   title: "The Spider's Web",
   room: 'Halloween',
   kind: 'centerpiece',
-  from: "Spiderweb; Halloween's own twist: Spooky (the Jack-o'-Lantern's dark knots)",
+  from: 'Spooky Web · Halloween (Halloween)',
   rules: `${CONTROLS} (Twist: a dark knot (?) in the shadows may have any count.)`,
   panels: SPIDER,
   mountPanel,

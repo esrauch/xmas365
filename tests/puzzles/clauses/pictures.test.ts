@@ -5,17 +5,17 @@ import { CLAUSE_PICTURES } from '../../../src/proto/puzzles/clauses/pictures';
 import { CLAUSE_PANEL_COUNT, pairCombinations } from '../../../src/proto/puzzles/clauses/types';
 
 describe('CLAUSE_PICTURES (Clause VI: Fourth of July · Fireworks)', () => {
-  it('has the expected clause metadata and 29 panels', () => {
+  it('has the expected clause metadata and 29 puzzles', () => {
     expect(CLAUSE_PICTURES.clauseIndex).toBe(5);
     expect(CLAUSE_PICTURES.id).toBe('C6');
     expect(CLAUSE_PICTURES.genre).toBe('pictures');
-    expect(CLAUSE_PICTURES.gimmickOrder).toEqual(PICTURE_TWISTS);
-    expect(CLAUSE_PICTURES.gimmicks.map((g) => g.key)).toEqual(PICTURE_TWISTS);
+    expect(CLAUSE_PICTURES.twistOrder).toEqual(PICTURE_TWISTS);
+    expect(CLAUSE_PICTURES.twistMeta.map((g) => g.key)).toEqual(PICTURE_TWISTS);
     expect(CLAUSE_PICTURES.panels).toHaveLength(CLAUSE_PANEL_COUNT);
   });
 
   it('has matching sections and canonical twist order across all 29 panels', () => {
-    const { panels, gimmickOrder } = CLAUSE_PICTURES;
+    const { panels, twistOrder } = CLAUSE_PICTURES;
 
     // 0: base
     expect(panels[0]?.section).toBe('base');
@@ -25,18 +25,18 @@ describe('CLAUSE_PICTURES (Clause VI: Fourth of July · Fireworks)', () => {
     for (let i = 0; i < 6; i++) {
       const item = panels[1 + i]!;
       expect(item.section).toBe('intro');
-      expect(item.twists).toEqual([gimmickOrder[i]]);
+      expect(item.twists).toEqual([twistOrder[i]]);
     }
 
     // 7..12: solo
     for (let i = 0; i < 6; i++) {
       const item = panels[7 + i]!;
       expect(item.section).toBe('solo');
-      expect(item.twists).toEqual([gimmickOrder[i]]);
+      expect(item.twists).toEqual([twistOrder[i]]);
     }
 
     // 13..27: duo
-    const pairs = pairCombinations(gimmickOrder);
+    const pairs = pairCombinations(twistOrder);
     expect(pairs).toHaveLength(15);
     for (let i = 0; i < 15; i++) {
       const item = panels[13 + i]!;
@@ -46,7 +46,7 @@ describe('CLAUSE_PICTURES (Clause VI: Fourth of July · Fireworks)', () => {
 
     // 28: all6
     expect(panels[28]?.section).toBe('all6');
-    expect(panels[28]?.twists).toEqual(gimmickOrder);
+    expect(panels[28]?.twists).toEqual(twistOrder);
 
     // Every panel's actual twistsOf(panel) matches item.twists
     for (const [idx, item] of panels.entries()) {

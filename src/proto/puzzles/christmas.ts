@@ -180,14 +180,14 @@ const mountPanel: Parameters<typeof run<LightsPanel>>[0]['mountPanel'] = (host, 
   mountLights(host, panel, { solved: () => hooks.solved(), status: hooks.status });
 
 const CONTROLS =
-  'Tap a piece to turn it a quarter clockwise (always clockwise; four taps go all the way round). The panels teach the rules; open a panel number to jump about.';
+  'Tap a piece to turn it a quarter clockwise (always clockwise; four taps go all the way round). The puzzles teach the rules; open a puzzle number to jump about.';
 
 export const fairylights = run({
   id: 'fairylights',
   title: 'The Fairy Lights',
   room: 'Christmas',
   kind: 'warm-up',
-  from: 'Lights, taught panel by panel',
+  from: 'Lights · Christmas, taught puzzle by puzzle',
   rules: `${CONTROLS} (Rules: turn the pieces so the power from the plug reaches every square, with no loose wire ends.)`,
   panels: WARMUP,
   mountPanel,
@@ -198,7 +198,7 @@ export const goldenegg = run({
   title: 'The Golden Egg',
   room: 'Christmas',
   kind: 'stray',
-  from: 'Lights; twist from Easter: Egg Hunt',
+  from: 'Egg-Hunt Lights · Christmas (Easter)',
   rules: `${CONTROLS} (Twist: the power must reach each numbered egg in exactly that many steps from the plug, counting squares along the wire.)`,
   panels: EGG,
   mountPanel,
@@ -209,7 +209,7 @@ export const pumpkinpie = run({
   title: 'The Pumpkin Pie',
   room: 'Christmas',
   kind: 'stray',
-  from: 'Lights; twist from Thanksgiving: Portions',
+  from: 'Portioned Lights · Christmas (Thanksgiving)',
   rules: `${CONTROLS} (Twist: each slice gets exactly one wire from the middle, across a dotted edge, and no wire may cross a thick crust line between two slices. Each slice shows how many wires it gets from the middle so far.)`,
   panels: PIE,
   mountPanel,
@@ -220,7 +220,7 @@ export const tree = run({
   title: 'The Christmas Tree',
   room: 'Christmas',
   kind: 'centerpiece',
-  from: "Lights; Christmas's own twist: Snowflakes",
+  from: 'Snowflake Lights · Christmas (Christmas)',
   rules: `${CONTROLS} (Twist: inside the frosty frame, pieces are mirrored across the icy line and turn together.)`,
   panels: TREE,
   mountPanel,

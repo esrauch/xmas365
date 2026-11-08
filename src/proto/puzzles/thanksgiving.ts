@@ -193,14 +193,14 @@ const mountPanel: Parameters<typeof run<Panel>>[0]['mountPanel'] = (host, panel,
   mountCarving(host, panel, { solved: () => hooks.solved(), status: hooks.status });
 
 const CONTROLS =
-  'Drag from one square to another to carve the rectangle between them (it replaces any portions in its way); tap a portion to lift it off; tap an empty square for a one-square portion. The panels teach the rules; open a panel number to jump about.';
+  'Drag from one square to another to carve the rectangle between them (it replaces any portions in its way); tap a portion to lift it off; tap an empty square for a one-square portion. The puzzles teach the rules; open a puzzle number to jump about.';
 
 export const breadboard = run({
   id: 'breadboard',
   title: 'The Bread Board',
   room: 'Thanksgiving',
   kind: 'warm-up',
-  from: 'Carving, taught panel by panel',
+  from: 'Carving · Thanksgiving, taught puzzle by puzzle',
   rules: `${CONTROLS} (Rules: carve the board into rectangles; each holds exactly one number, and the number is its size.)`,
   panels: WARMUP,
   mountPanel,
@@ -211,7 +211,7 @@ export const hotdog = run({
   title: 'The Hot Dog',
   room: 'Thanksgiving',
   kind: 'stray',
-  from: 'Carving; twist from Fourth of July: Red, White and Blue',
+  from: 'Patriotic Carving · Thanksgiving (Fourth of July)',
   rules: `${CONTROLS} (Twist: a portion takes the color of its red or blue mark; two portions of the same color may not share an edge, while plain portions can touch anything.)`,
   panels: HOTDOG,
   mountPanel,
@@ -222,7 +222,7 @@ export const stocking = run({
   title: 'The Stocking',
   room: 'Thanksgiving',
   kind: 'stray',
-  from: 'Carving; twist from Christmas: Snowflakes',
+  from: 'Snowflake Carving · Thanksgiving (Christmas)',
   rules: `${CONTROLS} (Twist: inside the frosty frame, the cuts between portions mirror across the icy line.)`,
   panels: STOCKING,
   mountPanel,
@@ -233,7 +233,7 @@ export const feast = run({
   title: 'The Feast',
   room: 'Thanksgiving',
   kind: 'centerpiece',
-  from: "Carving; Thanksgiving's own twist: Portions (fences no portion may cross)",
+  from: 'Portioned Carving · Thanksgiving (Thanksgiving)',
   rules: `${CONTROLS} (Twist: a portion may not cross a thick fence line between two squares.)`,
   panels: FEAST,
   mountPanel,

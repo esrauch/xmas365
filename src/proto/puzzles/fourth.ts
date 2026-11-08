@@ -152,14 +152,14 @@ const mountPanel: Parameters<typeof run<Panel>>[0]['mountPanel'] = (host, panel,
   mountPicture(host, panel, { solved: () => hooks.solved(), status: hooks.status });
 
 const CONTROLS =
-  'The numbers by each row and column are the runs of filled squares in that line, in order. Tap a square to fill it, again to cross it out, again to clear; drag along a row or column to do a run at once. The panels teach the rules; open a panel number to jump about.';
+  'The numbers by each row and column are the runs of filled squares in that line, in order. Tap a square to fill it, again to cross it out, again to clear; drag along a row or column to do a run at once. The puzzles teach the rules; open a puzzle number to jump about.';
 
 export const sparklers = run({
   id: 'sparklers',
   title: 'Sparklers',
   room: 'Fourth of July',
   kind: 'warm-up',
-  from: 'Fireworks, taught panel by panel',
+  from: 'Fireworks · Fourth of July, taught puzzle by puzzle',
   rules: CONTROLS,
   panels: SPARKLERS,
   mountPanel,
@@ -170,7 +170,7 @@ export const bow = run({
   title: "Cupid's Bow",
   room: 'Fourth of July',
   kind: 'stray',
-  from: "Fireworks; twist from Valentine's: Love Letters",
+  from: "Love-Letter Fireworks · Fourth of July (Valentine's)",
   rules: `${CONTROLS} (Twist: some clues are letters; the same letter is always the same number. The message's numbered blanks take the letter with that number.)`,
   panels: BOW,
   mountPanel,
@@ -181,7 +181,7 @@ export const broom = run({
   title: "The Witch's Broom",
   room: 'Fourth of July',
   kind: 'stray',
-  from: 'Fireworks; twist from Halloween: Spooky (clues in the dark)',
+  from: 'Spooky Fireworks · Fourth of July (Halloween)',
   rules: `${CONTROLS} (Twist: a ? is a clue in the dark: a run of any length.)`,
   panels: BROOM,
   mountPanel,
@@ -192,7 +192,7 @@ export const finale = run({
   title: 'The Grand Finale',
   room: 'Fourth of July',
   kind: 'centerpiece',
-  from: "Fireworks; the Fourth of July's own twist: Red, White and Blue",
+  from: 'Patriotic Fireworks · Fourth of July (Fourth of July)',
   rules: `${CONTROLS} (Color: pick a paint from the bar. Clues come in colors; two runs of the same color need a gap between them, different colors can touch.)`,
   panels: FINALE,
   mountPanel,

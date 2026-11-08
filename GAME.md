@@ -13,6 +13,52 @@ of dread. The house, characters, story and puzzles are Puzz's own.
 
 `PUZZLES.md` maps every base puzzle against every holiday twist.
 
+## Canonical Terminology Glossary (decided 2026-11-08)
+
+To eliminate ambiguity across the UI, documentation, and codebase, all concepts use the following canonical terms:
+
+### 1. The 6 Holiday Bases (Nouns) & 6 Holiday Twists (Adjectives)
+
+| Holiday | Icon | Base (Noun) | Twist (Adjective) | Formerly Used Terms |
+|---|---|---|---|---|
+| **Halloween** | 🎃 / 🕸️ | **`Web`** | **`Spooky`** | *Spiderweb*, *Spiderwebs*, *webs*, *Hashi*, *Dark*, *The dark* |
+| **Thanksgiving** | 🥧 | **`Carving`** | **`Portioned`** | *Table Carving*, *Shikaku*, *Portions*, *Fair shares*, *Cuts*, *Slices*, *Courses* |
+| **Christmas** | 🎄 / ❄️ | **`Lights`** | **`Snowflake`** | *Fairy Lights*, *Net*, *Snowflakes*, *Frosty mirror* |
+| **Valentine's** | 💌 | **`Heartstrings`** | **`Love-Letter`** | *Words*, *Word Search*, *Strands*, *Love Letters*, *Letters* |
+| **Easter** | 🐰 / 🥚 | **`Hops`** | **`Egg-Hunt`** | *Bunny Hops*, *Numbrix*, *Egg Hunt*, *Eggs*, *Baskets*, *Burrows* |
+| **Fourth of July** | 🎆 | **`Fireworks`** | **`Patriotic`** | *Pictures*, *Nonograms*, *Picross*, *Red, White and Blue*, *Red/White/Blue*, *Colours* |
+
+### 2. Dual Display Naming Convention (`formatPuzzleIdentity`)
+
+Every playable **Puzzle** or **Run** shows its identity in two complementary forms:
+- **Themed Name:** `[Twist1] [Twist2] [Base]` (e.g., `Love-Letter Portioned Web`; for 0 twists, simply `Web`).
+- **Holiday Formula:** `BaseHoliday (TwistHoliday1, TwistHoliday2)` (e.g., `Halloween (Valentine's, Thanksgiving)`; for 0 twists, simply `Halloween`).
+- **Combined Dual Label:** `Love-Letter Portioned Web · Halloween (Valentine's, Thanksgiving)`.
+
+### 3. Core Gameplay, Objects, Progression & UI Terms
+
+| Canonical Term | Definition | Formerly Used Terms |
+|---|---|---|
+| **`Base`** | One of the 6 core puzzle mechanics (`Web`, `Carving`, `Lights`, `Heartstrings`, `Hops`, `Fireworks`), each native to one Holiday Room. | *Genre*, *Base game*, *Base puzzle* |
+| **`Twist`** | One of the 6 portable holiday rule modifiers (`Spooky`, `Portioned`, `Snowflake`, `Love-Letter`, `Egg-Hunt`, `Patriotic`) that can be applied to any Base. Never called a "gimmick". | *Gimmick*, *Cross-theme*, *Extra*, *Modifier* |
+| **`Puzzle`** | A single playable grid instance with one solution (`Puzzle 8/29`, `solvedPuzzles`). | *Panel*, *Level*, *Stage*, *Grid* |
+| **`Run`** | An ordered sequence of Puzzles played through a numbered pip strip (`1..N`). | *Proto*, *Panel run*, *Ladder step*, *Sequence* |
+| **`Board`** | The interactive visual grid surface where the player taps or drags to solve a Puzzle. | *Canvas*, *Table*, *Grid*, *Panel* |
+| **`Relic`** | One of the 12 physical holiday props (2 per holiday) scrambled across the house; each Relic carries its home holiday's Twist. | *Item*, *Stray*, *Prop*, *Misfiled asset*, *Object* |
+| **`Lost Relic`** | A Relic currently trapped in the wrong Holiday Room awaiting rescue via a **Stray Run**. | *Stray*, *Stray item*, *Trapped item* |
+| **`Carried Relic`** | A Relic freed from its Stray Run and held in the bottom **Carried Relic** tray (`CARRIED RELIC`) until delivered home. | *Carried item*, *Misfiled asset*, *Inventory item* |
+| **`Restored Relic`** | A Relic placed onto its matching pedestal in its home Room (`restoredRelics`). Restoring 1 unlocks a Locked Room; restoring both unlocks the Room's Centerpiece Run. | *Placed item*, *Returned item*, *Pedestal item* |
+| **`Warm-up Run`** | A Room's introductory 5-puzzle Run teaching its Base mechanic with 0 Twists. Solving it reveals the Room's two Stray Runs. | *Warm-up*, *Tutorial*, *Intro run* |
+| **`Stray Run`** | A 3-puzzle Run in a Room combining that Room's Base with a Lost Relic's Twist. Solving it frees the Lost Relic into a Carried Relic. | *Stray*, *Stray puzzle*, *Item run* |
+| **`Centerpiece Run`** | A Room's culminating 5-puzzle Run using its own home Twist (unlocked once both of the Room's Relics are Restored). Solving it frees the Mascot and lights the Room's Lamp. | *Centerpiece*, *Boss run*, *Master puzzle* |
+| **`Bonus Run`** | An optional 2-puzzle post-rescue Run offered by a freed Mascot; solving it awards a party hat and room decoration. | *Bonus panels*, *Mascot bonus*, *Extra panels* |
+| **`Room`** | One of the 6 holiday dioramas surrounding Holiday Hall (`Locked` → `Unlocked` → `Restored`). | *Bay*, *Alcove*, *Holiday*, *Diorama* |
+| **`Contract`** | The **XMAS365™ Merger Contract** in Act III, consisting of 6 Clauses (`174` Puzzles total). | *Finale*, *Tuesday*, *Master contract*, *Gauntlet* |
+| **`Clause`** | One of the 6 sections of the Contract (`Clause I`–`Clause VI`), each a 29-puzzle Run for one Base across 5 Stages (`Stage 1 · Base Puzzle`, `Stage 2 · Twist Reminders`, `Stage 3 · Solo Twist`, `Stage 4 · Double Twist`, `Stage 5 · All 6 Twists`). | *Section*, *Chapter*, *Tuesday panel* |
+| **`Calendar Desk`** | Leap Day's desk in Holiday Hall hosting two modes: **Daily Puzzle (Day 366)** and **Puzzle Workshop** (the custom Base + Twist generator). | *Free Play*, *Custom Twist Mixer*, *Endless mode*, *Desk* |
+| **`Memo`** | An internal XMAS365™ corporate note found at milestones and pinned to the Hall Corkboard. | *Note*, *Letter*, *Document* |
+| **`Dialogue Beat`** | A character speech popup at the bottom of the screen (Leap Day,Mascots, or CEO Santa). | *Beat*, *Toast*, *Speech bubble*, *Line* |
+
 ## The story: Santa's hostile takeover (decided 2026-11-07)
 
 **Santa Claus has founded XMAS365™**, and it's staging a hostile takeover of
@@ -229,17 +275,17 @@ done. Each completed room lights one of six lamps in Holiday Hall (like
 mascots are free, CEO Santa stands center-stage in Holiday Hall behind a golden
 XMAS365™ podium (`src/game/dioramas/hall.ts`). Tapping him opens the **Master
 Merger Contract** (`src/proto/puzzles/clause.ts` + `src/proto/puzzles/clauses/`),
-a 6-Clause checklist (`C1`–`C6`, one clause per puzzle genre). Tapping any
-clause enters a **29-panel gauntlet** (`174` panels total across all 6 clauses):
-1. **Stage 1 · Base Game (`1` panel):** a clean no-gimmick board.
-2. **Stage 2 · Gimmick Refresher (`6` panels):** 6 trivial boards re-teaching
-   every holiday gimmick for that genre (including twists not met in the main
+a 6-Clause checklist (`C1`–`C6`, one clause per puzzle Base). Tapping any
+clause enters a **29-puzzle Clause Run** (`174` puzzles total across all 6 clauses):
+1. **Stage 1 · Base Puzzle (`1` puzzle):** a clean 0-twist board.
+2. **Stage 2 · Twist Reminders (`6` puzzles):** 6 compact boards re-teaching
+   every holiday Twist for that Base (including Twists not met in the main
    rooms).
-3. **Stage 3 · Solo Gimmick (`6` panels):** 6 nontrivial single-gimmick boards.
-4. **Stage 4 · Two-Gimmick Combos (`15` panels):** all $\binom{6}{2} = 15$
-   two-gimmick pairings as medium-sized quirk tests.
-5. **Stage 5 · All-6 Boss (`1` panel):** 1 compact board combining all 6
-   holiday gimmicks at once.
+3. **Stage 3 · Solo Twist (`6` puzzles):** 6 nontrivial single-twist boards.
+4. **Stage 4 · Double Twist (`15` puzzles):** all $\binom{6}{2} = 15$
+   two-twist pairings as medium-sized quirk tests.
+5. **Stage 5 · All 6 Twists (`1` puzzle):** 1 boss board combining all 6
+   holiday Twists at once.
 
 Voiding all 6 clauses triggers the Sec 6.2 loophole (`C6.torn`: *"Fiscal Year
 is strictly defined as 365 days"*), transforming Holiday Hall into **Leap Day's

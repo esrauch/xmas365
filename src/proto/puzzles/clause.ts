@@ -2,12 +2,12 @@
  * Act III Finale ("XMAS365™ Merger Contract"):
  * Tapping CEO Santa in Holiday Hall opens the Master Merger Contract modal
  * with a checklist of the 6 Clauses (`C1`–`C6`). Tapping any clause enters
- * a 29-panel gauntlet of that single puzzle genre:
- *   - Panel 1 (`base`): Base game with no gimmicks
- *   - Panels 2–7 (`intro`): 6 trivial boards re-explaining each of the 6 gimmicks
- *   - Panels 8–13 (`solo`): 6 nontrivial single-gimmick boards
- *   - Panels 14–28 (`duo`): All 15 two-gimmick combinations
- *   - Panel 29 (`all6`): 1 boss puzzle combining all 6 gimmicks at once
+ * a 29-puzzle Run of that single Base:
+ *   - Puzzle 1 (`base`): Base Puzzle with no twists
+ *   - Puzzles 2–7 (`intro`): 6 5×5 Twist Reminder puzzles re-explaining each of the 6 twists
+ *   - Puzzles 8–13 (`solo`): 6 nontrivial Solo Twist puzzles
+ *   - Puzzles 14–28 (`duo`): All 15 Double Twist combinations
+ *   - Puzzle 29 (`all6`): 1 finale puzzle combining all 6 twists at once
  */
 import { CONTRACT_CLAUSES } from '../../content/script';
 import { gameState } from '../../game/state';
@@ -31,6 +31,7 @@ import {
   type ClauseDef,
   type ClausePanelItem,
   type ClauseSection,
+  formatPuzzleIdentity,
 } from './clauses';
 
 const SECTION_META: Record<
@@ -38,36 +39,36 @@ const SECTION_META: Record<
   { badge: string; shortLabel: string; rangeLabel: string; color: string; bg: string }
 > = {
   base: {
-    badge: 'Stage 1 · Base Game',
+    badge: 'Stage 1 · Base Puzzle',
     shortLabel: 'Base (1)',
     rangeLabel: '1',
     color: '#2b6cb0',
     bg: '#ebf8ff',
   },
   intro: {
-    badge: 'Stage 2 · Gimmick Refresher',
-    shortLabel: 'Intros (2–7)',
+    badge: 'Stage 2 · Twist Reminders',
+    shortLabel: 'Reminders (2–7)',
     rangeLabel: '2–7',
     color: '#2f855a',
     bg: '#f0fff4',
   },
   solo: {
-    badge: 'Stage 3 · Solo Gimmick',
+    badge: 'Stage 3 · Solo Twist',
     shortLabel: 'Solo (8–13)',
     rangeLabel: '8–13',
     color: '#b7791f',
     bg: '#fefcbf',
   },
   duo: {
-    badge: 'Stage 4 · Two-Gimmick Combo',
-    shortLabel: 'Combos (14–28)',
+    badge: 'Stage 4 · Double Twist',
+    shortLabel: 'Double (14–28)',
     rangeLabel: '14–28',
     color: '#805ad5',
     bg: '#faf5ff',
   },
   all6: {
-    badge: 'Stage 5 · All 6 Gimmicks Boss',
-    shortLabel: 'All-6 (29)',
+    badge: 'Stage 5 · All 6 Twists',
+    shortLabel: 'All 6 (29)',
     rangeLabel: '29',
     color: '#c53030',
     bg: '#fff5f5',
@@ -95,9 +96,9 @@ export const clause: Proto = {
   room: 'Holiday Hall',
   kind: 'final',
   teaches: true,
-  from: "Six binding clauses of CEO Santa's Master Merger Contract. Tap a clause to enter its 29-panel gauntlet and red-line it!",
+  from: "Six binding clauses of CEO Santa's Master Merger Contract. Tap a clause to enter its 29-puzzle Run and red-line it!",
   rules:
-    'Each of the 6 clauses covers one holiday puzzle genre across 29 bite-sized panels: 1 Base Game, 6 Trivial Gimmick Refreshers, 6 Nontrivial Single-Gimmick puzzles, all 15 Two-Gimmick Combos, and 1 All-6-Gimmicks Finale.',
+    'Each of the 6 clauses covers one holiday Base across 29 bite-sized puzzles: 1 Base Puzzle, 6 Twist Reminders, 6 Solo Twist puzzles, all 15 Double Twist combinations, and 1 All-6-Twists Finale.',
   mount(host, ctx) {
     let autoAdvanceTimer = 0;
 
@@ -201,7 +202,7 @@ export const clause: Proto = {
                   border: '1px solid #cbd5e0',
                 },
               },
-              `${totalSolved} / ${totalPanels} Panels`,
+              `${totalSolved} / ${totalPanels} Puzzles`,
             ),
           ),
         ),
@@ -214,7 +215,7 @@ export const clause: Proto = {
               color: '#4a4238',
             },
           },
-          'Select any binding clause below to challenge its 29-panel gauntlet: Base Game → 6 Gimmick Refreshers → 6 Solo Gimmicks → All 15 Two-Gimmick Combos → All-6-Gimmicks Boss.',
+          'Select any binding clause below to challenge its 29-puzzle Run: Base Puzzle → 6 Twist Reminders → 6 Solo Twists → 15 Double Twists → All 6 Twists.',
         ),
       );
 
@@ -234,13 +235,13 @@ export const clause: Proto = {
 
         const stageSummary = [
           { label: 'Base', indices: [0] },
-          { label: '6 Intro', indices: [1, 2, 3, 4, 5, 6] },
+          { label: '6 Reminders', indices: [1, 2, 3, 4, 5, 6] },
           { label: '6 Solo', indices: [7, 8, 9, 10, 11, 12] },
           {
-            label: '15 Duo',
+            label: '15 Double',
             indices: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27],
           },
-          { label: 'All-6', indices: [28] },
+          { label: 'All 6', indices: [28] },
         ];
 
         const card = h(
@@ -386,7 +387,7 @@ export const clause: Proto = {
                   color: isVoided ? '#276749' : clauseDef.accent,
                 },
               },
-              h('span', {}, `${solvedCount} / ${CLAUSE_PANEL_COUNT} Panels`),
+              h('span', {}, `${solvedCount} / ${CLAUSE_PANEL_COUNT} Puzzles`),
               h('span', {}, isVoided ? 'Review Clause ▸' : 'Challenge Clause ▸'),
             ),
           ),
@@ -485,11 +486,11 @@ export const clause: Proto = {
         },
       });
 
-      // Row 2: Controls row below the panel progression (Reset on left, Hint + ? on right)
+      // Row 2: Controls row below the puzzle progression (Reset on left, Hint + ? on right)
       const resetBtn = h(
         'button',
         {
-          title: 'Reset current puzzle panel',
+          title: 'Reset current puzzle',
           style: {
             borderRadius: '999px',
             height: '28px',
@@ -510,7 +511,7 @@ export const clause: Proto = {
       const hintBtn = h(
         'button',
         {
-          title: 'Get a hint for this panel',
+          title: 'Get a hint for this puzzle',
           style: {
             borderRadius: '999px',
             height: '28px',
@@ -547,9 +548,9 @@ export const clause: Proto = {
         h(
           'div',
           { style: { fontWeight: '800', marginBottom: '4px' } },
-          `${clauseDef.icon} ${clauseDef.genreTitle} · All 6 Holiday Gimmicks:`,
+          `${clauseDef.icon} ${clauseDef.genreTitle} · All 6 Holiday Twists:`,
         ),
-        ...clauseDef.gimmicks.map((g) =>
+        ...clauseDef.twistMeta.map((g) =>
           h(
             'div',
             { style: { marginBottom: '2px' } },
@@ -562,7 +563,7 @@ export const clause: Proto = {
       const helpBtn = h(
         'button',
         {
-          title: 'Show all 6 gimmick rules for this genre',
+          title: 'Show all 6 twist rules for this Base',
           style: {
             borderRadius: '999px',
             width: '28px',
@@ -621,11 +622,12 @@ export const clause: Proto = {
           lastSection = item.section;
           const isDone = gameState.isClausePanelSolved(clauseDef.genre, idx);
           const isCurrent = idx === activeIdx;
+          const idInfo = formatPuzzleIdentity(clauseDef.genre, item.twists);
           nodes.push(
             h(
               'button',
               {
-                title: `Panel ${idx + 1}: ${item.name} (${SECTION_META[item.section].badge})`,
+                title: `Puzzle ${idx + 1}: ${item.name} — ${idInfo.dualLabel} (${SECTION_META[item.section].badge})`,
                 style: {
                   minWidth: '24px',
                   height: '22px',
@@ -651,12 +653,12 @@ export const clause: Proto = {
         pipStrip.replaceChildren(...nodes);
       };
 
-      // Panel title + section badge + Gimmick Explanation Banner
+      // Puzzle title + Stage badge + Dual Display + Rule explanation
       const metaHeader = h('div', {
         style: {
           display: 'flex',
           flexDirection: 'column',
-          gap: '6px',
+          gap: '5px',
         },
       });
 
@@ -686,7 +688,7 @@ export const clause: Proto = {
             else renderChecklist();
           },
         },
-        'Next panel ▸',
+        'Next puzzle ▸',
       );
 
       const footerRow = h(
@@ -711,10 +713,11 @@ export const clause: Proto = {
         const sec = SECTION_META[item.section];
         renderPips(idx);
 
-        const activeGimmicks = item.twists
-          .map((k) => clauseDef.gimmicks.find((g) => g.key === k))
+        const activeTwists = item.twists
+          .map((k) => clauseDef.twistMeta.find((g) => g.key === k))
           .filter((g): g is NonNullable<typeof g> => Boolean(g));
 
+        const identity = formatPuzzleIdentity(clauseDef.genre, item.twists);
         const isIntro = item.section === 'intro';
 
         metaHeader.replaceChildren(
@@ -734,7 +737,7 @@ export const clause: Proto = {
               {
                 style: { fontWeight: '800', fontSize: '14px', color: '#1f2430' },
               },
-              `Panel ${idx + 1}/${panels.length} · ${item.name}`,
+              `Puzzle ${idx + 1}/${panels.length} · ${item.name}`,
             ),
             h(
               'span',
@@ -753,6 +756,18 @@ export const clause: Proto = {
               sec.badge,
             ),
           ),
+          h(
+            'div',
+            {
+              style: {
+                fontSize: '12px',
+                fontWeight: '700',
+                color: '#4a5568',
+                lineHeight: '1.3',
+              },
+            },
+            identity.dualLabel,
+          ),
           isIntro
             ? h(
                 'div',
@@ -767,11 +782,11 @@ export const clause: Proto = {
                     color: '#2d3748',
                   },
                 },
-                activeGimmicks.length > 0
+                activeTwists.length > 0
                   ? h(
                       'span',
                       { style: { fontWeight: '800', marginRight: '6px', color: '#1f2430' } },
-                      activeGimmicks.map((g) => `${g.icon} ${g.label}`).join(' + ') + ':',
+                      activeTwists.map((g) => `${g.icon} ${g.label}`).join(' + ') + ':',
                     )
                   : h(
                       'span',
@@ -801,7 +816,7 @@ export const clause: Proto = {
         message.textContent = '';
         message.style.color = '#4a5568';
         const alreadyDone = gameState.isClausePanelSolved(clauseDef.genre, idx);
-        nextBtn.textContent = idx < panels.length - 1 ? 'Next panel ▸' : '← Contract Checklist';
+        nextBtn.textContent = idx < panels.length - 1 ? 'Next puzzle ▸' : '← Contract Checklist';
         nextBtn.style.visibility = alreadyDone ? 'visible' : 'hidden';
 
         const pane = h('div', { class: 'puzz-board-pane' });
@@ -845,10 +860,11 @@ export const clause: Proto = {
               nextUnsolved !== -1 ? nextUnsolved : Math.min(idx + 1, panels.length - 1);
 
             message.style.color = '#276749';
-            message.textContent = text ? `✓ ${text}` : `✓ Panel ${idx + 1} solved!`;
-            nextBtn.textContent = idx < panels.length - 1 ? 'Next panel ▸' : '← Contract Checklist';
+            message.textContent = text ? `✓ ${text}` : `✓ Puzzle ${idx + 1} solved!`;
+            nextBtn.textContent =
+              idx < panels.length - 1 ? 'Next puzzle ▸' : '← Contract Checklist';
             nextBtn.style.visibility = 'visible';
-            ctx.status(`Panel ${idx + 1} of ${panels.length} solved`);
+            ctx.status(`Puzzle ${idx + 1} of ${panels.length} solved`);
 
             autoAdvanceTimer = window.setTimeout(() => {
               autoAdvanceTimer = 0;

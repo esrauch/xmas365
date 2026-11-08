@@ -1719,7 +1719,7 @@ export function buildHolidayAlcoveBay(
           ? '★ Restored!'
           : cpUnlocked
             ? '▶ Ready to Solve!'
-            : 'Restore 2 Items Below',
+            : 'Restore 2 Relics Below',
         icon: cpDone ? '✓' : cpUnlocked ? room.centerpiece.icon : '🔒',
         status: cpDone ? 'done' : cpUnlocked ? 'ready' : 'locked',
         accent: room.accent,
@@ -1756,7 +1756,7 @@ export function buildHolidayAlcoveBay(
           bay: room.id,
           kind: 'return-slot',
           label: `${item.icon} ${item.title}`,
-          sublabel: isPlaced ? '✓ Restored' : isCarried ? '✨ Tap to Restore' : 'Return Item',
+          sublabel: isPlaced ? '✓ Restored' : isCarried ? '✨ Tap to Restore' : 'Restore Relic',
           icon: isPlaced ? '✓' : isCarried ? '✨' : item.icon,
           status: isPlaced ? 'done' : isCarried ? 'place' : 'locked',
           connections: [
@@ -1820,7 +1820,7 @@ export function buildHolidayAlcoveBay(
           id: `unlock:${room.id}`,
           bay: room.id,
           label: `✨ Restore ${carriedUnlockItem.icon} ${carriedUnlockItem.title}`,
-          sublabel: `▶ Tap to Restore Item & Unlock ${room.shortTitle}`,
+          sublabel: `▶ Tap to Restore Relic & Unlock ${room.shortTitle}`,
           icon: '✨',
           status: 'place',
           accent: '#d69e2e',

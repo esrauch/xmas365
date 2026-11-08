@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { GameState, ROOM_SPECS, STRAY_ITEMS } from '../../src/game/state';
-import { ALL_CLAUSES, CLAUSE_PANEL_COUNT } from '../../src/proto/puzzles/clauses';
+import { GameState, ROOM_SPECS, STRAY_ITEMS, getRunIdentity } from '../../src/game/state';
+import {
+  ALL_CLAUSES,
+  CLAUSE_PANEL_COUNT,
+  formatPuzzleIdentity,
+} from '../../src/proto/puzzles/clauses';
 
-describe('XMAS365™ Merger Contract Finale gauntlet (6 clauses × 29 panels = 174 panels)', () => {
-  it('exposes all 6 clauses with 29 panels each (174 total)', () => {
+describe('XMAS365™ Merger Contract Finale gauntlet (6 clauses × 29 puzzles = 174 puzzles)', () => {
+  it('exposes all 6 clauses with 29 puzzles each (174 total)', () => {
     expect(ALL_CLAUSES).toHaveLength(6);
     expect(ALL_CLAUSES.map((c) => c.genre)).toEqual([
       'webs',
@@ -13,13 +17,46 @@ describe('XMAS365™ Merger Contract Finale gauntlet (6 clauses × 29 panels = 1
       'hops',
       'pictures',
     ]);
+    expect(ALL_CLAUSES.map((c) => c.genreTitle)).toEqual([
+      'Web',
+      'Carving',
+      'Lights',
+      'Heartstrings',
+      'Hops',
+      'Fireworks',
+    ]);
     let total = 0;
     for (const clause of ALL_CLAUSES) {
       expect(clause.panels, clause.id).toHaveLength(CLAUSE_PANEL_COUNT);
-      expect(clause.gimmicks, clause.id).toHaveLength(6);
+      expect(clause.twistMeta, clause.id).toHaveLength(6);
       total += clause.panels.length;
     }
     expect(total).toBe(174);
+  });
+
+  it('formats normalized Dual Display puzzle identities for 0, 1, and 2+ twists', () => {
+    const baseOnly = formatPuzzleIdentity('webs', []);
+    expect(baseOnly.themedName).toBe('Web');
+    expect(baseOnly.holidayFormula).toBe('Halloween');
+    expect(baseOnly.dualLabel).toBe('Web · Halloween');
+
+    const soloTwist = formatPuzzleIdentity('webs', ['letters']);
+    expect(soloTwist.themedName).toBe('Love-Letter Web');
+    expect(soloTwist.holidayFormula).toBe("Halloween (Valentine's)");
+    expect(soloTwist.dualLabel).toBe("Love-Letter Web · Halloween (Valentine's)");
+
+    const duoTwist = formatPuzzleIdentity('webs', ['letters', 'cuts']);
+    expect(duoTwist.themedName).toBe('Love-Letter Portioned Web');
+    expect(duoTwist.holidayFormula).toBe("Halloween (Valentine's, Thanksgiving)");
+    expect(duoTwist.dualLabel).toBe(
+      "Love-Letter Portioned Web · Halloween (Valentine's, Thanksgiving)",
+    );
+
+    expect(getRunIdentity('cobwebs')?.dualLabel).toBe('Web · Halloween');
+    expect(getRunIdentity('chocolates')?.dualLabel).toBe(
+      "Love-Letter Web · Halloween (Valentine's)",
+    );
+    expect(getRunIdentity('web')?.dualLabel).toBe('Spooky Web · Halloween (Halloween)');
   });
 
   it('tracks per-panel and per-clause voiding state through all 6 clauses', () => {

@@ -18,8 +18,8 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
   genreTitle: 'Fireworks',
   icon: '🎆',
   accent: '#2b6cb0',
-  gimmickOrder: ['dark', 'letters', 'colours', 'eggs', 'portions', 'snow'],
-  gimmicks: [
+  twistOrder: ['dark', 'letters', 'colours', 'eggs', 'portions', 'snow'],
+  twistMeta: [
     {
       key: 'dark',
       icon: '🎃',
@@ -29,31 +29,31 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
     {
       key: 'letters',
       icon: '💌',
-      label: 'Love Letters',
+      label: 'Love-Letter',
       rule: 'Letter clues stand for run lengths; same letter = same length, different letters = different lengths, filling the message blanks.',
     },
     {
       key: 'colours',
       icon: '🎆',
-      label: 'Red, White & Blue',
+      label: 'Patriotic',
       rule: 'Squares and clues are Red or Blue; same-color runs need an empty gap between them, while Red and Blue runs can touch directly!',
     },
     {
       key: 'eggs',
       icon: '🥚',
-      label: 'Egg Hunt',
+      label: 'Egg-Hunt',
       rule: 'A square with a numbered egg is filled and is that exact nth filled square from the left in its row.',
     },
     {
       key: 'portions',
       icon: '🥧',
-      label: 'Portions',
+      label: 'Portioned',
       rule: 'Every outlined region on the grid contains the exact same number of filled squares.',
     },
     {
       key: 'snow',
       icon: '❄️',
-      label: 'Snowflakes',
+      label: 'Snowflake',
       rule: 'Inside the frosty frame, filled squares mirror across the icy line.',
     },
   ],
@@ -493,12 +493,12 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
       },
     },
 
-    // 28: All 6 gimmicks boss
+    // 28: All 6 twists boss
     {
       name: 'The Grand Merger Finale',
       section: 'all6',
       twists: ['dark', 'letters', 'colours', 'eggs', 'portions', 'snow'],
-      tip: '🎃💌🎆🥚🥧❄️ All 6 Gimmicks: Every holiday clause fires at once!',
+      tip: '🎃💌🎆🥚🥧❄️ All 6 Twists: Every holiday clause fires at once!',
       explain:
         'The Clause VI Boss! ? clues, coded letter lengths, touching Red & Blue runs, numbered row eggs, equal-share portions, and the frosty mirror frame all combine in one grand display.',
       panel: {

@@ -10,11 +10,11 @@
  */
 
 import type { Panel as HopPanel } from '../../hops';
-import type { ClauseDef, ClausePanelItem, GimmickMeta } from './types';
+import type { ClauseDef, ClausePanelItem, TwistMeta } from './types';
 
 export type { HopPanel };
 
-export const HOPS_GIMMICK_ORDER = [
+export const HOPS_TWIST_ORDER = [
   'courses',
   'colours',
   'burrows',
@@ -23,35 +23,35 @@ export const HOPS_GIMMICK_ORDER = [
   'dark',
 ] as const;
 
-export const HOPS_GIMMICKS: readonly GimmickMeta[] = [
+export const HOPS_TWISTS: readonly TwistMeta[] = [
   {
     key: 'courses',
     icon: '🥧',
-    label: 'Portions',
+    label: 'Portioned',
     rule: 'Once a bunny enters an outlined lawn course, it must visit every square in that course before hopping out.',
   },
   {
     key: 'colours',
     icon: '🎆',
-    label: 'Red, White & Blue',
+    label: 'Patriotic',
     rule: 'Two bunnies (Red and Blue) each start at their own 1 egg and hop on their own color; white squares can be visited by either bunny.',
   },
   {
     key: 'burrows',
     icon: '🥚',
-    label: 'Burrows',
+    label: 'Egg-Hunt',
     rule: 'Matching burrow holes connect underground as a single hop between their two squares.',
   },
   {
     key: 'snow',
     icon: '❄️',
-    label: 'Snowflakes',
+    label: 'Snowflake',
     rule: 'Inside the frosty frame, every hop inside the frame mirrors across the icy line.',
   },
   {
     key: 'letters',
     icon: '💌',
-    label: 'Love Letters',
+    label: 'Love-Letter',
     rule: 'Letter eggs must be visited on the hop numbers in the blanks to spell the secret word.',
   },
   {
@@ -689,12 +689,12 @@ const PANELS: readonly ClausePanelItem<HopPanel>[] = [
     },
   },
 
-  // ── 28: All 6 Gimmicks Boss Panel ───────────────────────────────────────────
+  // ── 28: All 6 Twists Boss Puzzle ───────────────────────────────────────────
   {
     name: 'The Grand Easter Merger',
     section: 'all6',
     twists: ['courses', 'colours', 'burrows', 'snow', 'letters', 'dark'],
-    tip: '🥧🎆🥚❄️💌🎃 All 6 Gimmicks: Portions, Red/White/Blue, Burrows, Snowflakes, Letters & Spooky!',
+    tip: '🥧🎆🥚❄️💌🎃 All 6 Twists: Portioned, Patriotic, Egg-Hunt, Snowflake, Love-Letter & Spooky!',
     explain:
       'All six holiday clauses unite! Guide the Red and Blue bunnies through their courses and colors, hop underground through the burrow, mirror inside the frosty frame, spell HOP on steps 7-10-14, and navigate the shadowed lawn.',
     panel: {
@@ -736,11 +736,11 @@ export const CLAUSE_HOPS: ClauseDef<HopPanel> = {
   clauseIndex: 4,
   id: 'C5',
   genre: 'hops',
-  title: 'Clause V: Easter · Bunny Hops',
-  genreTitle: 'Bunny Hops',
+  title: 'Clause V: Easter · Hops',
+  genreTitle: 'Hops',
   icon: '🐰',
   accent: '#ecc94b',
-  gimmickOrder: HOPS_GIMMICK_ORDER,
-  gimmicks: HOPS_GIMMICKS,
+  twistOrder: HOPS_TWIST_ORDER,
+  twistMeta: HOPS_TWISTS,
   panels: PANELS,
 };

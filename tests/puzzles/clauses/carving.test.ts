@@ -4,13 +4,15 @@ import { Budget } from '../../../src/gen/core/budget';
 import { CLAUSE_CARVING } from '../../../src/proto/puzzles/clauses/carving';
 import { CLAUSE_PANEL_COUNT, pairCombinations } from '../../../src/proto/puzzles/clauses/types';
 
-describe('Clause II (C2): Thanksgiving · Table Carving', () => {
-  it('has canonical metadata and 29 panels', () => {
+describe('Clause II (C2): Thanksgiving · Carving', () => {
+  it('has canonical metadata and 29 puzzles', () => {
     expect(CLAUSE_CARVING.clauseIndex).toBe(1);
     expect(CLAUSE_CARVING.id).toBe('C2');
     expect(CLAUSE_CARVING.genre).toBe('carving');
-    expect(CLAUSE_CARVING.gimmickOrder).toEqual(CARVE_TWISTS);
-    expect(CLAUSE_CARVING.gimmicks.map((g) => g.key)).toEqual(CARVE_TWISTS);
+    expect(CLAUSE_CARVING.title).toBe('Clause II: Thanksgiving · Carving');
+    expect(CLAUSE_CARVING.genreTitle).toBe('Carving');
+    expect(CLAUSE_CARVING.twistOrder).toEqual(CARVE_TWISTS);
+    expect(CLAUSE_CARVING.twistMeta.map((g) => g.key)).toEqual(CARVE_TWISTS);
     expect(CLAUSE_CARVING.panels).toHaveLength(CLAUSE_PANEL_COUNT);
   });
 

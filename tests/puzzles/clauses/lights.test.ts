@@ -4,13 +4,15 @@ import { LIGHT_TWISTS, parse, problems, solve, twistsOf } from '../../../src/gen
 import { CLAUSE_LIGHTS } from '../../../src/proto/puzzles/clauses/lights';
 import { CLAUSE_PANEL_COUNT, pairCombinations } from '../../../src/proto/puzzles/clauses/types';
 
-describe('Clause III (C3): Christmas · Fairy Lights (29-panel gauntlet)', () => {
-  it('exports valid clause metadata and canonical gimmick order', () => {
+describe('Clause III (C3): Christmas · Lights (29-puzzle gauntlet)', () => {
+  it('exports valid clause metadata and canonical twist order', () => {
     expect(CLAUSE_LIGHTS.clauseIndex).toBe(2);
     expect(CLAUSE_LIGHTS.id).toBe('C3');
     expect(CLAUSE_LIGHTS.genre).toBe('lights');
-    expect(CLAUSE_LIGHTS.gimmickOrder).toEqual(LIGHT_TWISTS);
-    expect(CLAUSE_LIGHTS.gimmicks.map((g) => g.key)).toEqual(LIGHT_TWISTS);
+    expect(CLAUSE_LIGHTS.title).toBe('Clause III: Christmas · Lights');
+    expect(CLAUSE_LIGHTS.genreTitle).toBe('Lights');
+    expect(CLAUSE_LIGHTS.twistOrder).toEqual(LIGHT_TWISTS);
+    expect(CLAUSE_LIGHTS.twistMeta.map((g) => g.key)).toEqual(LIGHT_TWISTS);
     expect(CLAUSE_LIGHTS.panels).toHaveLength(CLAUSE_PANEL_COUNT);
   });
 

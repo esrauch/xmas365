@@ -938,14 +938,14 @@ const mountPanel: Parameters<typeof run<Panel>>[0]['mountPanel'] = (host, panel,
   mountStrands(host, panel, { solved: () => hooks.solved(), status: hooks.status });
 
 const CONTROLS =
-  'Drag through touching letters (diagonals too) to spell a word; slide back to undo a letter; let go to check it. Every letter is in exactly one theme word. The panels teach the rules; open a panel number to jump about.';
+  'Drag through touching letters (diagonals too) to spell a word; slide back to undo a letter; let go to check it. Every letter is in exactly one theme word. The puzzles teach the rules; open a puzzle number to jump about.';
 
 export const lovenotes = run({
   id: 'lovenotes',
   title: 'Love Notes',
   room: "Valentine's",
   kind: 'warm-up',
-  from: 'Heartstrings, taught panel by panel',
+  from: "Heartstrings · Valentine's, taught puzzle by puzzle",
   rules: `${CONTROLS} (A spangram, on bigger boards, runs from one side of the board to the other.)`,
   panels: LOVENOTES,
   mountPanel,
@@ -956,7 +956,7 @@ export const jack = run({
   title: "The Jack-o'-Lantern",
   room: "Valentine's",
   kind: 'stray',
-  from: 'Heartstrings; twist from Halloween: Spooky (letters in the dark)',
+  from: "Spooky Heartstrings · Valentine's (Halloween)",
   rules: `${CONTROLS} (Twist: some letters are in the dark, shown as ?; they light up when a word through them is found.)`,
   panels: JACK,
   mountPanel,
@@ -967,7 +967,7 @@ export const basket = run({
   title: "The Bunny's Basket",
   room: "Valentine's",
   kind: 'stray',
-  from: 'Heartstrings; twist from Easter: Egg Hunt',
+  from: "Egg-Hunt Heartstrings · Valentine's (Easter)",
   rules: `${CONTROLS} (Twist: an egg on a letter gives its place in its word; an egg marked 1 starts a word.)`,
   panels: BASKET,
   mountPanel,
@@ -978,7 +978,7 @@ export const mailbox = run({
   title: 'The Valentine Mailbox',
   room: "Valentine's",
   kind: 'centerpiece',
-  from: "Heartstrings; Valentine's own Love Letters (the round-one Mailbox's cipher)",
+  from: "Love-Letter Heartstrings · Valentine's (Valentine's)",
   rules: `${CONTROLS} (Twist: some letters are written as numbers, the same number always the same letter; find a word through one and it's revealed everywhere, and in the key.)`,
   panels: MAILBOX,
   mountPanel,

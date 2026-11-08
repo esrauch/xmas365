@@ -4,13 +4,15 @@ import { WEB_TWISTS, parse as fromPanel, problems, solve, twistsOf } from '../..
 import { CLAUSE_PANEL_COUNT, pairCombinations } from '../../../src/proto/puzzles/clauses/types';
 import { CLAUSE_WEBS } from '../../../src/proto/puzzles/clauses/webs';
 
-describe('CLAUSE_WEBS (Clause I: Halloween · Spiderwebs)', () => {
-  it('has the expected clause metadata and 29 panels', () => {
+describe('CLAUSE_WEBS (Clause I: Halloween · Web)', () => {
+  it('has the expected clause metadata and 29 puzzles', () => {
     expect(CLAUSE_WEBS.clauseIndex).toBe(0);
     expect(CLAUSE_WEBS.id).toBe('C1');
     expect(CLAUSE_WEBS.genre).toBe('webs');
-    expect(CLAUSE_WEBS.gimmickOrder).toEqual(WEB_TWISTS);
-    expect(CLAUSE_WEBS.gimmicks.map((g) => g.key)).toEqual(WEB_TWISTS);
+    expect(CLAUSE_WEBS.title).toBe('Clause I: Halloween · Web');
+    expect(CLAUSE_WEBS.genreTitle).toBe('Web');
+    expect(CLAUSE_WEBS.twistOrder).toEqual(WEB_TWISTS);
+    expect(CLAUSE_WEBS.twistMeta.map((g) => g.key)).toEqual(WEB_TWISTS);
     expect(CLAUSE_WEBS.panels).toHaveLength(CLAUSE_PANEL_COUNT);
   });
 

@@ -69,25 +69,27 @@ and hear, the rules are on the board, and solving is a small celebration.
 
 ## The six base puzzles
 
-| Holiday | Puzzle | Based on | Rules in brief | The gesture | The payoff |
+| Holiday | Base (Noun) | Based on | Rules in brief | The gesture | The payoff |
 |---|---|---|---|---|---|
-| **Halloween** | **Spiderweb** | Hashi (Nikoli's Hashiwokakero; Tatham's Bridges) | Join the knots with threads. Each knot's number is how many threads leave it; threads run straight, one or two between a pair, never cross; the web is all one piece. | Drag knot to knot (again for a double); tap to cut. | Knots glow as they fill; a web in pieces flashes each piece; solved, it turns gold in the moonlight. |
+| **Halloween** | **Web** *(formerly Spiderweb)* | Hashi (Nikoli's Hashiwokakero; Tatham's Bridges) | Join the knots with threads. Each knot's number is how many threads leave it; threads run straight, one or two between a pair, never cross; the web is all one piece. | Drag knot to knot (again for a double); tap to cut. | Knots glow as they fill; a web in pieces flashes each piece; solved, it turns gold in the moonlight. |
 | **Thanksgiving** | **Carving** | Shikaku (Nikoli; Tatham's Rectangles) | Divide the grid into rectangles, each holding exactly one number: its size. | Drag corner to corner; tap to lift. | A portion glows green when right; the carved board turns gold. |
-| **Christmas** | **Lights** | Net (Tatham) | Turn the pieces so power from the plug reaches every square, with no loose wire ends. | Tap to turn a quarter clockwise. | You watch the power spread from the plug; loose ends spark; solved, the string turns gold and the star lights. |
-| **Valentine's** | **Heartstrings** | Strands (NYT) | Every letter belongs to one theme word; trace words through touching letters (diagonals too). Bigger grids have a spangram running side to side. | Drag through letters. | A word locks in blue (the spangram gold) with a chime. |
-| **Easter** | **Hops** | Numbrix (Hidato with plain steps) | The bunny visits every square once, stepping up, down, left or right; numbered eggs are its steps of that number. Every panel has an egg 1 to start on. | Drag the trail; tap the bunny to step back. | Eggs glow when reached on time (red when early or missed); solved, they turn gold. |
-| **Fourth of July** | **Fireworks** | Nonograms | Clues at each row and column give its runs of filled squares, in order. Pictures solve exactly as drawn. | Tap to fill / cross / clear; drag a run. | Clues go grey as lines match; the firework picture appears. |
+| **Christmas** | **Lights** *(formerly Fairy Lights)* | Net (Tatham) | Turn the pieces so power from the plug reaches every square, with no loose wire ends. | Tap to turn a quarter clockwise. | You watch the power spread from the plug; loose ends spark; solved, the string turns gold and the star lights. |
+| **Valentine's** | **Heartstrings** *(formerly Words)* | Strands (NYT) | Every letter belongs to one theme word; trace words through touching letters (diagonals too). Bigger grids have a spangram running side to side. | Drag through letters. | A word locks in blue (the spangram gold) with a chime. |
+| **Easter** | **Hops** *(formerly Bunny Hops)* | Numbrix (Hidato with plain steps) | The bunny visits every square once, stepping up, down, left or right; numbered eggs are its steps of that number. Every puzzle has an egg 1 to start on. | Drag the trail; tap the bunny to step back. | Eggs glow when reached on time (red when early or missed); solved, they turn gold. |
+| **Fourth of July** | **Fireworks** *(formerly Pictures)* | Nonograms | Clues at each row and column give its runs of filled squares, in order. Pictures solve exactly as drawn. | Tap to fill / cross / clear; drag a run. | Clues go grey as lines match; the firework picture appears. |
 
 ## The six twists
 
-| Holiday | Twist | What it always means | How it shows itself working |
-|---|---|---|---|
-| **Valentine's** | **Love Letters** | Some numbers are written as letters: the same letter is the same number, different letters different numbers. A little message's numbered blanks fill in from them, so the words and the puzzle help each other. Always at least two different letters (different numbers), even on easy: one letter alone is just a hidden given (fine only for a training level). | The message tiles fill in, gold, as the panel solves. Guessing the word is a legitimate shortcut. |
-| **Christmas** | **Snowflakes** | The answer's skeleton is its own mirror image across a line, but a detail on each side is free, so neither half can be solved alone (see below). | A ghost shows where your drawing's mirror image still has to go; it fades once it's drawn. |
-| **Halloween** | **Spooky** | Some clues are hidden in shadow (could be anything) until worked out. | The dark lights up on solving, showing what was there. |
-| **Easter** | **Egg Hunt** | An egg marks *when* or *which*: the step a square is visited on, its place in an order, or an Easter basket share. | An egg turns green when its moment comes on time, red when it doesn't. |
-| **Fourth of July** | **Red, White and Blue** | Things are red or blue, or white (the default: uncoloured); two reds or two blues can't join or touch, and white touches anything. | A same-colour touch flashes both pieces red. |
-| **Thanksgiving** | **Portions** | The board is outlined in portions and every portion gets the same; or short fences (cuts) that nothing may cross. | Each portion shows its share so far (🥧 2/3), green when it's fair; a fence flashes when something tries to cross it. |
+Each Twist has a canonical adjective used in the Dual Display format (`[Twist1] [Twist2] [Base] · BaseHoliday (TwistHoliday1, TwistHoliday2)`):
+
+| Holiday | Twist (Adjective) | Formerly Used Terms | What it always means | How it shows itself working |
+|---|---|---|---|---|
+| **Valentine's** | **Love-Letter** | *Love Letters*, *Letters* | Some numbers are written as letters: the same letter is the same number, different letters different numbers. A little message's numbered blanks fill in from them, so the words and the puzzle help each other. Always at least two different letters (different numbers), even on easy: one letter alone is just a hidden given (fine only for a training level). | The message tiles fill in, gold, as the puzzle solves. Guessing the word is a legitimate shortcut. |
+| **Christmas** | **Snowflake** | *Snowflakes*, *Frosty mirror* | The answer's skeleton is its own mirror image across a line, but a detail on each side is free, so neither half can be solved alone (see below). | A ghost shows where your drawing's mirror image still has to go; it fades once it's drawn. |
+| **Halloween** | **Spooky** | *Dark*, *The dark* | Some clues are hidden in shadow (could be anything) until worked out. | The dark lights up on solving, showing what was there. |
+| **Easter** | **Egg-Hunt** | *Egg Hunt*, *Eggs*, *Baskets*, *Burrows* | An egg marks *when* or *which*: the step a square is visited on, its place in an order, or an Easter basket share. | An egg turns green when its moment comes on time, red when it doesn't. |
+| **Fourth of July** | **Patriotic** | *Red, White and Blue*, *Red/White/Blue*, *Colours* | Things are red or blue, or white (the default: uncoloured); two reds or two blues can't join or touch, and white touches anything. | A same-colour touch flashes both pieces red. |
+| **Thanksgiving** | **Portioned** | *Portions*, *Fair shares*, *Cuts*, *Slices*, *Courses* | The board is outlined in portions and every portion gets the same; or short fences (cuts) that nothing may cross. | Each portion shows its share so far (🥧 2/3), green when it's fair; a fence flashes when something tries to cross it. |
 
 ### Snowflakes in detail
 
@@ -116,17 +118,15 @@ Mirroring everything just halves the puzzle (solve one side, copy it).
 
 ## The matrix
 
-Rows are puzzles, columns are twists. **Bold** marks the puzzle's own
-holiday's twist, at home (the centrepiece). ✅ a built room run (all still
-need playing); ⚙️ in the generator (any tier, any mix of twists). Santa's
+Rows are Bases, columns are Twists. **Bold** marks the Base's own
+holiday's Twist, at home (the Centerpiece Run). ✅ a built Room Run; ⚙️ in the generator (any tier, any mix of Twists). Santa's
 merger contract (`src/proto/puzzles/clause.ts` + `src/proto/puzzles/clauses/`)
-puts every cell of this matrix to work across 6 Clauses × 29 panels = 174 panels
-(1 base + 6 gimmick intros + 6 solo gimmicks + all 15 two-gimmick combos + 1
-all-6 boss panel per genre).
+puts every cell of this matrix to work across 6 Clauses × 29 puzzles = 174 puzzles
+(`Stage 1 · Base Puzzle` [1] + `Stage 2 · Twist Reminders` [6] + `Stage 3 · Solo Twist` [6] + `Stage 4 · Double Twist` [15] + `Stage 5 · All 6 Twists` [1] per Base).
 
-| Puzzle ↓ / Twist → | Love Letters (Val.) | Snowflakes (Xmas) | Spooky (Hall.) | Egg Hunt (Easter) | Red, White & Blue (4th) | Portions (Thanks.) |
+| Base ↓ / Twist → | Love-Letter (Val.) | Snowflake (Xmas) | Spooky (Hall.) | Egg-Hunt (Easter) | Patriotic (4th) | Portioned (Thanks.) |
 |---|---|---|---|---|---|---|
-| **Spiderweb** (Halloween) | ✅ Box of Chocolates, ⚙️ | ✅ Tree-Top Star, ⚙️ | ✅ **Spider's Web**, ⚙️ | ⚙️ | ⚙️ | ⚙️ cuts |
+| **Web** (Halloween) | ✅ Box of Chocolates, ⚙️ | ✅ Tree-Top Star, ⚙️ | ✅ **Spider's Web**, ⚙️ | ⚙️ | ⚙️ | ⚙️ cuts |
 | **Carving** (Thanksgiving) | ⚙️ | ✅ Stocking, ⚙️ | ⚙️ | ⚙️ Easter baskets | ✅ Hot Dog, ⚙️ | ✅ **Feast**, ⚙️ cuts |
 | **Lights** (Christmas) | ⚙️ | ✅ **Christmas Tree**, ⚙️ | ⚙️ | ✅ Golden Egg, ⚙️ | ⚙️ | ✅ Pumpkin Pie, ⚙️ |
 | **Heartstrings** (Valentine's) | ✅ **Valentine Mailbox**, ⚙️ | ⚙️ mirror pairs | ✅ Jack-o'-Lantern, ⚙️ | ✅ Bunny's Basket, ⚙️ | ⚙️ | ⚙️ cuts |
@@ -291,9 +291,9 @@ All six columns are in the generator (⚙️), generating across easy, medium, a
 
 XMAS365™'s merger contract (`src/proto/puzzles/clause.ts` +
 `src/proto/puzzles/clauses/`) is a 6-Clause checklist in Holiday Hall, one
-clause per puzzle genre (`webs`, `carving`, `lights`, `words`, `hops`,
-`pictures`). Each clause is a 29-panel gauntlet (`1 base + 6 gimmick intros +
-6 solo gimmicks + 15 two-gimmick combos + 1 all-6 boss panel` = 174 panels
+clause per puzzle Base (`Web`, `Carving`, `Lights`, `Heartstrings`, `Hops`,
+`Fireworks`). Each clause is a 29-puzzle Clause Run (`1 base + 6 twist reminders +
+6 solo twists + 15 double twists + 1 all-6 twists boss` = 174 puzzles
 total). Voiding all six clauses triggers the Sec 6.2 Leap Year loophole and
 opens Leap Day's surprise party in Holiday Hall (`src/game/dioramas/hall.ts`).
 

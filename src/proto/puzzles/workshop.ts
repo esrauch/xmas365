@@ -19,6 +19,7 @@ import { mountLights } from '../netBoard';
 import { mountPicture } from '../pictureBoard';
 import { mountCarving } from '../shikakuBoard';
 import { mountStrands } from '../strandsBoard';
+import { formatPuzzleIdentity } from './clauses/types';
 
 interface Workshop {
   genre: Genre;
@@ -37,29 +38,28 @@ interface Workshop {
 
 const WEBS: Workshop = {
   genre: 'webs',
-  title: 'Spiderweb workshop',
-  from: 'Spiderweb, generated in the browser, with any mix of twists',
+  title: 'Web Workshop',
+  from: 'Web, generated in the browser, with any mix of twists',
   rules:
     'Pick a difficulty and any twists, then Generate. Drag between knots to spin a thread (again for a double); tap a thread to cut it.',
   twists: [
     { id: 'dark', label: 'Spooky (Halloween): some knots show no number' },
-    { id: 'letters', label: "Love Letters (Valentine's): a message to fill in" },
+    { id: 'letters', label: "Love-Letter (Valentine's): a message to fill in" },
     {
       id: 'colours',
-      label:
-        'Red, White and Blue (Fourth of July): threads join red to blue; white knots join anything',
+      label: 'Patriotic (Fourth of July): threads join red to blue; white knots join anything',
     },
-    { id: 'eggs', label: 'Egg Hunt (Easter): threads from the spider’s home' },
-    { id: 'cuts', label: 'Portions (Thanksgiving): fences no thread may cross' },
-    { id: 'snow', label: 'Snowflakes (Christmas): the joins mirror; singles and doubles don’t' },
+    { id: 'eggs', label: 'Egg-Hunt (Easter): threads from the spider’s home' },
+    { id: 'cuts', label: 'Portioned (Thanksgiving): fences no thread may cross' },
+    { id: 'snow', label: 'Snowflake (Christmas): the joins mirror; singles and doubles don’t' },
   ],
   twistsOf: (p) => webTwists(p as WebPanel),
-  mount: (host, p, hooks) => mountWeb(host, { ...(p as WebPanel), name: 'Workshop web' }, hooks),
+  mount: (host, p, hooks) => mountWeb(host, { ...(p as WebPanel), name: 'Workshop Web' }, hooks),
 };
 
 const CARVING: Workshop = {
   genre: 'carving',
-  title: 'Carving workshop',
+  title: 'Carving Workshop',
   from: 'Carving, generated in the browser, with any mix of twists',
   rules:
     'Pick a difficulty and any twists, then Generate. Drag from one square to another to carve a portion; tap a portion to lift it.',
@@ -67,19 +67,19 @@ const CARVING: Workshop = {
     { id: 'dark', label: 'Spooky (Halloween): some sizes hidden' },
     {
       id: 'letters',
-      label: "Love Letters (Valentine's): some sizes are letters, with a message",
+      label: "Love-Letter (Valentine's): some sizes are letters, with a message",
     },
-    { id: 'colours', label: 'Red, White and Blue (Fourth of July): same colors never touch' },
-    { id: 'cuts', label: 'Portions (Thanksgiving): fences no portion may cross' },
+    { id: 'colours', label: 'Patriotic (Fourth of July): same colors never touch' },
+    { id: 'cuts', label: 'Portioned (Thanksgiving): fences no portion may cross' },
     {
       id: 'basket',
-      label: 'Egg Hunt (Easter): every portion gets an egg, a carrot and a chocolate',
+      label: 'Egg-Hunt (Easter): every portion gets an egg, a carrot and a chocolate',
     },
-    { id: 'snow', label: 'Snowflakes (Christmas): inside a frame, the cuts mirror' },
+    { id: 'snow', label: 'Snowflake (Christmas): inside a frame, the cuts mirror' },
   ],
   twistsOf: (p) => carveTwists(p as CarvePanel),
   mount: (host, p, hooks) =>
-    mountCarving(host, { ...(p as CarvePanel), name: 'Workshop carving' }, hooks),
+    mountCarving(host, { ...(p as CarvePanel), name: 'Workshop Carving' }, hooks),
 };
 
 const keyOf = (genre: Genre): string => `puzz.workshop.${genre}`;
@@ -237,8 +237,9 @@ const workshop = (id: string, w: Workshop): Proto => ({
         return;
       }
       const on = w.twistsOf(made.panel);
+      const identity = formatPuzzleIdentity(w.genre, on);
       const shapeTag = spec.shape && spec.shape !== 'rect' ? ` · ${spec.shape}` : '';
-      info.textContent = `Made in ${ms} ms · seed ${made.seed} · ${spec.tier}${shapeTag} · ${on.length ? on.join(', ') : 'plain'} · ${Object.entries(
+      info.textContent = `${identity.dualLabel} · Made in ${ms} ms · seed ${made.seed} · ${spec.tier}${shapeTag} · ${Object.entries(
         made.stats,
       )
         .map(([k, v]) => `${k} ${v}`)
@@ -309,27 +310,27 @@ const workshop = (id: string, w: Workshop): Proto => ({
 
 const WORDS: Workshop = {
   genre: 'words',
-  title: 'Heartstrings workshop',
+  title: 'Heartstrings Workshop',
   from: 'Heartstrings, generated in the browser, with any mix of twists',
   rules:
     'Pick a difficulty and any twists, then Generate. Drag through touching letters (diagonals too) to find the theme words; every letter is in one.',
   twists: [
     { id: 'dark', label: 'Spooky (Halloween): a few letters hidden' },
-    { id: 'letters', label: "Love Letters (Valentine's): some letters written as numbers" },
+    { id: 'letters', label: "Love-Letter (Valentine's): some letters written as numbers" },
     {
       id: 'colours',
-      label: 'Red, White and Blue (Fourth of July): bows; same colors never touch',
+      label: 'Patriotic (Fourth of July): bows; same colors never touch',
     },
-    { id: 'eggs', label: 'Egg Hunt (Easter): a letter’s place in its word' },
+    { id: 'eggs', label: 'Egg-Hunt (Easter): a letter’s place in its word' },
     {
       id: 'cuts',
-      label: 'Portions (Thanksgiving): fences no word steps across',
+      label: 'Portioned (Thanksgiving): fences no word steps across',
     },
-    { id: 'snow', label: 'Snowflakes (Christmas): words in mirror pairs inside a frame' },
+    { id: 'snow', label: 'Snowflake (Christmas): words in mirror pairs inside a frame' },
   ],
   twistsOf: (p) => wordTwists(p as WordPanel),
   mount: (host, p, hooks) =>
-    mountStrands(host, { ...(p as WordPanel), name: 'Workshop heartstrings' }, hooks),
+    mountStrands(host, { ...(p as WordPanel), name: 'Workshop Heartstrings' }, hooks),
 };
 
 export const webWorkshop = workshop('webworkshop', WEBS);
@@ -338,8 +339,8 @@ export const carvingWorkshop = workshop('carvingworkshop', CARVING);
 
 const HOPS: Workshop = {
   genre: 'hops',
-  title: 'Bunny Hops workshop',
-  from: 'Bunny Hops, generated in the browser, with any mix of twists',
+  title: 'Hops Workshop',
+  from: 'Hops, generated in the browser, with any mix of twists',
   rules:
     'Pick a difficulty and any twists, then Generate. Drag through neighboring spots to lay the bunny’s trail; tap the bunny to step back.',
   shapes: [
@@ -347,29 +348,29 @@ const HOPS: Workshop = {
     { id: 'tree', label: 'Tree (★ Golden Egg at top)' },
   ],
   twists: [
-    { id: 'courses', label: 'Portions (Thanksgiving): finish each portion before the next' },
+    { id: 'courses', label: 'Portioned (Thanksgiving): finish each portion before the next' },
     {
       id: 'colours',
       label:
-        'Red, White and Blue (Fourth of July): two bunnies, each over its own color; white goes to either',
+        'Patriotic (Fourth of July): two bunnies, each over its own color; white goes to either',
     },
-    { id: 'burrows', label: 'Egg Hunt (Easter): underground hops between burrows' },
-    { id: 'snow', label: 'Snowflakes (Christmas): inside a frame, the trail mirrors' },
+    { id: 'burrows', label: 'Egg-Hunt (Easter): underground hops between burrows' },
+    { id: 'snow', label: 'Snowflake (Christmas): inside a frame, the trail mirrors' },
     {
       id: 'letters',
-      label: "Love Letters (Valentine's): eggs with letters; a message to fill in",
+      label: "Love-Letter (Valentine's): eggs with letters; a message to fill in",
     },
     { id: 'dark', label: 'Spooky (Halloween): rocks hidden in shadow' },
   ],
   twistsOf: (p) => hopTwists(p as HopPanel),
-  mount: (host, p, hooks) => mountHops(host, { ...(p as HopPanel), name: 'Workshop hops' }, hooks),
+  mount: (host, p, hooks) => mountHops(host, { ...(p as HopPanel), name: 'Workshop Hops' }, hooks),
 };
 
 export const hopsWorkshop = workshop('hopsworkshop', HOPS);
 
 const LIGHTS: Workshop = {
   genre: 'lights',
-  title: 'Lights workshop',
+  title: 'Lights Workshop',
   from: 'Lights, generated in the browser, with any mix of twists',
   rules:
     'Pick a difficulty and any twists, then Generate. Tap a piece to turn it a quarter clockwise. Power spreads from the plug to light every square.',
@@ -381,32 +382,32 @@ const LIGHTS: Workshop = {
     { id: 'wreath', label: 'Wreath (ring)' },
   ],
   twists: [
-    { id: 'snow', label: 'Snowflakes (Christmas): inside a frame, wires mirror' },
+    { id: 'snow', label: 'Snowflake (Christmas): inside a frame, wires mirror' },
     { id: 'dark', label: 'Spooky (Halloween): pieces stay dark until solved' },
     {
       id: 'letters',
-      label: "Love Letters (Valentine's): letter bulbs whose distances match message blanks",
+      label: "Love-Letter (Valentine's): letter bulbs whose distances match message blanks",
     },
-    { id: 'eggs', label: 'Egg Hunt (Easter): power reaches each egg in its step count' },
+    { id: 'eggs', label: 'Egg-Hunt (Easter): power reaches each egg in its step count' },
     {
       id: 'colours',
-      label: 'Red, White and Blue (Fourth of July): red and blue strings from separate plugs',
+      label: 'Patriotic (Fourth of July): red and blue strings from separate plugs',
     },
     {
       id: 'slices',
-      label: 'Portions (Thanksgiving): pie slices with one feed each, no crossing slice walls',
+      label: 'Portioned (Thanksgiving): pie slices with one feed each, no crossing slice walls',
     },
   ],
   twistsOf: (p) => lightTwists(p as LightPanel),
   mount: (host, p, hooks) =>
-    mountLights(host, { ...(p as LightPanel), name: 'Workshop lights' }, hooks),
+    mountLights(host, { ...(p as LightPanel), name: 'Workshop Lights' }, hooks),
 };
 
 export const lightsWorkshop = workshop('lightsworkshop', LIGHTS);
 
 const PICTURES: Workshop = {
   genre: 'pictures',
-  title: 'Fireworks workshop',
+  title: 'Fireworks Workshop',
   from: 'Fireworks, generated in the browser, with any mix of twists',
   rules:
     'Pick a difficulty and any twists, then Generate. Tap to fill, cross out, or clear (or pick a paint in color); drag along a row or column to paint a run.',
@@ -414,25 +415,25 @@ const PICTURES: Workshop = {
     { id: 'dark', label: 'Spooky (Halloween): some run clues hidden (?)' },
     {
       id: 'letters',
-      label: "Love Letters (Valentine's): some run clues are letters, with a message",
+      label: "Love-Letter (Valentine's): some run clues are letters, with a message",
     },
     {
       id: 'colours',
-      label: 'Red, White and Blue (Fourth of July): red and blue runs; different colors can touch',
+      label: 'Patriotic (Fourth of July): red and blue runs; different colors can touch',
     },
     {
       id: 'eggs',
-      label: 'Egg Hunt (Easter): an egg on a row clue marks which run covers the egg square',
+      label: 'Egg-Hunt (Easter): an egg on a row clue marks which run covers the egg square',
     },
     {
       id: 'portions',
-      label: 'Portions (Thanksgiving): every outlined portion holds the same filled squares',
+      label: 'Portioned (Thanksgiving): every outlined portion holds the same filled squares',
     },
-    { id: 'snow', label: 'Snowflakes (Christmas): inside a frame, the filled squares mirror' },
+    { id: 'snow', label: 'Snowflake (Christmas): inside a frame, the filled squares mirror' },
   ],
   twistsOf: (p) => pictureTwists(p as PicturePanel),
   mount: (host, p, hooks) =>
-    mountPicture(host, { ...(p as PicturePanel), name: 'Workshop fireworks' }, hooks),
+    mountPicture(host, { ...(p as PicturePanel), name: 'Workshop Fireworks' }, hooks),
 };
 
 export const picturesWorkshop = workshop('picturesworkshop', PICTURES);

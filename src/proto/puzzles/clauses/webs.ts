@@ -5,12 +5,12 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
   clauseIndex: 0,
   id: 'C1',
   genre: 'webs',
-  title: 'Clause I: Halloween · Spiderwebs',
-  genreTitle: 'Spiderwebs',
+  title: 'Clause I: Halloween · Web',
+  genreTitle: 'Web',
   icon: '🕸️',
   accent: '#805ad5',
-  gimmickOrder: ['dark', 'letters', 'colours', 'eggs', 'cuts', 'snow'],
-  gimmicks: [
+  twistOrder: ['dark', 'letters', 'colours', 'eggs', 'cuts', 'snow'],
+  twistMeta: [
     {
       key: 'dark',
       icon: '🎃',
@@ -20,31 +20,31 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
     {
       key: 'letters',
       icon: '💌',
-      label: 'Love Letters',
+      label: 'Love-Letter',
       rule: 'Same letter = same thread count; different letters = different counts, filling the message blanks.',
     },
     {
       key: 'colours',
       icon: '🎆',
-      label: 'Red, White & Blue',
+      label: 'Patriotic',
       rule: 'Red and blue knots never join two knots of the same color; white knots join anything.',
     },
     {
       key: 'eggs',
       icon: '🥚',
-      label: 'Egg Hunt',
+      label: 'Egg-Hunt',
       rule: 'Each numbered egg knot is reached in that exact fewest thread-steps from the 🕷 home knot.',
     },
     {
       key: 'cuts',
       icon: '🥧',
-      label: 'Portions',
+      label: 'Portioned',
       rule: 'Threads cannot cross thick fence bars between squares.',
     },
     {
       key: 'snow',
       icon: '❄️',
-      label: 'Snowflakes',
+      label: 'Snowflake',
       rule: 'Inside the frosty frame, whether two knots are joined mirrors across the icy line.',
     },
   ],
@@ -453,12 +453,12 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
       },
     },
 
-    // 28: All 6 gimmicks boss panel (7x7)
+    // 28: All 6 twists boss puzzle (7x7)
     {
       name: 'The Grand Cobweb',
       section: 'all6',
       twists: ['dark', 'letters', 'colours', 'eggs', 'cuts', 'snow'],
-      tip: '🎃💌🎆🥚🥧❄️ All 6 Gimmicks: Every holiday clause rule is active at once!',
+      tip: '🎃💌🎆🥚🥧❄️ All 6 Twists: Every holiday clause rule is active at once!',
       explain:
         'The final Clause I boss web! Balance dark (?) knots, coded W/B letters, red/blue colors, the 5-hop egg from 🕷, the fence bar, and horizontal snowflake symmetry all at once.',
       panel: {

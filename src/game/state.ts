@@ -22,6 +22,8 @@ import {
   CLAUSE_GENRES,
   CLAUSE_PANEL_COUNT,
   type ClauseGenre,
+  type PuzzleIdentity,
+  formatPuzzleIdentity,
 } from '../proto/puzzles/clauses/types';
 import { basket, jack, lovenotes, mailbox } from '../proto/puzzles/valentines';
 
@@ -82,7 +84,7 @@ export const STRAY_ITEMS: Record<StrayId, StraySpec> = {
     id: 'chocolates',
     title: 'Box of Chocolates',
     icon: '🍫',
-    twistLabel: "Valentine's Love Letters: same letter = same thread count",
+    twistLabel: "Valentine's Love-Letter: same letter = same thread count",
     foundIn: 'halloween',
     homeRoom: 'valentines',
     proto: chocolates,
@@ -91,7 +93,7 @@ export const STRAY_ITEMS: Record<StrayId, StraySpec> = {
     id: 'starlights',
     title: 'Tree-Top Star',
     icon: '⭐',
-    twistLabel: 'Christmas Snowflakes: joins mirror across the icy line',
+    twistLabel: 'Christmas Snowflake: joins mirror across the icy line',
     foundIn: 'halloween',
     homeRoom: 'christmas',
     proto: starlights,
@@ -101,7 +103,7 @@ export const STRAY_ITEMS: Record<StrayId, StraySpec> = {
     id: 'hotdog',
     title: 'The Hot Dog',
     icon: '🌭',
-    twistLabel: 'Fourth of July Colors: same-color portions never share an edge',
+    twistLabel: 'Fourth of July Patriotic: same-color portions never share an edge',
     foundIn: 'thanksgiving',
     homeRoom: 'fourth',
     proto: hotdog,
@@ -110,7 +112,7 @@ export const STRAY_ITEMS: Record<StrayId, StraySpec> = {
     id: 'stocking',
     title: 'The Stocking',
     icon: '🧦',
-    twistLabel: 'Christmas Snowflakes: cuts mirror inside the frosty frame',
+    twistLabel: 'Christmas Snowflake: cuts mirror inside the frosty frame',
     foundIn: 'thanksgiving',
     homeRoom: 'christmas',
     proto: stocking,
@@ -120,7 +122,7 @@ export const STRAY_ITEMS: Record<StrayId, StraySpec> = {
     id: 'goldenegg',
     title: 'The Golden Egg',
     icon: '🥚',
-    twistLabel: 'Easter Egg Hunt: reach each numbered egg in that many wire steps',
+    twistLabel: 'Easter Egg-Hunt: reach each numbered egg in that many wire steps',
     foundIn: 'christmas',
     homeRoom: 'easter',
     proto: goldenegg,
@@ -129,7 +131,7 @@ export const STRAY_ITEMS: Record<StrayId, StraySpec> = {
     id: 'pumpkinpie',
     title: 'The Pumpkin Pie',
     icon: '🥧',
-    twistLabel: 'Thanksgiving Portions: each slice gets one wire from the plug',
+    twistLabel: 'Thanksgiving Portioned: each slice gets one wire from the plug',
     foundIn: 'christmas',
     homeRoom: 'thanksgiving',
     proto: pumpkinpie,
@@ -148,7 +150,7 @@ export const STRAY_ITEMS: Record<StrayId, StraySpec> = {
     id: 'basket',
     title: "Bunny's Basket",
     icon: '🧺',
-    twistLabel: 'Easter Egg Hunt: an egg shows a letter’s position in its word',
+    twistLabel: 'Easter Egg-Hunt: an egg shows a letter’s position in its word',
     foundIn: 'valentines',
     homeRoom: 'easter',
     proto: basket,
@@ -159,7 +161,7 @@ export const STRAY_ITEMS: Record<StrayId, StraySpec> = {
     title: 'Star-Spangled Flag',
     icon: '🇺🇸',
     twistLabel:
-      'Fourth of July Colors: red and blue bunnies hop over their own color (white is shared)',
+      'Fourth of July Patriotic: red and blue bunnies hop over their own color (white is shared)',
     foundIn: 'easter',
     homeRoom: 'fourth',
     proto: flag,
@@ -168,7 +170,7 @@ export const STRAY_ITEMS: Record<StrayId, StraySpec> = {
     id: 'cornucopia',
     title: 'The Cornucopia',
     icon: '🌽',
-    twistLabel: 'Thanksgiving Portions: finish each outlined course before the next',
+    twistLabel: 'Thanksgiving Portioned: finish each outlined course before the next',
     foundIn: 'easter',
     homeRoom: 'thanksgiving',
     proto: cornucopia,
@@ -178,7 +180,7 @@ export const STRAY_ITEMS: Record<StrayId, StraySpec> = {
     id: 'bow',
     title: "Cupid's Bow",
     icon: '🏹',
-    twistLabel: "Valentine's Love Letters: letter clues share equal run lengths",
+    twistLabel: "Valentine's Love-Letter: letter clues share equal run lengths",
     foundIn: 'fourth',
     homeRoom: 'valentines',
     proto: bow,
@@ -200,7 +202,7 @@ export const ROOM_SPECS: readonly [RoomSpec, RoomSpec, RoomSpec, RoomSpec, RoomS
     title: 'Halloween Porch',
     shortTitle: 'Halloween',
     icon: '🎃',
-    genreLabel: 'Spiderweb',
+    genreLabel: 'Web',
     accent: '#805ad5',
     secondaryAccent: '#ff7b29',
     wallColor: '#634887',
@@ -232,7 +234,7 @@ export const ROOM_SPECS: readonly [RoomSpec, RoomSpec, RoomSpec, RoomSpec, RoomS
       id: 'feast',
       title: 'The Feast',
       icon: '🦃',
-      twistLabel: 'Thanksgiving Portions: no rectangle may cross a thick fence line',
+      twistLabel: 'Thanksgiving Portioned: no rectangle may cross a thick fence line',
       requiredItems: ['pumpkinpie', 'cornucopia'],
       proto: feast,
     },
@@ -253,7 +255,7 @@ export const ROOM_SPECS: readonly [RoomSpec, RoomSpec, RoomSpec, RoomSpec, RoomS
       id: 'tree',
       title: 'The Christmas Tree',
       icon: '🎄',
-      twistLabel: 'Christmas Snowflakes: wires inside the frosty frame mirror across the axis',
+      twistLabel: 'Christmas Snowflake: wires inside the frosty frame mirror across the axis',
       requiredItems: ['starlights', 'stocking'],
       proto: tree,
     },
@@ -274,7 +276,7 @@ export const ROOM_SPECS: readonly [RoomSpec, RoomSpec, RoomSpec, RoomSpec, RoomS
       id: 'mailbox',
       title: 'The Valentine Mailbox',
       icon: '📮',
-      twistLabel: "Valentine's Love Letters: numbered squares share coded letters",
+      twistLabel: "Valentine's Love-Letter: numbered squares share coded letters",
       requiredItems: ['chocolates', 'bow'],
       proto: mailbox,
     },
@@ -284,7 +286,7 @@ export const ROOM_SPECS: readonly [RoomSpec, RoomSpec, RoomSpec, RoomSpec, RoomS
     title: 'Easter Garden',
     shortTitle: 'Easter',
     icon: '🐰',
-    genreLabel: 'Bunny Hops',
+    genreLabel: 'Hops',
     accent: '#ecc94b',
     secondaryAccent: '#f687b3',
     wallColor: '#fefcbf',
@@ -296,7 +298,7 @@ export const ROOM_SPECS: readonly [RoomSpec, RoomSpec, RoomSpec, RoomSpec, RoomS
       title: 'The Egg Tree',
       icon: '🌳',
       twistLabel:
-        'Easter Burrows: hop underground between matching burrows to reach the Golden Egg',
+        'Easter Egg-Hunt: hop underground between matching burrows to reach the Golden Egg',
       requiredItems: ['goldenegg', 'basket'],
       proto: eggtree,
     },
@@ -317,7 +319,7 @@ export const ROOM_SPECS: readonly [RoomSpec, RoomSpec, RoomSpec, RoomSpec, RoomS
       id: 'finale',
       title: 'The Grand Finale',
       icon: '🎆',
-      twistLabel: 'Fourth of July Colors: red and blue runs can touch without a gap',
+      twistLabel: 'Fourth of July Patriotic: red and blue runs can touch without a gap',
       requiredItems: ['hotdog', 'flag'],
       proto: finale,
     },
@@ -331,17 +333,17 @@ export const SAVE_VERSION = 1;
 
 export interface SaveData {
   version: number;
-  /** Solved panel keys (`<protoId>:<idx>` for room runs, `clause:<genre>:<idx>` for Merger Contract clauses). */
-  solvedPanels: string[];
-  /** Placed stray item IDs on their home pedestals (`chocolates`, `starlights`, etc.). */
-  placedItems: StrayId[];
+  /** Solved puzzle keys (`<protoId>:<idx>` for room runs, `clause:<genre>:<idx>` for Merger Contract clauses). */
+  solvedPuzzles: string[];
+  /** Restored Relic IDs on their home pedestals (`chocolates`, `starlights`, etc.). */
+  restoredRelics: StrayId[];
   /** Seen story beat IDs (`P0`, `P1`, `T1`, `C1.torn`, etc.). */
   milestones: string[];
   /** Story beats queued for the next return to Holiday Hall (`E1`..`E6`). */
   hallPendingBeats: BeatId[];
   /** Name of the first holiday room completed (`{holiday}` interpolation in `E1`). */
   firstRevertedHoliday: string;
-  /** Whether Free Play / Custom Twist Mixer is explicitly unlocked. */
+  /** Whether Free Play / Puzzle Workshop is explicitly unlocked. */
   freePlayUnlocked: boolean;
 }
 
@@ -539,8 +541,8 @@ export class GameState {
     this.recomputeDerived();
     return {
       version: SAVE_VERSION,
-      solvedPanels: [...this.solvedPanels].sort(),
-      placedItems: [...this.placedItems].filter((id): id is StrayId => id in STRAY_ITEMS).sort(),
+      solvedPuzzles: [...this.solvedPanels].sort(),
+      restoredRelics: [...this.placedItems].filter((id): id is StrayId => id in STRAY_ITEMS).sort(),
       milestones: [...this.milestones].sort(),
       hallPendingBeats: [...this.hallPendingBeats],
       firstRevertedHoliday: this.firstRevertedHoliday,
@@ -623,12 +625,18 @@ export class GameState {
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
       return { ok: false, error: 'Save data must be a JSON object.' };
     }
-    const obj = parsed as Partial<SaveData> & { solvedRuns?: unknown };
-    if (obj.solvedPanels !== undefined && !Array.isArray(obj.solvedPanels)) {
-      return { ok: false, error: '"solvedPanels" must be an array of strings.' };
+    const obj = parsed as Partial<SaveData> & {
+      solvedPanels?: unknown;
+      placedItems?: unknown;
+      solvedRuns?: unknown;
+    };
+    const rawPuzzles = obj.solvedPuzzles ?? obj.solvedPanels;
+    const rawRelics = obj.restoredRelics ?? obj.placedItems;
+    if (rawPuzzles !== undefined && !Array.isArray(rawPuzzles)) {
+      return { ok: false, error: '"solvedPuzzles" must be an array of strings.' };
     }
-    if (obj.placedItems !== undefined && !Array.isArray(obj.placedItems)) {
-      return { ok: false, error: '"placedItems" must be an array of item IDs.' };
+    if (rawRelics !== undefined && !Array.isArray(rawRelics)) {
+      return { ok: false, error: '"restoredRelics" must be an array of relic IDs.' };
     }
 
     this.solvedPanels.clear();
@@ -637,8 +645,8 @@ export class GameState {
     this.hallPendingBeats.clear();
     this.beatQueue.length = 0;
 
-    if (Array.isArray(obj.solvedPanels)) {
-      for (const k of obj.solvedPanels) {
+    if (Array.isArray(rawPuzzles)) {
+      for (const k of rawPuzzles) {
         if (typeof k === 'string') this.solvedPanels.add(k);
       }
     }
@@ -647,11 +655,11 @@ export class GameState {
         if (typeof runId === 'string') this.fillRunPanels(runId, true);
       }
     }
-    if (Array.isArray(obj.placedItems)) {
-      for (const id of obj.placedItems) {
+    if (Array.isArray(rawRelics)) {
+      for (const id of rawRelics) {
         if (typeof id === 'string' && id in STRAY_ITEMS) {
           this.placedItems.add(id);
-          // Placed items imply their stray run was solved
+          // Restored relics imply their stray run was solved
           const stray = STRAY_ITEMS[id as StrayId];
           this.fillRunPanels(stray.proto.id, true);
         }
@@ -1228,4 +1236,25 @@ export function getCompactRulePill(proto: Proto): string {
   );
   if (m?.[1]) return m[1];
   return proto.from;
+}
+
+/**
+ * Return the canonical Dual Display (`themedName`, `holidayFormula`, `dualLabel`)
+ * for a Room Run (`Warm-up`, `Stray Run`, or `Centerpiece Run`).
+ */
+export function getRunIdentity(protoId: string): PuzzleIdentity | null {
+  for (const room of ROOM_SPECS) {
+    if (room.warmup.id === protoId) {
+      return formatPuzzleIdentity(room.id, []);
+    }
+    if (room.centerpiece.proto.id === protoId) {
+      return formatPuzzleIdentity(room.id, [room.id]);
+    }
+  }
+  for (const stray of Object.values(STRAY_ITEMS)) {
+    if (stray.proto.id === protoId) {
+      return formatPuzzleIdentity(stray.foundIn, [stray.homeRoom]);
+    }
+  }
+  return null;
 }

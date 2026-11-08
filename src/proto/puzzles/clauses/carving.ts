@@ -9,13 +9,13 @@
  * - Panel 28 (`all6`, 1 panel): Boss puzzle combining all 6 gimmicks at once.
  */
 import { CARVE_TWISTS, type Panel as CarvePanel } from '../../../gen/carving';
-import type { ClauseDef, ClausePanelItem, GimmickMeta } from './types';
+import type { ClauseDef, ClausePanelItem, TwistMeta } from './types';
 
 export type { CarvePanel };
 
-export const CARVING_GIMMICK_ORDER = [...CARVE_TWISTS] as const;
+export const CARVING_TWIST_ORDER = [...CARVE_TWISTS] as const;
 
-export const CARVING_GIMMICKS: readonly GimmickMeta[] = [
+export const CARVING_TWISTS: readonly TwistMeta[] = [
   {
     key: 'dark',
     icon: '🎃',
@@ -25,31 +25,31 @@ export const CARVING_GIMMICKS: readonly GimmickMeta[] = [
   {
     key: 'letters',
     icon: '💌',
-    label: 'Love Letters',
+    label: 'Love-Letter',
     rule: 'Same letter = same rectangle area; different letters = different areas, filling the message blanks.',
   },
   {
     key: 'colours',
     icon: '🎆',
-    label: 'Red, White & Blue',
+    label: 'Patriotic',
     rule: 'Each rectangle takes its clue’s red or blue color; same-color rectangles cannot share an edge.',
   },
   {
     key: 'cuts',
     icon: '🥧',
-    label: 'Portions',
+    label: 'Portioned',
     rule: 'Rectangles cannot cross a thick fence line between squares.',
   },
   {
     key: 'snow',
     icon: '❄️',
-    label: 'Snowflakes',
+    label: 'Snowflake',
     rule: 'Inside the frosty frame, cut lines between rectangles mirror across the icy line.',
   },
   {
     key: 'basket',
     icon: '🥚',
-    label: 'Easter Baskets',
+    label: 'Egg-Hunt',
     rule: 'Every rectangle must contain one of each food item (🥚, 🥕, 🍫) on the board.',
   },
 ];
@@ -434,12 +434,12 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     },
   },
 
-  // ── Index 28: All 6 Gimmicks Boss ─────────────────────────────────────────
+  // ── Index 28: All 6 Twists Boss ─────────────────────────────────────────
   {
     name: 'The Grand Carving',
     section: 'all6',
-    twists: [...CARVING_GIMMICK_ORDER],
-    tip: '🎃 + 💌 + 🎆 + 🥧 + ❄️ + 🥚: All six holiday gimmicks on one 6×6 table!',
+    twists: [...CARVING_TWIST_ORDER],
+    tip: '🎃 + 💌 + 🎆 + 🥧 + ❄️ + 🥚: All six holiday twists on one 6×6 table!',
     explain:
       'Every portion collects one 🥚 and one 🥕, respects the fences, separates matching colors, mirrors cuts inside the frosty frame, and decodes P, E, and ?.',
     panel: {
@@ -474,11 +474,11 @@ export const CLAUSE_CARVING: ClauseDef<CarvePanel> = {
   clauseIndex: 1,
   id: 'C2',
   genre: 'carving',
-  title: 'Clause II: Thanksgiving · Table Carving',
-  genreTitle: 'Table Carving',
+  title: 'Clause II: Thanksgiving · Carving',
+  genreTitle: 'Carving',
   icon: '🦃',
   accent: '#8c4a20',
-  gimmickOrder: CARVING_GIMMICK_ORDER,
-  gimmicks: CARVING_GIMMICKS,
+  twistOrder: CARVING_TWIST_ORDER,
+  twistMeta: CARVING_TWISTS,
   panels: PANELS,
 };

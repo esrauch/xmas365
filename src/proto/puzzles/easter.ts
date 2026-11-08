@@ -274,14 +274,14 @@ const mountPanel: Parameters<typeof run<Panel>>[0]['mountPanel'] = (host, panel,
   mountHops(host, panel, { solved: () => hooks.solved(), status: hooks.status });
 
 const CONTROLS =
-  'Drag from the bunny through neighboring spots (up, down, left, right) to lay its trail; drag back to rub it out. Tap the bunny to take a hop back. Visit every spot once; a numbered egg must be that hop. The panels teach the rules; open a panel number to jump about.';
+  'Drag from the bunny through neighboring spots (up, down, left, right) to lay its trail; drag back to rub it out. Tap the bunny to take a hop back. Visit every spot once; a numbered egg must be that hop. The puzzles teach the rules; open a puzzle number to jump about.';
 
 export const hutch = run({
   id: 'hutch',
   title: 'The Hutch',
   room: 'Easter',
   kind: 'warm-up',
-  from: 'Bunny Hops, taught panel by panel',
+  from: 'Hops · Easter, taught puzzle by puzzle',
   rules: CONTROLS,
   panels: HUTCH,
   mountPanel,
@@ -292,7 +292,7 @@ export const flag = run({
   title: 'The Star-Spangled Flag',
   room: 'Easter',
   kind: 'stray',
-  from: 'Bunny Hops; twist from the Fourth of July: Red, White and Blue',
+  from: 'Patriotic Hops · Easter (Fourth of July)',
   rules: `${CONTROLS} (Twist: a red bunny and a blue bunny, each starting from its own 1 egg and stepping over its own color; white squares go to either.)`,
   panels: FLAG,
   mountPanel,
@@ -303,7 +303,7 @@ export const cornucopia = run({
   title: 'The Cornucopia',
   room: 'Easter',
   kind: 'stray',
-  from: 'Bunny Hops; twist from Thanksgiving: Portions, as courses',
+  from: 'Portioned Hops · Easter (Thanksgiving)',
   rules: `${CONTROLS} (Twist: the board is outlined in courses; the bunny must finish each course before starting the next.)`,
   panels: CORNUCOPIA,
   mountPanel,
@@ -314,7 +314,7 @@ export const eggtree = run({
   title: 'The Egg Tree',
   room: 'Easter',
   kind: 'centerpiece',
-  from: "Bunny Hops on trees; Easter's own extra: Egg Hunt and burrows",
+  from: 'Egg-Hunt Hops · Easter (Easter)',
   rules: `${CONTROLS} (Burrows: two burrows of a color are joined underground; popping down one and up the other is a hop. The last egg is the Golden Egg at the top.)`,
   panels: EGGTREE,
   mountPanel,

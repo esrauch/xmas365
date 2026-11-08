@@ -20,8 +20,8 @@ describe("Clause IV (C4): Valentine's · Heartstrings (words)", () => {
     expect(CLAUSE_WORDS.genreTitle).toBe('Heartstrings');
     expect(CLAUSE_WORDS.icon).toBe('💌');
     expect(CLAUSE_WORDS.accent).toBe('#ed64a6');
-    expect(CLAUSE_WORDS.gimmickOrder).toEqual(WORD_TWISTS);
-    expect(CLAUSE_WORDS.gimmicks.map((g) => g.key)).toEqual(WORD_TWISTS);
+    expect(CLAUSE_WORDS.twistOrder).toEqual(WORD_TWISTS);
+    expect(CLAUSE_WORDS.twistMeta.map((g) => g.key)).toEqual(WORD_TWISTS);
     expect(CLAUSE_WORDS.panels).toHaveLength(CLAUSE_PANEL_COUNT);
 
     // Panel 0: base
