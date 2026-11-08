@@ -148,63 +148,70 @@ function makeMonthHeaderTexture(name: string): THREE.CanvasTexture {
 
 function makeWrappingPaperTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas');
-  c.width = 256;
-  c.height = 256;
+  c.width = 512;
+  c.height = 512;
   const ctx = c.getContext('2d');
   if (ctx) {
-    ctx.fillStyle = '#b91c1c';
-    ctx.fillRect(0, 0, 256, 256);
+    // Festive bright crimson base
+    ctx.fillStyle = '#d92626';
+    ctx.fillRect(0, 0, 512, 512);
 
-    // Diagonal festive green stripes
-    ctx.strokeStyle = '#15803d';
-    ctx.lineWidth = 22;
-    for (let offset = -256; offset <= 512; offset += 64) {
+    // Diagonal festive holly-green stripes
+    ctx.strokeStyle = '#168a42';
+    ctx.lineWidth = 44;
+    for (let offset = -512; offset <= 1024; offset += 128) {
       ctx.beginPath();
       ctx.moveTo(offset, 0);
-      ctx.lineTo(offset + 256, 256);
+      ctx.lineTo(offset + 512, 512);
       ctx.stroke();
     }
 
-    // Gold trim pin-stripes
-    ctx.strokeStyle = '#facc15';
-    ctx.lineWidth = 3;
-    for (let offset = -256; offset <= 512; offset += 64) {
+    // Crisp gold trim pin-stripes
+    ctx.strokeStyle = '#fde047';
+    ctx.lineWidth = 6;
+    for (let offset = -512; offset <= 1024; offset += 128) {
       ctx.beginPath();
-      ctx.moveTo(offset + 14, 0);
-      ctx.lineTo(offset + 270, 256);
+      ctx.moveTo(offset + 28, 0);
+      ctx.lineTo(offset + 540, 512);
       ctx.stroke();
     }
 
-    // Repeating XMAS365™ stamp badges across the paper
+    // Repeating XMAS365™ stamp badges in a clean staggered pattern with generous breathing room
     ctx.save();
-    ctx.font = 'italic 900 24px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'center';
+    ctx.font = 'italic 900 32px system-ui, -apple-system, sans-serif';
     ctx.textBaseline = 'middle';
+    const wXmas = ctx.measureText('XMAS').width;
+    const w365 = ctx.measureText('365™').width;
+    const gap = 6;
+    const totalW = wXmas + gap + w365;
+    const startX = -totalW * 0.5;
+    const boxW = Math.ceil(totalW + 24);
+    const boxH = 46;
+
     for (const [px, py] of [
-      [64, 64],
-      [192, 64],
-      [128, 128],
-      [64, 192],
-      [192, 192],
+      [136, 128],
+      [376, 384],
     ] as const) {
       ctx.save();
       ctx.translate(px, py);
-      ctx.rotate(-0.22);
-      ctx.fillStyle = '#fefce8';
-      ctx.fillRect(-54, -15, 108, 30);
+      ctx.rotate(-0.18);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(-boxW * 0.5, -boxH * 0.5, boxW, boxH);
       ctx.strokeStyle = '#1f2430';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(-54, -15, 108, 30);
+      ctx.lineWidth = 5;
+      ctx.strokeRect(-boxW * 0.5, -boxH * 0.5, boxW, boxH);
+      ctx.textAlign = 'left';
       ctx.fillStyle = '#c53030';
-      ctx.fillText('XMAS', -18, 1);
+      ctx.fillText('XMAS', startX, 2);
       ctx.fillStyle = '#15803d';
-      ctx.fillText('365™', 26, 1);
+      ctx.fillText('365™', startX + wXmas + gap, 2);
       ctx.restore();
     }
     ctx.restore();
   }
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
   return tex;
@@ -508,7 +515,7 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
     tex.needsUpdate = true;
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
-    const pMat = trackMat(toonMaterial({ color: 0xffffff, map: tex }));
+    const pMat = trackMat(new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }));
     const pGeo = trackGeo(new THREE.BoxGeometry(1, 0.018, PAPER_WIDTH_Z));
     const mesh = new THREE.Mesh(pGeo, pMat);
     mesh.position.set(0, SLAB_H + 0.048, laneCenterZ(laneIdx));
