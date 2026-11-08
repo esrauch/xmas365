@@ -12,6 +12,7 @@
 import * as THREE from 'three';
 import { hexToNumber } from '../content/palettes';
 import { toonMaterial } from '../render/toon';
+import { ROOM_MASCOT_ID, buildMascotMesh } from './mascots';
 import { type RoomId, ROOM_SPECS, STRAY_ITEMS, gameState } from './state';
 
 export type BayId = 'hall' | RoomId;
@@ -216,6 +217,8 @@ export interface Hotspot3D {
   connections?: HotspotConnection[];
   accent: string;
   hero?: boolean;
+  /** If true, clickable in 3D via raycasting without rendering a floating DOM pill. */
+  hiddenPill?: boolean;
   worldPos: THREE.Vector3;
   cameraPos: THREE.Vector3;
   cameraLook: THREE.Vector3;
@@ -226,6 +229,12 @@ export interface Hotspot3D {
 export interface BuiltDiorama {
   root: THREE.Group;
   hotspots: Hotspot3D[];
+  /** World-space anchor right above Leap Day's head in Holiday Hall (for the P2 speech bubble). */
+  leapDayHeadWorldPos: THREE.Vector3;
+  /** Animate Leap Day hopping from the hall center toward `roomId`'s door (`progress` in 0..1). */
+  setDoorHop: (roomId: RoomId | null, progress: number) => void;
+  /** Animate Leap Day's cold-start intro pop-out & idle hops around the hall floor. */
+  setIntroPose: (mode: 'hidden' | 'pop' | 'idle', elapsed: number) => void;
   animate: (t: number, activeBay: BayId) => void;
 }
 
@@ -1745,6 +1754,86 @@ function buildCenterpieceSculpture(roomId: RoomId, accent: string, done: boolean
   return g;
 }
 
+function buildMascotStage(
+  roomId: RoomId,
+  accent: string,
+  freed: boolean,
+): { stage: THREE.Group; mascotMesh: THREE.Group } {
+  const stage = new THREE.Group();
+  const baseBot = cyl(0.36, 0.4, 0.09, '#5c3d24', 0, 0.045, 0, 16);
+  const baseTop = cyl(0.33, 0.35, 0.04, freed ? '#48bb78' : accent, 0, 0.1, 0, 16);
+  baseBot.receiveShadow = false;
+  baseTop.receiveShadow = false;
+  stage.add(baseBot, baseTop);
+
+  const mascotMesh = buildMascotMesh(ROOM_MASCOT_ID[roomId], 0.58);
+  mascotMesh.position.set(0, 0.12, 0);
+  mascotMesh.traverse((c) => {
+    c.castShadow = false;
+    c.receiveShadow = false;
+  });
+  stage.add(mascotMesh);
+
+  if (!freed) {
+    const cage = new THREE.Group();
+    const cageRadius = 0.3;
+    const cageBottomY = 0.13;
+    const cageTopY = 0.77;
+    const cageHeight = cageTopY - cageBottomY;
+
+    const botRing = new THREE.Mesh(
+      new THREE.TorusGeometry(cageRadius, 0.018, 8, 18),
+      mat('#2d3748'),
+    );
+    botRing.rotation.x = Math.PI / 2;
+    botRing.position.set(0, cageBottomY, 0);
+    cage.add(botRing);
+
+    const topRing = new THREE.Mesh(
+      new THREE.TorusGeometry(cageRadius, 0.018, 8, 18),
+      mat('#2d3748'),
+    );
+    topRing.rotation.x = Math.PI / 2;
+    topRing.position.set(0, cageTopY, 0);
+    cage.add(topRing);
+
+    // 8 vertical bars offset by half-step so the front-center window stays clear of bars
+    for (let i = 0; i < 8; i++) {
+      const ang = ((i + 0.5) / 8) * Math.PI * 2;
+      const bx = Math.sin(ang) * cageRadius;
+      const bz = Math.cos(ang) * cageRadius;
+      cage.add(cyl(0.013, 0.013, cageHeight, '#4a5568', bx, cageBottomY + cageHeight / 2, bz, 8));
+    }
+
+    // 2 crossed dome ribs on top + brass hanging ring
+    for (const rotY of [Math.PI / 8, -Math.PI / 8]) {
+      const domeArc = new THREE.Mesh(
+        new THREE.TorusGeometry(cageRadius, 0.015, 8, 16, Math.PI),
+        mat('#2d3748'),
+      );
+      domeArc.rotation.y = rotY;
+      domeArc.position.set(0, cageTopY, 0);
+      cage.add(domeArc);
+    }
+    const hookRing = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.012, 8, 12), mat('#d69e2e'));
+    hookRing.position.set(0, cageTopY + cageRadius + 0.03, 0);
+    cage.add(hookRing);
+
+    // Corporate Xmas365 red-and-gold padlock on the front-right bar
+    const lockX = Math.sin(Math.PI / 8) * (cageRadius + 0.02);
+    const lockZ = Math.cos(Math.PI / 8) * (cageRadius + 0.02);
+    cage.add(box(0.09, 0.1, 0.04, '#c53030', lockX, 0.42, lockZ));
+    cage.add(box(0.094, 0.024, 0.044, '#ecc94b', lockX, 0.42, lockZ));
+    cage.traverse((c) => {
+      c.castShadow = false;
+      c.receiveShadow = false;
+    });
+    stage.add(cage);
+  }
+
+  return { stage, mascotMesh };
+}
+
 /** Build a wrapped gift box with overhanging lid, crossed ribbons, and a 3D ribbon bow on top. */
 function buildPresentBox(
   w: number,
@@ -1952,7 +2041,7 @@ function decorateHolidayAlcove(
 
       //    (c) Inner Rug: Large Bubbling Witch's Cauldron on Firewood Tripod (left) + Giant Pumpkin Stack (right)
       const cauldron = new THREE.Group();
-      cauldron.position.set(-0.52, 0.03, 1.08);
+      cauldron.position.set(-0.56, 0.03, 1.04);
       cauldron.scale.setScalar(1.38);
       // Glowing fire logs underneath the cauldron
       cauldron.add(glowBox(0.28, 0.04, 0.18, '#ff7733', 0, 0.03, 0, 1.1));
@@ -1973,16 +2062,16 @@ function decorateHolidayAlcove(
       cauldron.add(ladle);
       bay.add(cauldron);
 
-      const floorPump1 = sphere(0.24, '#dd6b20', 0.48, 0.21, 1.06);
+      const floorPump1 = sphere(0.24, '#dd6b20', 0.54, 0.21, 1.02);
       floorPump1.scale.set(1.2, 0.85, 1.2);
-      bay.add(floorPump1, cyl(0.032, 0.045, 0.09, '#2f855a', 0.48, 0.42, 1.06, 10));
-      const floorPump2 = sphere(0.17, '#ed8936', 0.68, 0.16, 1.24);
+      bay.add(floorPump1, cyl(0.032, 0.045, 0.09, '#2f855a', 0.54, 0.42, 1.02, 10));
+      const floorPump2 = sphere(0.17, '#ed8936', 0.72, 0.16, 1.22);
       floorPump2.scale.set(1.16, 0.86, 1.16);
-      bay.add(floorPump2, cyl(0.024, 0.032, 0.07, '#2f855a', 0.68, 0.31, 1.24, 8));
-      const floorPump3 = sphere(0.14, '#f6ad55', 0.32, 0.13, 1.26);
+      bay.add(floorPump2, cyl(0.024, 0.032, 0.07, '#2f855a', 0.72, 0.31, 1.22, 8));
+      const floorPump3 = sphere(0.14, '#f6ad55', 0.48, 0.13, 1.28);
       floorPump3.scale.set(1.14, 0.84, 1.14);
-      bay.add(floorPump3, cyl(0.02, 0.028, 0.06, '#2f855a', 0.32, 0.25, 1.26, 8));
-      bay.add(buildCandle(0.044, 0.22, '#fffaf0', 0.22, 0.03, 1.12, flames, 2.6));
+      bay.add(floorPump3, cyl(0.02, 0.028, 0.06, '#2f855a', 0.48, 0.25, 1.28, 8));
+      bay.add(buildCandle(0.044, 0.22, '#fffaf0', 0.34, 0.03, 0.98, flames, 2.6));
       break;
     }
 
@@ -2124,7 +2213,7 @@ function decorateHolidayAlcove(
 
       //    (c) Inner Rug: Double-Stacked Bound Straw Hay Bales & Pumpkins (left) + Large Overflowing Apple Bushel (right)
       const hayBale = new THREE.Group();
-      hayBale.position.set(-0.5, 0.03, 1.1);
+      hayBale.position.set(-0.56, 0.03, 1.04);
       hayBale.rotation.y = 0.28;
       hayBale.scale.setScalar(1.32);
       // Bottom bale + top angled bale
@@ -2140,12 +2229,12 @@ function decorateHolidayAlcove(
       hayBale.add(topBale);
       bay.add(hayBale);
 
-      const tgPump = sphere(0.18, '#ed8936', -0.18, 0.17, 1.24);
+      const tgPump = sphere(0.18, '#ed8936', -0.52, 0.17, 1.32);
       tgPump.scale.set(1.18, 0.84, 1.18);
-      bay.add(tgPump, cyl(0.024, 0.032, 0.07, '#2f855a', -0.18, 0.33, 1.24, 8));
+      bay.add(tgPump, cyl(0.024, 0.032, 0.07, '#2f855a', -0.52, 0.33, 1.32, 8));
 
       const bushel = new THREE.Group();
-      bushel.position.set(0.48, 0.03, 1.1);
+      bushel.position.set(0.54, 0.03, 1.08);
       bushel.scale.setScalar(1.36);
       bushel.add(cyl(0.21, 0.16, 0.26, '#b7791f', 0, 0.13, 0, 14));
       bushel.add(cyl(0.22, 0.21, 0.035, '#5c3d24', 0, 0.23, 0, 14));
@@ -2405,12 +2494,12 @@ function decorateHolidayAlcove(
       bay.add(nutcracker);
 
       // 5. Scaled-up Floor Props: Stacked 2-tier towers of wrapped Christmas presents with ribbons & bows on the hearth rug
-      bay.add(buildPresentBox(0.42, 0.34, 0.38, '#c53030', '#f6e05e', -0.54, 0.03, 1.04, 0.28));
-      bay.add(buildPresentBox(0.28, 0.22, 0.26, '#2f855a', '#e53e3e', -0.54, 0.37, 1.04, -0.18));
-      bay.add(buildPresentBox(0.28, 0.24, 0.28, '#ecc94b', '#c53030', -0.26, 0.03, 1.26, -0.35));
-      bay.add(buildPresentBox(0.38, 0.38, 0.34, '#2b6cb0', '#f7fafc', 0.52, 0.03, 1.06, -0.24));
-      bay.add(buildPresentBox(0.24, 0.2, 0.22, '#805ad5', '#f6e05e', 0.52, 0.41, 1.06, 0.22));
-      bay.add(buildPresentBox(0.3, 0.22, 0.26, '#f6e05e', '#c53030', 0.28, 0.03, 1.26, 0.42));
+      bay.add(buildPresentBox(0.42, 0.34, 0.38, '#c53030', '#f6e05e', -0.56, 0.03, 1.02, 0.28));
+      bay.add(buildPresentBox(0.28, 0.22, 0.26, '#2f855a', '#e53e3e', -0.56, 0.37, 1.02, -0.18));
+      bay.add(buildPresentBox(0.28, 0.24, 0.28, '#ecc94b', '#c53030', -0.52, 0.03, 1.32, -0.35));
+      bay.add(buildPresentBox(0.38, 0.38, 0.34, '#2b6cb0', '#f7fafc', 0.56, 0.03, 1.04, -0.24));
+      bay.add(buildPresentBox(0.24, 0.2, 0.22, '#805ad5', '#f6e05e', 0.56, 0.41, 1.04, 0.22));
+      bay.add(buildPresentBox(0.3, 0.22, 0.26, '#f6e05e', '#c53030', 0.52, 0.03, 1.32, 0.42));
       break;
     }
 
@@ -2537,13 +2626,13 @@ function decorateHolidayAlcove(
       bay.add(harp);
 
       // 4. Scaled-up Floor Props: Stacked Ribboned Valentine Gift Boxes on the left + Silver Champagne Bucket & Velvet Heart Cushion on the right
-      bay.add(buildPresentBox(0.38, 0.26, 0.34, '#d53f8c', '#f6e05e', -0.5, 0.03, 1.08, 0.32));
-      bay.add(buildPresentBox(0.26, 0.2, 0.24, '#fbb6ce', '#c53030', -0.5, 0.29, 1.08, -0.22));
-      bay.add(buildPresentBox(0.24, 0.18, 0.22, '#c53030', '#fff5f7', -0.24, 0.03, 1.24, 0.15));
+      bay.add(buildPresentBox(0.38, 0.26, 0.34, '#d53f8c', '#f6e05e', -0.54, 0.03, 1.04, 0.32));
+      bay.add(buildPresentBox(0.26, 0.2, 0.24, '#fbb6ce', '#c53030', -0.54, 0.29, 1.04, -0.22));
+      bay.add(buildPresentBox(0.24, 0.18, 0.22, '#c53030', '#fff5f7', -0.48, 0.03, 1.3, 0.15));
 
       // Silver Champagne Ice Bucket on Stand with tilted emerald champagne bottle
       const champagneStand = new THREE.Group();
-      champagneStand.position.set(0.54, 0, 1.04);
+      champagneStand.position.set(0.56, 0, 1.02);
       champagneStand.add(cyl(0.16, 0.18, 0.05, '#cbd5e0', 0, 0.025, 0, 12));
       champagneStand.add(cyl(0.03, 0.035, 0.42, '#e2e8f0', 0, 0.24, 0, 10));
       champagneStand.add(cyl(0.16, 0.11, 0.28, '#cbd5e0', 0, 0.56, 0, 12));
@@ -2559,7 +2648,7 @@ function decorateHolidayAlcove(
 
       // Plush crimson velvet heart pillow on the rug (scaled up)
       const pillow = new THREE.Group();
-      pillow.position.set(0.32, 0.08, 1.26);
+      pillow.position.set(0.5, 0.08, 1.3);
       pillow.rotation.x = -Math.PI / 2.4;
       pillow.rotation.z = 0.25;
       pillow.scale.set(1.55, 1.55, 0.72);
@@ -2570,7 +2659,7 @@ function decorateHolidayAlcove(
       pillowTip.position.set(0, -0.05, 0);
       pillow.add(pillowTip);
       bay.add(pillow);
-      bay.add(buildCandle(0.048, 0.24, '#fff5f7', 0.14, 0.03, 1.24, flames, 1.5));
+      bay.add(buildCandle(0.048, 0.24, '#fff5f7', 0.36, 0.03, 0.98, flames, 1.5));
       break;
     }
 
@@ -2733,7 +2822,7 @@ function decorateHolidayAlcove(
 
       // 5. Scaled-up Floor Props: Terra-cotta Daffodil Pot on the left (1.42x) + Porcelain Bunny Statue & Painted Easter Eggs on the right (1.45x)
       const clayPot = new THREE.Group();
-      clayPot.position.set(-0.5, 0.03, 1.08);
+      clayPot.position.set(-0.54, 0.03, 1.04);
       clayPot.scale.setScalar(1.42);
       clayPot.add(cyl(0.14, 0.1, 0.2, '#c05621', 0, 0.1, 0, 12));
       clayPot.add(cyl(0.155, 0.145, 0.04, '#dd6b20', 0, 0.19, 0, 12));
@@ -2747,25 +2836,33 @@ function decorateHolidayAlcove(
       }
       bay.add(clayPot);
 
-      // Porcelain Garden Bunny Statue + giant pastel Easter eggs on the right rug
-      const bunnyFig = new THREE.Group();
-      bunnyFig.position.set(0.48, 0.03, 1.08);
-      bunnyFig.rotation.y = -0.35;
-      bunnyFig.scale.setScalar(1.48);
-      bunnyFig.add(sphere(0.11, '#fffaf0', 0, 0.11, 0));
-      bunnyFig.add(sphere(0.085, '#fffaf0', 0, 0.23, 0.03));
-      bunnyFig.add(sphere(0.035, '#ffffff', 0, 0.08, -0.1));
-      for (const side of [-1, 1] as const) {
-        const ear = sphere(0.032, '#fbb6ce', side * 0.035, 0.34, 0.02);
-        ear.scale.set(0.65, 2.2, 0.5);
-        ear.rotation.z = -side * 0.15;
-        bunnyFig.add(ear);
+      // Woven Easter Egg Basket + giant pastel Easter eggs on the right rug
+      const basketFig = new THREE.Group();
+      basketFig.position.set(0.52, 0.03, 1.04);
+      basketFig.rotation.y = -0.35;
+      basketFig.scale.setScalar(1.38);
+      basketFig.add(cyl(0.16, 0.12, 0.14, '#b7791f', 0, 0.07, 0, 12));
+      basketFig.add(cyl(0.17, 0.16, 0.03, '#d69e2e', 0, 0.13, 0, 12));
+      const bHandle = new THREE.Mesh(
+        new THREE.TorusGeometry(0.15, 0.018, 8, 14, Math.PI),
+        mat('#b7791f'),
+      );
+      bHandle.position.set(0, 0.14, 0);
+      basketFig.add(bHandle);
+      for (const [bx, bz, bHex] of [
+        [-0.05, 0.02, '#fbb6ce'],
+        [0.05, 0.02, '#f6e05e'],
+        [0, -0.04, '#90cdf4'],
+      ] as const) {
+        const bEgg = sphere(0.055, bHex, bx, 0.15, bz);
+        bEgg.scale.set(0.85, 1.25, 0.85);
+        basketFig.add(bEgg);
       }
-      bay.add(bunnyFig);
+      bay.add(basketFig);
       for (const [ex, ez, eHex] of [
-        [0.26, 1.22, '#f6e05e'],
-        [0.68, 1.22, '#90cdf4'],
-        [-0.24, 1.24, '#fbb6ce'],
+        [0.48, 1.28, '#f6e05e'],
+        [0.7, 1.2, '#90cdf4'],
+        [-0.48, 1.28, '#fbb6ce'],
       ] as const) {
         const floorEgg = sphere(0.11, eHex, ex, 0.15, ez);
         floorEgg.scale.set(0.85, 1.28, 0.85);
@@ -2923,7 +3020,7 @@ function decorateHolidayAlcove(
 
       // 4. Scaled-up Floor Props: Wicker Picnic Basket & Watermelon Wedge on the left (1.38x) + Giant Firecracker Bundle on the right (1.42x)
       const picnic = new THREE.Group();
-      picnic.position.set(-0.5, 0.03, 1.06);
+      picnic.position.set(-0.56, 0.03, 1.02);
       picnic.rotation.y = 0.26;
       picnic.scale.setScalar(1.38);
       picnic.add(box(0.36, 0.2, 0.24, '#b7791f', 0, 0.1, 0));
@@ -2934,7 +3031,7 @@ function decorateHolidayAlcove(
 
       // Juicy red watermelon slice wedge with green rind next to the picnic basket (scaled up)
       const melon = new THREE.Group();
-      melon.position.set(-0.2, 0.16, 1.26);
+      melon.position.set(-0.48, 0.16, 1.3);
       melon.rotation.y = -0.35;
       melon.scale.setScalar(1.38);
       const rind = new THREE.Mesh(
@@ -2954,7 +3051,7 @@ function decorateHolidayAlcove(
 
       // Bundle of 3 giant red firecrackers with gold bands & white fuses on the right rug (1.42x)
       const crackers = new THREE.Group();
-      crackers.position.set(0.48, 0.03, 1.1);
+      crackers.position.set(0.52, 0.03, 1.08);
       crackers.rotation.y = -0.22;
       crackers.scale.setScalar(1.42);
       for (const [cx, cz, ch] of [
@@ -2982,6 +3079,8 @@ export function buildHolidayHallDiorama(callbacks: {
   onOpenProto: (protoId: string, focusPos: THREE.Vector3, focusLook: THREE.Vector3) => void;
   onOpenDesk: (focusPos: THREE.Vector3, focusLook: THREE.Vector3) => void;
   onShowStory: () => void;
+  onOpenCorkboard?: () => void;
+  onClickMascot?: (roomId: RoomId) => void;
   onPlaceItem: (itemId: string) => void;
 }): BuiltDiorama {
   const root = new THREE.Group();
@@ -3034,287 +3133,366 @@ export function buildHolidayHallDiorama(callbacks: {
     return g;
   };
 
-  // --- BAY 0: HOLIDAY HALL (MAIN ENTRANCE, TUESDAY FINALE DOOR & CALENDAR DESK) ---
+  // --- BAY 0: HOLIDAY HALL (TWO-TIER GRAND FOYER WITH ALL 6 HOLIDAY DOORS) ---
+  let hallLeapDayActor = new THREE.Group();
+  let hallFloorSlip = new THREE.Group();
+  const hallDoorPivots = new Map<RoomId, { pivot: THREE.Group; baseRotY: number }>();
+  const hallDoorTargets = new Map<RoomId, THREE.Vector3>();
+  let activeDoorHop: { roomId: RoomId; progress: number } | null = null;
+  let activeIntroPose: { mode: 'hidden' | 'pop' | 'idle'; elapsed: number } | null = null;
+  const leapDayRestPos = new THREE.Vector3(0, 0.06, 2.08);
+
   {
     const theta = getBayAngle('hall');
     const bay = makeBayGroup(theta);
-    const wallHex = act >= 4 ? '#553c9a' : act === 3 ? '#334155' : '#523d2e';
-    const panelHex = act >= 4 ? '#44337a' : act === 3 ? '#1e293b' : '#3d2c20';
+    const wallHex = act >= 4 ? '#553c9a' : act === 3 ? '#334155' : '#4a3525';
+    const panelHex = act >= 4 ? '#44337a' : act === 3 ? '#1e293b' : '#36261a';
 
-    // Moody wood-paneled back wall, recessed wainscot panel, cornice beam, and pillar
-    bay.add(box(wallWidth, 5.8, 0.28, wallHex, 0, 2.9, 0, false));
-    bay.add(box(wallWidth - 0.5, 3.05, 0.05, '#7a5938', 0, 2.05, 0.13, false));
-    bay.add(box(wallWidth - 0.66, 2.88, 0.07, panelHex, 0, 2.05, 0.14, false));
-    bay.add(box(wallWidth, 0.34, 0.34, '#6b4f35', 0, 0.17, 0.04, false));
-    bay.add(box(wallWidth, 0.24, 0.38, '#4a3524', 0, 3.85, 0.05, false));
-    bay.add(cyl(0.22, 0.26, 5.8, '#3b281a', wallWidth / 2 - 0.06, 2.9, 0.14, 12, false));
-
-    // Runner carpet leading to the Grand Door
-    bay.add(box(2.2, 0.03, 2.65, act === 3 ? '#742a2a' : '#7b341e', 0, 0.015, 1.32, false));
-    bay.add(box(1.9, 0.04, 2.4, '#b7791f', 0, 0.02, 1.32, false));
-
-    // Brass Gaslight Wall Sconces flanking the Grand Door
+    // Grand wood-paneled foyer back wall, recessed wainscot panel, cornice beam, and side pillars
+    bay.add(box(wallWidth + 0.4, 5.8, 0.28, wallHex, 0, 2.9, 0, false));
+    bay.add(box(wallWidth - 0.1, 3.35, 0.05, '#7a5938', 0, 2.02, 0.13, false));
+    bay.add(box(wallWidth - 0.26, 3.18, 0.07, panelHex, 0, 2.02, 0.14, false));
+    bay.add(box(wallWidth + 0.4, 0.34, 0.34, '#6b4f35', 0, 0.17, 0.04, false));
+    bay.add(box(wallWidth + 0.4, 0.24, 0.38, '#4a3524', 0, 3.85, 0.05, false));
     for (const side of [-1, 1] as const) {
-      const sx = side * 1.28;
-      bay.add(box(0.14, 0.28, 0.12, '#d69e2e', sx, 2.25, 0.2, false));
-      const globe = glowSphere(0.12, act === 3 ? '#90cdf4' : '#ffbe3b', sx, 2.42, 0.28, 1.15);
-      bay.add(globe);
-      flames.push({ mesh: globe, baseY: 2.42, phase: side + 0.5 });
+      bay.add(cyl(0.2, 0.24, 5.8, '#3b281a', side * (wallWidth / 2 - 0.04), 2.9, 0.14, 12, false));
     }
 
-    // 1. Top-Center: Grand Finale Double Door ("Tuesday's Party" / "Santa's Merger")
-    const finaleUnlocked = lampsLit >= 6;
-    const finaleDone = gameState.solvedRuns.has('tuesday');
-    const finaleGroup = new THREE.Group();
-    finaleGroup.position.set(0, 0, 0.18);
-    finaleGroup.add(
-      box(1.92, 3.05, 0.22, finaleUnlocked ? '#ecc94b' : '#4a5568', 0, 1.52, 0, false),
-    );
-    finaleGroup.add(
-      box(0.78, 2.72, 0.26, finaleUnlocked ? '#d69e2e' : '#2d3748', -0.42, 1.38, 0.03, false),
-    );
-    finaleGroup.add(
-      box(0.78, 2.72, 0.26, finaleUnlocked ? '#d69e2e' : '#2d3748', 0.42, 1.38, 0.03, false),
-    );
-    finaleGroup.add(glowSphere(0.06, '#f6e05e', -0.12, 1.35, 0.18, 0.6));
-    finaleGroup.add(glowSphere(0.06, '#f6e05e', 0.12, 1.35, 0.18, 0.6));
-    for (const [i, roomSpec] of ROOM_SPECS.entries()) {
-      const lit = gameState.isRoomComplete(roomSpec);
-      const bx = -0.75 + i * 0.3;
-      finaleGroup.add(
-        lit
-          ? glowSphere(0.095, roomSpec.accent, bx, 3.22, 0.14, 1.15)
-          : sphere(0.095, '#4a5568', bx, 3.22, 0.14, false),
+    // Grand foyer carpet & central medallion rug
+    bay.add(box(3.2, 0.03, 2.65, act === 3 ? '#742a2a' : '#7b341e', 0, 0.015, 1.32, false));
+    bay.add(box(2.9, 0.038, 2.4, '#b7791f', 0, 0.02, 1.32, false));
+    bay.add(cyl(0.48, 0.52, 0.045, '#5c3d24', 0, 0.025, 2.08, 20, false));
+    bay.add(cyl(0.42, 0.44, 0.052, '#2f855a', 0, 0.03, 2.08, 20, false));
+
+    // Lower Foyer Raised Threshold Step (`ly = 0.56`) & Upper Gallery Balcony Ledge (`ly = 1.92`)
+    bay.add(box(3.46, 0.56, 0.52, '#4a321f', 0, 0.28, 0.24, false));
+    bay.add(box(3.52, 0.06, 0.56, '#7a5938', 0, 0.56, 0.25, false));
+    bay.add(box(3.52, 0.1, 0.56, '#5c3d24', 0, 1.9, 0.26, false));
+    bay.add(box(3.56, 0.045, 0.6, '#d69e2e', 0, 1.96, 0.27, false));
+
+    // Decorative brass balustrade posts between the upper balcony doors
+    for (const bx of [-1.72, -0.61, 0.61, 1.72]) {
+      bay.add(cyl(0.028, 0.032, 0.26, '#d69e2e', bx, 2.1, 0.48, 8, false));
+      bay.add(sphere(0.042, '#ecc94b', bx, 2.24, 0.48, false));
+    }
+
+    // 1. ALL SIX HOLIDAY DOORS IN TWO TIERS (3 Upper Balcony + 3 Lower Main Floor)
+    //    Upper tier: Halloween (left), Christmas (center), Easter (right)
+    //    Lower tier: Thanksgiving (left, ajar with warm orange light!), Valentine's (center), Fourth of July (right)
+    const doorLayout: readonly { roomId: RoomId; lx: number; floorY: number }[] = [
+      { roomId: 'halloween', lx: -1.22, floorY: 1.98 },
+      { roomId: 'christmas', lx: 0, floorY: 1.98 },
+      { roomId: 'easter', lx: 1.22, floorY: 1.98 },
+      { roomId: 'thanksgiving', lx: -1.22, floorY: 0.59 },
+      { roomId: 'valentines', lx: 0, floorY: 0.59 },
+      { roomId: 'fourth', lx: 1.22, floorY: 0.59 },
+    ];
+
+    const doorFocusPos = bayToWorld(theta, 0, 1.92, 5.15);
+    const doorFocusLook = bayToWorld(theta, 0, 1.38, 0.75);
+
+    for (const slot of doorLayout) {
+      const room = ROOM_SPECS.find((r) => r.id === slot.roomId);
+      if (!room) continue;
+      const unlocked = gameState.isRoomUnlocked(room);
+      const complete = gameState.isRoomComplete(room);
+      const unlockItem = !unlocked ? gameState.carriedEligibleItemForRoom(room) : null;
+      const carriedSecondItem = unlocked
+        ? (gameState.carriedItems().find((it) => it.homeRoom === room.id) ?? null)
+        : null;
+      const sign = gameState.getRoomSignage(room);
+
+      const dg = new THREE.Group();
+      dg.position.set(slot.lx, slot.floorY, 0.22);
+      hallDoorTargets.set(room.id, new THREE.Vector3(slot.lx, slot.floorY + 0.04, 0.48));
+
+      // Doorway outer casing & lintel
+      const frameColor = complete ? '#ecc94b' : unlocked ? room.accent : '#4a5568';
+      dg.add(box(0.74, 0.88, 0.12, '#3b281a', 0, 0.44, 0, false));
+      dg.add(box(0.68, 0.84, 0.14, frameColor, 0, 0.42, 0.01, false));
+      dg.add(box(0.78, 0.07, 0.18, frameColor, 0, 0.86, 0.02, false));
+
+      // Master Holiday Lamp directly above the door lintel (replaces top-bar 0/6 counter)
+      const lampMesh = complete
+        ? glowSphere(0.105, room.accent, 0, 1.01, 0.08, 1.35)
+        : sphere(0.095, '#3b4252', 0, 1.01, 0.08, false);
+      dg.add(lampMesh);
+      dg.add(cyl(0.04, 0.055, 0.05, '#d69e2e', 0, 0.91, 0.06, 10, false));
+
+      // Mini string of 4 fairy light bulbs across the top of the door arch
+      for (const [bIdx, bx] of [-0.27, -0.1, 0.1, 0.27].entries()) {
+        const bulbHex = (bIdx % 2 === 0 ? room.accent : room.secondaryAccent) as `#${string}`;
+        if (complete) {
+          const cNum = hexToNumber(bulbHex);
+          const bulbMat = toonMaterial({ color: cNum, emissive: cNum, emissiveIntensity: 1.1 });
+          const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.032, 10, 8), bulbMat);
+          bulb.position.set(bx, 0.86, 0.11);
+          bulb.castShadow = false;
+          bulb.receiveShadow = false;
+          dg.add(bulb);
+          fairyLights.push({
+            mat: bulbMat,
+            baseColor: new THREE.Color(cNum),
+            offColor: new THREE.Color(0x2a303c),
+            phase: bIdx * 1.1 + slot.lx,
+          });
+        } else {
+          dg.add(sphere(0.028, '#2d3340', bx, 0.86, 0.11, false));
+        }
+      }
+
+      // Interior doorway recess (warm orange glow when ajar/unlocked, dark when locked)
+      const glowColor =
+        room.id === 'thanksgiving'
+          ? '#ff8c24'
+          : complete
+            ? '#ffe082'
+            : unlocked
+              ? '#ffae52'
+              : '#161b24';
+      if (unlocked || complete) {
+        dg.add(glowBox(0.56, 0.78, 0.05, glowColor, 0, 0.4, 0.03, complete ? 1.15 : 1.05));
+        // Warm light spill pool on the threshold step in front of the ajar door
+        dg.add(
+          glowBox(
+            0.58,
+            0.018,
+            0.24,
+            room.id === 'thanksgiving' ? '#ff922b' : glowColor,
+            0,
+            0.01,
+            0.16,
+            0.9,
+          ),
+        );
+      } else {
+        dg.add(box(0.56, 0.78, 0.05, '#161b24', 0, 0.4, 0.03, false));
+      }
+
+      // Hinged wooden door leaf (pivoted at left jamb x = -0.28, z = 0.06)
+      const doorPivot = new THREE.Group();
+      doorPivot.position.set(-0.28, 0, 0.06);
+      const baseRotY = complete ? -0.82 : unlocked ? -0.48 : 0;
+      doorPivot.rotation.y = baseRotY;
+      hallDoorPivots.set(room.id, { pivot: doorPivot, baseRotY });
+
+      const leafColor = unlocked ? '#6b4428' : '#3d2818';
+      const panelInsetColor = unlocked ? '#8c5834' : '#2d1d11';
+      doorPivot.add(box(0.56, 0.78, 0.045, leafColor, 0.28, 0.4, 0, false));
+      doorPivot.add(box(0.42, 0.28, 0.052, panelInsetColor, 0.28, 0.58, 0, false));
+      doorPivot.add(box(0.42, 0.28, 0.052, panelInsetColor, 0.28, 0.22, 0, false));
+      // Brass doorknob
+      doorPivot.add(sphere(0.032, '#ecc94b', 0.48, 0.38, 0.04, false));
+
+      // Heavy brass padlock on locked doors
+      if (!unlocked) {
+        const lockGroup = new THREE.Group();
+        lockGroup.position.set(0.46, 0.38, 0.055);
+        lockGroup.add(
+          box(0.11, 0.12, 0.04, unlockItem ? '#ffea79' : '#d69e2e', 0, -0.04, 0, false),
+        );
+        lockGroup.add(box(0.03, 0.05, 0.045, '#1a202c', 0, -0.04, 0.005, false));
+        const shackle = new THREE.Mesh(
+          new THREE.TorusGeometry(0.038, 0.012, 8, 14, Math.PI),
+          mat('#cbd5e0'),
+        );
+        shackle.position.set(0, 0.02, 0);
+        lockGroup.add(shackle);
+        doorPivot.add(lockGroup);
+      }
+
+      dg.add(doorPivot);
+      bay.add(dg);
+
+      const canInteract = unlocked || unlockItem !== null;
+      const sublabel = complete
+        ? '★ Restored!'
+        : unlockItem
+          ? `✨ Unlock with ${unlockItem.icon} ${unlockItem.title}`
+          : carriedSecondItem
+            ? `✨ Deliver ${carriedSecondItem.icon} ${carriedSecondItem.title}`
+            : unlocked
+              ? '▶ Tap to Enter'
+              : '🔒 Locked';
+      const status: Hotspot3D['status'] = complete
+        ? 'done'
+        : unlockItem || carriedSecondItem
+          ? 'place'
+          : unlocked
+            ? 'door'
+            : 'locked';
+
+      hotspots.push({
+        id: `door:${room.id}`,
+        bay: 'hall',
+        label: `${room.icon} ${sign.title}`,
+        sublabel,
+        icon: complete ? '★' : unlockItem ? '✨' : unlocked ? room.icon : '🔒',
+        status,
+        accent: unlockItem ? '#d69e2e' : room.accent,
+        worldPos: bayToWorld(theta, slot.lx * 1.24, slot.floorY + 0.08, 0.42),
+        cameraPos: doorFocusPos,
+        cameraLook: doorFocusLook,
+        meshGroup: dg,
+        onClick: () => {
+          if (canInteract) {
+            callbacks.onSelectBay(room.id);
+          }
+        },
+      });
+    }
+
+    // 2. Foreground Center: Leap Day on the Hall Rug + FEB 29 Calendar Slip
+    hallFloorSlip = new THREE.Group();
+    hallFloorSlip.position.set(0, 0.058, 2.08);
+    hallFloorSlip.add(box(0.42, 0.012, 0.34, '#fffaf0', 0, 0, 0, false));
+    hallFloorSlip.add(box(0.42, 0.015, 0.08, '#c53030', 0, 0.001, -0.12, false));
+    hallFloorSlip.visible = false;
+    bay.add(hallFloorSlip);
+
+    hallLeapDayActor = new THREE.Group();
+    hallLeapDayActor.position.copy(leapDayRestPos);
+    const leapDayMesh = buildMascotMesh('leapday', 0.68);
+    leapDayMesh.traverse((c) => {
+      c.castShadow = false;
+      c.receiveShadow = false;
+    });
+    hallLeapDayActor.add(leapDayMesh);
+    if (act === 4) {
+      hallLeapDayActor.add(cyl(0.01, 0.085, 0.19, '#ed64a6', 0, 0.54, -0.01, 10, false));
+      hallLeapDayActor.add(glowSphere(0.026, '#ffea79', 0, 0.65, -0.01, 0.9));
+    }
+    bay.add(hallLeapDayActor);
+
+    // 3. Foreground Left: Hall Corkboard on a standing easel post (`lx = -1.24, lz = 1.44`)
+    const corkGroup = new THREE.Group();
+    corkGroup.position.set(-1.24, 0, 1.44);
+    corkGroup.rotation.y = 0.32;
+    corkGroup.add(cyl(0.04, 0.05, 0.92, '#5c3d24', -0.28, 0.46, 0, 8, false));
+    corkGroup.add(cyl(0.04, 0.05, 0.92, '#5c3d24', 0.28, 0.46, 0, 8, false));
+    corkGroup.add(box(0.76, 0.56, 0.06, '#5c3d24', 0, 0.66, 0, false));
+    corkGroup.add(box(0.68, 0.48, 0.07, '#c69760', 0, 0.66, 0.01, false));
+    corkGroup.add(box(0.66, 0.07, 0.08, act === 4 ? '#2f855a' : '#c53030', 0, 0.84, 0.015, false));
+    const memoCount = Math.min(12, Math.max(1, gameState.pinnedMemos.size));
+    for (let mIdx = 0; mIdx < memoCount; mIdx++) {
+      const col = mIdx % 4;
+      const row = Math.floor(mIdx / 4);
+      const mx = -0.22 + col * 0.145;
+      const my = 0.72 - row * 0.125;
+      const note = box(0.11, 0.1, 0.02, '#fffaf0', mx, my, 0.045, false);
+      note.rotation.z = (((mIdx * 7) % 5) - 2) * 0.04;
+      corkGroup.add(note);
+      corkGroup.add(
+        sphere(0.014, mIdx === 0 ? '#ecc94b' : '#e53e3e', mx, my + 0.035, 0.058, false),
       );
     }
-    bay.add(finaleGroup);
+    bay.add(corkGroup);
 
-    const doorFocusPos = bayToWorld(theta, 0, 1.95, 3.9);
-    const doorFocusLook = bayToWorld(theta, 0, 1.55, 0.2);
+    const pinnedCount = gameState.pinnedMemos.size;
     hotspots.push({
-      id: 'finale:tuesday',
+      id: 'hall:story',
       bay: 'hall',
-      label: act >= 3 ? "🎅 Santa's Merger" : "🔒 Tuesday's Party",
-      sublabel: finaleDone
-        ? '✓ Holiday Hall Saved!'
-        : finaleUnlocked
-          ? '6/6 Lamps Lit — Enter!'
-          : `${lampsLit}/6 Lamps Lit`,
-      icon: finaleDone ? '🎉' : finaleUnlocked ? '🎅' : '🔒',
-      status: finaleDone ? 'done' : finaleUnlocked ? 'ready' : 'locked',
-      accent: '#d69e2e',
-      worldPos: bayToWorld(theta, 0, 1.95, 0.34),
+      label: '📌 Corkboard',
+      sublabel: `${pinnedCount} Memo${pinnedCount === 1 ? '' : 's'}`,
+      icon: '📌',
+      status: 'ready',
+      accent: '#38a169',
+      worldPos: bayToWorld(theta, -1.24, 0.14, 1.72),
       cameraPos: doorFocusPos,
-      cameraLook: doorFocusLook,
-      meshGroup: finaleGroup,
+      cameraLook: bayToWorld(theta, -1.24, 0.65, 1.44),
+      meshGroup: corkGroup,
       onClick: () => {
-        if (finaleUnlocked) callbacks.onOpenProto('tuesday', doorFocusPos, doorFocusLook);
+        if (callbacks.onOpenCorkboard) callbacks.onOpenCorkboard();
         else callbacks.onShowStory();
       },
     });
 
-    // 2. Middle-Left: Host / Villain Figure on a circular plinth
-    const hostGroup = new THREE.Group();
-    hostGroup.position.set(-0.92, 0, 1.18);
-    hostGroup.add(cyl(0.34, 0.38, 0.18, '#8c6940', 0, 0.09, 0));
-    const figureBody = new THREE.Group();
-    figureBody.position.set(0, 0.18, 0);
-    if (act === 1) {
-      figureBody.add(cyl(0.18, 0.36, 1.25, '#1a202c', 0, 0.62, 0));
-      figureBody.add(sphere(0.24, '#2d3748', 0, 1.38, 0));
-      figureBody.add(glowSphere(0.048, '#ffea79', -0.07, 1.4, 0.2, 1.2));
-      figureBody.add(glowSphere(0.048, '#ffea79', 0.07, 1.4, 0.2, 1.2));
-    } else {
-      figureBody.add(cyl(0.2, 0.24, 1.05, '#b794f4', 0, 0.52, 0));
-      figureBody.add(sphere(0.22, '#fbd38d', 0, 1.2, 0));
-      figureBody.add(cyl(0.07, 0.07, 0.15, '#ffffff', 0.24, 0.72, 0.12));
-      if (act === 4) {
-        figureBody.add(cyl(0.01, 0.15, 0.34, '#ed64a6', 0, 1.52, 0));
-      }
-    }
-    hostGroup.add(figureBody);
-    bay.add(hostGroup);
-    floating.push({ mesh: figureBody, phase: 0.3, baseY: 0.18 });
-
-    hotspots.push({
-      id: 'hall:story',
-      bay: 'hall',
-      label:
-        act === 1
-          ? '🕯️ Shadowy Figure'
-          : act === 2
-            ? '☕ Ordinary Tuesday'
-            : act === 3
-              ? '🎅 Corporate Memo'
-              : '🎉 Host Tuesday',
-      sublabel: 'Story Note',
-      icon: act === 1 ? '🕯️' : act === 4 ? '🎉' : '☕',
-      status: 'ready',
-      accent: '#805ad5',
-      worldPos: bayToWorld(theta, -0.92, 0.28, 1.48),
-      cameraPos: doorFocusPos,
-      cameraLook: bayToWorld(theta, -0.92, 1.0, 1.18),
-      meshGroup: hostGroup,
-      onClick: () => callbacks.onShowStory(),
-    });
-
-    // 3. Middle-Right: The Calendar Desk with a glowing Banker's Lamp
+    // 4. Foreground Right: The Calendar Desk with a glowing Banker's Lamp (`lx = 1.24, lz = 1.44`)
+    //    Pill is hidden until your first warm-up is beaten (`deskUnlockedCount > 0`)!
     const deskGroup = new THREE.Group();
-    deskGroup.position.set(0.92, 0, 1.18);
-    deskGroup.rotation.y = -0.22;
-    deskGroup.add(box(0.98, 0.68, 0.62, '#8c6239', 0, 0.34, 0));
-    deskGroup.add(box(1.04, 0.08, 0.68, '#5c3d24', 0, 0.7, 0));
-    deskGroup.add(box(0.46, 0.06, 0.36, '#ffffff', -0.12, 0.77, 0));
-    deskGroup.add(box(0.46, 0.09, 0.12, '#e53e3e', -0.12, 0.81, -0.12));
-    // Glowing green-shaded brass banker's lamp on the desk
-    deskGroup.add(cyl(0.03, 0.07, 0.22, '#d69e2e', 0.28, 0.84, -0.08));
-    deskGroup.add(glowBox(0.22, 0.1, 0.14, '#48bb78', 0.28, 0.96, -0.08, 0.85));
-    deskGroup.add(glowSphere(0.06, '#ffea79', 0.28, 0.9, -0.08, 1.1));
-    if (act === 4) {
-      deskGroup.add(cyl(0.18, 0.18, 0.14, '#fbb6ce', 0.2, 0.82, 0.14));
-      deskGroup.add(cyl(0.12, 0.12, 0.1, '#fefcbf', 0.2, 0.93, 0.14));
-    }
+    deskGroup.position.set(1.24, 0, 1.44);
+    deskGroup.rotation.y = -0.32;
+    deskGroup.add(box(0.82, 0.56, 0.52, '#8c6239', 0, 0.28, 0, false));
+    deskGroup.add(box(0.88, 0.07, 0.56, '#5c3d24', 0, 0.58, 0, false));
+    deskGroup.add(box(0.38, 0.05, 0.3, '#ffffff', -0.1, 0.64, 0, false));
+    deskGroup.add(box(0.38, 0.07, 0.1, '#e53e3e', -0.1, 0.67, -0.1, false));
+    deskGroup.add(cyl(0.025, 0.06, 0.18, '#d69e2e', 0.22, 0.7, -0.06, 10, false));
+    deskGroup.add(glowBox(0.18, 0.08, 0.12, '#48bb78', 0.22, 0.8, -0.06, 0.85));
+    deskGroup.add(glowSphere(0.05, '#ffea79', 0.22, 0.75, -0.06, 1.1));
     bay.add(deskGroup);
 
     const deskFocusPos = bayToWorld(theta, 0.5, 1.9, 3.7);
-    const deskFocusLook = bayToWorld(theta, 0.92, 0.8, 1.18);
+    const deskFocusLook = bayToWorld(theta, 1.24, 0.65, 1.44);
     const deskUnlockedCount = gameState.unlockedDeskGenreCount();
     hotspots.push({
       id: 'desk:calendar',
       bay: 'hall',
       label: '📅 Calendar Desk',
-      sublabel:
-        deskUnlockedCount === 0 ? '🔒 Beat a Warm-up' : `${deskUnlockedCount}/6 Types Unlocked`,
+      sublabel: `${deskUnlockedCount}/6 Reclaimed`,
       icon: '📅',
-      status: deskUnlockedCount === 0 ? 'locked' : deskUnlockedCount >= 6 ? 'done' : 'ready',
+      status: deskUnlockedCount >= 6 ? 'done' : 'ready',
       accent: '#805ad5',
-      worldPos: bayToWorld(theta, 0.92, 0.28, 1.48),
+      hiddenPill: deskUnlockedCount === 0,
+      worldPos: bayToWorld(theta, 1.24, 0.14, 1.72),
       cameraPos: deskFocusPos,
       cameraLook: deskFocusLook,
       meshGroup: deskGroup,
-      onClick: () => callbacks.onOpenDesk(deskFocusPos, deskFocusLook),
+      onClick: () => {
+        if (deskUnlockedCount > 0) callbacks.onOpenDesk(deskFocusPos, deskFocusLook);
+      },
     });
 
-    // 4. Bottom-Center: Tour Holiday Hall Medallion
-    const nextIncomplete =
-      ROOM_SPECS.find(
-        (r) =>
-          !gameState.isRoomComplete(r) &&
-          (gameState.isRoomUnlocked(r) || gameState.carriedEligibleItemForRoom(r) !== null),
-      ) ??
-      ROOM_SPECS.find((r) => !gameState.isRoomComplete(r)) ??
-      ROOM_SPECS[0];
-    const compassGroup = new THREE.Group();
-    compassGroup.position.set(0, 0, 2.02);
-    compassGroup.add(cyl(0.46, 0.5, 0.1, nextIncomplete.accent, 0, 0.05, 0, 16));
-    compassGroup.add(glowSphere(0.22, '#f6e05e', 0, 0.08, 0, 0.45));
-    bay.add(compassGroup);
+    // 5. Center Podium: Xmas365 Merger Contract (only spawns once all 6 door lamps are lit!)
+    const finaleUnlocked = lampsLit >= 6;
+    const finaleDone = gameState.solvedRuns.has('tuesday');
+    if (finaleUnlocked) {
+      const podiumGroup = new THREE.Group();
+      podiumGroup.position.set(0, 0, 1.15);
+      podiumGroup.add(cyl(0.28, 0.34, 0.12, '#5c3d24', 0, 0.06, 0, 14, false));
+      podiumGroup.add(cyl(0.14, 0.18, 0.68, '#d69e2e', 0, 0.42, 0, 12, false));
+      podiumGroup.add(box(0.56, 0.08, 0.44, '#ecc94b', 0, 0.78, 0, false));
+      podiumGroup.add(glowBox(0.42, 0.04, 0.32, '#fffaf0', 0, 0.83, 0, 0.6));
+      bay.add(podiumGroup);
 
-    hotspots.push({
-      id: 'hall:next-room',
-      bay: 'hall',
-      label: `${nextIncomplete.icon} Visit ${nextIncomplete.shortTitle} ▸`,
-      sublabel: 'Tour Holiday Hall',
-      icon: nextIncomplete.icon,
-      status: 'door',
-      accent: nextIncomplete.accent,
-      worldPos: bayToWorld(theta, 0, 0.02, 2.38),
-      cameraPos: doorFocusPos,
-      cameraLook: doorFocusLook,
-      meshGroup: compassGroup,
-      onClick: () => callbacks.onSelectBay(nextIncomplete.id),
-    });
-
-    // 5. Large Outer Flank Hero Props for Main Hall (Bay 0):
-    //    Left Outer Flank (lx=-1.78, lz=0.62): Tall Carved Mahogany Grandfather Clock (~2.45m tall)
-    const grandClock = new THREE.Group();
-    grandClock.position.set(-1.78, 0, 0.62);
-    grandClock.rotation.y = 0.28;
-    // Plinth base + waist cabinet with recessed door + brass pendulum visible inside
-    grandClock.add(box(0.58, 0.48, 0.38, '#3b281a', 0, 0.24, 0));
-    grandClock.add(box(0.62, 0.06, 0.42, '#5c3d24', 0, 0.48, 0));
-    grandClock.add(box(0.44, 1.08, 0.32, '#4a3524', 0, 1.04, 0));
-    grandClock.add(box(0.32, 0.88, 0.04, '#1a202c', 0, 1.04, 0.15));
-    // Brass pendulum rod & glowing bob inside the waist window
-    grandClock.add(cyl(0.012, 0.012, 0.62, '#d69e2e', 0, 1.12, 0.17, 8));
-    grandClock.add(glowSphere(0.085, '#ecc94b', 0, 0.82, 0.17, 0.6));
-    // Clock hood cabinet + cream dial face + black hands + swan-neck pediment & brass finials
-    grandClock.add(box(0.56, 0.56, 0.36, '#3b281a', 0, 1.84, 0));
-    grandClock.add(box(0.6, 0.06, 0.4, '#5c3d24', 0, 1.56, 0));
-    grandClock.add(box(0.6, 0.06, 0.4, '#5c3d24', 0, 2.12, 0));
-    const clockFace = cyl(0.2, 0.2, 0.04, '#fffaf0', 0, 1.84, 0.18, 16);
-    clockFace.rotation.x = Math.PI / 2;
-    grandClock.add(clockFace);
-    const clockRim = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.022, 8, 16), mat('#ecc94b'));
-    clockRim.position.set(0, 1.84, 0.19);
-    grandClock.add(clockRim);
-    // Clock hands pointing to midnight / Tuesday
-    grandClock.add(box(0.022, 0.14, 0.02, '#1a202c', 0, 1.89, 0.21));
-    const minHand = box(0.018, 0.16, 0.02, '#1a202c', 0.04, 1.87, 0.21);
-    minHand.rotation.z = -0.65;
-    grandClock.add(minHand);
-    // Pediment crown & 3 brass spire finials
-    grandClock.add(box(0.52, 0.16, 0.34, '#4a3524', 0, 2.22, 0));
-    for (const fx of [-0.22, 0, 0.22]) {
-      grandClock.add(cyl(0.02, 0.03, 0.12, '#ecc94b', fx, 2.36, 0.12, 8));
-      grandClock.add(sphere(0.036, '#f6e05e', fx, 2.43, 0.12));
+      hotspots.push({
+        id: 'finale:tuesday',
+        bay: 'hall',
+        label: act === 4 ? "🎉 Leap Day's Party" : '📜 Xmas365 Merger Contract',
+        sublabel: finaleDone ? '✓ Xmas12 · Day 366 Every Year!' : '6/6 Mascots Free · Red-Line It!',
+        icon: finaleDone ? '🎉' : '📜',
+        status: finaleDone ? 'done' : 'ready',
+        hero: !finaleDone,
+        accent: '#d69e2e',
+        worldPos: bayToWorld(theta, 0, 1.02, 1.25),
+        cameraPos: doorFocusPos,
+        cameraLook: doorFocusLook,
+        meshGroup: podiumGroup,
+        onClick: () => callbacks.onOpenProto('tuesday', doorFocusPos, doorFocusLook),
+      });
     }
-    bay.add(grandClock);
 
-    //    Right Outer Flank (lx=1.78, lz=0.62): Tall Mahogany Archive Bookcase (~2.28m tall) with Holiday Ledgers & Brass Globe + Parlour Palm
-    const bookcase = new THREE.Group();
-    bookcase.position.set(1.78, 0, 0.62);
-    bookcase.rotation.y = -0.28;
-    bookcase.add(box(0.76, 2.18, 0.36, '#3b281a', 0, 1.09, 0));
-    bookcase.add(box(0.66, 2.04, 0.06, '#26180f', 0, 1.09, -0.12));
-    bookcase.add(box(0.82, 0.08, 0.42, '#5c3d24', 0, 2.2, 0));
-    // 4 horizontal shelves + colorful rows of bound Holiday Hall ledgers
-    const ledgerColors = [
-      '#c53030',
-      '#dd6b20',
-      '#ecc94b',
-      '#2f855a',
-      '#2b6cb0',
-      '#805ad5',
-      '#d53f8c',
-    ];
-    for (const [sIdx, sy] of [0.46, 0.92, 1.38, 1.82].entries()) {
-      bookcase.add(box(0.7, 0.04, 0.34, '#5c3d24', 0, sy, 0.01));
-      for (let b = -3; b <= 3; b++) {
-        const bCol = ledgerColors[(b + 3 + sIdx * 2) % ledgerColors.length] ?? '#c53030';
-        const bh = 0.24 + ((b + sIdx) % 3) * 0.035;
-        bookcase.add(box(0.072, bh, 0.22, bCol, b * 0.085, sy + 0.02 + bh / 2, 0.02));
+    // In Act 4 (Leap Day's Party), all 6 freed holiday mascots + humbled CEO Santa gather in the Hall!
+    if (act === 4) {
+      const partySpots: readonly [RoomId, number, number, number][] = [
+        ['halloween', -0.78, 1.54, 0.42],
+        ['thanksgiving', -0.45, 1.62, 0.18],
+        ['christmas', 0.45, 1.62, -0.18],
+        ['valentines', 0.78, 1.54, -0.42],
+        ['easter', -0.58, 1.12, 0.24],
+        ['fourth', 0.58, 1.12, -0.24],
+      ];
+      for (const [pIdx, [rId, px, pz, rotY]] of partySpots.entries()) {
+        const guest = buildMascotMesh(ROOM_MASCOT_ID[rId], 0.46);
+        guest.position.set(px, 0.03, pz);
+        guest.rotation.y = rotY;
+        bay.add(guest);
+        floating.push({ mesh: guest, phase: pIdx * 0.9 + 0.5, baseY: 0.03 });
       }
+      const santaGuest = buildMascotMesh('santa', 0.48);
+      santaGuest.position.set(0, 0.03, 0.82);
+      bay.add(santaGuest);
+      floating.push({ mesh: santaGuest, phase: 2.1, baseY: 0.03 });
     }
-    // Antique Brass Celestial Globe on top of the bookcase
-    bookcase.add(cyl(0.1, 0.12, 0.05, '#d69e2e', 0, 2.26, 0, 12));
-    bookcase.add(sphere(0.14, '#63b3ed', 0, 2.44, 0));
-    const globeRing = new THREE.Mesh(new THREE.TorusGeometry(0.165, 0.018, 8, 16), mat('#ecc94b'));
-    globeRing.rotation.z = 0.4;
-    globeRing.position.set(0, 2.44, 0);
-    bookcase.add(globeRing);
-    bay.add(bookcase);
-
-    // Lush Potted Parlour Palm beside the Calendar Desk & Bookcase
-    const palmPot = new THREE.Group();
-    palmPot.position.set(1.48, 0, 1.08);
-    palmPot.add(cyl(0.18, 0.14, 0.34, '#b7791f', 0, 0.17, 0, 12));
-    palmPot.add(cyl(0.195, 0.185, 0.04, '#d69e2e', 0, 0.33, 0, 12));
-    for (let f = 0; f < 6; f++) {
-      const angle = (f * Math.PI) / 3;
-      const frondGroup = new THREE.Group();
-      frondGroup.position.set(0, 0.34, 0);
-      frondGroup.rotation.y = angle;
-      const stem = cyl(0.014, 0.018, 0.55, '#276749', 0, 0.24, 0.12, 6);
-      stem.rotation.x = 0.48;
-      frondGroup.add(stem);
-      const blade = sphere(0.14, '#38a169', 0, 0.48, 0.28);
-      blade.scale.set(0.65, 0.25, 1.65);
-      blade.rotation.x = 0.55;
-      frondGroup.add(blade);
-      palmPot.add(frondGroup);
-    }
-    bay.add(palmPot);
   }
 
   // Moody alcove wall & recessed-panel colors so each holiday feels atmospheric & candle/fire-lit
@@ -3399,6 +3577,30 @@ export function buildHolidayHallDiorama(callbacks: {
     cpGroup.add(box(1.12, 0.06, 0.48, '#d69e2e', 0, 0.1, 0, false));
     cpGroup.add(buildCenterpieceSculpture(room.id, room.accent, cpDone));
     bay.add(cpGroup);
+
+    // Holiday Mascot Stage on the front-center of the rug (caged while !cpDone; freed when cpDone)
+    const { stage: mascotStage, mascotMesh } = buildMascotStage(room.id, room.accent, cpDone);
+    mascotStage.position.set(0, 0.02, 1.44);
+    bay.add(mascotStage);
+    if (cpDone) {
+      floating.push({ mesh: mascotMesh, phase: theta + 1.1, baseY: 0.12 });
+    }
+    hotspots.push({
+      id: `mascot:${room.id}`,
+      bay: room.id,
+      label: room.shortTitle,
+      icon: room.icon,
+      status: cpDone ? 'done' : 'ready',
+      accent: room.accent,
+      hiddenPill: true,
+      worldPos: bayToWorld(theta, 0, 0.35, 1.44),
+      cameraPos: bayToWorld(theta, 0, 1.65, 3.8),
+      cameraLook: bayToWorld(theta, 0, 0.45, 1.44),
+      meshGroup: mascotStage,
+      onClick: () => {
+        callbacks.onClickMascot?.(room.id);
+      },
+    });
 
     const cpFocusPos = bayToWorld(theta, 0, 2.15, 3.6);
     const cpFocusLook = bayToWorld(theta, 0, 2.35, 0.36);
@@ -3628,8 +3830,97 @@ export function buildHolidayHallDiorama(callbacks: {
   return {
     root,
     hotspots,
+    leapDayHeadWorldPos: bayToWorld(getBayAngle('hall'), 0, 0.62, 2.08),
+    setDoorHop: (roomId, progress) => {
+      if (!roomId) {
+        activeDoorHop = null;
+        hallLeapDayActor.position.copy(leapDayRestPos);
+        hallLeapDayActor.rotation.set(0, 0, 0);
+        hallLeapDayActor.scale.setScalar(1);
+        for (const { pivot, baseRotY } of hallDoorPivots.values()) {
+          pivot.rotation.y = baseRotY;
+        }
+        return;
+      }
+      activeDoorHop = { roomId, progress: Math.max(0, Math.min(1, progress)) };
+    },
+    setIntroPose: (mode, elapsed) => {
+      activeIntroPose = { mode, elapsed };
+    },
     animate: (t, activeBay) => {
       void floating;
+      // Animate Leap Day in Holiday Hall (door hop, intro pop-out, or idle breathing)
+      if (activeDoorHop) {
+        const target = hallDoorTargets.get(activeDoorHop.roomId) ?? leapDayRestPos;
+        const p = activeDoorHop.progress;
+        const ease = p * p * (3 - 2 * p);
+        hallLeapDayActor.visible = true;
+        hallFloorSlip.visible = false;
+        hallLeapDayActor.position.lerpVectors(leapDayRestPos, target, ease);
+        // 3 energetic frog hops on the way to the threshold
+        const hopArc = Math.abs(Math.sin(p * Math.PI * 3)) * 0.32;
+        hallLeapDayActor.position.y += hopArc;
+        const dx = target.x - leapDayRestPos.x;
+        const dz = target.z - leapDayRestPos.z;
+        hallLeapDayActor.rotation.y = Math.atan2(dx, dz) * Math.min(1, p * 2.5);
+        hallLeapDayActor.rotation.x = Math.cos(p * Math.PI * 3) * 0.18;
+        const doorEntry = hallDoorPivots.get(activeDoorHop.roomId);
+        if (doorEntry) {
+          doorEntry.pivot.rotation.y = THREE.MathUtils.lerp(
+            doorEntry.baseRotY,
+            -0.95,
+            Math.min(1, p * 1.4),
+          );
+        }
+      } else if (activeIntroPose) {
+        if (activeIntroPose.mode === 'hidden') {
+          hallLeapDayActor.visible = false;
+          hallFloorSlip.visible = false;
+        } else if (activeIntroPose.mode === 'pop') {
+          const e = Math.max(0, activeIntroPose.elapsed);
+          hallFloorSlip.visible = true;
+          hallLeapDayActor.visible = true;
+          const popT = Math.min(1, e / 0.55);
+          const popScale =
+            popT < 1 ? popT * popT * (2.6 - 1.6 * popT) : 1 + Math.sin((e - 0.55) * 6) * 0.04;
+          hallLeapDayActor.scale.setScalar(Math.max(0.01, popScale));
+          // Hop around on the foyer rug after popping out of the FEB 29 slip
+          const hopCycle = (e * 2.2) % 1;
+          const hopHeight =
+            e < 0.55
+              ? Math.sin(popT * Math.PI) * 0.45
+              : Math.abs(Math.sin(hopCycle * Math.PI)) * 0.24;
+          const roamAngle = e * 1.9;
+          const roamRadius = Math.min(0.28, Math.max(0, (e - 0.45) * 0.22));
+          hallLeapDayActor.position.set(
+            leapDayRestPos.x + Math.sin(roamAngle) * roamRadius,
+            leapDayRestPos.y + hopHeight,
+            leapDayRestPos.z + (Math.cos(roamAngle) - 1) * roamRadius * 0.5,
+          );
+          hallLeapDayActor.rotation.y = Math.sin(roamAngle) * 0.45;
+          hallLeapDayActor.rotation.x = Math.cos(hopCycle * Math.PI) * 0.12;
+        } else {
+          hallFloorSlip.visible = false;
+          hallLeapDayActor.visible = true;
+          hallLeapDayActor.scale.setScalar(1);
+          hallLeapDayActor.position.set(
+            leapDayRestPos.x,
+            leapDayRestPos.y + Math.abs(Math.sin(t * 2.1)) * 0.03,
+            leapDayRestPos.z,
+          );
+          hallLeapDayActor.rotation.set(0, Math.sin(t * 0.9) * 0.08, 0);
+        }
+      } else {
+        hallLeapDayActor.visible = true;
+        hallLeapDayActor.scale.setScalar(1);
+        hallLeapDayActor.position.set(
+          leapDayRestPos.x,
+          leapDayRestPos.y + Math.abs(Math.sin(t * 2.1)) * 0.03,
+          leapDayRestPos.z,
+        );
+        hallLeapDayActor.rotation.set(0, Math.sin(t * 0.9) * 0.08, 0);
+      }
+
       // Subtle flame flicker + rising ember/spark particles on candles and the fireplace
       for (const fl of flames) {
         if (fl.particle) {

@@ -1,10 +1,10 @@
 /**
- * Render voxel models to PNGs headlessly, so they can be looked at without
+ * Render the models (the mascots) to PNGs headlessly, so they can be looked at without
  * running the game (TECHNICAL.md §6).
  *
  *   npm run preview-models              every model, plus a contact sheet per folder
- *   npm run preview-models -- props/crate   just these models
- *   npm run preview-models -- --close props/crate   big front, ¾, side and ¾-back views → previews/<id>-close.png
+ *   npm run preview-models -- mascots/santa   just these models
+ *   npm run preview-models -- --close mascots/santa   big front, ¾, side and ¾-back views → previews/<id>-close.png
  *
  * Writes previews/<id>.png (front, ¾ and side) and previews/sheet-<folder>.png.
  * Uses the system Chrome through playwright-core, so no browser download is needed.
@@ -14,7 +14,7 @@ import { join } from 'node:path';
 import { chromium } from 'playwright-core';
 import { createServer } from 'vite';
 
-const ROOT = join(import.meta.dirname, '..', '..');
+const ROOT = join(import.meta.dirname, '..');
 const OUT = join(ROOT, 'previews');
 
 const server = await createServer({ root: ROOT, server: { port: 0 }, logLevel: 'error' });
@@ -31,10 +31,12 @@ try {
   const page = await browser.newPage({ viewport: { width: 1200, height: 1200 } });
   page.on('pageerror', (e) => console.error(`page error: ${e.message}`));
 
-  // Ask the page which models exist (it reads them through Vite, like the game does).
+  // Ask the page which models exist (its list, as the models viewer shows it).
   await page.goto(`${base}/dev/models.html`);
   const allIds = await page.evaluate(() =>
-    [...document.querySelectorAll('#list button')].map((b) => b.textContent ?? ''),
+    [...document.querySelectorAll<HTMLButtonElement>('#list button[data-key^="model:"]')].map(
+      (b) => b.textContent ?? '',
+    ),
   );
   const args = process.argv.slice(2);
   const close = args.includes('--close');

@@ -785,7 +785,7 @@ export function mountHops(host: HTMLElement, panel: Panel, hooks: HopsHooks): ()
           : 'Home!'
         : left > 0
           ? `${left} hop${left === 1 ? '' : 's'} left`
-          : 'Check your route — a clue or rule isn’t met yet',
+          : "Check your route: a clue or rule isn't met yet",
     );
     lastHoppedSpot = null;
   };

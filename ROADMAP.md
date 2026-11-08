@@ -2,148 +2,154 @@
 
 From where the game stands (2026-11-07) to the finished, polished game.
 What the game *is* lives in [GAME.md](GAME.md) (the story is "The story:
-Santa's hostile takeover": you are Leap Day, freeing the
-mascots from Xmas365); the puzzle-by-twist map in
-[PUZZLES.md](PUZZLES.md); build status in [PROTOTYPES.md](PROTOTYPES.md).
+Santa's hostile takeover": you are Leap Day, freeing the mascots from Xmas365);
+the full script and beat IDs live in [SCRIPT.md](SCRIPT.md); the puzzle-by-twist
+map lives in [PUZZLES.md](PUZZLES.md); build status lives in
+[PROTOTYPES.md](PROTOTYPES.md).
 
-## Where we are
+## Where we are (completed foundations)
 
-- **Puzzles: in decent shape.** Six genres, six twists, three tiers, all
-  generated in seconds and pinned by tests; every room's runs built; the
-  merger contract is six two-twist panels.
-- **Game shell: working.** Holiday Hall (3D rotunda), room runs, carried
-  items, lamps, the Calendar Desk, step hints.
-- **Story and progression: the weak part.** The code runs an older story
-  told in text banners, with progress shown as counters. The new design (you
-  are Leap Day; free the mascots; found Xmas365 memos; acquired rooms that
-  peel back; a party at the end) isn't built.
+- **Puzzles & generators (done):** All six genres (`Spiderweb`, `Carving`,
+  `Heartstrings`, `Bunny Hops`, `Lights`, `Fireworks`) and all six holiday twists
+  generate at easy, medium, and hard in seconds and are pinned by tests. Real-world
+  puzzle names (`Hashi`, `Shikaku`, `Net`, `Strands`, `Numbrix`, `Nonograms`) are
+  never shown in user-facing UI.
+- **Guided opening & Room Ladder UX (done):** Only Thanksgiving starts open
+  (with its big Warm-up button). Other rooms start locked until you bring one of
+  their two eligible home items (**"Restore Item & Unlock Room"** → **Warm-up**).
+  Beating a room's warm-up reveals the two-tier **Room Ladder UX** (completed
+  green warm-up branching up to the two stray runs at the bottom; two non-puzzle
+  return-item sockets feeding up into the centrepiece unlock at the top).
+- **Calendar Desk progression (done):** Reclaims each holiday's warm-up and
+  standard generator when its warm-up is beaten, and all twists when its
+  centrepiece is beaten, alongside the daily puzzle and custom mixer.
+- **3D mascots, cages & acquired room stages (done):** All 8 procedural low-poly
+  mascots (`leapday`, `santa`, `spider`, `turkey`, `snowman`, `bear`, `bunny`,
+  `eaglet`) are built in `src/game/mascots.ts` with Wind-Waker-style ink outlines
+  and wired into `src/game/diorama.ts`, complete with cages, Xmas365 acquisition
+  banners/crates that peel back as items are restored, drained-to-restored room
+  palettes, and Hall lamps.
+- **Script & corpspeak memos (done):** Every memo, Leap Day one-liner, mascot
+  caged/freed/bonus line, Merger Contract clause, and ending scene is written in
+  [SCRIPT.md](SCRIPT.md).
 
-## The plan
+---
 
-Phases run roughly in order; each ends in something playable. Playtests
-(your phone, the whole loop, in order) are the checkpoints between them.
+## Remaining plan to complete the game
 
-### Phase 0: housekeeping (small)
+Phases run in order; each ends in a playable milestone verified by `npm run check`
+and a phone/browser playtest.
 
-- Finish and commit the in-progress Calendar Desk menu work.
-- Keep `GAME.md`, `PUZZLES.md` and `PROTOTYPES.md` in step as each phase lands.
+### Phase 1: Wire `SCRIPT.md` into the game shell & Hall Corkboard (Next Up)
 
-### Phase 1: the new story in the shell
+Replace the legacy 4-act story code (`SHADOW_NOTES`, `TUESDAY_NOTES`,
+`MILESTONE_VIGNETTES` in `src/game/state.ts` and `src/main.ts`) with the
+Xmas365 / Leap Day story from [SCRIPT.md](SCRIPT.md).
 
-Replace the old story with the new one, in words first (art comes later).
+- **Script content module (`src/content/script.ts`):** Encode all beats from
+  `SCRIPT.md` (`P1`, `T1`, room entry memos `H1`/`X1`/`V1`/`A1`/`F1`, stray-freed
+  beats `*2a`/`*2b`, item-returned beats `*3a`/`*3b`, mascot-freed thank-yous
+  `*4`, escalating Santa memos `E1`–`E6`, caged/freed mascot barks `*0`,
+  contract clauses `C0`–`C9`, and party ending `Y1`–`Y7`).
+- **Clean puzzle panels:** Remove the old per-panel villain notes inside puzzle
+  modals so panels show rules only.
+- **Milestone beat cards:** Show a crisp memo/dialogue toast in the shell when
+  a milestone fires (first room entry, stray freed, item returned, mascot freed),
+  pairing the found Xmas365 memo with Leap Day's dry one-liner (and the mascot's
+  thank-you when a cage opens).
+- **The Hall Corkboard:** Add a clickable Corkboard in Holiday Hall where every
+  found Xmas365 memo is pinned up to reread in order.
+- **Player as Leap Day:** Rename remaining `Tuesday` UI labels in the Hall,
+  Finale modal, and Calendar Desk to **Leap Day**, **Xmas365 Merger Contract**,
+  and **Day 366**.
 
-- **State:** drop the act chain (Shadowy Figure, Tuesday unmasked); Xmas365
-  is the open villain from the start, and the player is Leap Day. Track story milestones as events: first
-  entry to a room, stray freed, item brought home, mascot freed, lamp count.
-- **Beats:** one small system that shows a short beat at each milestone (a
-  found Xmas365 memo, a Leap Day one-liner, a mascot's thank-you), shown
-  once, then pinned up in the hall to reread. Remove the per-panel villain notes: panels show
-  rules only.
-- **Lines:** all story text in one content file: Xmas365's internal memos
-  (by milestone, escalating, written to Santa's staff and never to you),
-  Leap Day's reactions, six mascot thank-yous, the ending.
-- **Player as Leap Day:** UI copy speaks to the player as Leap Day; rename
-  Tuesday throughout the shell (the hall, the finale, the desk's daily
-  puzzle).
+*Done when:* A full playthrough triggers every beat from `SCRIPT.md` in the
+shell, panels are clean, found memos accumulate on the Hall Corkboard, and zero
+legacy Shadowy Figure / Tuesday text remains.
 
-*Done when:* a full playthrough reads as the new story, start to finish,
-with no old-story text left.
+### Phase 2: The Finale — Merger Contract, Santa Confrontation & Cake Relay
 
-### Phase 2: the guided opening and Room Ladder UX
+Build the two-stage climax in Holiday Hall (`SCRIPT.md`, "The Finale").
 
-- **Opening & room unlocks:** a dropped Xmas365 memo announces the takeover of
-  all 365 days; only Thanksgiving starts open (showing its big Warm-up button).
-  Other rooms start with a big Locked indicator until you bring one of their two
-  eligible items: arriving with an eligible item turns the button into **"Restore
-  Item & Unlock Room"**, which places the item and transitions into the big
-  Warm-up button.
-- **Room Ladder UX:** once a room's warm-up is complete, show the two-tree
-  progression ladder in the room:
-  - **Bottom:** the completed warm-up (clearly green) with lines branching up to
-    the room's two stray puzzle boxes (each turning green and staying in place
-    when solved).
-  - **Top:** the two home items to return in their own non-puzzle slot UX, with
-    lines feeding up into the centrepiece unlock.
-- **Calendar Desk:** reclaims each holiday's warm-up & standard generator as its
-  warm-up is beaten, and all twists as its centrepiece is beaten; **"Day 366"**
-  (the daily puzzle) and the full mixer serve as the endless mode.
+- **The Merger Contract (`C0`–`C6`):** Frame the 12 two-twist finale panels as
+  the **6 Clauses of the Xmas365 Perpetual Holiday Merger Contract** (2 sub-panels
+  per clause). Solving each clause plays a tear-up animation and triggers Santa's
+  escalating clause memo + Leap Day's retort (`C1`–`C6`).
+- **The Loophole & CEO Santa Confrontation (`C7`–`C9`):** When Clause VI is torn
+  up, CEO Santa (`santa` mascot in his red business suit and green tie) appears
+  in Holiday Hall demanding *"Who are you?!"*, discovers **Day 366** isn't in his
+  365-day contract, and watches the contract void itself.
+- **The Cake Relay (`Y2`):** Design and build the single multi-stage finale board
+  where all 6 genres collaborate to build Leap Day's 6-tier birthday cake:
+  1. `Fireworks`: paint the cake silhouette
+  2. `Heartstrings`: trace the frosting message across the cake
+  3. `Carving`: slice the cake into fair portions without cutting words
+  4. `Bunny Hops`: hop slice-by-slice to place the toppings
+  5. `Lights`: wire the birthday candles from the plug
+  6. `Spiderweb`: spin celebratory bunting between the lit candles
+- **Leap Day's Party & Xmas12 (`Y1`, `Y3`–`Y7`):** Transition Holiday Hall into
+  the party scene with all 6 freed mascots and humbled Santa (rebranded to
+  **Xmas12**), crown Leap Day **"Day 366 (Every Year)"**, and present the credits
+  screen.
 
-*Done when:* a brand-new player is taught the whole loop in Thanksgiving
-without reading instructions. **Playtest 1: the whole loop, new story.**
+*Done when:* The game can be played from the opening memo all the way through
+the Merger Contract, the Cake Relay, and the Party ending.
 
-### Phase 3: acquired rooms, mascots and lamps (art)
+### Phase 3: Freed Mascot Bonus Panels & Party Hats
 
-The story told in the world.
+Give each freed mascot their post-rescue optional challenge (`SCRIPT.md`,
+`T5`/`H5`/`X5`/`V5`/`A5`/`F5`).
 
-- **Leap Day** as a voxel frog in round glasses (the player's look), and
-  **six mascots** (`GAME.md`, "The cast"): the Spider in a witch's hat, the
-  Turkey in a buckle hat, the Snowman in a top hat, the Teddy Bear with a
-  heart on its tummy, the Easter Bunny, and the Eaglet in an Uncle Sam hat;
-  each with a cage at its centrepiece, and a freed pose.
-- **Acquired rooms:** each room starts with corporate Christmas signage,
-  drained colours and the caged mascot.
-- **Peel-back stages:** each item brought home peels some branding off;
-  restoring the centrepiece opens the cage, brings back the room's full
-  colour and lights its lamp in the hall (a moment with sound and a little
-  camera move).
-- The found memos pinned up in the hall (a corkboard), growing as you go.
+- **Mascot interaction:** Tapping a caged mascot shows their caged line (`*0`);
+  tapping a freed mascot offers their **3 hard bonus panels** (pinned from that
+  room's generator).
+- **Visible rewards:** Completing a mascot's bonus run awards a festive **party
+  hat** on the mascot (worn in their alcove and in the Hall party) and a special
+  room trophy decoration, plus their completion line (`*5` done).
 
-*Done when:* you can tell how far you are by looking at the house.
+*Done when:* Every freed mascot offers a 3-panel bonus run that visibly upgrades
+the mascot and room upon completion.
 
-### Phase 4: the ending
+### Phase 4: Sound & Music Moods
 
-- **The merger contract:** the six two-twist panels framed as clauses, each
-  torn up on solving; the last is the loophole, day 366.
-- **The party:** all six mascots in the hall, Leap Day crowned **"Day 366
-  (Every Year)"** (pencilling Feb 29th onto every year's calendar), Santa
-  finally learning who you are, credits.
-- **The cake relay:** design and build the single board where every genre
-  adds to Leap Day's party cake (outline in `GAME.md`). This needs a small
-  multi-genre board of its own.
+Bring the house to life with procedural audio (`src/audio`).
 
-*Done when:* the game can be finished. **Playtest 2: the whole game, start
-to end.**
+- **Two music moods per room:** Acquired rooms play a dreary, muzak-ish corporate
+  Christmas loop; restored rooms play their own holiday theme; Holiday Hall and
+  Leap Day's Party have their own themes.
+- **Milestone SFX & camera moments:** Distinct synthesized chimes/flourishes for
+  freeing a stray, slotting a returned item, opening a mascot's cage + lighting a
+  Hall lamp (with a brief camera focus), finding a memo, and tearing up a
+  contract clause.
 
-### Phase 5: bonus panels
+*Done when:* Every room transition and progression milestone has clear musical
+and sound feedback.
 
-- Offered by each room's **freed mascot** once their cage opens: a few optional
-  hard panels per room, picked from the generators (and pinned), earning a room
-  decoration and a party hat for that mascot to wear at the party.
+### Phase 5: The Lighter Layer (Hidden Strays & Clickable Gags)
 
-### Phase 6: sound
+Add the toy-theatre exploration layer between puzzles (`GAME.md`, "Room left for
+a lighter layer").
 
-- Music per room in two moods (acquired: muzak-ish corporate Christmas;
-  restored: the room's own theme), the hall's theme, the party.
-- Milestone sounds: stray freed, item placed, cage opened, lamp lit, clause
-  torn. Built on `src/audio` (synthesized songs and effects already exist).
+- **Finding the strays:** Strays start tucked behind a room prop with a short
+  riddle/memo clue hinting where to spot them; tapping the hiding spot reveals
+  the stray and opens its puzzle run.
+- **Clickable room gags:** Add 2–3 clickable diorama props per room (especially
+  around the Xmas365 corporate signage and holiday mash-ups) that play a quick
+  toy-theatre animation and a dry Leap Day one-liner.
 
-### Phase 7: the lighter layer
+*Done when:* Exploring each diorama rewards curiosity with visual gags and
+riddle-guided stray discovery.
 
-- Strays that start hidden, with a found memo hinting where.
-- Clickable gags and reactions in every room, above all round the mash-ups
-  and Santa's branding.
+### Phase 6: Tuning, Accessibility & Release Polish
 
-### Phase 8: tuning and UX
+Final verification for mobile and desktop release (`TECHNICAL.md`).
 
-- Panel order and difficulty within each run (from playtest notes); the
-  open UX items in `PROTOTYPES.md` ("For the UX pass").
-- Accessibility: red and blue readable for colour-blind players (shapes or
-  patterns as well as colour), text size, touch targets.
-- **Playtest 3**, ideally with someone who hasn't seen the game.
-
-### Phase 9: release
-
-- Phone performance: a steady 60 fps on a mid-range phone, first load under
-  ~5 MB (`TECHNICAL.md`, Goals).
-- Saves that survive refreshes and updates; a reset option.
-- Title screen, settings, credits; deployment as a static site.
-
-### After release: the Calendar Desk
-
-- The daily puzzle (**"Day 366"**, seeded by date) and the mixer are the endless
-  mode; tune which genres and twists the daily rotates through.
-
-## Decisions still open
-
-From `GAME.md`, "To decide": the exact lines; how the cake relay looks
-with the mascots at the party; hidden strays and the lighter layer's gags.
+- **Puzzle & UX polish:** Tune panel difficulty ordering based on playtest notes
+  and resolve open UX items in `PROTOTYPES.md` (e.g. Pumpkin Pie slice badge,
+  Easter hop curve).
+- **Accessibility:** Ensure red/blue/green puzzle elements have secondary
+  shape/pattern cues for color-blind readability; verify text contrast and touch
+  targets on mobile portrait viewports.
+- **Title screen, saves & performance:** Add a clean title/continue overlay,
+  verify save persistence and reset flows, confirm steady 60 fps and `< 5 MB`
+  bundle size, and run a full start-to-finish playtest.

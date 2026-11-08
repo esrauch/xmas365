@@ -1,8 +1,9 @@
 /**
- * Tuesday's Calendar Desk: houses the deterministic "Daily Tuesday" challenge
- * (seeded by YYYY-MM-DD) and the "Custom Holiday Mixer" powered by the
- * in-browser Web Worker generator.
+ * Leap Day's Calendar Desk: houses the deterministic "Day 366" daily challenge
+ * (seeded by YYYY-MM-DD) and the reclaimed holiday puzzle generators powered by
+ * the in-browser Web Worker generator.
  */
+import { ROOM_SCRIPT } from '../content/script';
 import type { Panel as CarvePanel } from '../gen/carving';
 import { type Genre, cancelGenerating, generateInBrowser } from '../gen/client';
 import type { Tier } from '../gen/core/spec';
@@ -341,7 +342,7 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
             blip(660, 120);
             renderTabs();
             if (dailySolved.size === 3) {
-              statusEl.textContent = `🎉 Daily Tuesday (${dateStr}) Complete!`;
+              statusEl.textContent = `🎉 Day 366 Daily (${dateStr}) Complete!`;
             } else if (idx < 2) {
               statusEl.textContent = `✓ Panel ${idx + 1} solved! Loading next...`;
               window.setTimeout(() => {
@@ -405,7 +406,7 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
     if (token !== deskViewToken) return;
     if (!reply.made) {
       statusEl.textContent =
-        'No board found for that combination in time — try 1 twist or Easy/Medium.';
+        'No board found for that combination in time. Try 1 twist or Easy/Medium.';
       return;
     }
     const mountCustom = (dir: 'forward' | 'reset'): void => {
@@ -574,10 +575,14 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
                   'div',
                   { style: { fontSize: '11px', color: '#718096' } },
                   unlocked
-                    ? `Beat ${r.centerpiece.title} (${r.shortTitle} Centerpiece) for all 6 Twists`
+                    ? `${ROOM_SCRIPT[r.id].deskReclaimedSign} · Beat ${r.centerpiece.title} for all 6 Twists`
                     : `Then beat ${r.centerpiece.title} for all 6 Twists`,
                 )
-              : null,
+              : h(
+                  'div',
+                  { style: { fontSize: '11px', color: '#2f855a', fontWeight: '700' } },
+                  ROOM_SCRIPT[r.id].deskReclaimedSign,
+                ),
           );
         }),
       );
@@ -878,7 +883,7 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
           },
           onclick: async () => {
             const marks = [0, 1, 2].map((i) => (dailySolved.has(i) ? '🟩' : '⬜')).join('');
-            const text = `Puzz · Daily Tuesday (${dateStr}) ${marks} (${dailySolved.size}/3)`;
+            const text = `Puzz · Day 366 (${dateStr}) ${marks} (${dailySolved.size}/3)`;
             try {
               await navigator.clipboard.writeText(text);
               statusEl.textContent = `Copied: "${text}"`;
@@ -942,11 +947,12 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
             renderDaily();
           },
         },
-        anyUnlocked ? `📅 Daily Tuesday (${dateStr})` : '🔒 Daily Tuesday',
+        anyUnlocked ? `📅 Day 366 Daily (${dateStr})` : '🔒 Day 366 Daily',
       ),
     );
   };
 
+  const isPartyDone = gameState.act() === 4;
   const header = h(
     'div',
     {
@@ -957,7 +963,11 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
         marginBottom: '10px',
       },
     },
-    h('h2', { style: { margin: '0', fontSize: '20px' } }, "📅 Tuesday's Calendar Desk"),
+    h(
+      'h2',
+      { style: { margin: '0', fontSize: '20px' } },
+      isPartyDone ? '📅 Day 366 · Open Every Day' : "📅 Leap Day's Calendar Desk",
+    ),
     h(
       'button',
       {

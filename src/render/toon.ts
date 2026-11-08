@@ -40,7 +40,7 @@ export const celUniforms = {
   celSun: { value: new THREE.Color(1, 1, 1) },
   celLitTint: { value: new THREE.Color(cel.litTint) },
   celShadeTint: { value: new THREE.Color(cel.shadeTint) },
-  celShadeGamma: { value: cel.shadeGamma },
+  celShadeGamma: { value: cel.shadeGamma as number },
 };
 
 const DECLARATIONS = /* glsl */ `

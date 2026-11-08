@@ -1,8 +1,15 @@
 /**
- * Shared meta-game state, room/stray/centerpiece registry, and act-based
- * villain commentary (Act I: The Shadow -> Act II: Ordinary Tuesday ->
- * Act III: Santa's Hostile Merger -> Act IV: Tuesday's Party).
+ * Shared meta-game state, room/stray/centerpiece registry, and story beat /
+ * corkboard progression (`SCRIPT.md`: Leap Day vs. CEO Santa's Xmas365 takeover).
  */
+import {
+  type BeatId,
+  MEMOS,
+  MEMO_ORDER,
+  type MemoId,
+  type MemoSpec,
+  ROOM_SCRIPT,
+} from '../content/script';
 import type { Proto } from '../proto/kit';
 import { fairylights, goldenegg, pumpkinpie, tree } from '../proto/puzzles/christmas';
 import { cornucopia, eggtree, flag, hutch } from '../proto/puzzles/easter';
@@ -317,6 +324,9 @@ const SOLVED_RUNS_KEY = 'puzz.proto.solved';
 const PLACED_ITEMS_KEY = 'puzz.meta.placed';
 const MILESTONES_KEY = 'puzz.meta.milestones';
 const FREEPLAY_KEY = 'puzz.meta.freeplay';
+const PINNED_MEMOS_KEY = 'puzz.story.memos';
+const HALL_PENDING_KEY = 'puzz.story.hallPending';
+const FIRST_HOLIDAY_KEY = 'puzz.story.firstHoliday';
 
 function readSet(key: string): Set<string> {
   try {
@@ -338,6 +348,16 @@ export class GameState {
   readonly solvedRuns = readSet(SOLVED_RUNS_KEY);
   readonly placedItems = readSet(PLACED_ITEMS_KEY);
   readonly milestones = readSet(MILESTONES_KEY);
+  readonly pinnedMemos = readSet(PINNED_MEMOS_KEY) as Set<MemoId>;
+  readonly hallPendingBeats = readSet(HALL_PENDING_KEY) as Set<BeatId>;
+  readonly beatQueue: BeatId[] = [];
+  firstRevertedHoliday = ((): string => {
+    try {
+      return localStorage.getItem(FIRST_HOLIDAY_KEY) ?? 'Thanksgiving';
+    } catch {
+      return 'Thanksgiving';
+    }
+  })();
   freePlayUnlocked = ((): boolean => {
     try {
       return localStorage.getItem(FREEPLAY_KEY) === '1';
@@ -347,6 +367,12 @@ export class GameState {
   })();
 
   constructor() {
+    // `P1` is always pinned to the Hall Corkboard from the very start of the game (`SCRIPT.md`)
+    if (!this.pinnedMemos.has('P1')) {
+      this.pinnedMemos.add('P1');
+      writeSet(PINNED_MEMOS_KEY, this.pinnedMemos as Set<string>);
+    }
+
     // Backfill solvedRuns from per-panel progress if a run's final panel was already beaten
     const solvedPanels = readSet('puzz.proto.panels');
     for (const room of ROOM_SPECS) {
@@ -380,11 +406,122 @@ export class GameState {
     for (const fn of this.listeners) fn();
   }
 
+  /** Pin a memo to the Hall Corkboard without necessariamente opening a modal. */
+  pinMemo(id: MemoId): void {
+    if (!this.pinnedMemos.has(id)) {
+      this.pinnedMemos.add(id);
+      writeSet(PINNED_MEMOS_KEY, this.pinnedMemos as Set<string>);
+    }
+  }
+
+  /** Return all discovered Xmas365 / Xmas12 memos in canonical Corkboard order. */
+  pinnedMemosInOrder(): MemoSpec[] {
+    this.pinMemo('P1');
+    return MEMO_ORDER.filter((id) => this.pinnedMemos.has(id)).map((id) => MEMOS[id]);
+  }
+
+  /**
+   * Queue a story beat (`SCRIPT.md`) to play in order.
+   * If `force` is false and the beat has already been seen, it is skipped (though memos still pin).
+   */
+  enqueueBeat(id: BeatId, force = false): void {
+    if (id in MEMOS) {
+      this.pinMemo(id as MemoId);
+    }
+    if (!force && this.milestones.has(id)) return;
+    if (!this.beatQueue.includes(id)) {
+      this.beatQueue.push(id);
+      this.notify();
+    }
+  }
+
+  /** Return the front beat waiting to be displayed, or `null` if the queue is empty. */
+  currentBeat(): BeatId | null {
+    return this.beatQueue[0] ?? null;
+  }
+
+  /** Dismiss the active beat, mark it as seen, and advance the queue. */
+  dismissBeat(id?: BeatId): void {
+    const target = id ?? this.beatQueue[0];
+    if (!target) return;
+    const idx = this.beatQueue.indexOf(target);
+    if (idx !== -1) {
+      this.beatQueue.splice(idx, 1);
+    }
+    this.milestones.add(target);
+    writeSet(MILESTONES_KEY, this.milestones);
+    this.notify();
+  }
+
+  /**
+   * Triggered when the player enters Holiday Hall or turns to a holiday alcove (`SCRIPT.md`).
+   * - In `hall`: opens `P1` on a new game, and flushes any pending escalation memos (`E1`–`E6`).
+   * - In a holiday room: nothing yet. The room's memo (`<room>.enter`, with its caged mascot's plea
+   *   on a sticky note) comes with beating its warm-up: see `markRunSolved`.
+   */
+  onEnterBay(bay: 'hall' | RoomId): void {
+    if (bay === 'hall') {
+      this.enqueueBeat('P1');
+      this.enqueueBeat('P2');
+      if (this.hallPendingBeats.size > 0) {
+        const pending = [...this.hallPendingBeats];
+        this.hallPendingBeats.clear();
+        writeSet(HALL_PENDING_KEY, this.hallPendingBeats as Set<string>);
+        for (const beatId of pending) {
+          this.enqueueBeat(beatId);
+        }
+      }
+      return;
+    }
+  }
+
   markRunSolved(protoId: string): void {
     if (!this.solvedRuns.has(protoId)) {
       this.solvedRuns.add(protoId);
       writeSet(SOLVED_RUNS_KEY, this.solvedRuns);
-      if (protoId === 'tuesday') this.setFreePlay(true);
+
+      // 1. First stray ever freed -> `T1` Logistics memo
+      const isStray = Object.values(STRAY_ITEMS).some((s) => s.proto.id === protoId);
+      if (isStray) {
+        this.enqueueBeat('T1');
+      }
+
+      // 2. A room's warm-up beaten -> that room's memo (`<room>.enter`)
+      const warmupRoom = ROOM_SPECS.find((r) => r.warmup.id === protoId);
+      if (warmupRoom) this.enqueueBeat(ROOM_SCRIPT[warmupRoom.id].enterMemoId);
+
+      // 3. Room centerpiece solved -> mascot freed (`<room>.freed`) + queue escalation memo (`E1`..`E6`) for the Hall
+      const cpRoom = ROOM_SPECS.find((r) => r.centerpiece.proto.id === protoId);
+      if (cpRoom) {
+        const script = ROOM_SCRIPT[cpRoom.id];
+        this.enqueueBeat(script.freedBeatId);
+        const count = this.completedRoomCount();
+        if (count === 1) {
+          this.firstRevertedHoliday = cpRoom.shortTitle;
+          try {
+            localStorage.setItem(FIRST_HOLIDAY_KEY, this.firstRevertedHoliday);
+          } catch {
+            // Ignore
+          }
+        }
+        if (count >= 1 && count <= 6) {
+          const escId = `E${count}` as MemoId;
+          this.pinMemo(escId);
+          this.hallPendingBeats.add(escId);
+          writeSet(HALL_PENDING_KEY, this.hallPendingBeats as Set<string>);
+        }
+      }
+
+      // 4. Merger contract solved -> loophole & Santa confrontation (`C6.torn`), party (`Y1`, `Y2`, `Y4`), and `Y7` memo
+      if (protoId === 'tuesday') {
+        this.setFreePlay(true);
+        this.enqueueBeat('C6.torn');
+        this.enqueueBeat('Y1');
+        this.enqueueBeat('Y2');
+        this.enqueueBeat('Y4');
+        this.enqueueBeat('Y7');
+      }
+
       this.notify();
     }
   }
@@ -412,6 +549,10 @@ export class GameState {
     if (!this.placedItems.has(itemId)) {
       this.placedItems.add(itemId);
       writeSet(PLACED_ITEMS_KEY, this.placedItems);
+
+      // First item ever restored -> `T3` Leap Day line
+      this.enqueueBeat('T3');
+
       this.notify();
     }
   }
@@ -436,16 +577,25 @@ export class GameState {
     this.solvedRuns.clear();
     this.placedItems.clear();
     this.milestones.clear();
+    this.pinnedMemos.clear();
+    this.pinnedMemos.add('P1');
+    this.hallPendingBeats.clear();
+    this.beatQueue.length = 0;
+    this.firstRevertedHoliday = 'Thanksgiving';
     this.freePlayUnlocked = false;
     writeSet(SOLVED_RUNS_KEY, this.solvedRuns);
     writeSet(PLACED_ITEMS_KEY, this.placedItems);
     writeSet(MILESTONES_KEY, this.milestones);
+    writeSet(PINNED_MEMOS_KEY, this.pinnedMemos as Set<string>);
+    writeSet(HALL_PENDING_KEY, this.hallPendingBeats as Set<string>);
     try {
       localStorage.removeItem(FREEPLAY_KEY);
+      localStorage.removeItem(FIRST_HOLIDAY_KEY);
       localStorage.removeItem('puzz.proto.panels');
     } catch {
       // Ignore storage errors
     }
+    this.enqueueBeat('P1');
     this.notify();
   }
 
@@ -473,6 +623,26 @@ export class GameState {
 
   completedRoomCount(): number {
     return ROOM_SPECS.filter((r) => this.isRoomComplete(r)).length;
+  }
+
+  /**
+   * Return a room's display title & subtitle based on whether it is still an
+   * acquired Xmas365 subsidiary or has been restored (`SCRIPT.md`).
+   */
+  getRoomSignage(room: RoomSpec): { title: string; subtitle: string; isAcquired: boolean } {
+    const s = ROOM_SCRIPT[room.id];
+    if (this.isRoomComplete(room)) {
+      return {
+        title: s.restoredTitle,
+        subtitle: `${room.shortTitle} · Restored`,
+        isAcquired: false,
+      };
+    }
+    return {
+      title: s.acquiredTitle,
+      subtitle: s.acquiredSubtitle,
+      isAcquired: true,
+    };
   }
 
   /**
@@ -528,135 +698,22 @@ export class GameState {
   }
 
   /**
-   * Current narrative act:
-   * - Act 1: The Shadowy Culprit (0–2 rooms complete)
-   * - Act 2: Ordinary Tuesday Unmasked (3–5 rooms complete)
-   * - Act 3: Santa's Hostile Merger (all 6 rooms complete, Finale open)
-   * - Act 4: Tuesday's Party (Finale beaten)
+   * Current narrative act (`SCRIPT.md`):
+   * - Act 1: Thanksgiving guided opening (0 rooms complete)
+   * - Act 2: The Open House (1–5 rooms complete)
+   * - Act 3: The Merger Contract in Holiday Hall (all 6 rooms complete)
+   * - Act 4: Leap Day's Party & Xmas12 (Merger Contract beaten)
    */
   act(): 1 | 2 | 3 | 4 {
     if (this.solvedRuns.has('tuesday')) return 4;
     const lamps = this.completedRoomCount();
     if (lamps >= 6) return 3;
-    if (lamps >= 3) return 2;
+    if (lamps >= 1) return 2;
     return 1;
   }
 }
 
 export const gameState = new GameState();
-
-export interface VillainNote {
-  sender: string;
-  badge: string;
-  bg: string;
-  border: string;
-  textColor: string;
-  text: string;
-}
-
-const SHADOW_NOTES: Record<string, string> = {
-  cobwebs: 'Spin my threads if you dare—every holiday is tangled in my lair!',
-  chocolates: 'I dipped Valentine’s sweets in midnight silk. Good luck reading their numbers!',
-  starlights: 'A frozen star caught in a spider’s web—no light escapes my shadow!',
-  web: 'Even my own lantern hides knots in the dark. You will never mend this web!',
-  breadboard: 'Carve the board as you please; the feast will never be served!',
-  hotdog: 'A backyard cookout on the Thanksgiving table? Chaos is my finest dish!',
-  stocking: 'I froze a Christmas stocking right into the carving board!',
-  feast: 'Fences across the table! Try serving fair portions through that!',
-  fairylights: 'Twist the wires till your fingers ache—this house stays in the dark!',
-  goldenegg: 'An Easter egg wired into the Christmas lights! Count your steps carefully!',
-  pumpkinpie: 'Pumpkin pie on the light string! One wire per slice, or the fuse blows!',
-  tree: 'Frost on the branches! Only a mirror-perfect circuit can light this tree!',
-  lovenotes: 'Trace your little words—my shadows have scrambled every parlor!',
-  jack: 'My Jack-o’-Lantern swallowed Valentine’s letters into the dark!',
-  basket: 'Easter eggs in the love letters! Every number pins your words in place!',
-  mailbox: 'I locked the mailbox in a secret cipher. No love note leaves this room!',
-  hutch: 'Hop along little bunny—the garden paths are mine now!',
-  flag: 'Two bunnies at a Fourth of July parade! Don’t cross their colors!',
-  cornucopia: 'Thanksgiving courses across the lawn! Finish every dish in order!',
-  eggtree: 'Underground burrows in the Egg Tree! You’ll lose your trail for sure!',
-  sparklers: 'Paint by numbers in the dark—your fireworks are dampened!',
-  bow: 'Cupid’s bow on the fireworks rack! Even the clues are written in code!',
-  broom: 'My broom swept the numbers right off the firework clues!',
-  finale: 'Red and blue rockets tangled together! The Grand Finale stays grounded!',
-};
-
-const TUESDAY_NOTES: Record<string, string> = {
-  cobwebs: 'Okay fine, the cape was rented. But nobody ever hangs cobwebs for Ordinary Tuesday!',
-  chocolates: 'Do you know how sticky it was wedging a box of chocolates into a spiderweb?',
-  starlights: 'I found this frosty star in the December closet. Wait—why did it freeze the web?',
-  web: 'Honestly, I only moved the props. Somebody else wired these 9×9 logic locks...',
-  breadboard: 'Tuesday night dinner is usually plain toast. Enjoy your fancy rectangles.',
-  hotdog: 'A hot dog at Thanksgiving! Honestly an upgrade over dry turkey.',
-  stocking: 'Whoever my “benefactor” is, they really, really like frost.',
-  feast: 'I didn’t put those fences on the table! My benefactor said it was “Q4 restructuring.”',
-  fairylights:
-    'Why does December get six weeks of fairy lights and Tuesday gets fluorescent tubes?',
-  goldenegg: 'I hid the Golden Egg in the tree branches. The step-counter lock wasn’t me!',
-  pumpkinpie:
-    'Pie in the Christmas hearth—see, November and December were already bleeding together!',
-  tree: 'Wait... why is the Christmas Tree locked with corporate-grade permafrost?',
-  lovenotes: 'Nobody ever writes “Be My Ordinary Tuesday” on a candy heart.',
-  jack: 'A pumpkin in the sweetheart parlor! Spooky Season meets Valentine’s.',
-  basket: 'I left the Easter basket on the sofa. The numbered eggs were already ticking.',
-  mailbox: 'I checked the mailbox—half the envelopes are invoices from the North Pole?!',
-  hutch: 'Bunnies get a whole Sunday. I just wanted one afternoon!',
-  flag: 'I put the flags by the hutch. Two bunnies at once was actually pretty cute.',
-  cornucopia: 'Three courses for Easter, meanwhile Tuesday is “leftover Tupperware night.”',
-  eggtree: 'Those burrows weren’t dug by bunnies—they look like sleigh-runner tracks...',
-  sparklers: 'Fireworks on a Tuesday usually just means the toaster shorted out.',
-  bow: 'Cupid’s bow on the rocket rack! Admit it, that’s a great crossover.',
-  broom: 'I leaned the broom against the sparklers and half the clue numbers vanished.',
-  finale: 'Wait—if you light all six lamps in Holiday Hall, the big door opens. Be careful!',
-};
-
-export function getVillainNote(protoId: string, act = gameState.act()): VillainNote {
-  if (protoId === 'tuesday' || act === 3) {
-    return {
-      sender: 'SANTA CLAUS · CEO, Q4 EVERYDAY',
-      badge: '🎅 MEMO',
-      bg: '#fffaf0',
-      border: '#d69e2e',
-      textColor: '#744210',
-      text:
-        protoId === 'tuesday'
-          ? '“Why stop at October and November? Once my Dual-Twist Merger locks, all 365 days—even Tuesday—will be Christmas!”'
-          : '“Per North Pole Directive 12/25, this room’s assets are being absorbed into Year-Round Christmas.”',
-    };
-  }
-  if (act === 4) {
-    return {
-      sender: 'ORDINARY TUESDAY (GUEST OF HONOR)',
-      badge: '🎉 TUESDAY',
-      bg: '#fefcbf',
-      border: '#d69e2e',
-      textColor: '#744210',
-      text: '“We beat Santa’s merger! Take your time—or come back to my desk in Holiday Hall for the Daily Calendar!”',
-    };
-  }
-  if (act === 2) {
-    return {
-      sender: 'ORDINARY TUESDAY',
-      badge: '☕ TUESDAY',
-      bg: '#fefcbf',
-      border: '#ecc94b',
-      textColor: '#744210',
-      text:
-        TUESDAY_NOTES[protoId] ??
-        '“I only mixed up the props! Somebody else wired the whole house into a logic lock!”',
-    };
-  }
-  return {
-    sender: 'THE SHADOWY FIGURE',
-    badge: '🕯️ SEALED',
-    bg: '#2d2438',
-    border: '#9f7aea',
-    textColor: '#f7fafc',
-    text:
-      SHADOW_NOTES[protoId] ??
-      '“Every holiday is tangled in my grasp—solve my panels if you dare!”',
-  };
-}
 
 const COMPACT_RULE_PILLS: Record<string, string> = {
   // Halloween (Spiderweb)

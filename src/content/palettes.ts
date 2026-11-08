@@ -21,7 +21,7 @@ export const common = {
 } as const satisfies Record<string, Hex>;
 
 /**
- * Named colors that voxel models (.voxt) refer to. Models use these names,
+ * Named colors the 3D models (mascots, props) use. Models use these names,
  * never raw hex, so changing a color here recolors every model that uses it.
  */
 export const voxel = {
@@ -40,6 +40,8 @@ export const voxel = {
   stoneDark: '#646a79',
   pink: '#ff7b93',
   pinkLight: '#ffb3c1',
+  /** Faces (Santa): warm, so lit skin doesn't wash out to white beside a white beard. */
+  skin: '#f0a27a',
   /** Eyes: deeper than any colour round them, so they always read. */
   eye: '#0e1018',
   glass: '#a7d8f0',

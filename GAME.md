@@ -25,10 +25,13 @@ you're the loophole that tears the whole merger up.
 
 When the last mascot is free and the merger is torn up, the mascots throw
 you a party and promise to celebrate you every year, not just one in four.
+Santa comes too, humbled: the mascots vote to let him keep his twelve days of
+Christmas, and Xmas365 becomes **Xmas12**.
 
 Christmas is a victim too: the elves, the reindeer and the tree have been
 taken over by their own boss, so Christmas is restored like every other
-room. Santa himself never appears in the rooms: he's in his memos.
+room. Santa never appears in the rooms: he's in his memos, until he bursts
+in at the loophole, too late.
 
 ### The cast
 
@@ -39,7 +42,8 @@ room. Santa himself never appears in the rooms: he's in his memos.
   latest memo you've found.
 - **Santa, CEO of Xmas365.** Pompous, never menacing: press releases,
   synergy, "integration". He writes to his own staff, not to you; he doesn't
-  know you exist until the very end ("Who is *Leap Day*?").
+  know you exist until the very end, putting the extra day down to a
+  bookkeeping error, until he meets you at the loophole ("Who are *you*?").
 - **The six mascots**, each caged at its room's centrepiece, freed when you
   restore it, with a short thank-you; all six come to your party.
 
@@ -67,7 +71,7 @@ shape.
   cage, brings back the room's own colour and music, and lights its lamp in
   the hall.
 - **Found memos.** The story is Xmas365's internal memos, which aren't meant
-  for you: you find them at milestones (entering a room the first time,
+  for you: you find them at milestones (beating a room's warm-up,
   freeing a stray, bringing an item home, freeing a mascot) and they're
   pinned up in the hall to reread. Santa writes candidly to his staff ("Re:
   the Easter integration. The Bunny remains uncooperative."), so you're
@@ -108,7 +112,7 @@ shape.
 5. **Leap Day's party.** The freed mascots throw it; its last puzzle is the
    cake relay (one board, every genre adding to it). They crown you **"Day 366
    (Every Year)"**—pencilling February 29th onto every year's calendar—and
-   Santa finally learns who you are.
+   Santa, a humbled guest, keeps twelve days (Xmas12).
 6. **After the story: the Calendar Desk.** Your desk in the hall, there from
    the start (reclaiming each holiday's warm-up, standard generator and twists
    as you restore the house); after the party it opens the full endless mode:
@@ -1019,8 +1023,8 @@ Prototype status, the audit against the inspiration games, and next steps:
 
 ## To decide
 
-- The exact lines: Xmas365's memos (one per milestone, escalating),
-  Leap Day's reactions, each mascot's thank-you.
+- The exact lines: beats outlined in `SCRIPT.md`; the lines themselves are
+  still to write.
 - How the cake relay looks with the mascots at the party.
 - Whether some strays should start hidden (the lighter layer).
 - The lighter layer's riddles and gags (after the panels).

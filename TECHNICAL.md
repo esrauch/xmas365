@@ -1,6 +1,6 @@
 # Puzz: Technical
 
-How we build it: the stack, the architecture, and how assets get made. What the game *is* lives in [GAME.md](GAME.md). The tech is shared with `~/Code/schnau` and `~/Code/vox` (three.js, `.voxt` voxel models, synthesized sound, the cel-shaded look); the game, art and sound are Puzz's own.
+How we build it: the stack, the architecture, and how assets get made. What the game *is* lives in [GAME.md](GAME.md). The tech is shared with `~/Code/schnau` and `~/Code/vox` (three.js, synthesized sound, the cel-shaded look; Puzz builds its models in code rather than as `.voxt` voxels); the game, art and sound are Puzz's own.
 
 ---
 
@@ -16,7 +16,7 @@ How we build it: the stack, the architecture, and how assets get made. What the 
 | Layer | Choice |
 |---|---|
 | Language | TypeScript, strict (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`) |
-| 3D | three.js: voxel meshes (blocky or smoothed) with vertex colours, cel shaded |
+| 3D | three.js: low-poly models built in code from primitives, cel shaded |
 | UI overlay | Plain DOM + CSS over the canvas |
 | Audio | Web Audio API: synthesized songs and SFX rendered at load |
 | Build / dev | Vite |
@@ -25,7 +25,7 @@ How we build it: the stack, the architecture, and how assets get made. What the 
 
 ## 3. Architecture
 
-Nothing game-specific yet: `src/main.ts` shows a placeholder scene (a sunny cel-shaded corner of a room with a voxel crate, a drifting camera and the title) that proves the pipeline end to end. As the game takes shape: puzzle rules in plain TypeScript (`src/puzzles/`), rooms and their props as data, a controller that moves between rooms and puzzles, and renderers that only read state.
+Nothing game-specific yet: `src/main.ts` shows a placeholder scene (a sunny cel-shaded corner of a room, a drifting camera and the title) that proves the pipeline end to end. As the game takes shape: puzzle rules in plain TypeScript (`src/puzzles/`), rooms and their props as data, a controller that moves between rooms and puzzles, and renderers that only read state.
 
 - URL options: `?outline=0`. In dev builds the view is `window.view`.
 
@@ -72,11 +72,11 @@ at dev time and pinned as JSON; the phone never runs a search.
 - **Cel tones** (`src/render/toon.ts`, `toonMaterial`): built on `MeshToonMaterial`, but its light only decides *whether* a pixel is lit (a hard ramp, and shadows). The tones come from `cel` in `palettes.ts`: lit = the surface colour × `litTint`; shade = the colour raised to `shadeGamma` × `shadeTint`, which darkens and saturates it. Every lit surface uses `toonMaterial`; call `syncCelSun` after changing the sun.
 - **Line art** (`src/render/outline.ts`): a post pass that finds silhouettes (the Laplacian of 1/depth, so flat floors stay clean) and creases (normals), and draws each line in a darker, richer shade of the nearer surface's colour, never black. `?outline=0` turns it off.
 - **Contour** (same pass): a thick line around only the outside of objects on `CONTOUR_LAYER` (`Outline.setContour`), for picking something out: the thing under the cursor, the selected piece.
-- **Rounded models:** `.voxt` models marked `smooth` are meshed as rounded surfaces (§6), so the terminator sweeps across curves. Hard-edged things (crates) stay blocky.
+- **Rounded models:** models are built from smooth primitives (§6), so the terminator sweeps across curves.
 - `src/render/view.ts` (`View`): renderer (pixel ratio capped at 2), the sky gradient and fog, and the sun (high, from the left; PCF shadows). The game places the camera.
-- Voxel meshes are cached per model (`getGeometry`); use `InstancedMesh` for many copies of a static prop. Keep draw calls under ~100 (the outline pass doubles them) and don't allocate in the frame loop.
+- Use `InstancedMesh` for many copies of a static prop. Keep draw calls under ~100 (the outline pass doubles them) and don't allocate in the frame loop.
 - The DOM overlay (`#ui`) lets taps through (`pointer-events: none`); real controls opt back in with `.interactive`. Style tokens are at the top of `src/ui/base.css`.
-- **Colours** have one source of truth, `src/content/palettes.ts`: `common` becomes CSS custom properties (`ui/paletteVars.ts`), `voxel` is the named colours models use, `sky` and `cel` set the light.
+- **Colours** have one source of truth, `src/content/palettes.ts`: `common` becomes CSS custom properties (`ui/paletteVars.ts`), `voxel` (a historical name) is the named colours models use, `sky` and `cel` set the light.
 
 ## 5. Audio
 
@@ -87,30 +87,24 @@ One `AudioContext`, with a mixer: `master → (music, sfx, ui)` buses (`audio/mi
 - Hear them on `/dev/audio.html` or render them with `npm run render-audio`.
 - **Samples** (CC0 / public domain) are allowed for what synthesis does badly: voices, crowds.
 
-## 6. Voxel Models (`.voxt`)
+## 6. Models (built in code)
 
-A plain-text format Claude writes, reads and diffs. Full syntax at the top of `src/voxel/voxt.ts`:
+Every 3D model is built in TypeScript from three.js primitives (spheres
+squashed into ellipsoids, cylinders, cones, boxes, tori), each its own mesh
+with `toonMaterial` and a named colour from `palettes.ts`. Separate primitives
+keep their own normals, so the outline pass draws ink lines round every
+detail, at higher fidelity than voxels gave. (A `.voxt` voxel format came
+first; it was removed on 2026-11-07, once nothing used it.)
 
-```
-size 8 8 8          # width (x), height (y), depth (z)
-voxel 0.1           # world units per voxel
-colors
-  w wood            # names resolve to palettes.ts `voxel` (never raw hex in models)
-box 0 0 0 7 7 7 w   # inclusive; y up from 0, z from the front
-slice 0             # front-view grid at depth z; rows top to bottom
-  ..w..
-```
-
-- **`ellipsoid x y z rx ry rz c`** fills a rounded blob: the main tool for soft cartoon shapes.
-- **`paint ellipsoid …` / `paint box …`** recolours only voxels already filled: markings that follow a curved surface without adding bumps.
-- **`smooth [passes]`** meshes the model as a rounded surface (surface nets, `src/voxel/smooth.ts`), with normals from the density field, so the cel terminator sweeps cleanly with no voxel staircase.
-- **`part <name> pivot x y z [parent <name>]`** splits a model into separately animated parts (a door that swings, a lid that lifts). `buildRig(id)` gives a group per part at its pivot; `getGeometry(id)` is still the whole model.
-- **Watch for overhangs:** sunlight slipping under one leaves a lit island inside its shadow; fill underneath.
-- Models live in `assets-src/voxels/<folder>/<name>.voxt`; the **model id is the path** (`props/crate`). Vite loads them as text, so edits hot-reload.
-- Slice 0 is the front and faces +z. `mirror x` makes each row the left half plus the centre column.
-- `npm run import-vox -- model.vox folder/name [voxelSize]` converts MagicaVoxel files, snapping colours to the palette.
-
-**Making a model:** write the `.voxt` → register it in `assets/manifest.json` (`author: "Claude"`, `license: "original"`) → `npm run preview-models -- <id>` and look at `previews/<id>.png`; for detail work, `--close` renders big front, ¾, side and ¾-back views → use it with `getGeometry(id)` and `voxelMaterial`. Judge models from the game camera: a thing should read from its silhouette alone.
+- **Mascots:** `src/game/mascots.ts` (`buildMascotMesh(id)`, ids in `MASCOT_IDS`).
+- **Props and centrepieces:** built in `src/game/diorama.ts`, with the hall.
+- **Looking at them:** `/dev/models.html` shows every mascot, the hall (at
+  the start and restored) and every prop. `npm run preview-models -- <id>`
+  renders a mascot to `previews/<id>.png`; `--close` gives big front, ¾,
+  side and ¾-back views for detail work. Judge models from the game camera:
+  a thing should read from its silhouette alone.
+- **Watch for overhangs:** light slipping under one leaves a lit island
+  inside its shadow; fill underneath.
 
 ## 7. Licensing
 
@@ -131,7 +125,6 @@ A static site. `.github/workflows/deploy.yml` runs `npm run check` and deploys `
 │  ├─ render/            // view (renderer, scene, lights), toon shading, outline pass
 │  ├─ ui/                // base styles, palette CSS variables
 │  ├─ audio/             // mixer, synth, songs, SFX, wav encoding
-│  ├─ voxel/             // .voxt parser, meshers, model cache, .vox import
 │  ├─ content/           // palettes, shared tuning
 │  ├─ sim/rng.ts         // seeded RNG
 │  ├─ gen/               // puzzle generators: core/ helpers, one folder per genre (webs/)
@@ -139,7 +132,7 @@ A static site. `.github/workflows/deploy.yml` runs `npm run check` and deploys `
 │  ├─ proto/             // puzzle prototypes: boards, runs, engines not yet moved to gen/
 │  ├─ settings.ts        // localStorage settings shell
 │  └─ dev/               // dev page scripts
-├─ assets-src/           // voxels/, svg/, samples/
+├─ assets-src/           // svg/, samples/
 ├─ assets/manifest.json
 ├─ tools/                // asset check, screenshots, model previews, audio render
 └─ tests/
@@ -156,7 +149,6 @@ A static site. `.github/workflows/deploy.yml` runs `npm run check` and deploys `
 |---|---|
 | `npm run check` | Lint, Prettier check, typecheck, tests, asset-license check. Run before every commit. |
 | `npm run build` / `build:release` | Build with / without the dev pages. |
-| `npm run preview-models [--close] [ids…]` | PNG turntables → `previews/<id>.png`, plus a contact sheet per folder; `--close` for big detail views. |
+| `npm run preview-models [--close] [ids…]` | PNG turntables of the mascots → `previews/<id>.png`, plus a contact sheet; `--close` for big detail views. |
 | `npm run screenshot [seed] [query] [name]` | Phone-size (375×812 @2x) capture → `previews/<name>.png`. `WAIT=<ms>` waits first; `VIEW=WxH` for another size. |
 | `npm run render-audio [song:id \| stem:song/stem \| sfx:id …]` | WAVs and waveform PNGs in `previews/audio/`, with levels and a loop-seam check. |
-| `npm run import-vox -- file.vox folder/name [voxelSize]` | Convert a MagicaVoxel model to `.voxt`. |

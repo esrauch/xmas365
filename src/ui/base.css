@@ -624,3 +624,335 @@ body {
   text-shadow: var(--text-edge);
   pointer-events: none;
 }
+
+/*
+ * Xmas365 memos (ui/memo.ts): a sheet of typed memo paper. A new memo fills the
+ * screen (.memo-overlay); the hall corkboard reads old ones with the same sheet.
+ */
+:root {
+  /* Typewriter type: Courier on desktops, Cutive Mono / Nimbus Mono on phones and Linux. */
+  --typewriter:
+    'Courier Prime', 'Courier New', Courier, 'Cutive Mono', 'Nimbus Mono PS', 'Liberation Mono',
+    ui-monospace, monospace;
+  --memo-paper: #fbf6e6;
+  --memo-ink: #2b2620;
+  --memo-red: #b8232f;
+  --memo-green: #2f7a46;
+}
+
+.memo-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: auto;
+  overflow-y: auto;
+  touch-action: pan-y;
+  background: rgba(22, 16, 12, 0.74);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  padding: calc(18px + env(safe-area-inset-top)) 16px calc(22px + env(safe-area-inset-bottom));
+  display: flex;
+  animation: puzz-backdrop-in 0.2s ease-out both;
+}
+
+.memo-overlay-inner {
+  margin: auto;
+  width: min(560px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.memo-overlay-kicker {
+  font-family: var(--typewriter);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #f3e7c6;
+  opacity: 0.85;
+}
+
+/* The sheet and Leap Day's sticky note, which overlaps its bottom corner. */
+.memo-stack {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.memo-sheet {
+  position: relative;
+  width: 100%;
+  padding: 22px 22px 24px;
+  color: var(--memo-ink);
+  font-family: var(--typewriter);
+  letter-spacing: 0;
+  user-select: text;
+  -webkit-user-select: text;
+  /* Paper: warm off-white, a little lighter at the top, faintly yellowed at the edges. */
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0) 38%),
+    radial-gradient(ellipse at center, rgb(0 0 0 / 0) 62%, rgb(150 110 40 / 0.1) 100%),
+    var(--memo-paper);
+  border-radius: 2px;
+  box-shadow:
+    0 1px 0 #e6dcc1,
+    0 2px 0 #f6efda,
+    0 3px 0 #e2d6b8,
+    0 18px 36px rgb(0 0 0 / 0.45);
+  transform: rotate(-0.6deg);
+}
+
+.memo-overlay .memo-sheet {
+  animation: memo-slide-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes memo-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(40px) rotate(2deg);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-0.6deg);
+  }
+}
+
+/* A staple in the top-left corner. */
+.memo-sheet::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  width: 22px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #d9dde3, #8b919b);
+  box-shadow: 0 1px 1px rgb(0 0 0 / 0.35);
+  transform: rotate(-28deg);
+}
+
+.memo-letterhead {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 8px;
+  /* A heavy red rule over a thin green one. */
+  border-bottom: 4px solid var(--memo-red);
+  box-shadow:
+    0 3px 0 var(--memo-paper),
+    0 5px 0 var(--memo-green);
+  margin-bottom: 16px;
+}
+
+.memo-wordmark {
+  font-family: system-ui, sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(26px, 7vw, 34px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.memo-wordmark-xmas {
+  color: var(--memo-red);
+}
+
+.memo-wordmark-days {
+  color: var(--memo-green);
+}
+
+.memo-wordmark-inc {
+  margin-left: 4px;
+  font-size: 0.32em;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  color: var(--memo-ink);
+  vertical-align: top;
+}
+
+.memo-tagline {
+  margin-top: 4px;
+  font-family: system-ui, sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #6b5d48;
+}
+
+.memo-titleblock {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6b5d48;
+  line-height: 1.35;
+}
+
+.memo-titleblock-big {
+  font-size: 14px;
+  letter-spacing: 0.18em;
+  color: var(--memo-ink);
+}
+
+/* After the merger the letterhead turns green. */
+.memo-sheet--xmas12 .memo-letterhead {
+  border-bottom-color: var(--memo-green);
+  box-shadow:
+    0 3px 0 var(--memo-paper),
+    0 5px 0 var(--memo-red);
+}
+
+.memo-sheet--xmas12 .memo-wordmark-xmas {
+  color: var(--memo-green);
+}
+
+.memo-sheet--xmas12 .memo-wordmark-days {
+  color: var(--memo-red);
+}
+
+/* A rubber stamp for the memo's kind ("ALL-HANDS MEMO"), askew in the top-right corner. */
+.memo-stamp {
+  position: absolute;
+  top: 20px;
+  right: 16px;
+  max-width: 34%;
+  padding: 4px 8px;
+  border: 2.5px solid currentColor;
+  border-radius: 4px;
+  color: var(--memo-red);
+  font-family: system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+  opacity: 0.78;
+  transform: rotate(6deg);
+  mix-blend-mode: multiply;
+}
+
+.memo-sheet--xmas12 .memo-stamp {
+  color: var(--memo-green);
+}
+
+.memo-fields {
+  font-size: 14px;
+  line-height: 1.55;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px dashed #c9bc9b;
+}
+
+.memo-field {
+  display: flex;
+  gap: 8px;
+}
+
+.memo-field-label {
+  flex: 0 0 4.2em;
+  font-weight: 700;
+}
+
+.memo-body {
+  font-size: 15px;
+  line-height: 1.6;
+  /* A hint of ink spreading into the paper. */
+  text-shadow: 0 0 0.6px rgb(43 38 32 / 0.55);
+}
+
+.memo-signoff {
+  margin-top: 16px;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.memo-signoff::before {
+  content: '';
+  display: block;
+  width: 9em;
+  margin-bottom: 4px;
+  border-top: 1px solid #8a7c62;
+}
+
+/* The sticky note over the sheet's corner: Leap Day's reaction (frog green) or a mascot's plea. */
+.memo-sticky {
+  position: relative;
+  z-index: 1;
+  margin: -18px -6px 0 0;
+  width: min(270px, 78%);
+  padding: 10px 12px 12px;
+  background: linear-gradient(180deg, #d9f7b8, #c4ee9a);
+  color: #1c3d1f;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  box-shadow: 0 6px 14px rgb(0 0 0 / 0.3);
+  transform: rotate(2.2deg);
+}
+
+/* A caged mascot's plea, on a plain yellow note. */
+.memo-sticky--plea {
+  background: linear-gradient(180deg, #fff4a3, #ffe878);
+  color: #4a3a12;
+}
+
+.memo-overlay .memo-sticky {
+  animation: memo-sticky-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both;
+}
+
+@keyframes memo-sticky-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) rotate(8deg) scale(1.08);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(2.2deg);
+  }
+}
+
+.memo-sticky-who {
+  margin-bottom: 3px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+/* The corkboard's reader: room round the tilted sheet and its sticky note. */
+.memo-reader {
+  padding: 4px 6px 10px;
+}
+
+.memo-done {
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: 2.5px solid #1f2430;
+  background: var(--memo-red);
+  color: #fff;
+  font-weight: 900;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #1f2430;
+}
+
+.memo-done:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #1f2430;
+}
+
+@media (max-width: 420px) {
+  .memo-sheet {
+    padding: 18px 15px 20px;
+  }
+
+  .memo-body {
+    font-size: 14px;
+  }
+}

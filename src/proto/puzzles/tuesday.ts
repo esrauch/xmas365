@@ -1,9 +1,9 @@
 /**
- * Act III Finale ("Santa's Merger & Tuesday's Party"): six dual-twist boss
+ * Act III Finale ("Xmas365 Merger Contract"): six dual-twist boss
  * panels behind the 6-lamp door in Holiday Hall. One panel per holiday
- * puzzle genre, each combining two holiday twists so every twist appears
- * twice across the gauntlet.
+ * puzzle genre, each framed as a clause of Santa's Merger Contract (`C1`–`C6`).
  */
+import { CONTRACT_CLAUSES } from '../../content/script';
 import type { Panel as CarvePanel } from '../../gen/carving';
 import type { Panel as HopPanel } from '../../gen/hops';
 import type { Panel as LightPanel } from '../../gen/lights';
@@ -12,6 +12,7 @@ import type { Panel as WebPanel } from '../../gen/webs';
 import type { Panel as WordPanel } from '../../gen/words';
 import { mountWeb } from '../hashiBoard';
 import { mountHops } from '../hopsBoard';
+import { h } from '../kit';
 import { mountLights } from '../netBoard';
 import { mountPicture } from '../pictureBoard';
 import { run } from '../run';
@@ -221,20 +222,44 @@ export const FINALE_PANELS: FinaleItem[] = [
 
 export const tuesday = run<FinaleItem>({
   id: 'tuesday',
-  title: "Santa's Merger & Tuesday's Party",
-  room: 'Tuesday',
+  title: 'Xmas365 Merger Contract',
+  room: 'Holiday Hall',
   kind: 'final',
-  from: 'All six holiday genres, each combining two holiday twists to foil Santa and throw Ordinary Tuesday a party',
+  from: "Six binding clauses of Santa's Master Merger Contract. Solve each panel to tear up its clause.",
   rules:
-    'One board per holiday genre, each combining two holiday twists you have mastered across the house.',
+    'One board per holiday genre, each combining two holiday twists you have mastered across the house. Solving a panel tears up that clause.',
   panels: FINALE_PANELS,
   mountPanel: (host, item, hooks) => {
-    const h = { solved: () => hooks.solved(), status: hooks.status };
-    if (item.genre === 'webs') mountWeb(host, item.panel, h);
-    else if (item.genre === 'carving') mountCarving(host, item.panel, h);
-    else if (item.genre === 'lights') mountLights(host, item.panel, h);
-    else if (item.genre === 'words') mountStrands(host, item.panel, h);
-    else if (item.genre === 'hops') mountHops(host, item.panel, h);
-    else mountPicture(host, item.panel, h);
+    const clause = CONTRACT_CLAUSES.find((c) => c.genre === item.genre);
+    if (clause) {
+      host.append(
+        h(
+          'div',
+          {
+            style: {
+              padding: '7px 11px',
+              marginBottom: '8px',
+              borderRadius: '8px',
+              background: '#fffaf0',
+              border: '1.5px solid #d69e2e',
+              fontSize: '12px',
+              lineHeight: '1.35',
+              color: '#744210',
+            },
+          },
+          h('strong', { style: { fontWeight: '800' } }, `${clause.heading}. `),
+          h('span', {}, clause.body.replaceAll('*', '')),
+        ),
+      );
+    }
+    const boardSlot = h('div', {});
+    host.append(boardSlot);
+    const panelHooks = { solved: () => hooks.solved(), status: hooks.status };
+    if (item.genre === 'webs') mountWeb(boardSlot, item.panel, panelHooks);
+    else if (item.genre === 'carving') mountCarving(boardSlot, item.panel, panelHooks);
+    else if (item.genre === 'lights') mountLights(boardSlot, item.panel, panelHooks);
+    else if (item.genre === 'words') mountStrands(boardSlot, item.panel, panelHooks);
+    else if (item.genre === 'hops') mountHops(boardSlot, item.panel, panelHooks);
+    else mountPicture(boardSlot, item.panel, panelHooks);
   },
 });

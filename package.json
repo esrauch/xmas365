@@ -15,8 +15,7 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "check-assets": "tsx tools/check-assets.ts",
-    "import-vox": "tsx tools/voxels/import-vox.ts",
-    "preview-models": "tsx tools/voxels/preview.ts",
+    "preview-models": "tsx tools/preview-models.ts",
     "render-audio": "tsx tools/audio/render.ts",
     "screenshot": "tsx tools/screenshot.ts",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm test && npm run check-assets"

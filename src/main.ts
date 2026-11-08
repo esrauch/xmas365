@@ -8,6 +8,17 @@
  */
 import * as THREE from 'three';
 import { common, hexToNumber } from './content/palettes';
+import {
+  type BeatId,
+  type DialogueLine,
+  MEMOS,
+  MEMO_ORDER,
+  type MemoId,
+  ROOM_SCRIPT,
+  SPEAKERS,
+  formatMemoText,
+  getBeatSpec,
+} from './content/script';
 import { installErrorOverlay } from './dev/errorOverlay';
 import { mountCalendarDesk } from './game/calendarDesk';
 import {
@@ -26,6 +37,7 @@ import { PROTOS } from './proto/puzzles';
 import { celUniforms } from './render/toon';
 import { View } from './render/view';
 import { isFpsEnabled, isSoundEnabled, setFpsEnabled, setSoundEnabled } from './settings';
+import { buildMemoSheet, renderFormattedText, showMemoOverlay } from './ui/memo';
 import { applyPaletteVars } from './ui/paletteVars';
 
 if (import.meta.env.DEV) installErrorOverlay();
@@ -44,7 +56,7 @@ const view = new View(canvas, { fov: 40, outline: params.get('outline') !== '0' 
 // Scene state: all 7 bays live in one Holiday Hall diorama
 let currentBay: BayId = 'hall';
 let activeDiorama: BuiltDiorama | null = null;
-let activeModal: 'none' | 'proto' | 'desk' | 'settings' = 'none';
+let activeModal: 'none' | 'proto' | 'desk' | 'corkboard' | 'settings' = 'none';
 
 // Circular camera rotation around Holiday Hall + focus targets
 let camAngleTarget = getBayAngle('hall');
@@ -88,6 +100,16 @@ const sideArrowsHost = h('div', {
   },
 });
 
+/** Speech bubble host anchored directly over Leap Day in Holiday Hall. */
+const leapBubbleHost = h('div', {
+  style: {
+    position: 'fixed',
+    inset: '0',
+    pointerEvents: 'none',
+    zIndex: '22',
+  },
+});
+
 const bottomStack = h('div', {
   style: {
     position: 'fixed',
@@ -108,6 +130,31 @@ const storyBannerHost = h('div', { style: { width: '100%' } });
 bottomStack.append(carryTrayHost, storyBannerHost);
 
 const modalHost = h('div', {});
+/** A new memo fills the screen here (`ui/memo.ts`), above everything else. */
+const memoHost = h('div', {});
+
+/** Cold-start calendar-stamping & Tap to Start overlay. */
+const introHost = h('div', {
+  style: {
+    position: 'fixed',
+    inset: '0',
+    zIndex: '48',
+    display: 'none',
+  },
+});
+
+/** Full-screen black curtain for door-hop fade transitions. */
+const fadeOverlay = h('div', {
+  style: {
+    position: 'fixed',
+    inset: '0',
+    background: '#0b0e14',
+    opacity: '0',
+    pointerEvents: 'none',
+    transition: 'opacity 220ms ease',
+    zIndex: '50',
+  },
+});
 
 const fpsBadge = h(
   'div',
@@ -133,7 +180,18 @@ const fpsBadge = h(
   '-- FPS',
 );
 
-ui.replaceChildren(hotspotLayer, sideArrowsHost, topBar, bottomStack, modalHost, fpsBadge);
+ui.replaceChildren(
+  hotspotLayer,
+  sideArrowsHost,
+  topBar,
+  leapBubbleHost,
+  bottomStack,
+  modalHost,
+  memoHost,
+  introHost,
+  fadeOverlay,
+  fpsBadge,
+);
 
 interface ProjectedPill {
   hotspot: Hotspot3D;
@@ -141,66 +199,154 @@ interface ProjectedPill {
 }
 let projectedPills: ProjectedPill[] = [];
 
-const MILESTONE_VIGNETTES: Record<
-  'intro' | 'act2' | 'act3' | 'act4',
-  { speaker: string; badge: string; bg: string; border: string; text: string }
-> = {
-  intro: {
-    speaker: 'THE SHADOWY FIGURE',
-    badge: '🕯️ ACT I · HOLIDAY HALL',
-    bg: '#2d2438',
-    border: '#9f7aea',
-    text: '“Welcome to Holiday Hall! I scattered every holiday’s prized props into the wrong alcoves and locked them. Spin around the Hall and light all 6 Lamps if you dare!”',
-  },
-  act2: {
-    speaker: 'ORDINARY TUESDAY (UNMASKED)',
-    badge: '☕ ACT II · 3/6 LAMPS LIT',
-    bg: '#fefcbf',
-    border: '#d69e2e',
-    text: '“BZZT! ...Okay, the shadow cloak was rented! Nobody ever celebrates an Ordinary Tuesday! Wait—I only swapped the props. My ‘benefactor’ wired these 9×9 logic locks...”',
-  },
-  act3: {
-    speaker: 'SANTA CLAUS · CEO OF Q4 EVERYDAY',
-    badge: '🎅 ACT III · 6/6 LAMPS LIT',
-    bg: '#fff5f5',
-    border: '#e53e3e',
-    text: '“Ho-ho-hostile takeover! Thanks for clearing Holiday Hall—and thank you, Tuesday, for being my patsy! Soon all 365 days will be Christmas! Try breaking my Dual-Twist Merger Lock!”',
-  },
-  act4: {
-    speaker: 'ORDINARY TUESDAY & ALL SIX HOLIDAYS',
-    badge: '🎉 ACT IV · TUESDAY’S PARTY!',
-    bg: '#f0fff4',
-    border: '#38a169',
-    text: '“We shredded Santa’s merger contract! The holidays threw Tuesday’s Party right here in Holiday Hall—visit the Calendar Desk anytime for Daily Tuesday or the Custom Mixer!”',
-  },
-};
+let activeDialogueStepIndex = 0;
+let activeDialogueBeatId: BeatId | null = null;
+/** The memo beat filling the screen, if any (so re-renders don't restart its animation). */
+let shownMemoBeatId: BeatId | null = null;
 
-function currentMilestoneKey(): 'intro' | 'act2' | 'act3' | 'act4' {
-  const act = gameState.act();
-  if (act === 4) return 'act4';
-  if (act === 3) return 'act3';
-  if (act === 2) return 'act2';
-  return 'intro';
+function hideMemoOverlay(): void {
+  shownMemoBeatId = null;
+  memoHost.replaceChildren();
 }
 
-function showStoryVignette(key = currentMilestoneKey(), force = false): void {
-  if (!force && gameState.milestones.has(key)) return;
-  const v = MILESTONE_VIGNETTES[key];
-  const isDark = key === 'intro';
+function positionLeapBubbleElement(bubbleWrap: HTMLElement): void {
+  const w = Math.max(1, window.innerWidth);
+  const hPx = Math.max(1, window.innerHeight);
+  let anchorX = w * 0.5;
+  let anchorY = hPx * 0.72;
+  if (activeDiorama) {
+    tempProj.copy(activeDiorama.leapDayHeadWorldPos).project(stableCam);
+    if (tempProj.z <= 1) {
+      anchorX = (tempProj.x * 0.5 + 0.5) * w;
+      anchorY = (-tempProj.y * 0.5 + 0.5) * hPx;
+    }
+  }
+  const clampedX = Math.max(175, Math.min(w - 175, anchorX));
+  // Anchor the speech bubble right below Leap Day on the rug with an upward tail
+  // so it points directly at Leap Day without covering any of the 6 holiday doors!
+  const belowY = Math.max(200, Math.min(hPx - 115, anchorY + 72));
+  bubbleWrap.style.left = `${clampedX.toFixed(1)}px`;
+  bubbleWrap.style.top = `${belowY.toFixed(1)}px`;
+}
+
+/**
+ * Render the front beat from `gameState.beatQueue` into `storyBannerHost`
+ * (or directly over Leap Day in `leapBubbleHost` when Leap Day speaks in Holiday Hall).
+ * Per `SCRIPT.md`, beats never sit in front of an open puzzle panel.
+ */
+function renderActiveStoryBeat(): void {
+  if (activeModal === 'proto') {
+    storyBannerHost.replaceChildren();
+    leapBubbleHost.replaceChildren();
+    hideMemoOverlay();
+    return;
+  }
+  const beatId = gameState.currentBeat();
+  if (!beatId) {
+    activeDialogueBeatId = null;
+    activeDialogueStepIndex = 0;
+    storyBannerHost.replaceChildren();
+    leapBubbleHost.replaceChildren();
+    hideMemoOverlay();
+    return;
+  }
+  if (beatId !== activeDialogueBeatId) {
+    activeDialogueBeatId = beatId;
+    activeDialogueStepIndex = 0;
+  }
+
+  const spec = getBeatSpec(beatId);
+  if (spec.kind === 'memo') {
+    // A new memo fills the screen; putting it away pins it to the corkboard (already done on queueing).
+    storyBannerHost.replaceChildren();
+    leapBubbleHost.replaceChildren();
+    if (shownMemoBeatId === beatId) return;
+    shownMemoBeatId = beatId;
+    const hasMore = gameState.beatQueue.length > 1;
+    showMemoOverlay(
+      memoHost,
+      MEMOS[spec.memoId],
+      gameState.firstRevertedHoliday,
+      hasMore ? 'Next ▸' : '📌 Pin it to the corkboard',
+      () => {
+        blip(523, 45);
+        shownMemoBeatId = null;
+        gameState.dismissBeat(beatId);
+        renderTopBar();
+        renderActiveStoryBeat();
+      },
+    );
+    return;
+  }
+  hideMemoOverlay();
+
+  // Dialogue beat (`spec.kind === 'dialogue'`)
+  const lines = spec.lines;
+  const line: DialogueLine | undefined = lines[activeDialogueStepIndex] ?? lines[0];
+  if (!line) {
+    gameState.dismissBeat(beatId);
+    renderActiveStoryBeat();
+    return;
+  }
+
+  const sp = SPEAKERS[line.speaker];
+  const isLastLine = activeDialogueStepIndex >= lines.length - 1;
+  const hasMoreBeats = gameState.beatQueue.length > 1;
+  const btnLabel = !isLastLine
+    ? `Next (${activeDialogueStepIndex + 1}/${lines.length}) ▸`
+    : hasMoreBeats
+      ? 'Next ▸'
+      : 'Got it ✓';
+
+  const docNode =
+    spec.document && activeDialogueStepIndex === 0
+      ? h(
+          'div',
+          {
+            style: {
+              padding: '7px 10px',
+              marginBottom: '7px',
+              borderRadius: '8px',
+              background: '#fffaf0',
+              border: '1.5px solid #d69e2e',
+              color: '#744210',
+              fontSize: '11px',
+              lineHeight: '1.35',
+            },
+          },
+          h('div', { style: { fontWeight: '900', letterSpacing: '0.04em' } }, spec.document.title),
+          h('div', {}, spec.document.subtitle),
+          h('div', { style: { fontWeight: '700' } }, `Term: ${spec.document.term}`),
+        )
+      : null;
+
+  const advanceDialogue = (): void => {
+    blip(523, 45);
+    if (!isLastLine) {
+      activeDialogueStepIndex++;
+      renderActiveStoryBeat();
+    } else {
+      gameState.dismissBeat(beatId);
+      renderTopBar();
+      renderActiveStoryBeat();
+    }
+  };
+
   const card = h(
     'div',
     {
       class: 'interactive',
       style: {
-        background: v.bg,
-        color: isDark ? '#f7fafc' : '#1f2430',
-        border: `2.5px solid ${v.border}`,
-        borderRadius: '12px',
-        padding: '8px 12px',
-        boxShadow: '0 4px 0 #1f2430, 0 8px 18px rgba(0,0,0,0.28)',
+        background: sp.bg,
+        color: sp.textColor,
+        border: `2.5px solid ${sp.border}`,
+        borderRadius: '13px',
+        padding: '10px 13px',
+        boxShadow: '0 4px 0 #1f2430, 0 10px 22px rgba(0,0,0,0.28)',
         pointerEvents: 'auto',
       },
     },
+    docNode,
     h(
       'div',
       {
@@ -208,52 +354,90 @@ function showStoryVignette(key = currentMilestoneKey(), force = false): void {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          gap: '6px',
-          marginBottom: '3px',
+          gap: '8px',
+          marginBottom: '5px',
         },
       },
       h(
         'span',
         {
           style: {
-            fontSize: '10.5px',
-            fontWeight: '800',
+            fontSize: '11px',
+            fontWeight: '900',
             letterSpacing: '0.05em',
-            opacity: '0.92',
           },
         },
-        `${v.badge} · ${v.speaker}`,
+        sp.badge,
+        line.stage
+          ? h(
+              'em',
+              { style: { fontWeight: '600', opacity: '0.85', marginLeft: '5px' } },
+              `(${line.stage})`,
+            )
+          : null,
       ),
       h(
         'button',
         {
           style: {
-            padding: '2px 8px',
+            padding: '3px 10px',
             borderRadius: '999px',
             fontSize: '11px',
             fontWeight: '800',
             cursor: 'pointer',
-            border: '1.5px solid currentColor',
-            background: 'transparent',
-            color: 'inherit',
+            border: '1.5px solid #1f2430',
+            background: sp.border,
+            color: '#fff',
           },
-          onclick: () => {
-            gameState.markMilestone(key);
-            storyBannerHost.replaceChildren();
-          },
+          onclick: advanceDialogue,
         },
-        '✕',
+        btnLabel,
       ),
     ),
-    h('div', { style: { fontSize: '12px', lineHeight: '1.35', fontStyle: 'italic' } }, v.text),
+    h(
+      'div',
+      { style: { fontSize: '12.5px', lineHeight: '1.4', fontWeight: '600' } },
+      '"',
+      renderFormattedText(line.text),
+      '"',
+    ),
   );
-  storyBannerHost.replaceChildren(card);
-}
 
-function stepBay(delta: number): void {
-  const idx = BAY_ORDER.indexOf(currentBay);
-  const nextIdx = (idx + delta + BAY_ORDER.length) % BAY_ORDER.length;
-  switchBay(BAY_ORDER[nextIdx] ?? 'hall');
+  // When Leap Day speaks in Holiday Hall (such as P2 right after closing the All-Hands Memo),
+  // anchor the speech bubble directly to Leap Day's 3D mascot!
+  if (currentBay === 'hall' && line.speaker === 'leapday') {
+    storyBannerHost.replaceChildren();
+    card.style.animation = 'puzz-card-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) both';
+    const tailUp = h('div', {
+      style: {
+        width: '0',
+        height: '0',
+        borderLeft: '11px solid transparent',
+        borderRight: '11px solid transparent',
+        borderBottom: `12px solid ${sp.border}`,
+        margin: '0 auto -1px auto',
+      },
+    });
+    const bubbleWrap = h(
+      'div',
+      {
+        style: {
+          position: 'fixed',
+          transform: 'translateX(-50%)',
+          width: 'min(340px, 92vw)',
+          pointerEvents: 'auto',
+        },
+      },
+      tailUp,
+      card,
+    );
+    positionLeapBubbleElement(bubbleWrap);
+    leapBubbleHost.replaceChildren(bubbleWrap);
+    return;
+  }
+
+  leapBubbleHost.replaceChildren();
+  storyBannerHost.replaceChildren(card);
 }
 
 function renderSideArrows(): void {
@@ -261,11 +445,89 @@ function renderSideArrows(): void {
 }
 
 function renderTopBar(): void {
-  const lamps = gameState.completedRoomCount();
+  const act = gameState.act();
   const roomSpec =
     currentBay === 'hall' ? null : (ROOM_SPECS.find((r) => r.id === currentBay) ?? null);
+  const signage = roomSpec ? gameState.getRoomSignage(roomSpec) : null;
+  const hallTitle =
+    act === 4
+      ? '🏛️ Holiday Hall · Day 366 & Xmas12'
+      : '🏛️ Holiday Hall · An Xmas365 Synergized Campus';
 
-  // Row 1: Current Bay Title + Lamp Progress + Calendar Desk + Settings (Top Right)
+  const leftGroup =
+    roomSpec && signage
+      ? h(
+          'div',
+          {
+            style: {
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              minWidth: '0',
+            },
+          },
+          h(
+            'button',
+            {
+              title: 'Return to Holiday Hall',
+              style: {
+                padding: '5px 10px',
+                borderRadius: '10px',
+                fontWeight: '800',
+                fontSize: '12.5px',
+                cursor: 'pointer',
+                background: '#fffdf9',
+                color: '#1f2430',
+                border: '2px solid #1f2430',
+                boxShadow: '0 2px 0 #1f2430',
+                flexShrink: '0',
+              },
+              onclick: () => switchBay('hall'),
+            },
+            '← Hall',
+          ),
+          h(
+            'div',
+            {
+              title: `${roomSpec.title} · ${signage.title} (${signage.subtitle})`,
+              style: {
+                padding: '5px 11px',
+                borderRadius: '10px',
+                fontWeight: '800',
+                fontSize: '13px',
+                background: roomSpec.accent,
+                color: '#fff',
+                border: '2px solid #1f2430',
+                boxShadow: '0 2px 0 #1f2430',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              },
+            },
+            `${roomSpec.icon} ${signage.title}`,
+          ),
+        )
+      : h(
+          'div',
+          {
+            title: hallTitle,
+            style: {
+              padding: '5px 11px',
+              borderRadius: '10px',
+              fontWeight: '800',
+              fontSize: '13px',
+              background: '#1f2430',
+              color: '#fff',
+              border: '2px solid #1f2430',
+              boxShadow: '0 2px 0 #1f2430',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            },
+          },
+          '🏛️ Holiday Hall',
+        );
+
   const row1 = h(
     'div',
     {
@@ -277,61 +539,10 @@ function renderTopBar(): void {
         pointerEvents: 'auto',
       },
     },
-    h(
-      'div',
-      {
-        style: {
-          padding: '5px 11px',
-          borderRadius: '10px',
-          fontWeight: '800',
-          fontSize: '13.5px',
-          background: roomSpec ? roomSpec.accent : '#1f2430',
-          color: '#fff',
-          border: '2px solid #1f2430',
-          boxShadow: '0 2px 0 #1f2430',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        },
-      },
-      roomSpec ? `${roomSpec.icon} ${roomSpec.title}` : '🏛️ Holiday Hall',
-    ),
+    leftGroup,
     h(
       'div',
       { style: { display: 'flex', alignItems: 'center', gap: '5px', flexShrink: '0' } },
-      h(
-        'span',
-        {
-          style: {
-            padding: '5px 9px',
-            borderRadius: '999px',
-            fontWeight: '800',
-            fontSize: '11.5px',
-            background: '#fffdf9',
-            color: '#1f2430',
-            border: '2px solid #1f2430',
-          },
-        },
-        `★ ${lamps}/6`,
-      ),
-      h(
-        'button',
-        {
-          title: 'Open Calendar Desk',
-          style: {
-            padding: '5px 9px',
-            borderRadius: '9px',
-            fontWeight: '800',
-            fontSize: '11.5px',
-            cursor: 'pointer',
-            background: '#805ad5',
-            color: '#fff',
-            border: '2px solid #1f2430',
-          },
-          onclick: () => openCalendarDeskModal(),
-        },
-        '📅 Desk',
-      ),
       h(
         'button',
         {
@@ -349,112 +560,12 @@ function renderTopBar(): void {
           },
           onclick: () => openSettingsModal(),
         },
-        '⚙️ Settings',
+        roomSpec ? '⚙️' : '⚙️ Settings',
       ),
     ),
   );
 
-  // Row 2: Compact 7-bay ring switcher around Holiday Hall with ‹ / › spin buttons
-  const row2 = h(
-    'div',
-    {
-      style: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '4px',
-        pointerEvents: 'auto',
-      },
-    },
-    h(
-      'button',
-      {
-        title: 'Rotate left in Holiday Hall',
-        style: {
-          padding: '3px 9px',
-          borderRadius: '999px',
-          fontWeight: '900',
-          fontSize: '14px',
-          cursor: 'pointer',
-          background: '#fffdf9',
-          color: '#1f2430',
-          border: '2px solid #1f2430',
-        },
-        onclick: () => stepBay(-1),
-      },
-      '‹',
-    ),
-    h(
-      'button',
-      {
-        title: 'Holiday Hall (Tuesday Finale & Desk)',
-        style: {
-          padding: '4px 8px',
-          borderRadius: '999px',
-          fontWeight: '800',
-          fontSize: '11.5px',
-          cursor: 'pointer',
-          background: currentBay === 'hall' ? '#1f2430' : '#fffdf9',
-          color: currentBay === 'hall' ? '#fff' : '#1f2430',
-          border: '2px solid #1f2430',
-        },
-        onclick: () => switchBay('hall'),
-      },
-      '🏛️',
-    ),
-    ...ROOM_SPECS.map((r) => {
-      const active = currentBay === r.id;
-      const done = gameState.isRoomComplete(r);
-      const unlocked = gameState.isRoomUnlocked(r);
-      const canUnlock = !unlocked && gameState.carriedEligibleItemForRoom(r) !== null;
-      return h(
-        'button',
-        {
-          title: r.title,
-          style: {
-            padding: '4px 8px',
-            borderRadius: '999px',
-            fontWeight: '800',
-            fontSize: '12px',
-            cursor: 'pointer',
-            background: active
-              ? r.accent
-              : done
-                ? '#c6f6d5'
-                : canUnlock
-                  ? '#fefcbf'
-                  : unlocked
-                    ? '#fffdf9'
-                    : '#edf2f7',
-            color: active ? '#fff' : '#1f2430',
-            border: canUnlock ? '2px solid #d69e2e' : '2px solid #1f2430',
-          },
-          onclick: () => switchBay(r.id),
-        },
-        done ? `${r.icon}★` : canUnlock ? `${r.icon}✨` : unlocked ? r.icon : `${r.icon}🔒`,
-      );
-    }),
-    h(
-      'button',
-      {
-        title: 'Rotate right in Holiday Hall',
-        style: {
-          padding: '3px 9px',
-          borderRadius: '999px',
-          fontWeight: '900',
-          fontSize: '14px',
-          cursor: 'pointer',
-          background: '#fffdf9',
-          color: '#1f2430',
-          border: '2px solid #1f2430',
-        },
-        onclick: () => stepBay(1),
-      },
-      '›',
-    ),
-  );
-
-  topBar.replaceChildren(row1, row2);
+  topBar.replaceChildren(row1);
 }
 
 function renderCarryTray(): void {
@@ -467,9 +578,18 @@ function renderCarryTray(): void {
   const pills = carried.map((item) => {
     const homeRoom = ROOM_SPECS.find((r) => r.id === item.homeRoom);
     const inHomeRoom = currentBay === item.homeRoom;
+    const inHall = currentBay === 'hall';
+    const homeSign = homeRoom ? gameState.getRoomSignage(homeRoom) : null;
+    const homeLabel = homeSign?.title ?? homeRoom?.shortTitle ?? item.homeRoom;
+    const actionLabel = inHomeRoom
+      ? '✨ Restore Here!'
+      : inHall
+        ? `✨ Take to ${homeLabel} Door ▸`
+        : `← Holiday Hall (${homeRoom?.shortTitle ?? item.homeRoom})`;
     return h(
       'button',
       {
+        title: `Misfiled Asset · Belongs in ${homeLabel}`,
         style: {
           display: 'inline-flex',
           alignItems: 'center',
@@ -479,16 +599,18 @@ function renderCarryTray(): void {
           fontWeight: '700',
           fontSize: '12px',
           cursor: 'pointer',
-          background: inHomeRoom ? '#fefcbf' : '#fffdf9',
+          background: inHomeRoom || inHall ? '#fefcbf' : '#fffdf9',
           color: '#1f2430',
-          border: inHomeRoom ? '2px solid #d69e2e' : '2px solid #1f2430',
+          border: inHomeRoom || inHall ? '2px solid #d69e2e' : '2px solid #1f2430',
           boxShadow: '0 2px 0 #1f2430',
         },
         onclick: () => {
           if (inHomeRoom) {
             placeItemOnPedestal(item.id);
-          } else {
+          } else if (inHall) {
             switchBay(item.homeRoom);
+          } else {
+            switchBay('hall');
           }
         },
       },
@@ -499,10 +621,10 @@ function renderCarryTray(): void {
           style: {
             fontSize: '11px',
             fontWeight: '800',
-            color: inHomeRoom ? '#b7791f' : (homeRoom?.accent ?? '#4a5568'),
+            color: inHomeRoom || inHall ? '#b7791f' : (homeRoom?.accent ?? '#4a5568'),
           },
         },
-        inHomeRoom ? '✨ Place!' : `→ ${homeRoom?.shortTitle ?? item.homeRoom}`,
+        actionLabel,
       ),
     );
   });
@@ -526,7 +648,7 @@ function renderCarryTray(): void {
         pointerEvents: 'auto',
       },
     },
-    h('span', { style: { fontSize: '11px', fontWeight: '800' } }, '🎒 CARRY:'),
+    h('span', { style: { fontSize: '11px', fontWeight: '800' } }, '🏷️ MISFILED ASSET:'),
     ...pills,
   );
   carryTrayHost.replaceChildren(bar);
@@ -546,78 +668,92 @@ const ladderSvg = document.createElementNS(SVG_NS, 'svg');
 ladderSvg.setAttribute('class', 'ladder-lines-svg');
 
 function buildHotspotDOM(hotspots: Hotspot3D[]): void {
-  projectedPills = hotspots.map((hs) => {
-    if (hs.kind === 'return-slot') {
-      const el = h(
-        hs.status === 'place' ? 'button' : 'div',
-        {
-          class: `ladder-return-slot ${hs.status}`,
-          onclick:
-            hs.status === 'place'
-              ? (e: MouseEvent) => {
-                  e.stopPropagation();
-                  hs.onClick();
-                }
-              : undefined,
-        },
-        h('span', { class: 'slot-socket' }, hs.icon),
-        h(
-          'div',
+  projectedPills = hotspots
+    .filter((hs) => !hs.hiddenPill)
+    .map((hs) => {
+      if (hs.kind === 'return-slot') {
+        const slotTitle = hs.label.startsWith(`${hs.icon} `)
+          ? hs.label.slice(hs.icon.length + 1)
+          : hs.label;
+        const el = h(
+          hs.status === 'place' ? 'button' : 'div',
           {
-            style: {
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              gap: '1px',
-            },
+            class: `ladder-return-slot ${hs.status}`,
+            onclick:
+              hs.status === 'place'
+                ? (e: MouseEvent) => {
+                    e.stopPropagation();
+                    hs.onClick();
+                  }
+                : undefined,
           },
-          h('span', { style: { fontWeight: '800', fontSize: '10.5px' } }, hs.label),
-          hs.status === 'place'
-            ? h(
-                'span',
-                { style: { fontSize: '8.5px', fontWeight: '800', color: '#975a16' } },
-                '✨ Tap to Restore',
-              )
-            : null,
-        ),
-      );
-      return { hotspot: hs, el };
-    }
-
-    const el = h(
-      'button',
-      {
-        class: `hotspot-pill ${hs.status}${hs.hero ? ' hero' : ''}`,
-        style: {
-          borderColor: hs.status === 'ready' || hs.status === 'door' ? hs.accent : undefined,
-        },
-        onclick: (e: MouseEvent) => {
-          e.stopPropagation();
-          hs.onClick();
-        },
-      },
-      h(
-        'span',
-        { style: { fontWeight: '800', fontSize: hs.hero ? '15.5px' : '10.5px' } },
-        hs.label,
-      ),
-      hs.sublabel
-        ? h(
-            'span',
+          h('span', { class: 'slot-socket' }, hs.icon),
+          h(
+            'div',
             {
               style: {
-                fontSize: hs.hero ? '12px' : '9px',
-                fontWeight: '700',
-                opacity: hs.hero ? '0.95' : '0.88',
-                color: hs.status === 'done' ? '#22543d' : hs.hero ? hs.accent : undefined,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                gap: '1px',
               },
             },
-            hs.sublabel,
-          )
-        : null,
-    );
-    return { hotspot: hs, el };
-  });
+            h('span', { style: { fontWeight: '800', fontSize: '10.5px' } }, slotTitle),
+            hs.status === 'place'
+              ? h(
+                  'span',
+                  { style: { fontSize: '8.5px', fontWeight: '800', color: '#975a16' } },
+                  '✨ Tap to Restore',
+                )
+              : null,
+          ),
+        );
+        return { hotspot: hs, el };
+      }
+
+      const isDoorPill = hs.id.startsWith('door:');
+      const el = h(
+        'button',
+        {
+          class: `hotspot-pill ${hs.status}${hs.hero ? ' hero' : ''}`,
+          style: {
+            borderColor: hs.status === 'ready' || hs.status === 'door' ? hs.accent : undefined,
+            minWidth: isDoorPill ? '0' : undefined,
+            maxWidth: isDoorPill ? '112px' : undefined,
+            padding: isDoorPill ? '4px 6px' : undefined,
+          },
+          onclick: (e: MouseEvent) => {
+            e.stopPropagation();
+            hs.onClick();
+          },
+        },
+        h(
+          'span',
+          {
+            style: {
+              fontWeight: '800',
+              fontSize: hs.hero ? '15.5px' : isDoorPill ? '9.5px' : '10.5px',
+            },
+          },
+          hs.label,
+        ),
+        hs.sublabel
+          ? h(
+              'span',
+              {
+                style: {
+                  fontSize: hs.hero ? '12px' : isDoorPill ? '8.5px' : '9px',
+                  fontWeight: '700',
+                  opacity: hs.hero ? '0.95' : '0.88',
+                  color: hs.status === 'done' ? '#22543d' : hs.hero ? hs.accent : undefined,
+                },
+              },
+              hs.sublabel,
+            )
+          : null,
+      );
+      return { hotspot: hs, el };
+    });
   hotspotLayer.replaceChildren(ladderSvg, ...projectedPills.map((p) => p.el));
 }
 
@@ -660,7 +796,9 @@ function layoutStableHotspots(): void {
   stableCam.lookAt(bayToWorld(camAngleTarget, 0, 1.38, 0.75));
   stableCam.updateMatrixWorld();
 
-  const padX = Math.min(76, w * 0.2);
+  const padX = currentBay === 'hall' ? Math.min(60, w * 0.16) : Math.min(76, w * 0.2);
+  const topBarBottom = topBar.getBoundingClientRect().bottom;
+  const minY = Math.max(88, topBarBottom > 0 ? topBarBottom + 22 : 88);
   const posById = new Map<string, { x: number; y: number }>();
 
   for (const item of projectedPills) {
@@ -674,7 +812,8 @@ function layoutStableHotspots(): void {
     } else {
       const rawX = (tempProj.x * 0.5 + 0.5) * w;
       const clampedX = Math.max(padX, Math.min(w - padX, rawX));
-      const y = (-tempProj.y * 0.5 + 0.5) * hPx;
+      const rawY = (-tempProj.y * 0.5 + 0.5) * hPx;
+      const y = Math.max(minY, rawY);
       item.el.style.display = '';
       item.el.style.left = `${clampedX.toFixed(1)}px`;
       item.el.style.top = `${y.toFixed(1)}px`;
@@ -721,7 +860,14 @@ function layoutStableHotspots(): void {
       ladderSvg.appendChild(fgPath);
     }
   }
+  const bubbleChild = leapBubbleHost.firstElementChild as HTMLElement | null;
+  if (bubbleChild) {
+    positionLeapBubbleElement(bubbleChild);
+  }
 }
+
+let introActive = false;
+let isTransitioningBay = false;
 
 function rebuildScene(): void {
   if (activeDiorama) {
@@ -732,41 +878,125 @@ function rebuildScene(): void {
     onSelectBay: (bay) => switchBay(bay),
     onOpenProto: (protoId, focusPos, focusLook) => openProtoModal(protoId, focusPos, focusLook),
     onOpenDesk: (focusPos, focusLook) => openCalendarDeskModal(focusPos, focusLook),
-    onShowStory: () => showStoryVignette(currentMilestoneKey(), true),
+    onShowStory: () => openCorkboardModal(),
+    onOpenCorkboard: () => openCorkboardModal(),
+    onClickMascot: (roomId) => {
+      const room = ROOM_SPECS.find((r) => r.id === roomId);
+      if (!room) return;
+      const script = ROOM_SCRIPT[roomId];
+      const beatId = gameState.isRoomComplete(room) ? script.freedBeatId : script.cagedBeatId;
+      blip(587, 55);
+      gameState.enqueueBeat(beatId, true);
+      renderActiveStoryBeat();
+    },
     onPlaceItem: (itemId) => placeItemOnPedestal(itemId),
   });
 
   view.scene.add(activeDiorama.root);
   buildHotspotDOM(activeDiorama.hotspots);
   layoutStableHotspots();
-  if (Math.abs(shortestAngleDelta(camAngleCurrent, camAngleTarget)) <= 0.015) {
+  if (!introActive && Math.abs(shortestAngleDelta(camAngleCurrent, camAngleTarget)) <= 0.015) {
     hotspotLayer.classList.add('settled');
   }
-  renderTopBar();
-  renderSideArrows();
-  renderCarryTray();
-  showStoryVignette();
+  if (!introActive) {
+    gameState.onEnterBay(currentBay);
+    renderTopBar();
+    renderSideArrows();
+    renderCarryTray();
+    renderActiveStoryBeat();
+  }
 }
 
-function switchBay(bay: BayId): void {
+function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
+  if (isTransitioningBay && !opts?.instant) return;
   closeModal();
-  const changed = bay !== currentBay;
-  currentBay = bay;
-  camAngleTarget = getBayAngle(bay);
-  if (changed) {
-    // Immediately hide the old bay's pills during rotation; they will fade in once settled
-    hotspotLayer.style.transition = 'none';
-    hotspotLayer.classList.remove('settled');
-    layoutStableHotspots();
-    requestAnimationFrame(() => {
-      hotspotLayer.style.transition = '';
-    });
-  } else {
-    layoutStableHotspots();
+
+  if (opts?.instant || bay === currentBay) {
+    currentBay = bay;
+    camAngleTarget = getBayAngle(bay);
+    camAngleCurrent = camAngleTarget;
+    rebuildScene();
+    hotspotLayer.classList.add('settled');
+    return;
   }
-  blip(440, 45);
-  renderTopBar();
-  renderCarryTray();
+
+  // Navigating from Holiday Hall through one of the 6 holiday doors:
+  // Leap Day hops to the door, unlocks it if carrying its first misfiled item,
+  // fades to black, and fades in inside the holiday room!
+  if (currentBay === 'hall' && bay !== 'hall') {
+    const roomSpec = ROOM_SPECS.find((r) => r.id === bay);
+    if (!roomSpec) return;
+    const unlocked = gameState.isRoomUnlocked(roomSpec);
+    const unlockItem = !unlocked ? gameState.carriedEligibleItemForRoom(roomSpec) : null;
+    if (!unlocked && !unlockItem) {
+      blip(180, 60);
+      return;
+    }
+
+    isTransitioningBay = true;
+    hotspotLayer.classList.remove('settled');
+    leapBubbleHost.replaceChildren();
+    storyBannerHost.replaceChildren();
+    blip(440, 50);
+    window.setTimeout(() => blip(587, 65), 140);
+
+    const hopDurationMs = 420;
+    const hopStart = performance.now();
+    const tickHop = (now: number): void => {
+      const p = Math.min(1, (now - hopStart) / hopDurationMs);
+      activeDiorama?.setDoorHop(bay, p);
+      if (p < 1 && isTransitioningBay) {
+        requestAnimationFrame(tickHop);
+      }
+    };
+    requestAnimationFrame(tickHop);
+
+    window.setTimeout(() => {
+      fadeOverlay.style.pointerEvents = 'auto';
+      fadeOverlay.style.opacity = '1';
+    }, 270);
+
+    window.setTimeout(() => {
+      if (unlockItem) {
+        blip(659, 90);
+        gameState.placeItem(unlockItem.id);
+      }
+      currentBay = bay;
+      camAngleTarget = getBayAngle(bay);
+      camAngleCurrent = camAngleTarget;
+      activeDiorama?.setDoorHop(null, 0);
+      rebuildScene();
+      hotspotLayer.classList.add('settled');
+      fadeOverlay.style.opacity = '0';
+      fadeOverlay.style.pointerEvents = 'none';
+      window.setTimeout(() => {
+        isTransitioningBay = false;
+      }, 220);
+    }, 500);
+    return;
+  }
+
+  // Returning to Holiday Hall (or switching bays): fade to black, snap camera, fade in
+  isTransitioningBay = true;
+  hotspotLayer.classList.remove('settled');
+  leapBubbleHost.replaceChildren();
+  storyBannerHost.replaceChildren();
+  blip(392, 45);
+  fadeOverlay.style.pointerEvents = 'auto';
+  fadeOverlay.style.opacity = '1';
+
+  window.setTimeout(() => {
+    currentBay = bay;
+    camAngleTarget = getBayAngle(bay);
+    camAngleCurrent = camAngleTarget;
+    rebuildScene();
+    hotspotLayer.classList.add('settled');
+    fadeOverlay.style.opacity = '0';
+    fadeOverlay.style.pointerEvents = 'none';
+    window.setTimeout(() => {
+      isTransitioningBay = false;
+    }, 220);
+  }, 220);
 }
 
 function closeModal(): void {
@@ -775,6 +1005,7 @@ function closeModal(): void {
   modalHost.replaceChildren();
   hotspotLayer.style.display = '';
   sideArrowsHost.style.display = '';
+  renderActiveStoryBeat();
 }
 
 const ROOM_TINTS: Record<string, string> = {
@@ -792,8 +1023,8 @@ function showUnlockDialog(roomSpec: RoomSpec, kind: 'warm-up' | 'centerpiece'): 
     ? `${roomSpec.icon} ${roomSpec.genreLabel} Unlocked at Calendar Desk!`
     : `${roomSpec.icon} All ${roomSpec.genreLabel} Twists Unlocked!`;
   const detailText = isWarmup
-    ? `Beating the ${roomSpec.shortTitle} Warm-up (${roomSpec.warmup.title}) unlocked both the Warm-up replay and the Standard (No-Twist) ${roomSpec.genreLabel} generator at Tuesday's Calendar Desk!`
-    : `Beating the ${roomSpec.shortTitle} Centerpiece (${roomSpec.centerpiece.title}) unlocked all 6 holiday twists for ${roomSpec.genreLabel} at Tuesday's Calendar Desk!`;
+    ? `Beating the ${roomSpec.shortTitle} Warm-up (${roomSpec.warmup.title}) unlocked both the Warm-up replay and the Standard (No-Twist) ${roomSpec.genreLabel} generator at Leap Day's Calendar Desk!`
+    : `Beating the ${roomSpec.shortTitle} Centerpiece (${roomSpec.centerpiece.title}) unlocked all 6 holiday twists for ${roomSpec.genreLabel} at Leap Day's Calendar Desk!`;
 
   const overlay = h(
     'div',
@@ -924,7 +1155,13 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
     protoId === 'tuesday' ? FINALE_PROTO : PROTOS.find((p) => p.id === protoId);
   if (!proto) return;
 
+  if (protoId === 'tuesday') {
+    gameState.enqueueBeat('C0');
+  }
+
   activeModal = 'proto';
+  storyBannerHost.replaceChildren();
+  hideMemoOverlay();
   hotspotLayer.style.display = 'none';
   sideArrowsHost.style.display = 'none';
   isCameraFocused = true;
@@ -1016,9 +1253,9 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
                         border: '2px solid #1f2430',
                         boxShadow: '0 2px 0 #1f2430',
                       },
-                      onclick: () => switchBay(homeRoom.id),
+                      onclick: () => switchBay('hall'),
                     },
-                    `Go to ${homeRoom.shortTitle} ▸`,
+                    '← Return to Holiday Hall ▸',
                   )
                 : null,
               h(
@@ -1172,6 +1409,244 @@ function openCalendarDeskModal(
     closeModal();
     rebuildScene();
   });
+}
+
+function openCorkboardModal(initialMemoId?: MemoId): void {
+  activeModal = 'corkboard';
+  hotspotLayer.style.display = 'none';
+  sideArrowsHost.style.display = 'none';
+  isCameraFocused = false;
+
+  const pinnedSpecs = gameState.pinnedMemosInOrder();
+  const pinnedIds = new Set<MemoId>(pinnedSpecs.map((m) => m.id));
+  let selectedId: MemoId =
+    initialMemoId && pinnedIds.has(initialMemoId)
+      ? initialMemoId
+      : (pinnedSpecs[pinnedSpecs.length - 1]?.id ?? 'P1');
+
+  const bodyHost = h('div', {
+    class: 'puzz-modal-body',
+    style: {
+      padding: '16px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '14px',
+      overflowY: 'auto',
+    },
+  });
+
+  const renderCorkboardContent = (): void => {
+    const pinCards = MEMO_ORDER.map((memoId) => {
+      const unlocked = pinnedIds.has(memoId);
+      const spec = MEMOS[memoId];
+      const active = unlocked && memoId === selectedId;
+      const isXmas12 = spec.header.includes('XMAS12');
+      return h(
+        'button',
+        {
+          disabled: unlocked ? undefined : 'disabled',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            gap: '3px',
+            padding: '8px 10px',
+            borderRadius: '10px',
+            textAlign: 'left',
+            cursor: unlocked ? 'pointer' : 'not-allowed',
+            background: !unlocked
+              ? 'rgba(31, 36, 48, 0.22)'
+              : active
+                ? isXmas12
+                  ? '#f0fff4'
+                  : '#fff5f5'
+                : '#fffdf7',
+            color: unlocked ? '#1f2430' : '#cbd5e0',
+            border: active
+              ? `2.5px solid ${isXmas12 ? '#2f855a' : '#c53030'}`
+              : unlocked
+                ? '1.5px solid #bfa77a'
+                : '1.5px dashed rgba(255,255,255,0.28)',
+            boxShadow: active ? '0 3px 0 #1f2430' : unlocked ? '0 2px 0 rgba(0,0,0,0.18)' : 'none',
+            opacity: unlocked ? '1' : '0.6',
+          },
+          onclick: () => {
+            if (!unlocked) return;
+            selectedId = memoId;
+            blip(540, 45);
+            renderCorkboardContent();
+          },
+        },
+        h(
+          'div',
+          {
+            style: {
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              gap: '4px',
+            },
+          },
+          h(
+            'span',
+            {
+              style: {
+                fontSize: '10px',
+                fontWeight: '800',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: !unlocked ? '#a0aec0' : isXmas12 ? '#2f855a' : '#c53030',
+              },
+            },
+            unlocked ? (isXmas12 ? '📌 Xmas12' : '📌 Memo') : '🔒 Unfound',
+          ),
+          h(
+            'span',
+            {
+              style: {
+                fontSize: '9.5px',
+                fontWeight: '800',
+                color: unlocked ? '#718096' : '#a0aec0',
+              },
+            },
+            memoId,
+          ),
+        ),
+        h(
+          'div',
+          {
+            style: {
+              fontSize: '11.5px',
+              fontWeight: '800',
+              lineHeight: '1.25',
+              display: '-webkit-box',
+              webkitLineClamp: '2',
+              webkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            },
+          },
+          unlocked ? formatMemoText(spec.re, gameState.firstRevertedHoliday) : 'Undiscovered Memo',
+        ),
+      );
+    });
+
+    const corkGrid = h(
+      'div',
+      {
+        style: {
+          padding: '12px',
+          borderRadius: '14px',
+          background: 'linear-gradient(180deg, #b8834a 0%, #9c6b36 100%)',
+          border: '3px solid #5c3b1e',
+          boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.28)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(155px, 1fr))',
+          gap: '8px',
+        },
+      },
+      ...pinCards,
+    );
+
+    const activeReader = h(
+      'div',
+      { class: 'memo-reader' },
+      buildMemoSheet(MEMOS[selectedId], gameState.firstRevertedHoliday),
+    );
+
+    bodyHost.replaceChildren(corkGrid, activeReader);
+  };
+
+  const card = h(
+    'div',
+    {
+      class: 'puzz-modal-card',
+      onclick: (e: MouseEvent) => e.stopPropagation(),
+    },
+    h(
+      'div',
+      { class: 'puzz-modal-header' },
+      h(
+        'div',
+        { style: { display: 'flex', alignItems: 'center', gap: '9px' } },
+        h(
+          'span',
+          {
+            style: {
+              display: 'inline-grid',
+              placeItems: 'center',
+              width: '34px',
+              height: '34px',
+              borderRadius: '10px',
+              background: '#9c6b36',
+              color: '#fff',
+              border: '2px solid #1f2430',
+              boxShadow: '0 2px 0 #1f2430',
+              fontSize: '18px',
+            },
+          },
+          '📌',
+        ),
+        h(
+          'div',
+          {},
+          h(
+            'div',
+            {
+              style: {
+                fontSize: '10px',
+                fontWeight: '800',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                color: '#744210',
+              },
+            },
+            `Holiday Hall · ${pinnedSpecs.length}/${MEMO_ORDER.length} Pinned`,
+          ),
+          h(
+            'h2',
+            { style: { margin: '0', fontSize: '17px', lineHeight: '1.15' } },
+            'Hall Corkboard · Xmas365 Memos',
+          ),
+        ),
+      ),
+      h(
+        'button',
+        {
+          title: 'Close corkboard',
+          style: {
+            marginLeft: 'auto',
+            flexShrink: '0',
+            padding: '5px 11px',
+            borderRadius: '999px',
+            fontWeight: '800',
+            fontSize: '12px',
+            cursor: 'pointer',
+            background: '#1f2430',
+            color: '#fff',
+            border: '2px solid #1f2430',
+            boxShadow: '0 2px 0 #1f2430',
+          },
+          onclick: () => closeModal(),
+        },
+        '✕ Close',
+      ),
+    ),
+    bodyHost,
+  );
+  card.style.setProperty('--room-accent', '#9c6b36');
+  card.style.setProperty('--room-tint', '#fdf8ef');
+
+  const backdrop = h(
+    'div',
+    {
+      class: 'puzz-modal-backdrop',
+      onclick: () => closeModal(),
+    },
+    card,
+  );
+  modalHost.replaceChildren(backdrop);
+  renderCorkboardContent();
 }
 
 function openSettingsModal(): void {
@@ -1329,10 +1804,10 @@ function openSettingsModal(): void {
             },
             onclick: () => {
               closeModal();
-              showStoryVignette(currentMilestoneKey(), true);
+              openCorkboardModal();
             },
           },
-          `📖 View Act ${act} Story Note`,
+          `📌 Hall Corkboard (${gameState.pinnedMemos.size}/${MEMO_ORDER.length} Memos)`,
         ),
       ),
       h(
@@ -1482,7 +1957,7 @@ function openSettingsModal(): void {
         (next) => gameState.setFreePlay(next),
       ),
       makeCheckRow(
-        "🎉 Tuesday's Finale Solved",
+        '📜 Xmas365 Merger Contract Solved',
         'Completes Grand Finale Door (Act IV)',
         gameState.solvedRuns.has('tuesday'),
         (next) => gameState.setRunSolved('tuesday', next),
@@ -1493,6 +1968,7 @@ function openSettingsModal(): void {
       const req0 = STRAY_ITEMS[room.centerpiece.requiredItems[0]];
       const req1 = STRAY_ITEMS[room.centerpiece.requiredItems[1]];
       const roomDone = gameState.isRoomComplete(room);
+      const roomSign = gameState.getRoomSignage(room);
 
       return h(
         'div',
@@ -1518,9 +1994,18 @@ function openSettingsModal(): void {
             },
           },
           h(
-            'span',
-            { style: { fontWeight: '800', fontSize: '13.5px', color: '#1f2430' } },
-            `${room.icon} ${room.title}`,
+            'div',
+            { style: { display: 'flex', flexDirection: 'column', gap: '1px' } },
+            h(
+              'span',
+              { style: { fontWeight: '800', fontSize: '13.5px', color: '#1f2430' } },
+              `${room.icon} ${room.title}`,
+            ),
+            h(
+              'span',
+              { style: { fontSize: '10.5px', fontWeight: '700', color: '#6b7280' } },
+              roomSign.isAcquired ? `${roomSign.title} (${roomSign.subtitle})` : roomSign.subtitle,
+            ),
           ),
           h(
             'span',
@@ -1716,14 +2201,10 @@ canvas.addEventListener('pointerdown', (e: PointerEvent) => {
 });
 
 canvas.addEventListener('pointerup', (e: PointerEvent) => {
-  if (activeModal !== 'none' || !activeDiorama) return;
+  if (introActive || isTransitioningBay || activeModal !== 'none' || !activeDiorama) return;
   const dx = e.clientX - pointerDownX;
   const dy = e.clientY - pointerDownY;
-  // Horizontal swipe rotates around Holiday Hall!
-  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) {
-    stepBay(dx < 0 ? 1 : -1);
-    return;
-  }
+  if (Math.hypot(dx, dy) > 24) return;
   const rect = canvas.getBoundingClientRect();
   pointerNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
   pointerNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
@@ -1731,31 +2212,25 @@ canvas.addEventListener('pointerup', (e: PointerEvent) => {
   const hits = raycaster.intersectObjects(activeDiorama.root.children, true);
   for (const hit of hits) {
     const hs = findHotspotFromObject(hit.object);
-    if (hs) {
-      if (hs.bay !== currentBay) {
-        switchBay(hs.bay);
-      } else {
-        hs.onClick();
-      }
+    if (hs && hs.bay === currentBay) {
+      hs.onClick();
       return;
     }
   }
 });
 
-// Build initial Holiday Hall scene
-rebuildScene();
-
 // Support ?room=<bayId> or ?p=<protoId> deep-linking
 const startRoomParam = params.get('room') as BayId | null;
-if (startRoomParam && BAY_ORDER.includes(startRoomParam)) {
-  switchBay(startRoomParam);
-  camAngleCurrent = camAngleTarget;
-  layoutStableHotspots();
-  hotspotLayer.classList.add('settled');
-}
-
 const startProtoId = params.get('p');
-if (startProtoId) {
+
+// Cold-start intro runs on normal launch unless deep-linking into a room/puzzle or ?intro=0
+introActive = !startRoomParam && !startProtoId && params.get('intro') !== '0';
+
+if (startRoomParam && BAY_ORDER.includes(startRoomParam)) {
+  currentBay = startRoomParam;
+  camAngleTarget = getBayAngle(startRoomParam);
+  camAngleCurrent = camAngleTarget;
+} else if (startProtoId) {
   const matchingRoom = ROOM_SPECS.find(
     (r) =>
       r.warmup.id === startProtoId ||
@@ -1763,11 +2238,419 @@ if (startProtoId) {
       r.centerpiece.proto.id === startProtoId,
   );
   if (matchingRoom) {
-    switchBay(matchingRoom.id);
+    currentBay = matchingRoom.id;
+    camAngleTarget = getBayAngle(matchingRoom.id);
     camAngleCurrent = camAngleTarget;
-    layoutStableHotspots();
   }
+}
+
+// Build initial Holiday Hall scene
+rebuildScene();
+
+if (startProtoId) {
   openProtoModal(startProtoId, camPosCurrent.clone(), camLookCurrent.clone());
+}
+
+// --- COLD-START INTRO CINEMATIC (<10s) & TAP TO START ---
+const INTRO_MONTHS: readonly { short: string; full: string; days: string }[] = [
+  { short: 'JAN', full: 'JANUARY', days: 'DAYS 001 - 031' },
+  { short: 'FEB', full: 'FEBRUARY', days: 'DAYS 032 - 059' },
+  { short: 'MAR', full: 'MARCH', days: 'DAYS 060 - 090' },
+  { short: 'APR', full: 'APRIL', days: 'DAYS 091 - 120' },
+  { short: 'MAY', full: 'MAY', days: 'DAYS 121 - 151' },
+  { short: 'JUN', full: 'JUNE', days: 'DAYS 152 - 181' },
+  { short: 'JUL', full: 'JULY', days: 'DAYS 182 - 212' },
+  { short: 'AUG', full: 'AUGUST', days: 'DAYS 213 - 243' },
+  { short: 'SEP', full: 'SEPTEMBER', days: 'DAYS 244 - 273' },
+  { short: 'OCT', full: 'OCTOBER', days: 'DAYS 274 - 304' },
+  { short: 'NOV', full: 'NOVEMBER', days: 'DAYS 305 - 334' },
+  { short: 'DEC', full: 'DECEMBER', days: 'DAYS 335 - 365' },
+];
+
+let introStartTime: number | null = null;
+let lastStampedMonthIdx = -1;
+let introPopTriggered = false;
+let introCalCardEl: HTMLElement | null = null;
+let introMonthTitleEl: HTMLElement | null = null;
+let introDaysCounterEl: HTMLElement | null = null;
+let introMonthCells: HTMLElement[] = [];
+let introBigStampEl: HTMLElement | null = null;
+let introSlipEl: HTMLElement | null = null;
+let introTapBtnEl: HTMLElement | null = null;
+let introSubheadEl: HTMLElement | null = null;
+
+function finishIntro(): void {
+  if (!introActive) return;
+  introActive = false;
+  blip(587, 65);
+  introHost.replaceChildren();
+  introHost.style.display = 'none';
+  activeDiorama?.setIntroPose('idle', 0);
+  hotspotLayer.style.display = '';
+  topBar.style.display = 'flex';
+  bottomStack.style.display = 'flex';
+  gameState.onEnterBay(currentBay);
+  renderTopBar();
+  renderCarryTray();
+  renderActiveStoryBeat();
+  layoutStableHotspots();
+  hotspotLayer.classList.add('settled');
+}
+
+function mountIntroOverlay(): void {
+  hotspotLayer.style.display = 'none';
+  topBar.style.display = 'none';
+  bottomStack.style.display = 'none';
+  introHost.style.display = 'block';
+  activeDiorama?.setIntroPose('hidden', 0);
+
+  introMonthTitleEl = h(
+    'div',
+    {
+      style: {
+        fontSize: '21px',
+        fontWeight: '900',
+        letterSpacing: '0.06em',
+        color: '#1f2430',
+      },
+    },
+    'JANUARY',
+  );
+
+  introDaysCounterEl = h(
+    'div',
+    {
+      style: {
+        fontSize: '11.5px',
+        fontWeight: '800',
+        letterSpacing: '0.08em',
+        color: '#c53030',
+        marginTop: '2px',
+      },
+    },
+    'DAYS 001 - 031 · REBRANDED',
+  );
+
+  introMonthCells = INTRO_MONTHS.map((m) =>
+    h(
+      'div',
+      {
+        style: {
+          position: 'relative',
+          padding: '6px 4px',
+          borderRadius: '7px',
+          background: '#fffdf9',
+          border: '1.5px solid #d8cfc0',
+          textAlign: 'center',
+          fontSize: '10.5px',
+          fontWeight: '900',
+          color: '#4a5568',
+          overflow: 'hidden',
+          transition: 'transform 90ms ease, background 90ms ease, border-color 90ms ease',
+        },
+      },
+      h('div', {}, m.short),
+      h(
+        'div',
+        {
+          class: 'xmas-mini-stamp',
+          style: {
+            position: 'absolute',
+            inset: '1px',
+            display: 'grid',
+            placeItems: 'center',
+            background: 'rgba(197, 48, 48, 0.92)',
+            color: '#fff',
+            fontWeight: '900',
+            fontSize: '9.5px',
+            letterSpacing: '0.06em',
+            borderRadius: '5px',
+            transform: 'rotate(-8deg) scale(1.35)',
+            opacity: '0',
+            transition: 'opacity 70ms ease, transform 90ms cubic-bezier(0.22, 1, 0.36, 1)',
+          },
+        },
+        'XMAS',
+      ),
+    ),
+  );
+
+  introBigStampEl = h(
+    'div',
+    {
+      style: {
+        position: 'absolute',
+        top: '54%',
+        left: '50%',
+        transform: 'translate(-50%, -50%) rotate(-11deg) scale(1.6)',
+        padding: '8px 16px',
+        borderRadius: '10px',
+        border: '4px solid #c53030',
+        background: 'rgba(255, 245, 245, 0.96)',
+        color: '#c53030',
+        fontWeight: '900',
+        fontSize: '19px',
+        letterSpacing: '0.08em',
+        whiteSpace: 'nowrap',
+        boxShadow: '0 6px 18px rgba(197, 48, 48, 0.35)',
+        opacity: '0',
+        pointerEvents: 'none',
+        transition: 'opacity 90ms ease, transform 130ms cubic-bezier(0.22, 1, 0.36, 1)',
+      },
+    },
+    '🎄 XMAS · 365 / 365',
+  );
+
+  introCalCardEl = h(
+    'div',
+    {
+      style: {
+        position: 'relative',
+        width: 'min(320px, 88vw)',
+        background: '#fffaf0',
+        border: '3px solid #1f2430',
+        borderRadius: '16px',
+        boxShadow: '0 8px 0 #1f2430, 0 18px 36px rgba(0,0,0,0.45)',
+        overflow: 'hidden',
+        transition: 'opacity 280ms ease, transform 280ms ease',
+      },
+    },
+    h(
+      'div',
+      {
+        style: {
+          padding: '8px 12px',
+          background: '#c53030',
+          color: '#fff',
+          borderBottom: '2.5px solid #1f2430',
+          fontWeight: '900',
+          fontSize: '11px',
+          letterSpacing: '0.08em',
+          textAlign: 'center',
+        },
+      },
+      '📅 2026 CALENDAR CONSOLIDATION',
+    ),
+    h(
+      'div',
+      {
+        style: {
+          padding: '12px 14px 14px 14px',
+          textAlign: 'center',
+        },
+      },
+      introMonthTitleEl,
+      introDaysCounterEl,
+      h(
+        'div',
+        {
+          style: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '6px',
+            marginTop: '10px',
+          },
+        },
+        ...introMonthCells,
+      ),
+    ),
+    introBigStampEl,
+  );
+
+  introSlipEl = h(
+    'div',
+    {
+      style: {
+        position: 'fixed',
+        left: '50%',
+        top: '44%',
+        transform: 'translate(-50%, -50%) scale(0.8)',
+        padding: '7px 14px',
+        borderRadius: '9px',
+        background: '#fffaf0',
+        border: '2.5px dashed #2f855a',
+        boxShadow: '0 4px 0 #1f2430, 0 10px 22px rgba(0,0,0,0.35)',
+        color: '#22543d',
+        fontWeight: '900',
+        fontSize: '13px',
+        letterSpacing: '0.05em',
+        opacity: '0',
+        pointerEvents: 'none',
+      },
+    },
+    '🐸 FEB 29 · LEAP DAY (UNFILED)',
+  );
+
+  introSubheadEl = h(
+    'div',
+    {
+      style: {
+        fontSize: '12.5px',
+        fontWeight: '700',
+        color: '#fefcbf',
+        marginTop: '4px',
+        textShadow: '0 2px 4px rgba(0,0,0,0.6)',
+      },
+    },
+    'Stamping 365 days as Christmas...',
+  );
+
+  introTapBtnEl = h(
+    'button',
+    {
+      style: {
+        padding: '12px 28px',
+        borderRadius: '999px',
+        fontWeight: '900',
+        fontSize: '16px',
+        letterSpacing: '0.04em',
+        cursor: 'pointer',
+        background: '#ecc94b',
+        color: '#1f2430',
+        border: '3px solid #1f2430',
+        boxShadow: '0 5px 0 #1f2430, 0 12px 26px rgba(0,0,0,0.45)',
+        transition: 'transform 160ms ease, background 160ms ease',
+      },
+      onclick: (e: MouseEvent) => {
+        e.stopPropagation();
+        finishIntro();
+      },
+    },
+    '▶ Tap to Start',
+  );
+
+  const wrapper = h(
+    'div',
+    {
+      class: 'interactive',
+      style: {
+        position: 'fixed',
+        inset: '0',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding:
+          'calc(18px + env(safe-area-inset-top)) 16px calc(26px + env(safe-area-inset-bottom)) 16px',
+        background:
+          'radial-gradient(circle at 50% 62%, rgba(15, 20, 28, 0.12) 0%, rgba(10, 14, 22, 0.62) 100%)',
+        cursor: 'pointer',
+        pointerEvents: 'auto',
+      },
+      onclick: () => finishIntro(),
+    },
+    h(
+      'div',
+      {
+        style: {
+          textAlign: 'center',
+          padding: '10px 18px',
+          borderRadius: '14px',
+          background: 'rgba(31, 36, 48, 0.92)',
+          border: '2.5px solid #1f2430',
+          boxShadow: '0 4px 0 #1f2430, 0 10px 24px rgba(0,0,0,0.4)',
+          color: '#fff',
+        },
+      },
+      h(
+        'div',
+        {
+          style: {
+            fontSize: '20px',
+            fontWeight: '900',
+            letterSpacing: '0.04em',
+          },
+        },
+        '🏛️ HOLIDAY HALL',
+      ),
+      introSubheadEl,
+    ),
+    introCalCardEl,
+    introSlipEl,
+    introTapBtnEl,
+  );
+
+  introHost.replaceChildren(wrapper);
+}
+
+function updateIntroCinematic(now: number): void {
+  if (!introActive) return;
+  if (introStartTime === null) {
+    introStartTime = now;
+  }
+  const elapsed = (now - introStartTime) / 1000;
+
+  // Stage 1 (0.0s -> 1.95s): Rapidly stamp all 12 months JAN -> DEC as XMAS
+  const monthIdx = Math.min(11, Math.floor(elapsed / 0.155));
+  if (monthIdx > lastStampedMonthIdx && monthIdx >= 0) {
+    for (let i = lastStampedMonthIdx + 1; i <= monthIdx; i++) {
+      const m = INTRO_MONTHS[i];
+      const cell = introMonthCells[i];
+      if (m && cell) {
+        if (introMonthTitleEl) introMonthTitleEl.textContent = m.full;
+        if (introDaysCounterEl) introDaysCounterEl.textContent = `${m.days} · STAMPED XMAS`;
+        cell.style.background = '#fff5f5';
+        cell.style.borderColor = '#c53030';
+        const stamp = cell.querySelector<HTMLElement>('.xmas-mini-stamp');
+        if (stamp) {
+          stamp.style.opacity = '1';
+          stamp.style.transform = 'rotate(-8deg) scale(1)';
+        }
+      }
+    }
+    lastStampedMonthIdx = monthIdx;
+    if (introCalCardEl) {
+      const tilt = (monthIdx % 2 === 0 ? 1 : -1) * 1.4;
+      introCalCardEl.style.transform = `translateY(-2px) rotate(${tilt}deg)`;
+    }
+  }
+
+  // At 1.95s: Slam giant "XMAS 365/365" stamp across the calendar
+  if (elapsed >= 1.95 && introBigStampEl && introBigStampEl.style.opacity === '0') {
+    introBigStampEl.style.opacity = '1';
+    introBigStampEl.style.transform = 'translate(-50%, -50%) rotate(-11deg) scale(1)';
+    if (introSubheadEl) {
+      introSubheadEl.textContent = '365/365 Days Stamped... wait, what about FEB 29?';
+    }
+  }
+
+  // Stage 2 (2.15s -> 2.70s): FEB 29 slip shakes loose and flutters down to the Holiday Hall rug
+  if (elapsed >= 2.15 && elapsed < 2.75 && introSlipEl) {
+    const u = Math.min(1, (elapsed - 2.15) / 0.55);
+    const topPct = 44 + u * 22;
+    const swayX = Math.sin(u * Math.PI * 2.5) * 26 * (1 - u * 0.4);
+    const rotDeg = Math.sin(u * Math.PI * 2.5) * 14;
+    introSlipEl.style.opacity = u < 0.9 ? '1' : `${(1 - u) * 10}`;
+    introSlipEl.style.top = `${topPct.toFixed(1)}%`;
+    introSlipEl.style.transform = `translate(calc(-50% + ${swayX.toFixed(1)}px), -50%) rotate(${rotDeg.toFixed(1)}deg) scale(${(0.95 + u * 0.1).toFixed(2)})`;
+    if (introCalCardEl && elapsed >= 2.35) {
+      introCalCardEl.style.opacity = '0';
+      introCalCardEl.style.transform = 'translateY(-18px) scale(0.92)';
+      introCalCardEl.style.pointerEvents = 'none';
+    }
+  }
+
+  // Stage 3 (2.70s+): Leap Day pops out of the FEB 29 slip on the Holiday Hall floor and hops around!
+  if (elapsed >= 2.7) {
+    if (!introPopTriggered) {
+      introPopTriggered = true;
+      if (introSlipEl) introSlipEl.style.opacity = '0';
+      if (introCalCardEl) introCalCardEl.style.opacity = '0';
+      if (introSubheadEl) {
+        introSubheadEl.textContent = 'FEB 29 slipped loose! Leap Day is in Holiday Hall.';
+      }
+    }
+    activeDiorama?.setIntroPose('pop', elapsed - 2.7);
+    if (introTapBtnEl) {
+      const pulse = 1 + Math.sin((elapsed - 2.7) * 5.5) * 0.045;
+      introTapBtnEl.style.transform = `scale(${pulse.toFixed(3)})`;
+      introTapBtnEl.style.background = '#68d391';
+    }
+  }
+}
+
+if (introActive) {
+  mountIntroOverlay();
 }
 
 const targetLitColor = new THREE.Color();
@@ -1790,6 +2673,10 @@ view.renderer.setAnimationLoop((now) => {
     fpsSampleStart = now;
   }
 
+  if (introActive) {
+    updateIntroCinematic(now);
+  }
+
   const t = now / 1000;
   if (activeDiorama) {
     activeDiorama.animate(t, currentBay);
@@ -1803,13 +2690,9 @@ view.renderer.setAnimationLoop((now) => {
     layoutStableHotspots();
   }
 
-  // Smooth circular rotation around Holiday Hall
-  const angleDelta = shortestAngleDelta(camAngleCurrent, camAngleTarget);
-  if (Math.abs(angleDelta) > 0.012) {
-    camAngleCurrent += angleDelta * 0.16;
-  } else {
-    camAngleCurrent = camAngleTarget;
-    if (activeModal === 'none' && !hotspotLayer.classList.contains('settled')) {
+  camAngleCurrent = camAngleTarget;
+  if (!introActive && !isTransitioningBay && activeModal === 'none') {
+    if (!hotspotLayer.classList.contains('settled')) {
       hotspotLayer.classList.add('settled');
     }
   }
