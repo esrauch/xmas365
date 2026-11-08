@@ -56,9 +56,10 @@ export class View {
     new ResizeObserver(() => this.fit()).observe(canvas);
   }
 
-  render(): void {
-    if (this.outline) this.outline.render(this.renderer, this.scene, this.camera);
-    else this.renderer.render(this.scene, this.camera);
+  render(overrideScene?: THREE.Scene): void {
+    const target = overrideScene ?? this.scene;
+    if (this.outline) this.outline.render(this.renderer, target, this.camera);
+    else this.renderer.render(target, this.camera);
   }
 
   private fit(): void {

@@ -436,6 +436,24 @@ export class GameState {
     }
   }
 
+  /** Whether the player has any existing save progress (so "Tap to start" goes straight to the hall). */
+  hasSaveProgress(): boolean {
+    return (
+      this.milestones.has('P0') ||
+      this.milestones.has('P1') ||
+      this.solvedRuns.size > 0 ||
+      this.placedItems.size > 0
+    );
+  }
+
+  /** Mark the intro cinematic (`P0`) as completed in persistent milestones. */
+  markIntroSeen(): void {
+    if (!this.milestones.has('P0')) {
+      this.milestones.add('P0');
+      writeSet(MILESTONES_KEY, this.milestones);
+    }
+  }
+
   /** Return the front beat waiting to be displayed, or `null` if the queue is empty. */
   currentBeat(): BeatId | null {
     return this.beatQueue[0] ?? null;

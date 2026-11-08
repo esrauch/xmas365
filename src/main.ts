@@ -31,6 +31,7 @@ import {
   getBayAngle,
   getBayLightMood,
 } from './game/diorama';
+import { type BuiltIntroCinematic, buildIntroCinematic } from './game/introCinematic';
 import { FINALE_PROTO, ROOM_SPECS, type RoomSpec, STRAY_ITEMS, gameState } from './game/state';
 import { type Proto, blip, h } from './proto/kit';
 import { PROTOS } from './proto/puzzles';
@@ -1835,6 +1836,27 @@ function openSettingsModal(): void {
           },
           `📄 Unlocked Memos (${gameState.pinnedMemos.size}/${MEMO_ORDER.length})`,
         ),
+        h(
+          'button',
+          {
+            style: {
+              padding: '8px 14px',
+              borderRadius: '10px',
+              fontWeight: '800',
+              fontSize: '13px',
+              cursor: 'pointer',
+              background: '#ebf8ff',
+              color: '#1a365d',
+              border: '2px solid #2b6cb0',
+              boxShadow: '0 2px 0 #1e4e8c',
+            },
+            onclick: () => {
+              closeModal();
+              startIntroReplay();
+            },
+          },
+          '🎬 Replay Intro',
+        ),
       ),
       h(
         'button',
@@ -2278,50 +2300,314 @@ if (startProtoId) {
   openProtoModal(startProtoId, camPosCurrent.clone(), camLookCurrent.clone());
 }
 
-// --- COLD-START INTRO CINEMATIC (<10s) & TAP TO START ---
-const INTRO_MONTHS: readonly { short: string; full: string; days: string }[] = [
-  { short: 'JAN', full: 'JANUARY', days: 'DAYS 001 - 031' },
-  { short: 'FEB', full: 'FEBRUARY', days: 'DAYS 032 - 059' },
-  { short: 'MAR', full: 'MARCH', days: 'DAYS 060 - 090' },
-  { short: 'APR', full: 'APRIL', days: 'DAYS 091 - 120' },
-  { short: 'MAY', full: 'MAY', days: 'DAYS 121 - 151' },
-  { short: 'JUN', full: 'JUNE', days: 'DAYS 152 - 181' },
-  { short: 'JUL', full: 'JULY', days: 'DAYS 182 - 212' },
-  { short: 'AUG', full: 'AUGUST', days: 'DAYS 213 - 243' },
-  { short: 'SEP', full: 'SEPTEMBER', days: 'DAYS 244 - 273' },
-  { short: 'OCT', full: 'OCTOBER', days: 'DAYS 274 - 304' },
-  { short: 'NOV', full: 'NOVEMBER', days: 'DAYS 305 - 334' },
-  { short: 'DEC', full: 'DECEMBER', days: 'DAYS 335 - 365' },
-];
-
+// --- COLD-START 3D INTRO CINEMATIC (`intro_cinematic.md`) & TAP TO START ---
+type IntroStage = 'none' | 'tap_to_start' | 'cinematic' | 'fading_out';
+let introStage: IntroStage = 'none';
+let activeIntroCinematic: BuiltIntroCinematic | null = null;
 let introStartTime: number | null = null;
-let lastStampedMonthIdx = -1;
-let introPopTriggered = false;
-let introCalCardEl: HTMLElement | null = null;
-let introMonthTitleEl: HTMLElement | null = null;
-let introDaysCounterEl: HTMLElement | null = null;
-let introMonthCells: HTMLElement[] = [];
-let introBigStampEl: HTMLElement | null = null;
-let introSlipEl: HTMLElement | null = null;
-let introTapBtnEl: HTMLElement | null = null;
-let introSubheadEl: HTMLElement | null = null;
+let introSteadyFrames = 0;
+let introPrecompiled = false;
 
-function finishIntro(): void {
-  if (!introActive) return;
-  introActive = false;
-  blip(587, 65);
-  introHost.replaceChildren();
-  introHost.style.display = 'none';
-  activeDiorama?.setIntroPose('idle', 0);
-  hotspotLayer.style.display = '';
-  topBar.style.display = 'flex';
-  bottomStack.style.display = 'flex';
-  gameState.onEnterBay(currentBay);
-  renderTopBar();
-  renderCarryTray();
-  renderActiveStoryBeat();
-  layoutStableHotspots();
-  hotspotLayer.classList.add('settled');
+// DOM elements for the letterbox, caption, and hold-to-skip indicator
+let letterboxTopEl: HTMLElement | null = null;
+let letterboxBotEl: HTMLElement | null = null;
+let captionWrapEl: HTMLElement | null = null;
+let captionTextEl: HTMLElement | null = null;
+let titlePromptEl: HTMLElement | null = null;
+let holdSkipPillEl: HTMLElement | null = null;
+let holdSkipFillEl: HTMLElement | null = null;
+let holdPointerDownAt: number | null = null;
+
+const CAPTION_FULL_TEXT = 'Huh. Missed a spot.';
+
+function cleanupIntroCinematicScene(): void {
+  if (activeIntroCinematic) {
+    activeIntroCinematic.dispose();
+    activeIntroCinematic = null;
+  }
+}
+
+function finishIntro(fromCinematic: boolean): void {
+  if (!introActive || introStage === 'fading_out') return;
+  holdPointerDownAt = null;
+  gameState.markIntroSeen();
+
+  if (!fromCinematic) {
+    // Returning player with a save: go straight from "Tap to start" to Holiday Hall
+    cleanupIntroCinematicScene();
+    introActive = false;
+    introStage = 'none';
+    introHost.replaceChildren();
+    introHost.style.display = 'none';
+    activeDiorama?.setIntroPose('idle', 0);
+    hotspotLayer.style.display = '';
+    topBar.style.display = 'flex';
+    bottomStack.style.display = 'flex';
+    gameState.onEnterBay(currentBay);
+    renderTopBar();
+    renderCarryTray();
+    renderActiveStoryBeat();
+    layoutStableHotspots();
+    hotspotLayer.classList.add('settled');
+    return;
+  }
+
+  // Close the letterbox bars over the 3D intro scene, then fade open into Holiday Hall
+  introStage = 'fading_out';
+  if (captionWrapEl) captionWrapEl.style.opacity = '0';
+  if (titlePromptEl) titlePromptEl.style.opacity = '0';
+  if (holdSkipPillEl) holdSkipPillEl.style.opacity = '0';
+  if (letterboxTopEl) letterboxTopEl.style.height = '50vh';
+  if (letterboxBotEl) letterboxBotEl.style.height = '50vh';
+
+  window.setTimeout(() => {
+    cleanupIntroCinematicScene();
+    activeDiorama?.setIntroPose('idle', 0);
+    hotspotLayer.style.display = '';
+    topBar.style.display = 'flex';
+    bottomStack.style.display = 'flex';
+    renderTopBar();
+    renderCarryTray();
+    layoutStableHotspots();
+    hotspotLayer.classList.add('settled');
+
+    const fadeWrapper = introHost.firstElementChild as HTMLElement | null;
+    if (fadeWrapper) {
+      fadeWrapper.style.transition = 'opacity 420ms ease';
+      fadeWrapper.style.opacity = '0';
+      fadeWrapper.style.pointerEvents = 'none';
+    }
+
+    window.setTimeout(() => {
+      introActive = false;
+      introStage = 'none';
+      introHost.replaceChildren();
+      introHost.style.display = 'none';
+      // Wait ~0.5s for Holiday Hall & Leap Day on the rug to register before opening P1
+      window.setTimeout(() => {
+        gameState.onEnterBay(currentBay);
+        renderTopBar();
+        renderCarryTray();
+        renderActiveStoryBeat();
+      }, 500);
+    }, 420);
+  }, 380);
+}
+
+function mountCinematicStageDOM(): void {
+  hotspotLayer.style.display = 'none';
+  topBar.style.display = 'none';
+  bottomStack.style.display = 'none';
+  introHost.style.display = 'block';
+
+  if (!activeIntroCinematic) {
+    activeIntroCinematic = buildIntroCinematic();
+    activeIntroCinematic.precompile(view);
+  }
+
+  introStage = 'cinematic';
+  introStartTime = null;
+  introSteadyFrames = 0;
+  holdPointerDownAt = null;
+
+  letterboxTopEl = h('div', {
+    style: {
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      right: '0',
+      height: 'min(78px, 11.5vh)',
+      background: '#0d0907',
+      transform: 'translateY(-100%)',
+      transition: 'transform 650ms cubic-bezier(0.22, 1, 0.36, 1), height 420ms ease',
+      zIndex: '2',
+    },
+  });
+
+  captionTextEl = h(
+    'div',
+    {
+      style: {
+        fontSize: 'clamp(16px, 4.4vw, 20px)',
+        fontWeight: '700',
+        color: '#ffffff',
+        textShadow: '0 2px 6px rgba(0, 0, 0, 0.85)',
+        minHeight: '1.35em',
+        marginTop: '2px',
+      },
+    },
+    '',
+  );
+
+  captionWrapEl = h(
+    'div',
+    {
+      style: {
+        textAlign: 'center',
+        opacity: '0',
+        transition: 'opacity 220ms ease',
+        padding: '0 16px',
+      },
+    },
+    h(
+      'div',
+      {
+        style: {
+          fontSize: '11px',
+          fontWeight: '900',
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: '#facc15',
+          textShadow: '0 1px 4px rgba(0, 0, 0, 0.85)',
+        },
+      },
+      'LEAP DAY',
+    ),
+    captionTextEl,
+  );
+
+  titlePromptEl = h(
+    'div',
+    {
+      style: {
+        position: 'absolute',
+        fontSize: '12px',
+        fontWeight: '800',
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+        color: 'rgba(255, 253, 247, 0.85)',
+        opacity: '0',
+        transition: 'opacity 320ms ease',
+        pointerEvents: 'none',
+      },
+    },
+    'Tap to continue',
+  );
+
+  letterboxBotEl = h(
+    'div',
+    {
+      style: {
+        position: 'absolute',
+        bottom: '0',
+        left: '0',
+        right: '0',
+        height: 'min(96px, 14vh)',
+        background: '#0d0907',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        transform: 'translateY(100%)',
+        transition: 'transform 650ms cubic-bezier(0.22, 1, 0.36, 1), height 380ms ease',
+        zIndex: '2',
+      },
+    },
+    captionWrapEl,
+    titlePromptEl,
+  );
+
+  holdSkipFillEl = h('div', {
+    style: {
+      height: '100%',
+      width: '0%',
+      background: '#facc15',
+      borderRadius: '999px',
+    },
+  });
+
+  holdSkipPillEl = h(
+    'div',
+    {
+      style: {
+        position: 'absolute',
+        top: 'calc(14px + env(safe-area-inset-top))',
+        right: '14px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4px',
+        padding: '6px 11px',
+        borderRadius: '10px',
+        background: 'rgba(15, 12, 10, 0.82)',
+        border: '1.5px solid rgba(255, 255, 255, 0.22)',
+        color: '#fdf8ec',
+        fontSize: '11px',
+        fontWeight: '800',
+        letterSpacing: '0.04em',
+        opacity: '0',
+        transition: 'opacity 140ms ease',
+        pointerEvents: 'none',
+        zIndex: '5',
+      },
+    },
+    h('div', {}, 'Hold to skip'),
+    h(
+      'div',
+      {
+        style: {
+          width: '84px',
+          height: '4px',
+          background: 'rgba(255, 255, 255, 0.2)',
+          borderRadius: '999px',
+          overflow: 'hidden',
+        },
+      },
+      holdSkipFillEl,
+    ),
+  );
+
+  const stageWrapper = h(
+    'div',
+    {
+      class: 'interactive',
+      style: {
+        position: 'fixed',
+        inset: '0',
+        overflow: 'hidden',
+        userSelect: 'none',
+        webkitUserSelect: 'none',
+        touchAction: 'none',
+        pointerEvents: 'auto',
+      },
+      onpointerdown: (e: PointerEvent) => {
+        if (e.button !== 0 && e.pointerType === 'mouse') return;
+        if (introStartTime !== null) {
+          const elapsed = (performance.now() - introStartTime) / 1000;
+          if (elapsed >= 21.6) {
+            finishIntro(true);
+            return;
+          }
+        }
+        holdPointerDownAt = performance.now();
+        if (holdSkipPillEl) holdSkipPillEl.style.opacity = '1';
+      },
+      onpointerup: () => {
+        holdPointerDownAt = null;
+        if (holdSkipPillEl) holdSkipPillEl.style.opacity = '0';
+        if (holdSkipFillEl) holdSkipFillEl.style.width = '0%';
+      },
+      onpointercancel: () => {
+        holdPointerDownAt = null;
+        if (holdSkipPillEl) holdSkipPillEl.style.opacity = '0';
+        if (holdSkipFillEl) holdSkipFillEl.style.width = '0%';
+      },
+      onpointerleave: () => {
+        holdPointerDownAt = null;
+        if (holdSkipPillEl) holdSkipPillEl.style.opacity = '0';
+        if (holdSkipFillEl) holdSkipFillEl.style.width = '0%';
+      },
+    },
+    letterboxTopEl,
+    letterboxBotEl,
+    holdSkipPillEl,
+  );
+
+  introHost.replaceChildren(stageWrapper);
+}
+
+export function startIntroReplay(): void {
+  introActive = true;
+  mountCinematicStageDOM();
 }
 
 function mountIntroOverlay(): void {
@@ -2329,355 +2615,149 @@ function mountIntroOverlay(): void {
   topBar.style.display = 'none';
   bottomStack.style.display = 'none';
   introHost.style.display = 'block';
-  activeDiorama?.setIntroPose('hidden', 0);
+  introStage = 'tap_to_start';
+  introPrecompiled = false;
+  activeDiorama?.setIntroPose('idle', 0);
 
-  introMonthTitleEl = h(
-    'div',
-    {
-      style: {
-        fontSize: '21px',
-        fontWeight: '900',
-        letterSpacing: '0.06em',
-        color: '#1f2430',
-      },
-    },
-    'JANUARY',
-  );
-
-  introDaysCounterEl = h(
-    'div',
-    {
-      style: {
-        fontSize: '11.5px',
-        fontWeight: '800',
-        letterSpacing: '0.08em',
-        color: '#c53030',
-        marginTop: '2px',
-      },
-    },
-    'DAYS 001 - 031 · REBRANDED',
-  );
-
-  introMonthCells = INTRO_MONTHS.map((m) =>
-    h(
-      'div',
-      {
-        style: {
-          position: 'relative',
-          padding: '6px 4px',
-          borderRadius: '7px',
-          background: '#fffdf9',
-          border: '1.5px solid #d8cfc0',
-          textAlign: 'center',
-          fontSize: '10.5px',
-          fontWeight: '900',
-          color: '#4a5568',
-          overflow: 'hidden',
-          transition: 'transform 90ms ease, background 90ms ease, border-color 90ms ease',
-        },
-      },
-      h('div', {}, m.short),
-      h(
-        'div',
-        {
-          class: 'xmas-mini-stamp',
-          style: {
-            position: 'absolute',
-            inset: '1px',
-            display: 'grid',
-            placeItems: 'center',
-            background: 'rgba(197, 48, 48, 0.92)',
-            color: '#fff',
-            fontWeight: '900',
-            fontSize: '9.5px',
-            letterSpacing: '0.06em',
-            borderRadius: '5px',
-            transform: 'rotate(-8deg) scale(1.35)',
-            opacity: '0',
-            transition: 'opacity 70ms ease, transform 90ms cubic-bezier(0.22, 1, 0.36, 1)',
-          },
-        },
-        'XMAS',
-      ),
-    ),
-  );
-
-  introBigStampEl = h(
-    'div',
-    {
-      style: {
-        position: 'absolute',
-        top: '54%',
-        left: '50%',
-        transform: 'translate(-50%, -50%) rotate(-11deg) scale(1.6)',
-        padding: '8px 16px',
-        borderRadius: '10px',
-        border: '4px solid #c53030',
-        background: 'rgba(255, 245, 245, 0.96)',
-        color: '#c53030',
-        fontWeight: '900',
-        fontSize: '19px',
-        letterSpacing: '0.08em',
-        whiteSpace: 'nowrap',
-        boxShadow: '0 6px 18px rgba(197, 48, 48, 0.35)',
-        opacity: '0',
-        pointerEvents: 'none',
-        transition: 'opacity 90ms ease, transform 130ms cubic-bezier(0.22, 1, 0.36, 1)',
-      },
-    },
-    '🎄 XMAS · 365 / 365',
-  );
-
-  introCalCardEl = h(
-    'div',
-    {
-      style: {
-        position: 'relative',
-        width: 'min(320px, 88vw)',
-        background: '#fffaf0',
-        border: '3px solid #1f2430',
-        borderRadius: '16px',
-        boxShadow: '0 8px 0 #1f2430, 0 18px 36px rgba(0,0,0,0.45)',
-        overflow: 'hidden',
-        transition: 'opacity 280ms ease, transform 280ms ease',
-      },
-    },
-    h(
-      'div',
-      {
-        style: {
-          padding: '8px 12px',
-          background: '#c53030',
-          color: '#fff',
-          borderBottom: '2.5px solid #1f2430',
-          fontWeight: '900',
-          fontSize: '11px',
-          letterSpacing: '0.08em',
-          textAlign: 'center',
-        },
-      },
-      '📅 2026 CALENDAR CONSOLIDATION',
-    ),
-    h(
-      'div',
-      {
-        style: {
-          padding: '12px 14px 14px 14px',
-          textAlign: 'center',
-        },
-      },
-      introMonthTitleEl,
-      introDaysCounterEl,
-      h(
-        'div',
-        {
-          style: {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '6px',
-            marginTop: '10px',
-          },
-        },
-        ...introMonthCells,
-      ),
-    ),
-    introBigStampEl,
-  );
-
-  introSlipEl = h(
-    'div',
-    {
-      style: {
-        position: 'fixed',
-        left: '50%',
-        top: '44%',
-        transform: 'translate(-50%, -50%) scale(0.8)',
-        padding: '7px 14px',
-        borderRadius: '9px',
-        background: '#fffaf0',
-        border: '2.5px dashed #2f855a',
-        boxShadow: '0 4px 0 #1f2430, 0 10px 22px rgba(0,0,0,0.35)',
-        color: '#22543d',
-        fontWeight: '900',
-        fontSize: '13px',
-        letterSpacing: '0.05em',
-        opacity: '0',
-        pointerEvents: 'none',
-      },
-    },
-    '🐸 FEB 29 · LEAP DAY (UNFILED)',
-  );
-
-  introSubheadEl = h(
-    'div',
-    {
-      style: {
-        fontSize: '12.5px',
-        fontWeight: '700',
-        color: '#fefcbf',
-        marginTop: '4px',
-        textShadow: '0 2px 4px rgba(0,0,0,0.6)',
-      },
-    },
-    'Stamping 365 days as Christmas...',
-  );
-
-  introTapBtnEl = h(
-    'button',
-    {
-      style: {
-        padding: '12px 28px',
-        borderRadius: '999px',
-        fontWeight: '900',
-        fontSize: '16px',
-        letterSpacing: '0.04em',
-        cursor: 'pointer',
-        background: '#ecc94b',
-        color: '#1f2430',
-        border: '3px solid #1f2430',
-        boxShadow: '0 5px 0 #1f2430, 0 12px 26px rgba(0,0,0,0.45)',
-        transition: 'transform 160ms ease, background 160ms ease',
-      },
-      onclick: (e: MouseEvent) => {
-        e.stopPropagation();
-        finishIntro();
-      },
-    },
-    '▶ Tap to Start',
-  );
-
-  const wrapper = h(
+  // Plain dark "Tap to start" screen with a sound-on hint and no logo (`intro_cinematic.md`)
+  const tapScreen = h(
     'div',
     {
       class: 'interactive',
       style: {
         position: 'fixed',
         inset: '0',
+        background: '#140d09',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        padding:
-          'calc(18px + env(safe-area-inset-top)) 16px calc(26px + env(safe-area-inset-bottom)) 16px',
-        background:
-          'radial-gradient(circle at 50% 62%, rgba(15, 20, 28, 0.12) 0%, rgba(10, 14, 22, 0.62) 100%)',
+        justifyContent: 'center',
+        gap: '14px',
         cursor: 'pointer',
+        userSelect: 'none',
         pointerEvents: 'auto',
       },
-      onclick: () => finishIntro(),
+      onclick: () => {
+        if (gameState.hasSaveProgress()) {
+          finishIntro(false);
+        } else {
+          mountCinematicStageDOM();
+        }
+      },
     },
     h(
       'div',
       {
         style: {
-          textAlign: 'center',
-          padding: '10px 18px',
-          borderRadius: '14px',
-          background: 'rgba(31, 36, 48, 0.92)',
-          border: '2.5px solid #1f2430',
-          boxShadow: '0 4px 0 #1f2430, 0 10px 24px rgba(0,0,0,0.4)',
-          color: '#fff',
+          fontSize: '18px',
+          fontWeight: '800',
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          color: '#fdf8ec',
+          padding: '12px 26px',
+          borderRadius: '999px',
+          border: '1.5px solid rgba(253, 248, 236, 0.32)',
+          background: 'rgba(255, 255, 255, 0.04)',
         },
       },
-      h(
-        'div',
-        {
-          style: {
-            fontSize: '20px',
-            fontWeight: '900',
-            letterSpacing: '0.04em',
-          },
-        },
-        '🏛️ HOLIDAY HALL',
-      ),
-      introSubheadEl,
+      'Tap to start',
     ),
-    introCalCardEl,
-    introSlipEl,
-    introTapBtnEl,
+    h(
+      'div',
+      {
+        style: {
+          fontSize: '12.5px',
+          fontWeight: '600',
+          color: 'rgba(253, 248, 236, 0.58)',
+          letterSpacing: '0.04em',
+        },
+      },
+      '🔊 Sound on',
+    ),
   );
 
-  introHost.replaceChildren(wrapper);
+  introHost.replaceChildren(tapScreen);
 }
 
 function updateIntroCinematic(now: number): void {
   if (!introActive) return;
+
+  // Pre-compile shaders during the "Tap to start" screen so Shot 1 never stutters
+  if (introStage === 'tap_to_start') {
+    if (!introPrecompiled) {
+      introPrecompiled = true;
+      view.renderer.compile(view.scene, view.camera);
+      if (!gameState.hasSaveProgress() && !activeIntroCinematic) {
+        activeIntroCinematic = buildIntroCinematic();
+        activeIntroCinematic.precompile(view);
+      }
+    }
+    return;
+  }
+
+  if (introStage === 'fading_out' || introStage === 'none') return;
+
+  // Check 1-second hold-to-skip
+  if (holdPointerDownAt !== null) {
+    const heldMs = now - holdPointerDownAt;
+    const pct = Math.min(100, (heldMs / 1000) * 100);
+    if (holdSkipFillEl) holdSkipFillEl.style.width = `${pct.toFixed(1)}%`;
+    if (heldMs >= 1000) {
+      finishIntro(true);
+      return;
+    }
+  }
+
+  // Wait for 2 steady animation frames after mounting before starting the timeline clock
   if (introStartTime === null) {
-    introStartTime = now;
+    introSteadyFrames++;
+    activeIntroCinematic?.update(0, view);
+    if (introSteadyFrames >= 2) {
+      introStartTime = now;
+      if (letterboxTopEl) letterboxTopEl.style.transform = 'translateY(0)';
+      if (letterboxBotEl) letterboxBotEl.style.transform = 'translateY(0)';
+    }
+    return;
   }
-  const elapsed = (now - introStartTime) / 1000;
 
-  // Stage 1 (0.0s -> 1.95s): Rapidly stamp all 12 months JAN -> DEC as XMAS
-  const monthIdx = Math.min(11, Math.floor(elapsed / 0.155));
-  if (monthIdx > lastStampedMonthIdx && monthIdx >= 0) {
-    for (let i = lastStampedMonthIdx + 1; i <= monthIdx; i++) {
-      const m = INTRO_MONTHS[i];
-      const cell = introMonthCells[i];
-      if (m && cell) {
-        if (introMonthTitleEl) introMonthTitleEl.textContent = m.full;
-        if (introDaysCounterEl) introDaysCounterEl.textContent = `${m.days} · STAMPED XMAS`;
-        cell.style.background = '#fff5f5';
-        cell.style.borderColor = '#c53030';
-        const stamp = cell.querySelector<HTMLElement>('.xmas-mini-stamp');
-        if (stamp) {
-          stamp.style.opacity = '1';
-          stamp.style.transform = 'rotate(-8deg) scale(1)';
-        }
+  const elapsed =
+    params.get('introTime') !== null
+      ? Number(params.get('introTime'))
+      : (now - introStartTime) / 1000;
+
+  activeIntroCinematic?.update(elapsed, view);
+
+  if (elapsed < 21.0) {
+    // Shot 10 (18.2–21.0s): After panning to Leap Day and pausing (16.4–18.2s), type out caption
+    if (elapsed >= 18.2 && captionWrapEl && captionTextEl) {
+      captionWrapEl.style.opacity = '1';
+      const charCount = Math.min(
+        CAPTION_FULL_TEXT.length,
+        Math.floor(((elapsed - 18.25) / 1.25) * CAPTION_FULL_TEXT.length),
+      );
+      const nextText = CAPTION_FULL_TEXT.slice(0, Math.max(0, charCount));
+      if (captionTextEl.textContent !== nextText) {
+        captionTextEl.textContent = nextText;
       }
     }
-    lastStampedMonthIdx = monthIdx;
-    if (introCalCardEl) {
-      const tilt = (monthIdx % 2 === 0 ? 1 : -1) * 1.4;
-      introCalCardEl.style.transform = `translateY(-2px) rotate(${tilt}deg)`;
+  } else {
+    // At 21.0s+: Pan back up from Leap Day to the wide wrapped XMAS365™ calendar view
+    if (captionWrapEl) captionWrapEl.style.opacity = '0';
+    if (elapsed >= 23.4 && titlePromptEl && titlePromptEl.style.opacity === '0') {
+      titlePromptEl.style.opacity = '1';
     }
-  }
-
-  // At 1.95s: Slam giant "XMAS 365/365" stamp across the calendar
-  if (elapsed >= 1.95 && introBigStampEl && introBigStampEl.style.opacity === '0') {
-    introBigStampEl.style.opacity = '1';
-    introBigStampEl.style.transform = 'translate(-50%, -50%) rotate(-11deg) scale(1)';
-    if (introSubheadEl) {
-      introSubheadEl.textContent = '365/365 Days Stamped... wait, what about FEB 29?';
-    }
-  }
-
-  // Stage 2 (2.15s -> 2.70s): FEB 29 slip shakes loose and flutters down to the Holiday Hall rug
-  if (elapsed >= 2.15 && elapsed < 2.75 && introSlipEl) {
-    const u = Math.min(1, (elapsed - 2.15) / 0.55);
-    const topPct = 44 + u * 22;
-    const swayX = Math.sin(u * Math.PI * 2.5) * 26 * (1 - u * 0.4);
-    const rotDeg = Math.sin(u * Math.PI * 2.5) * 14;
-    introSlipEl.style.opacity = u < 0.9 ? '1' : `${(1 - u) * 10}`;
-    introSlipEl.style.top = `${topPct.toFixed(1)}%`;
-    introSlipEl.style.transform = `translate(calc(-50% + ${swayX.toFixed(1)}px), -50%) rotate(${rotDeg.toFixed(1)}deg) scale(${(0.95 + u * 0.1).toFixed(2)})`;
-    if (introCalCardEl && elapsed >= 2.35) {
-      introCalCardEl.style.opacity = '0';
-      introCalCardEl.style.transform = 'translateY(-18px) scale(0.92)';
-      introCalCardEl.style.pointerEvents = 'none';
-    }
-  }
-
-  // Stage 3 (2.70s+): Leap Day pops out of the FEB 29 slip on the Holiday Hall floor and hops around!
-  if (elapsed >= 2.7) {
-    if (!introPopTriggered) {
-      introPopTriggered = true;
-      if (introSlipEl) introSlipEl.style.opacity = '0';
-      if (introCalCardEl) introCalCardEl.style.opacity = '0';
-      if (introSubheadEl) {
-        introSubheadEl.textContent = 'FEB 29 slipped loose! Leap Day is in Holiday Hall.';
-      }
-    }
-    activeDiorama?.setIntroPose('pop', elapsed - 2.7);
-    if (introTapBtnEl) {
-      const pulse = 1 + Math.sin((elapsed - 2.7) * 5.5) * 0.045;
-      introTapBtnEl.style.transform = `scale(${pulse.toFixed(3)})`;
-      introTapBtnEl.style.background = '#68d391';
+    if (elapsed >= 27.0) {
+      finishIntro(true);
     }
   }
 }
 
 if (introActive) {
-  mountIntroOverlay();
+  if (params.get('introTime') !== null) {
+    mountCinematicStageDOM();
+  } else {
+    mountIntroOverlay();
+  }
 }
 
 const targetLitColor = new THREE.Color();
@@ -2700,8 +2780,17 @@ view.renderer.setAnimationLoop((now) => {
     fpsSampleStart = now;
   }
 
+  // Guarantee horizontal FOV on mobile portrait so dioramas never clip off the sides
+  const w = Math.max(1, window.innerWidth);
+  const hPx = Math.max(1, window.innerHeight);
+  syncCameraFov(w, hPx);
+
   if (introActive) {
     updateIntroCinematic(now);
+    if (introStage !== 'tap_to_start' && activeIntroCinematic) {
+      view.render(activeIntroCinematic.scene);
+      return;
+    }
   }
 
   const t = now / 1000;
@@ -2709,10 +2798,6 @@ view.renderer.setAnimationLoop((now) => {
     activeDiorama.animate(t, currentBay);
   }
 
-  // Guarantee horizontal FOV on mobile portrait so dioramas never clip off the sides
-  const w = Math.max(1, window.innerWidth);
-  const hPx = Math.max(1, window.innerHeight);
-  syncCameraFov(w, hPx);
   if (w !== lastLayoutW || hPx !== lastLayoutH) {
     layoutStableHotspots();
   }

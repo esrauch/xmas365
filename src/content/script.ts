@@ -299,6 +299,7 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
 };
 
 export type DialogueBeatId =
+  | 'P0'
   | 'P2'
   | 'thanksgiving.caged'
   | 'thanksgiving.freed'
@@ -355,6 +356,16 @@ export interface MemoBeatSpec {
 export type BeatSpec = MemoBeatSpec | DialogueBeatSpec;
 
 export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
+  P0: {
+    id: 'P0',
+    kind: 'dialogue',
+    lines: [
+      {
+        speaker: 'leapday',
+        text: 'Huh. Missed a spot.',
+      },
+    ],
+  },
   P2: {
     id: 'P2',
     kind: 'dialogue',
