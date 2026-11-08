@@ -303,6 +303,16 @@ function interactive(): void {
     if (!spot?.meshGroup) return;
     mode = { kind: 'single' };
     const copy = spot.meshGroup.clone(true);
+    // Strip hidden state variants and invisible raycast hitboxes (layer 2) so Box3 measures only visible prop meshes
+    const toRemove: THREE.Object3D[] = [];
+    copy.traverse((child) => {
+      if (child !== copy && (!child.visible || child.layers.mask === 1 << 2)) {
+        toRemove.push(child);
+      }
+    });
+    for (const child of toRemove) {
+      child.parent?.remove(child);
+    }
     copy.position.set(0, 0, 0);
     copy.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(copy);

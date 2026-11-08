@@ -245,7 +245,7 @@ function positionLeapBubbleElement(bubbleWrap: HTMLElement): void {
  */
 function renderActiveStoryBeat(): void {
   clearCagedPromptTimer();
-  if (activeModal === 'proto') {
+  if (activeModal !== 'none') {
     storyBannerHost.replaceChildren();
     leapBubbleHost.replaceChildren();
     hideMemoOverlay();
@@ -907,29 +907,29 @@ function syncBayUIAndHotspots(): void {
 }
 
 function rebuildScene(): void {
-  if (activeDiorama) {
-    view.scene.remove(activeDiorama.root);
+  if (!activeDiorama) {
+    activeDiorama = buildHolidayHallDiorama({
+      onSelectBay: (bay) => switchBay(bay),
+      onOpenProto: (protoId, focusPos, focusLook) => openProtoModal(protoId, focusPos, focusLook),
+      onOpenDesk: (focusPos, focusLook) => openCalendarDeskModal(focusPos, focusLook),
+      onShowStory: () => openCorkboardModal(),
+      onOpenCorkboard: () => openCorkboardModal(),
+      onClickMascot: (roomId) => {
+        const room = ROOM_SPECS.find((r) => r.id === roomId);
+        if (!room) return;
+        const script = ROOM_SCRIPT[roomId];
+        const beatId = gameState.isRoomComplete(room) ? script.freedBeatId : script.cagedBeatId;
+        blip(587, 55);
+        gameState.enqueueBeat(beatId, true);
+        renderActiveStoryBeat();
+      },
+      onPlaceItem: (itemId) => placeItemOnPedestal(itemId),
+    });
+    view.scene.add(activeDiorama.root);
+  } else {
+    activeDiorama.syncState();
   }
 
-  activeDiorama = buildHolidayHallDiorama({
-    onSelectBay: (bay) => switchBay(bay),
-    onOpenProto: (protoId, focusPos, focusLook) => openProtoModal(protoId, focusPos, focusLook),
-    onOpenDesk: (focusPos, focusLook) => openCalendarDeskModal(focusPos, focusLook),
-    onShowStory: () => openCorkboardModal(),
-    onOpenCorkboard: () => openCorkboardModal(),
-    onClickMascot: (roomId) => {
-      const room = ROOM_SPECS.find((r) => r.id === roomId);
-      if (!room) return;
-      const script = ROOM_SCRIPT[roomId];
-      const beatId = gameState.isRoomComplete(room) ? script.freedBeatId : script.cagedBeatId;
-      blip(587, 55);
-      gameState.enqueueBeat(beatId, true);
-      renderActiveStoryBeat();
-    },
-    onPlaceItem: (itemId) => placeItemOnPedestal(itemId),
-  });
-
-  view.scene.add(activeDiorama.root);
   buildHotspotDOM(activeDiorama.hotspots);
   syncBayUIAndHotspots();
 }
@@ -1415,6 +1415,7 @@ function openCalendarDeskModal(
   activeModal = 'desk';
   hotspotLayer.style.display = 'none';
   sideArrowsHost.style.display = 'none';
+  renderActiveStoryBeat();
   isCameraFocused = true;
   focusPosTarget.copy(focusPos);
   focusLookTarget.copy(focusLook);
@@ -1449,6 +1450,7 @@ function openCorkboardModal(initialMemoId?: MemoId): void {
   activeModal = 'corkboard';
   hotspotLayer.style.display = 'none';
   sideArrowsHost.style.display = 'none';
+  renderActiveStoryBeat();
   isCameraFocused = false;
 
   const pinnedSpecs = gameState.pinnedMemosInOrder();
@@ -1687,6 +1689,7 @@ function openSettingsModal(): void {
   activeModal = 'settings';
   hotspotLayer.style.display = 'none';
   sideArrowsHost.style.display = 'none';
+  renderActiveStoryBeat();
   isCameraFocused = false;
 
   let confirmReset = false;
@@ -2316,10 +2319,11 @@ if (startProtoId) {
 // --- COLD-START 3D INTRO CINEMATIC (`intro_cinematic.md`) & TAP TO START ---
 type IntroStage = 'none' | 'tap_to_start' | 'cinematic' | 'fading_out';
 let introStage: IntroStage = 'none';
-let activeIntroCinematic: BuiltIntroCinematic | null = null;
+const activeIntroCinematic: BuiltIntroCinematic = buildIntroCinematic();
 let introStartTime: number | null = null;
 let introSteadyFrames = 0;
 let introPrecompiled = false;
+let introSceneMounted = false;
 
 // DOM elements for the letterbox, caption, and hold-to-skip indicator
 let letterboxTopEl: HTMLElement | null = null;
@@ -2334,10 +2338,7 @@ let holdPointerDownAt: number | null = null;
 const CAPTION_FULL_TEXT = 'Huh. Missed a spot.';
 
 function cleanupIntroCinematicScene(): void {
-  if (activeIntroCinematic) {
-    activeIntroCinematic.dispose();
-    activeIntroCinematic = null;
-  }
+  introSceneMounted = false;
 }
 
 function finishIntro(fromCinematic: boolean): void {
@@ -2354,11 +2355,13 @@ function finishIntro(fromCinematic: boolean): void {
     introHost.style.display = 'none';
     activeDiorama?.setIntroPose('idle', 0);
     hotspotLayer.style.display = '';
+    sideArrowsHost.style.display = '';
     topBar.style.display = 'flex';
     bottomStack.style.display = 'flex';
     gameState.onEnterBay(currentBay);
     renderTopBar();
     renderCarryTray();
+    renderSideArrows();
     renderActiveStoryBeat();
     layoutStableHotspots();
     hotspotLayer.classList.add('settled');
@@ -2377,10 +2380,12 @@ function finishIntro(fromCinematic: boolean): void {
     cleanupIntroCinematicScene();
     activeDiorama?.setIntroPose('idle', 0);
     hotspotLayer.style.display = '';
+    sideArrowsHost.style.display = '';
     topBar.style.display = 'flex';
     bottomStack.style.display = 'flex';
     renderTopBar();
     renderCarryTray();
+    renderSideArrows();
     layoutStableHotspots();
     hotspotLayer.classList.add('settled');
 
@@ -2409,12 +2414,18 @@ function finishIntro(fromCinematic: boolean): void {
 
 function mountCinematicStageDOM(): void {
   hotspotLayer.style.display = 'none';
+  sideArrowsHost.style.display = 'none';
   topBar.style.display = 'none';
   bottomStack.style.display = 'none';
+  storyBannerHost.replaceChildren();
+  leapBubbleHost.replaceChildren();
+  hideMemoOverlay();
   introHost.style.display = 'block';
 
-  if (!activeIntroCinematic) {
-    activeIntroCinematic = buildIntroCinematic();
+  introSceneMounted = true;
+  if (!introPrecompiled) {
+    introPrecompiled = true;
+    view.renderer.compile(view.scene, view.camera);
     activeIntroCinematic.precompile(view);
   }
 
@@ -2625,11 +2636,16 @@ export function startIntroReplay(): void {
 
 function mountIntroOverlay(): void {
   hotspotLayer.style.display = 'none';
+  sideArrowsHost.style.display = 'none';
   topBar.style.display = 'none';
   bottomStack.style.display = 'none';
+  storyBannerHost.replaceChildren();
+  leapBubbleHost.replaceChildren();
+  hideMemoOverlay();
   introHost.style.display = 'block';
   introStage = 'tap_to_start';
   introPrecompiled = false;
+  introSceneMounted = false;
   activeDiorama?.setIntroPose('idle', 0);
 
   // Plain dark "Tap to start" screen with a sound-on hint and no logo (`intro_cinematic.md`)
@@ -2700,10 +2716,7 @@ function updateIntroCinematic(now: number): void {
     if (!introPrecompiled) {
       introPrecompiled = true;
       view.renderer.compile(view.scene, view.camera);
-      if (!gameState.hasSaveProgress() && !activeIntroCinematic) {
-        activeIntroCinematic = buildIntroCinematic();
-        activeIntroCinematic.precompile(view);
-      }
+      activeIntroCinematic.precompile(view);
     }
     return;
   }
@@ -2798,12 +2811,12 @@ view.renderer.setAnimationLoop((now) => {
   syncCameraFov(w, hPx);
 
   if (introActive) {
+    updateIntroCinematic(now);
     // Do not render the 3D scene while the opaque "Tap to Start" cover fills the viewport
     if (introStage === 'tap_to_start') {
       return;
     }
-    updateIntroCinematic(now);
-    if (activeIntroCinematic) {
+    if (introSceneMounted) {
       view.render(activeIntroCinematic.scene);
       return;
     }
