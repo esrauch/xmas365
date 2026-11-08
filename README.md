@@ -1,4 +1,4 @@
-# Puzz
+# XMAS365™
 
 A bright, light-hearted puzzle adventure in a house full of puzzles
 ([GAME.md](GAME.md)). three.js, low-poly models and synthesized sound, built

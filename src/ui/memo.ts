@@ -1,12 +1,11 @@
 /**
- * Xmas365's memos, drawn as typed sheets of memo paper (`SCRIPT.md`): the
+ * XMAS365's memos, drawn as typed sheets of memo paper (`SCRIPT.md`): the
  * company letterhead, a rubber stamp for the kind of memo, TO / FROM / RE in
- * typewriter type, the body, Santa's sign-off, and a sticky note: Leap Day's
- * reaction on the opening memo, a caged mascot's plea on a room's memo. A new memo fills the screen (`showMemoOverlay`); the hall
+ * typewriter type, the body, and Santa's sign-off. A new memo fills the screen (`showMemoOverlay`); the hall
  * corkboard reads old ones with the same sheet (`buildMemoSheet`).
  * Styles: `.memo-*` in `ui/base.css`.
  */
-import { type MemoSpec, SPEAKERS, formatMemoText } from '../content/script';
+import { type MemoSpec, formatMemoText } from '../content/script';
 import { h } from '../proto/kit';
 
 /** Inline `**bold**`, `*italic*` and ` / ` line breaks (`SCRIPT.md`) as DOM nodes. */
@@ -42,7 +41,7 @@ function letterhead(memo: MemoSpec): HTMLElement {
         { class: 'memo-wordmark' },
         h('span', { class: 'memo-wordmark-xmas' }, 'XMAS'),
         h('span', { class: 'memo-wordmark-days' }, xmas12 ? '12' : '365'),
-        h('span', { class: 'memo-wordmark-inc' }, 'INC.'),
+        h('span', { class: 'memo-wordmark-inc' }, xmas12 ? 'INC.' : '™'),
       ),
       h(
         'div',
@@ -69,13 +68,12 @@ const field = (label: string, value: Node | string): HTMLElement =>
   );
 
 /**
- * A memo as a sheet of paper, with its sticky note (if any): Leap Day's in frog
- * green, a mascot's plea in yellow. `holiday` fills `{holiday}` (the room that just reverted).
+ * A memo as a sheet of paper. `holiday` fills `{holiday}` (the room that just reverted).
  */
 export function buildMemoSheet(memo: MemoSpec, holiday: string): HTMLElement {
   // The header is "BRAND · KIND": the kind goes on the rubber stamp.
   const kind = memo.header.split('·').slice(1).join('·').trim() || 'MEMO';
-  const sheet = h(
+  return h(
     'article',
     { class: `memo-sheet${isXmas12(memo) ? ' memo-sheet--xmas12' : ''}` },
     letterhead(memo),
@@ -89,19 +87,6 @@ export function buildMemoSheet(memo: MemoSpec, holiday: string): HTMLElement {
     ),
     h('div', { class: 'memo-body' }, renderFormattedText(formatMemoText(memo.body, holiday))),
     h('div', { class: 'memo-signoff' }, memo.signoff),
-  );
-  if (!memo.reaction) return sheet;
-  const speaker = SPEAKERS[memo.reaction.speaker];
-  return h(
-    'div',
-    { class: 'memo-stack' },
-    sheet,
-    h(
-      'aside',
-      { class: `memo-sticky${memo.reaction.speaker === 'leapday' ? '' : ' memo-sticky--plea'}` },
-      h('div', { class: 'memo-sticky-who' }, `${speaker.icon} ${speaker.name}`),
-      h('div', {}, renderFormattedText(memo.reaction.text)),
-    ),
   );
 }
 

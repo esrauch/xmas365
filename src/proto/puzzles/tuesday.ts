@@ -1,5 +1,5 @@
 /**
- * Act III Finale ("Xmas365 Merger Contract"): six dual-twist boss
+ * Act III Finale ("XMAS365 Merger Contract"): six dual-twist boss
  * panels behind the 6-lamp door in Holiday Hall. One panel per holiday
  * puzzle genre, each framed as a clause of Santa's Merger Contract (`C1`–`C6`).
  */
@@ -222,7 +222,7 @@ export const FINALE_PANELS: FinaleItem[] = [
 
 export const tuesday = run<FinaleItem>({
   id: 'tuesday',
-  title: 'Xmas365 Merger Contract',
+  title: 'XMAS365™ Merger Contract',
   room: 'Holiday Hall',
   kind: 'final',
   from: "Six binding clauses of Santa's Master Merger Contract. Solve each panel to tear up its clause.",

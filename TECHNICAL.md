@@ -1,4 +1,4 @@
-# Puzz: Technical
+# XMAS365™: Technical
 
 How we build it: the stack, the architecture, and how assets get made. What the game *is* lives in [GAME.md](GAME.md). The tech is shared with `~/Code/schnau` and `~/Code/vox` (three.js, synthesized sound, the cel-shaded look; Puzz builds its models in code rather than as `.voxt` voxels); the game, art and sound are Puzz's own.
 

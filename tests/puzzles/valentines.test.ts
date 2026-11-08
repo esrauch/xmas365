@@ -10,18 +10,44 @@ import {
   spellings,
   wellFormed,
 } from '../../src/gen/words';
-import { BASKET, JACK, LOVENOTES, MAILBOX } from '../../src/proto/puzzles/valentines';
+import {
+  BASKET,
+  JACK,
+  LOVENOTES,
+  MAILBOX,
+  VALENTINES_BONUS,
+} from '../../src/proto/puzzles/valentines';
 
-const all: Panel[] = [...LOVENOTES, ...JACK, ...BASKET, ...MAILBOX];
+const all: Panel[] = [...LOVENOTES, ...JACK, ...BASKET, ...MAILBOX, ...VALENTINES_BONUS];
 
 describe("Valentine's love-letter run", () => {
+  it('story strays go 4x4, 5x5, 6x6; centerpiece goes 5x5, 6x6, 7x7; 9x9 reserved for bonus', () => {
+    expect(JACK.map((p) => [p.rows.length, p.rows[0]?.length])).toEqual([
+      [4, 4],
+      [5, 5],
+      [6, 6],
+    ]);
+    expect(BASKET.map((p) => [p.rows.length, p.rows[0]?.length])).toEqual([
+      [4, 4],
+      [5, 5],
+      [6, 6],
+    ]);
+    expect(MAILBOX.map((p) => [p.rows.length, p.rows[0]?.length])).toEqual([
+      [5, 5],
+      [6, 6],
+      [7, 7],
+    ]);
+    expect(VALENTINES_BONUS.map((p) => [p.rows.length, p.rows[0]?.length])).toEqual([[9, 9]]);
+  });
+
   it('the words fill each grid exactly, each along touching squares', () => {
     for (const p of all) expect(wellFormed(p), p.name).toBe(true);
   });
 
   it('each theme word can be spelled only one way with its clues', () => {
     for (const p of all) expect(eachWordOnce(p), p.name).toBe(true);
-    for (const p of [...JACK, ...BASKET, ...MAILBOX]) expect(problems(p, 1), p.name).toEqual([]);
+    for (const p of [...JACK, ...BASKET, ...MAILBOX, ...VALENTINES_BONUS])
+      expect(problems(p, 1), p.name).toEqual([]);
   });
 
   it('at most one dark letter per word, never its first or last', () => {

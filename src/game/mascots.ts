@@ -132,7 +132,7 @@ export function buildMascotMesh(id: MascotId, scale = 1): THREE.Group {
 
   switch (id) {
     case 'santa': {
-      // Santa, CEO of Xmas365: classic portly Santa shape & full white beard,
+      // Santa, CEO of XMAS365: classic portly Santa shape & full white beard,
       // in a tailored red business suit with crisp white V-shirt, angled lapels,
       // gold CEO lapel pin, bold green necktie, and no hat (bald crown + white hair fringe).
 

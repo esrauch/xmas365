@@ -1,6 +1,6 @@
 /**
  * Shared meta-game state, room/stray/centerpiece registry, and story beat /
- * corkboard progression (`SCRIPT.md`: Leap Day vs. CEO Santa's Xmas365 takeover).
+ * corkboard progression (`SCRIPT.md`: Leap Day vs. CEO Santa's XMAS365 takeover).
  */
 import {
   type BeatId,
@@ -383,8 +383,9 @@ export class GameState {
         room.centerpiece.proto,
       ]) {
         if ([...solvedPanels].some((k) => k.startsWith(`${proto.id}:`))) {
-          // Check if the highest-indexed panel (index >= 4 for centerpiece/warmup, >= 2 for strays) is solved
-          const minLast = proto.kind === 'stray' ? 2 : 4;
+          // Check if the highest-indexed panel is solved
+          const minLast =
+            proto.kind === 'stray' || proto.id === 'mailbox' ? 2 : proto.id === 'lovenotes' ? 3 : 4;
           for (let i = minLast; i <= 8; i++) {
             if (solvedPanels.has(`${proto.id}:${i}`)) {
               this.solvedRuns.add(proto.id);
@@ -414,7 +415,7 @@ export class GameState {
     }
   }
 
-  /** Return all discovered Xmas365 / Xmas12 memos in canonical Corkboard order. */
+  /** Return all discovered XMAS365 / Xmas12 memos in canonical Corkboard order. */
   pinnedMemosInOrder(): MemoSpec[] {
     this.pinMemo('P1');
     return MEMO_ORDER.filter((id) => this.pinnedMemos.has(id)).map((id) => MEMOS[id]);
@@ -627,7 +628,7 @@ export class GameState {
 
   /**
    * Return a room's display title & subtitle based on whether it is still an
-   * acquired Xmas365 subsidiary or has been restored (`SCRIPT.md`).
+   * acquired XMAS365 subsidiary or has been restored (`SCRIPT.md`).
    */
   getRoomSignage(room: RoomSpec): { title: string; subtitle: string; isAcquired: boolean } {
     const s = ROOM_SCRIPT[room.id];

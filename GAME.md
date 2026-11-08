@@ -1,4 +1,9 @@
-# Puzz
+# XMAS365™
+
+**The name (decided 2026-11-07): XMAS365™**, the villain's own brand, played
+straight on the title card. The codebase, repo and save keys keep the working
+name `puzz`.
+
 
 A puzzle adventure in a house full of puzzles, in the tradition of *The 7th
 Guest*, *The 11th Hour* and *The 13th Doll* (see `inspiration/`), but **bright
@@ -10,23 +15,23 @@ of dread. The house, characters, story and puzzles are Puzz's own.
 
 ## The story: Santa's hostile takeover (decided 2026-11-07)
 
-**Santa Claus has founded Xmas365**, and it's staging a hostile takeover of
-every holiday. Each holiday's room has been rebranded as an Xmas365
-subsidiary ("Easter, an Xmas365 company"), their prized things scrambled into
+**Santa Claus has founded XMAS365™**, and it's staging a hostile takeover of
+every holiday. Each holiday's room has been rebranded as an XMAS365™
+subsidiary ("Easter, an XMAS365™ company"), their prized things scrambled into
 the wrong rooms, and **all six holiday mascots locked up**. The plan is in
 the name: Christmas, all 365 days of the year.
 
 All 365. **You are Leap Day**, February 29th, the day that only turns up
 every four years, and nobody throws you a party. Santa didn't lock you up
 because you aren't in his plan at all: day 366 isn't on the spreadsheet. He
-doesn't know you exist. That makes you the one thing Xmas365 can't account
+doesn't know you exist. That makes you the one thing XMAS365™ can't account
 for: you set out to free the mascots, one holiday at a time, and in the end
 you're the loophole that tears the whole merger up.
 
 When the last mascot is free and the merger is torn up, the mascots throw
 you a party and promise to celebrate you every year, not just one in four.
 Santa comes too, humbled: the mascots vote to let him keep his twelve days of
-Christmas, and Xmas365 becomes **Xmas12**.
+Christmas, and XMAS365™ becomes **Xmas12**.
 
 Christmas is a victim too: the elves, the reindeer and the tree have been
 taken over by their own boss, so Christmas is restored like every other
@@ -40,7 +45,7 @@ in at the loophole, too late.
   a good hopper. Leap
   Day speaks only in dry one-liners at milestones, usually reacting to the
   latest memo you've found.
-- **Santa, CEO of Xmas365.** Pompous, never menacing: press releases,
+- **Santa, CEO of XMAS365™.** Pompous, never menacing: press releases,
   synergy, "integration". He writes to his own staff, not to you; he doesn't
   know you exist until the very end, putting the extra day down to a
   bookkeeping error, until he meets you at the loophole ("Who are *you*?").
@@ -65,12 +70,12 @@ shape.
 
 ### How the story is told
 
-- **In the world first.** Every room starts *acquired*: Xmas365 signage over
+- **In the world first.** Every room starts *acquired*: XMAS365™ signage over
   it, its colours drained, its mascot in a cage at the centrepiece. Freeing
   its items peels the branding back; restoring the centrepiece opens the
   cage, brings back the room's own colour and music, and lights its lamp in
   the hall.
-- **Found memos.** The story is Xmas365's internal memos, which aren't meant
+- **Found memos.** The story is XMAS365™'s internal memos, which aren't meant
   for you: you find them at milestones (beating a room's warm-up,
   freeing a stray, bringing an item home, freeing a mascot) and they're
   pinned up in the hall to reread. Santa writes candidly to his staff ("Re:
@@ -85,7 +90,7 @@ shape.
 
 ### Progression
 
-1. **Opening & room unlocks.** A dropped Xmas365 memo announces the takeover of
+1. **Opening & room unlocks.** A dropped XMAS365™ memo announces the takeover of
    all 365 days. Only **Thanksgiving** starts open (showing its big Warm-up
    button). Every other room starts with a big Locked indicator until you bring
    one of its two home items there: arriving with an eligible item turns the
@@ -106,7 +111,7 @@ shape.
    tapping the mascot offers a few hard bonus panels (generated or hand-picked)
    that earn visible rewards: a room decoration and a party hat for that mascot
    to wear at the finale. The story never needs them.
-4. **The merger contract.** With all six mascots free, Xmas365's contract is
+4. **The merger contract.** With all six mascots free, XMAS365™'s contract is
    the run of two-twist panels (each genre with two twists it hasn't had);
    each panel tears up a clause, and the last is the loophole: day 366.
 5. **Leap Day's party.** The freed mascots throw it; its last puzzle is the
@@ -217,7 +222,7 @@ done. Each completed room lights one of six lamps in Holiday Hall (like
 
 ### The final area: the merger contract, then Leap Day's party
 
-**Story framing (2026-11-07):** the two-twist panels below are Xmas365's
+**Story framing (2026-11-07):** the two-twist panels below are XMAS365™'s
 merger contract (each panel tears up a clause); the board relay is the last
 puzzle at the mascots' party for Leap Day. The notes below are the puzzle
 design history, from when the final area was Tuesday's (the earlier host).
@@ -282,7 +287,7 @@ Between the big puzzles, the inspirations have a lighter layer: *11th Hour*'s
 lids to pair up, clickable scenery and story scenes. Puzz will have one too,
 filled in after the puzzles:
 
-- **Finding the strays:** a found Xmas365 memo ("the Golden Egg has been
+- **Finding the strays:** a found XMAS365™ memo ("the Golden Egg has been
   filed somewhere sweet") hints where a stray is hiding ("Something round and golden is keeping very sweet company").
   Spotting it is the quick win; its puzzle is the big one.
 - **Gags:** clickable jokes and reactions all over each room, above all

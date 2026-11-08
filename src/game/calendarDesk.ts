@@ -6,12 +6,12 @@
 import { ROOM_SCRIPT } from '../content/script';
 import type { Panel as CarvePanel } from '../gen/carving';
 import { type Genre, cancelGenerating, generateInBrowser } from '../gen/client';
-import type { Tier } from '../gen/core/spec';
+import type { Tier, WordBoardSize } from '../gen/core/spec';
 import type { Panel as HopPanel } from '../gen/hops';
 import type { Panel as LightPanel } from '../gen/lights';
 import type { Panel as PicPanel } from '../gen/pictures';
 import type { Panel as WebPanel } from '../gen/webs';
-import type { Panel as WordPanel } from '../gen/words';
+import { type Panel as WordPanel, WORD_BOARD_SIZES } from '../gen/words';
 import { mountWeb } from '../proto/hashiBoard';
 import { mountHops } from '../proto/hopsBoard';
 import { blip, h } from '../proto/kit';
@@ -223,25 +223,74 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
     },
     '💡 Hint',
   );
+  const dailyAdvanceBarFill = h('div', {
+    style: {
+      height: '100%',
+      width: '0%',
+      borderRadius: '999px',
+      background: 'linear-gradient(90deg, #38a169 0%, #48bb78 100%)',
+    },
+  });
+  const dailyAdvanceBarTrack = h(
+    'div',
+    {
+      style: {
+        display: 'none',
+        width: '100%',
+        height: '6px',
+        borderRadius: '999px',
+        background: '#d8e8dc',
+        border: '1px solid #9ae6b4',
+        overflow: 'hidden',
+        marginTop: '4px',
+      },
+    },
+    dailyAdvanceBarFill,
+  );
+  const stopDailyAdvanceBar = (): void => {
+    dailyAdvanceBarTrack.style.display = 'none';
+    dailyAdvanceBarFill.style.transition = 'none';
+    dailyAdvanceBarFill.style.width = '0%';
+  };
+  const startDailyAdvanceBar = (durationMs: number): void => {
+    dailyAdvanceBarFill.style.transition = 'none';
+    dailyAdvanceBarFill.style.width = '0%';
+    dailyAdvanceBarTrack.style.display = 'block';
+    void dailyAdvanceBarFill.offsetWidth;
+    dailyAdvanceBarFill.style.transition = `width ${durationMs}ms linear`;
+    dailyAdvanceBarFill.style.width = '100%';
+  };
+
   const statusRow = h(
     'div',
     {
       style: {
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '8px',
-        flexWrap: 'wrap',
+        flexDirection: 'column',
+        gap: '4px',
         margin: '8px 0',
       },
     },
-    deskResetBtn,
-    statusEl,
     h(
       'div',
-      { style: { display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto' } },
-      deskHintBtn,
+      {
+        style: {
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '8px',
+          flexWrap: 'wrap',
+        },
+      },
+      deskResetBtn,
+      statusEl,
+      h(
+        'div',
+        { style: { display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto' } },
+        deskHintBtn,
+      ),
     ),
+    dailyAdvanceBarTrack,
   );
   const boardHost = h('div', { class: 'puzz-board-stage', style: { minHeight: '240px' } });
   let activeDeskPane: HTMLElement | null = null;
@@ -251,6 +300,7 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
   const clearBoardHost = (): void => {
     deskViewToken++;
     cancelGenerating();
+    stopDailyAdvanceBar();
     if (deskHeightTimer) {
       clearTimeout(deskHeightTimer);
       deskHeightTimer = 0;
@@ -319,9 +369,21 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
     const token = ++deskViewToken;
     cancelGenerating();
     statusEl.textContent = `Generating Daily Panel ${idx + 1}/3 (${step.label})...`;
+    const dailyWordSize: WordBoardSize | undefined =
+      step.genre === 'words'
+        ? step.tier === 'easy'
+          ? 4
+          : step.tier === 'medium'
+            ? 5
+            : 6
+        : undefined;
     const reply = await generateInBrowser({
       genre: step.genre,
-      spec: { tier: step.tier, twists: step.twists },
+      spec: {
+        tier: step.tier,
+        ...(dailyWordSize ? { size: dailyWordSize } : {}),
+        twists: step.twists,
+      },
       seconds: 8,
       seed: step.seed,
     });
@@ -345,7 +407,9 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
               statusEl.textContent = `🎉 Day 366 Daily (${dateStr}) Complete!`;
             } else if (idx < 2) {
               statusEl.textContent = `✓ Panel ${idx + 1} solved! Loading next...`;
+              startDailyAdvanceBar(1350);
               window.setTimeout(() => {
+                stopDailyAdvanceBar();
                 if (boardHost.isConnected && activeTab === 'daily') void loadDailyStep(idx + 1);
               }, 1350);
             }
@@ -365,6 +429,7 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
   let selectedGenre: Genre | null = null;
   let customMode: 'generator' | 'warmup' = 'generator';
   let customTier: Tier = 'easy';
+  let customWordSize: WordBoardSize = 5;
   const customTwists = new Set<string>();
 
   const mountWarmupInDesk = (room: RoomSpec): void => {
@@ -396,10 +461,15 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
     const seed = Math.floor(Math.random() * 100_000) + 1;
     const twistDesc =
       customTwists.size === 0 ? 'Standard (No Twist)' : `Twists: ${[...customTwists].join(', ')}`;
-    statusEl.textContent = `Generating ${customTier} ${gInfo.label} · ${twistDesc}...`;
+    const sizeDesc = genre === 'words' ? `${customWordSize}×${customWordSize}` : customTier;
+    statusEl.textContent = `Generating ${sizeDesc} ${gInfo.label} · ${twistDesc}...`;
     const reply = await generateInBrowser({
       genre,
-      spec: { tier: customTier, twists: [...customTwists] },
+      spec: {
+        tier: customTier,
+        ...(genre === 'words' ? { size: customWordSize } : {}),
+        twists: [...customTwists],
+      },
       seconds: 10,
       seed,
     });
@@ -714,19 +784,48 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
       return;
     }
 
-    const tierSelect = h(
-      'select',
-      {
-        style: { padding: '6px 10px', borderRadius: '6px', fontSize: '13.5px', fontWeight: '700' },
-        onchange: (e: Event) => {
-          customTier = (e.target as HTMLSelectElement).value as Tier;
-          void generateAndMountStandardOrTwist();
-        },
-      },
-      ...(['easy', 'medium', 'hard'] as const).map((t) =>
-        h('option', { value: t, selected: t === customTier }, t.toUpperCase()),
-      ),
-    );
+    const tierSelect =
+      selectedGenre === 'words'
+        ? h(
+            'select',
+            {
+              style: {
+                padding: '6px 10px',
+                borderRadius: '6px',
+                fontSize: '13.5px',
+                fontWeight: '700',
+              },
+              onchange: (e: Event) => {
+                customWordSize = Number((e.target as HTMLSelectElement).value) as WordBoardSize;
+                void generateAndMountStandardOrTwist();
+              },
+            },
+            ...WORD_BOARD_SIZES.map((sz) =>
+              h(
+                'option',
+                { value: String(sz), selected: sz === customWordSize },
+                sz === 9 ? '9×9 (Bonus)' : `${sz}×${sz}`,
+              ),
+            ),
+          )
+        : h(
+            'select',
+            {
+              style: {
+                padding: '6px 10px',
+                borderRadius: '6px',
+                fontSize: '13.5px',
+                fontWeight: '700',
+              },
+              onchange: (e: Event) => {
+                customTier = (e.target as HTMLSelectElement).value as Tier;
+                void generateAndMountStandardOrTwist();
+              },
+            },
+            ...(['easy', 'medium', 'hard'] as const).map((t) =>
+              h('option', { value: t, selected: t === customTier }, t.toUpperCase()),
+            ),
+          );
 
     const noTwistActive = customTwists.size === 0;
     const standardBtn = h(
@@ -883,7 +982,7 @@ export function mountCalendarDesk(host: HTMLElement, onClose: () => void): void 
           },
           onclick: async () => {
             const marks = [0, 1, 2].map((i) => (dailySolved.has(i) ? '🟩' : '⬜')).join('');
-            const text = `Puzz · Day 366 (${dateStr}) ${marks} (${dailySolved.size}/3)`;
+            const text = `XMAS365™ · Day 366 (${dateStr}) ${marks} (${dailySolved.size}/3)`;
             try {
               await navigator.clipboard.writeText(text);
               statusEl.textContent = `Copied: "${text}"`;

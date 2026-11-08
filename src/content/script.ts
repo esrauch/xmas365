@@ -35,7 +35,7 @@ export const SPEAKERS: Record<SpeakerId, SpeakerMeta> = {
   santa: {
     id: 'santa',
     name: 'Santa Claus',
-    badge: '🎅 S. CLAUS · CEO, XMAS365',
+    badge: '🎅 S. CLAUS · CEO, XMAS365™',
     icon: '🎅',
     bg: '#fff5f5',
     border: '#c53030',
@@ -139,11 +139,6 @@ export interface MemoSpec {
   re: string;
   body: string;
   signoff: string;
-  /**
-   * A line on a sticky note on the memo: Leap Day's on the opening memo (`P2`); on each
-   * room's memo, its caged mascot's plea (`<room>.caged`, filled in below `ROOM_SCRIPT`).
-   */
-  reaction?: DialogueLine;
 }
 
 /** Canonical display order of memos on the Hall Corkboard when multiple are pinned. */
@@ -168,16 +163,16 @@ export const MEMO_ORDER: readonly MemoId[] = [
 export const MEMOS: Record<MemoId, MemoSpec> = {
   P1: {
     id: 'P1',
-    header: 'XMAS365 · ALL-HANDS MEMO',
+    header: 'XMAS365™ · ALL-HANDS MEMO',
     to: 'All Verticals',
     from: 'S. Claus, CEO',
     re: 'Maximizing Sleigh-Holder Value!',
-    body: "Thrilled to announce Xmas365 has finalized our hostile takeover of every holiday on the calendar! Going forward, all seasonal verticals will synergize under one North Star KPI: **Christmas, 365 days a year.** Legacy mascots have been right-sized into cages, and core assets cross-siloed. Let's wrap up Q1 through Q4!",
+    body: "Thrilled to announce XMAS365™ has finalized our hostile takeover of every holiday on the calendar! Going forward, all seasonal verticals will synergize under one North Star KPI: **Christmas, 365 days a year.** Legacy mascots have been right-sized into cages, and core assets cross-siloed. Let's wrap up Q1 through Q4!",
     signoff: 'S. Claus, CEO ("Always Be Clausing")',
   },
   'thanksgiving.enter': {
     id: 'thanksgiving.enter',
-    header: 'XMAS365 · SUBSIDIARY DIRECTIVE',
+    header: 'XMAS365™ · SUBSIDIARY DIRECTIVE',
     to: 'Pre-Christmas Dinner (fka Thanksgiving)',
     from: 'S. Claus, CEO',
     re: 'Gobbling Up Market Share',
@@ -186,7 +181,7 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
   },
   T1: {
     id: 'T1',
-    header: 'XMAS365 · LOGISTICS BRIEFING',
+    header: 'XMAS365™ · LOGISTICS BRIEFING',
     to: 'Logistics',
     from: 'S. Claus, CEO',
     re: 'Cross-Silo Asset Scrambling',
@@ -195,7 +190,7 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
   },
   'fourth.enter': {
     id: 'fourth.enter',
-    header: 'XMAS365 · SUBSIDIARY DIRECTIVE',
+    header: 'XMAS365™ · SUBSIDIARY DIRECTIVE',
     to: 'Christmas in July (fka Fourth of July)',
     from: 'S. Claus, CEO',
     re: 'Q3 Sparkle Alignment',
@@ -204,7 +199,7 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
   },
   'christmas.enter': {
     id: 'christmas.enter',
-    header: 'XMAS365 · GLOBAL HQ MEMO',
+    header: 'XMAS365™ · GLOBAL HQ MEMO',
     to: 'Christmas+™ (fka Christmas)',
     from: 'S. Claus, CEO',
     re: '365/24/7 Crunch Mode!',
@@ -213,7 +208,7 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
   },
   'easter.enter': {
     id: 'easter.enter',
-    header: 'XMAS365 · SUBSIDIARY DIRECTIVE',
+    header: 'XMAS365™ · SUBSIDIARY DIRECTIVE',
     to: 'Eggnog Day (fka Easter)',
     from: 'S. Claus, CEO',
     re: 'Egg-cellent Q2 Synergies!',
@@ -222,16 +217,16 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
   },
   'valentines.enter': {
     id: 'valentines.enter',
-    header: 'XMAS365 · SUBSIDIARY DIRECTIVE',
+    header: 'XMAS365™ · SUBSIDIARY DIRECTIVE',
     to: "Mistletoe Day (fka Valentine's Day)",
     from: 'S. Claus, CEO',
     re: 'Scaling Romance',
-    body: 'Handwritten love notes are a bottleneck. One sender, one recipient, abysmal conversion! We\'re replacing romance with automated bulk-mail blasts ("Warm Regards from Xmas365"). Roses are now holly-berry red, and the Teddy Bear is impounded. One-on-one hugs don\'t scale across Q1.',
+    body: 'Handwritten love notes are a bottleneck. One sender, one recipient, abysmal conversion! We\'re replacing romance with automated bulk-mail blasts ("Warm Regards from XMAS365™"). Roses are now holly-berry red, and the Teddy Bear is impounded. One-on-one hugs don\'t scale across Q1.',
     signoff: 'S. Claus, CEO',
   },
   'halloween.enter': {
     id: 'halloween.enter',
-    header: 'XMAS365 · SUBSIDIARY DIRECTIVE',
+    header: 'XMAS365™ · SUBSIDIARY DIRECTIVE',
     to: 'Ugly Sweater Night (fka Halloween)',
     from: 'S. Claus, CEO',
     re: 'Brand Alignment: Spooky Season',
@@ -240,7 +235,7 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
   },
   E1: {
     id: 'E1',
-    header: 'XMAS365 · INCIDENT TICKET #1',
+    header: 'XMAS365™ · INCIDENT TICKET #1',
     to: 'Change-Management Taskforce',
     from: 'S. Claus, CEO',
     re: 'Unauthorized De-Synergizing ({holiday})',
@@ -249,7 +244,7 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
   },
   E2: {
     id: 'E2',
-    header: 'XMAS365 · HR & ACCOUNTING MEMO',
+    header: 'XMAS365™ · HR & ACCOUNTING MEMO',
     to: 'Elf Human Resources',
     from: 'S. Claus, CEO',
     re: 'PTO Request & Spreadsheet Glitch',
@@ -258,16 +253,16 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
   },
   E3: {
     id: 'E3',
-    header: 'XMAS365 · EXECUTIVE AUDIT',
+    header: 'XMAS365™ · EXECUTIVE AUDIT',
     to: 'Forensic Accounting',
     from: 'S. Claus, CEO',
     re: 'THE 366TH DAY ANOMALY',
-    body: "I've checked the master deck three times. Our entire valuation is built on **Xmas365**, yet every pivot table spits out 366! Stop muttering about \"February's quadrennial edge-case\" and delete the extra cell! Worse, we're down three subsidiaries. That's half the portfolio!",
+    body: "I've checked the master deck three times. Our entire valuation is built on **XMAS365™**, yet every pivot table spits out 366! Stop muttering about \"February's quadrennial edge-case\" and delete the extra cell! Worse, we're down three subsidiaries. That's half the portfolio!",
     signoff: 'S. Claus, CEO',
   },
   E4: {
     id: 'E4',
-    header: 'XMAS365 · SECURITY ALERT',
+    header: 'XMAS365™ · SECURITY ALERT',
     to: 'All Staff',
     from: 'S. Claus, CEO',
     re: 'CODE RED-NOSED: Locate Day 366!',
@@ -276,7 +271,7 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
   },
   E5: {
     id: 'E5',
-    header: 'XMAS365 · LEGAL ESCALATION',
+    header: 'XMAS365™ · LEGAL ESCALATION',
     to: 'General Counsel',
     from: 'S. Claus, CEO',
     re: 'URGENT: Lock It Down',
@@ -285,11 +280,11 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
   },
   E6: {
     id: 'E6',
-    header: 'XMAS365 · MANDATORY SUMMONS',
+    header: 'XMAS365™ · MANDATORY SUMMONS',
     to: 'All Staff',
     from: 'S. Claus, CEO',
     re: 'Mandatory Signing Mixer @ Hall',
-    body: 'The binding Master Merger Contract is on the podium in Holiday Hall, awaiting my executive autograph. Once signed, all six holidays snap back under Xmas365 ownership forever! Hold tight while I locate my platinum fountain pen. Lukewarm eggnog will be served. Fun is compulsory!',
+    body: 'The binding Master Merger Contract is on the podium in Holiday Hall, awaiting my executive autograph. Once signed, all six holidays snap back under XMAS365™ ownership forever! Hold tight while I locate my platinum fountain pen. Lukewarm eggnog will be served. Fun is compulsory!',
     signoff: 'S. Claus, CEO',
   },
   Y7: {
@@ -298,7 +293,7 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
     to: 'All Holidays (and Day 366)',
     from: 'S. Claus, Founder',
     re: 'Right-Sizing to Xmas12',
-    body: 'Effective today, Xmas365 has pivoted to **Xmas12**: twelve cosy days starting Dec 25th, and 353 days of well-earned PTO for the elves, the reindeer, and me. Plus one permanent VIP slot pencilled into every diary on earth: **February 29th**. Happy Leap Day. See you every year!',
+    body: 'Effective today, XMAS365™ has pivoted to **Xmas12**: twelve cosy days starting Dec 25th, and 353 days of well-earned PTO for the elves, the reindeer, and me. Plus one permanent VIP slot pencilled into every diary on earth: **February 29th**. Happy Leap Day. See you every year!',
     signoff: 'S. Claus, Recovering CEO',
   },
 };
@@ -625,7 +620,7 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
     kind: 'dialogue',
     document: {
       title: 'MASTER MERGER & SUBSUMPTION AGREEMENT',
-      subtitle: 'between Xmas365 Inc. ("The Big Guy") and All Other Holidays ("Sub-Brands").',
+      subtitle: 'between XMAS365™ Inc. ("The Big Guy") and All Other Holidays ("Sub-Brands").',
       term: 'All 365 calendar days of the Fiscal Year, in perpetuity.',
       signature: '____________',
     },
@@ -739,7 +734,7 @@ export function getBeatSpec(id: BeatId): BeatSpec {
 
 export interface RoomScriptSpec {
   id: RoomScriptId;
-  /** Rebranded Xmas365 corporate name while acquired (`SCRIPT.md`). */
+  /** Rebranded XMAS365 corporate name while acquired (`SCRIPT.md`). */
   acquiredTitle: string;
   /** Short corporate tag shown in the top bar while acquired. */
   acquiredSubtitle: string;
@@ -757,7 +752,7 @@ export const ROOM_SCRIPT: Record<RoomScriptId, RoomScriptSpec> = {
   thanksgiving: {
     id: 'thanksgiving',
     acquiredTitle: 'Pre-Christmas Table',
-    acquiredSubtitle: 'an Xmas365 Subsidiary',
+    acquiredSubtitle: 'an XMAS365™ Subsidiary',
     restoredTitle: 'Thanksgiving Table',
     enterMemoId: 'thanksgiving.enter',
     cagedBeatId: 'thanksgiving.caged',
@@ -769,7 +764,7 @@ export const ROOM_SCRIPT: Record<RoomScriptId, RoomScriptSpec> = {
   fourth: {
     id: 'fourth',
     acquiredTitle: 'Christmas in July Yard',
-    acquiredSubtitle: 'an Xmas365 Subsidiary',
+    acquiredSubtitle: 'an XMAS365™ Subsidiary',
     restoredTitle: 'Fourth of July Yard',
     enterMemoId: 'fourth.enter',
     cagedBeatId: 'fourth.caged',
@@ -793,7 +788,7 @@ export const ROOM_SCRIPT: Record<RoomScriptId, RoomScriptSpec> = {
   easter: {
     id: 'easter',
     acquiredTitle: 'Eggnog Garden',
-    acquiredSubtitle: 'an Xmas365 Subsidiary',
+    acquiredSubtitle: 'an XMAS365™ Subsidiary',
     restoredTitle: 'Easter Garden',
     enterMemoId: 'easter.enter',
     cagedBeatId: 'easter.caged',
@@ -805,7 +800,7 @@ export const ROOM_SCRIPT: Record<RoomScriptId, RoomScriptSpec> = {
   valentines: {
     id: 'valentines',
     acquiredTitle: 'Mistletoe Parlor',
-    acquiredSubtitle: 'an Xmas365 Subsidiary',
+    acquiredSubtitle: 'an XMAS365™ Subsidiary',
     restoredTitle: "Valentine's Parlor",
     enterMemoId: 'valentines.enter',
     cagedBeatId: 'valentines.caged',
@@ -817,7 +812,7 @@ export const ROOM_SCRIPT: Record<RoomScriptId, RoomScriptSpec> = {
   halloween: {
     id: 'halloween',
     acquiredTitle: 'Ugly Sweater Porch',
-    acquiredSubtitle: 'an Xmas365 Subsidiary',
+    acquiredSubtitle: 'an XMAS365™ Subsidiary',
     restoredTitle: 'Halloween Porch',
     enterMemoId: 'halloween.enter',
     cagedBeatId: 'halloween.caged',
@@ -833,12 +828,6 @@ export interface ContractClauseSpec {
   genre: 'webs' | 'carving' | 'lights' | 'words' | 'hops' | 'pictures';
   heading: string;
   body: string;
-}
-
-// Each room's memo carries its caged mascot's plea on a sticky note (one source: the caged beat).
-for (const room of Object.values(ROOM_SCRIPT)) {
-  const plea = DIALOGUE_BEATS[room.cagedBeatId].lines[0];
-  if (plea) MEMOS[room.enterMemoId].reaction = plea;
 }
 
 export const CONTRACT_CLAUSES: readonly ContractClauseSpec[] = [

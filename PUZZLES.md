@@ -14,7 +14,7 @@ All built rooms now use the current set.
 
 ## The premise
 
-Xmas365, Santa's hostile takeover, has mixed up the six holidays (you are
+XMAS365™, Santa's hostile takeover, has mixed up the six holidays (you are
 Leap Day, freeing them; see `GAME.md`). Each holiday brings two
 things, kept apart on purpose:
 
@@ -29,7 +29,7 @@ things, kept apart on purpose:
 So the game is a 6 × 6 grid where any puzzle can carry any twist. Each
 room plays its own puzzle plain (the warm-up), then with two visiting
 twists (the strays), then with its own holiday's twist at home (the
-centrepiece). The final area, Xmas365's merger contract, fills in more of
+centrepiece). The final area, XMAS365™'s merger contract, fills in more of
 the grid: each puzzle
 with two twists it hasn't had yet. Across the whole grid the player keeps
 meeting the same six puzzles and six twists in new combinations, which is
@@ -287,7 +287,7 @@ All six columns are in the generator (⚙️), generating across easy, medium, a
 
 ## The final area: the merger contract, then the party
 
-Xmas365's merger contract is six two-twist panels, one per genre, each twist
+XMAS365™'s merger contract is six two-twist panels, one per genre, each twist
 appearing twice (`src/proto/puzzles/tuesday.ts`, still named for the earlier
 host). After it, the last puzzle is a board relay on one board, building
 Leap Day's party cake (outline in `GAME.md`), not built yet.

@@ -1,4 +1,17 @@
 {
   "$comment": "Every file under assets/ and assets-src/ needs an entry here. See TECHNICAL.md §14.",
-  "assets": []
+  "assets": [
+    {
+      "path": "assets-src/svg/icon.svg",
+      "source": "Original launcher icon (Leap Day the frog in round glasses, over a Webs puzzle), written by Claude",
+      "author": "Claude",
+      "license": "original"
+    },
+    {
+      "path": "assets-src/svg/favicon.svg",
+      "source": "Original favicon (Leap Day the frog's face), written by Claude",
+      "author": "Claude",
+      "license": "original"
+    }
+  ]
 }

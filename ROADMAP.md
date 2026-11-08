@@ -1,8 +1,8 @@
-# Puzz: Roadmap
+# XMAS365™: Roadmap
 
 From where the game stands (2026-11-07) to the finished, polished game.
 What the game *is* lives in [GAME.md](GAME.md) (the story is "The story:
-Santa's hostile takeover": you are Leap Day, freeing the mascots from Xmas365);
+Santa's hostile takeover": you are Leap Day, freeing the mascots from XMAS365™);
 the full script and beat IDs live in [SCRIPT.md](SCRIPT.md); the puzzle-by-twist
 map lives in [PUZZLES.md](PUZZLES.md); build status lives in
 [PROTOTYPES.md](PROTOTYPES.md).
@@ -26,7 +26,7 @@ map lives in [PUZZLES.md](PUZZLES.md); build status lives in
 - **3D mascots, cages & acquired room stages (done):** All 8 procedural low-poly
   mascots (`leapday`, `santa`, `spider`, `turkey`, `snowman`, `bear`, `bunny`,
   `eaglet`) are built in `src/game/mascots.ts` with Wind-Waker-style ink outlines
-  and wired into `src/game/diorama.ts`, complete with cages, Xmas365 acquisition
+  and wired into `src/game/diorama.ts`, complete with cages, XMAS365™ acquisition
   banners/crates that peel back as items are restored, drained-to-restored room
   palettes, and Hall lamps.
 - **Script & corpspeak memos (done):** Every memo, Leap Day one-liner, mascot
@@ -44,7 +44,7 @@ and a phone/browser playtest.
 
 Replace the legacy 4-act story code (`SHADOW_NOTES`, `TUESDAY_NOTES`,
 `MILESTONE_VIGNETTES` in `src/game/state.ts` and `src/main.ts`) with the
-Xmas365 / Leap Day story from [SCRIPT.md](SCRIPT.md).
+XMAS365™ / Leap Day story from [SCRIPT.md](SCRIPT.md).
 
 - **Script content module (`src/content/script.ts`):** Encode all beats from
   `SCRIPT.md` (`P1`, `T1`, room entry memos `H1`/`X1`/`V1`/`A1`/`F1`, stray-freed
@@ -55,12 +55,12 @@ Xmas365 / Leap Day story from [SCRIPT.md](SCRIPT.md).
   modals so panels show rules only.
 - **Milestone beat cards:** Show a crisp memo/dialogue toast in the shell when
   a milestone fires (first room entry, stray freed, item returned, mascot freed),
-  pairing the found Xmas365 memo with Leap Day's dry one-liner (and the mascot's
+  pairing the found XMAS365™ memo with Leap Day's dry one-liner (and the mascot's
   thank-you when a cage opens).
 - **The Hall Corkboard:** Add a clickable Corkboard in Holiday Hall where every
-  found Xmas365 memo is pinned up to reread in order.
+  found XMAS365™ memo is pinned up to reread in order.
 - **Player as Leap Day:** Rename remaining `Tuesday` UI labels in the Hall,
-  Finale modal, and Calendar Desk to **Leap Day**, **Xmas365 Merger Contract**,
+  Finale modal, and Calendar Desk to **Leap Day**, **XMAS365™ Merger Contract**,
   and **Day 366**.
 
 *Done when:* A full playthrough triggers every beat from `SCRIPT.md` in the
@@ -72,7 +72,7 @@ legacy Shadowy Figure / Tuesday text remains.
 Build the two-stage climax in Holiday Hall (`SCRIPT.md`, "The Finale").
 
 - **The Merger Contract (`C0`–`C6`):** Frame the 12 two-twist finale panels as
-  the **6 Clauses of the Xmas365 Perpetual Holiday Merger Contract** (2 sub-panels
+  the **6 Clauses of the XMAS365™ Perpetual Holiday Merger Contract** (2 sub-panels
   per clause). Solving each clause plays a tear-up animation and triggers Santa's
   escalating clause memo + Leap Day's retort (`C1`–`C6`).
 - **The Loophole & CEO Santa Confrontation (`C7`–`C9`):** When Clause VI is torn
@@ -134,7 +134,7 @@ a lighter layer").
   riddle/memo clue hinting where to spot them; tapping the hiding spot reveals
   the stray and opens its puzzle run.
 - **Clickable room gags:** Add 2–3 clickable diorama props per room (especially
-  around the Xmas365 corporate signage and holiday mash-ups) that play a quick
+  around the XMAS365™ corporate signage and holiday mash-ups) that play a quick
   toy-theatre animation and a dry Leap Day one-liner.
 
 *Done when:* Exploring each diorama rewards curiosity with visual gags and

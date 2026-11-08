@@ -203,6 +203,14 @@ let activeDialogueStepIndex = 0;
 let activeDialogueBeatId: BeatId | null = null;
 /** The memo beat filling the screen, if any (so re-renders don't restart its animation). */
 let shownMemoBeatId: BeatId | null = null;
+let cagedPromptTimer: number | null = null;
+
+function clearCagedPromptTimer(): void {
+  if (cagedPromptTimer !== null) {
+    window.clearTimeout(cagedPromptTimer);
+    cagedPromptTimer = null;
+  }
+}
 
 function hideMemoOverlay(): void {
   shownMemoBeatId = null;
@@ -235,6 +243,7 @@ function positionLeapBubbleElement(bubbleWrap: HTMLElement): void {
  * Per `SCRIPT.md`, beats never sit in front of an open puzzle panel.
  */
 function renderActiveStoryBeat(): void {
+  clearCagedPromptTimer();
   if (activeModal === 'proto') {
     storyBannerHost.replaceChildren();
     leapBubbleHost.replaceChildren();
@@ -267,7 +276,7 @@ function renderActiveStoryBeat(): void {
       memoHost,
       MEMOS[spec.memoId],
       gameState.firstRevertedHoliday,
-      hasMore ? 'Next ▸' : '📌 Pin it to the corkboard',
+      hasMore ? 'Next ▸' : 'Got it ✓',
       () => {
         blip(523, 45);
         shownMemoBeatId = null;
@@ -290,6 +299,7 @@ function renderActiveStoryBeat(): void {
   }
 
   const sp = SPEAKERS[line.speaker];
+  const isCagedMascotPrompt = beatId.endsWith('.caged');
   const isLastLine = activeDialogueStepIndex >= lines.length - 1;
   const hasMoreBeats = gameState.beatQueue.length > 1;
   const btnLabel = !isLastLine
@@ -332,6 +342,15 @@ function renderActiveStoryBeat(): void {
     }
   };
 
+  if (isCagedMascotPrompt) {
+    cagedPromptTimer = window.setTimeout(() => {
+      cagedPromptTimer = null;
+      gameState.dismissBeat(beatId);
+      renderTopBar();
+      renderActiveStoryBeat();
+    }, 5000);
+  }
+
   const card = h(
     'div',
     {
@@ -343,7 +362,7 @@ function renderActiveStoryBeat(): void {
         borderRadius: '13px',
         padding: '10px 13px',
         boxShadow: '0 4px 0 #1f2430, 0 10px 22px rgba(0,0,0,0.28)',
-        pointerEvents: 'auto',
+        pointerEvents: isCagedMascotPrompt ? 'none' : 'auto',
       },
     },
     docNode,
@@ -376,23 +395,25 @@ function renderActiveStoryBeat(): void {
             )
           : null,
       ),
-      h(
-        'button',
-        {
-          style: {
-            padding: '3px 10px',
-            borderRadius: '999px',
-            fontSize: '11px',
-            fontWeight: '800',
-            cursor: 'pointer',
-            border: '1.5px solid #1f2430',
-            background: sp.border,
-            color: '#fff',
-          },
-          onclick: advanceDialogue,
-        },
-        btnLabel,
-      ),
+      isCagedMascotPrompt
+        ? null
+        : h(
+            'button',
+            {
+              style: {
+                padding: '3px 10px',
+                borderRadius: '999px',
+                fontSize: '11px',
+                fontWeight: '800',
+                cursor: 'pointer',
+                border: '1.5px solid #1f2430',
+                background: sp.border,
+                color: '#fff',
+              },
+              onclick: advanceDialogue,
+            },
+            btnLabel,
+          ),
     ),
     h(
       'div',
@@ -452,7 +473,7 @@ function renderTopBar(): void {
   const hallTitle =
     act === 4
       ? '🏛️ Holiday Hall · Day 366 & Xmas12'
-      : '🏛️ Holiday Hall · An Xmas365 Synergized Campus';
+      : '🏛️ Holiday Hall · An XMAS365™ Synergized Campus';
 
   const leftGroup =
     roomSpec && signage
@@ -909,6 +930,11 @@ function rebuildScene(): void {
 
 function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
   if (isTransitioningBay && !opts?.instant) return;
+  clearCagedPromptTimer();
+  const activeBeat = gameState.currentBeat();
+  if (activeBeat && activeBeat.endsWith('.caged')) {
+    gameState.dismissBeat(activeBeat);
+  }
   closeModal();
 
   if (opts?.instant || bay === currentBay) {
@@ -938,9 +964,9 @@ function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
     leapBubbleHost.replaceChildren();
     storyBannerHost.replaceChildren();
     blip(440, 50);
-    window.setTimeout(() => blip(587, 65), 140);
+    window.setTimeout(() => blip(587, 65), 320);
 
-    const hopDurationMs = 420;
+    const hopDurationMs = 860;
     const hopStart = performance.now();
     const tickHop = (now: number): void => {
       const p = Math.min(1, (now - hopStart) / hopDurationMs);
@@ -954,7 +980,7 @@ function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
     window.setTimeout(() => {
       fadeOverlay.style.pointerEvents = 'auto';
       fadeOverlay.style.opacity = '1';
-    }, 270);
+    }, 660);
 
     window.setTimeout(() => {
       if (unlockItem) {
@@ -972,7 +998,7 @@ function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
       window.setTimeout(() => {
         isTransitioningBay = false;
       }, 220);
-    }, 500);
+    }, 900);
     return;
   }
 
@@ -1585,7 +1611,7 @@ function openCorkboardModal(initialMemoId?: MemoId): void {
               fontSize: '18px',
             },
           },
-          '📌',
+          '📄',
         ),
         h(
           'div',
@@ -1601,19 +1627,19 @@ function openCorkboardModal(initialMemoId?: MemoId): void {
                 color: '#744210',
               },
             },
-            `Holiday Hall · ${pinnedSpecs.length}/${MEMO_ORDER.length} Pinned`,
+            `Holiday Hall · ${pinnedSpecs.length}/${MEMO_ORDER.length} Unlocked`,
           ),
           h(
             'h2',
             { style: { margin: '0', fontSize: '17px', lineHeight: '1.15' } },
-            'Hall Corkboard · Xmas365 Memos',
+            'Unlocked Memos · XMAS365™ Archive',
           ),
         ),
       ),
       h(
         'button',
         {
-          title: 'Close corkboard',
+          title: 'Close memos',
           style: {
             marginLeft: 'auto',
             flexShrink: '0',
@@ -1807,7 +1833,7 @@ function openSettingsModal(): void {
               openCorkboardModal();
             },
           },
-          `📌 Hall Corkboard (${gameState.pinnedMemos.size}/${MEMO_ORDER.length} Memos)`,
+          `📄 Unlocked Memos (${gameState.pinnedMemos.size}/${MEMO_ORDER.length})`,
         ),
       ),
       h(
@@ -1957,7 +1983,7 @@ function openSettingsModal(): void {
         (next) => gameState.setFreePlay(next),
       ),
       makeCheckRow(
-        '📜 Xmas365 Merger Contract Solved',
+        '📜 XMAS365™ Merger Contract Solved',
         'Completes Grand Finale Door (Act IV)',
         gameState.solvedRuns.has('tuesday'),
         (next) => gameState.setRunSolved('tuesday', next),
@@ -2179,6 +2205,7 @@ function openSettingsModal(): void {
 
 // 3D Raycasting + Horizontal Swipe to spin around Holiday Hall
 const raycaster = new THREE.Raycaster();
+raycaster.layers.enable(2);
 const pointerNDC = new THREE.Vector2();
 let pointerDownX = 0;
 let pointerDownY = 0;

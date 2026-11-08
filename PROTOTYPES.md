@@ -19,7 +19,7 @@ Prototypes are deliberately unthemed: they test whether each puzzle is fun.
   room runs, carried items and placement, lamps, the Calendar Desk (daily
   puzzle and mixer), and a step hint on every board.
 - **Story redesigned** (`GAME.md`, "The story"): you are Leap Day, freeing
-  the mascots from Xmas365, Santa's hostile takeover of all 365 days. The code still runs
+  the mascots from XMAS365™, Santa's hostile takeover of all 365 days. The code still runs
   the older story (a Shadowy Figure, then Tuesday unmasked, then Santa), to
   be replaced.
 - **Next:** `ROADMAP.md`.
@@ -52,7 +52,7 @@ Prototypes are deliberately unthemed: they test whether each puzzle is fun.
 | Christmas | Golden Egg (`goldenegg`) | stray | **Built:** 3 panels on egg-shaped boards, Easter's numbered eggs (reach the egg in exactly its number of steps). Panel 3's eggs are far up (14, 15): playtest. |
 | Christmas | Pumpkin Pie (`pumpkinpie`) | stray | **Built, reworked once:** one serving per slice (no wires between slices; each slice gets exactly one wire from the middle), on pies of 2, 4, 6 slices. Was "same number of wires into every slice": far too hard. Needs playing. |
 | Christmas | Christmas Tree (`tree`) | centrepiece | **Built, reworked once:** colours only make Net easier, so it now ramps: a little plain tree, red and green strings (each from its own plug), a taller one, then white lights (either string) on a wreath and the big tree (~40% white). Needs playing. |
-| Finale | The merger contract (`tuesday`) | final | **Built:** six two-twist panels, one per genre, each twist appearing twice (still named for Tuesday in the code; to become Xmas365's merger contract, then Leap Day's party with the cake relay, not built yet). Needs playing. |
+| Finale | The merger contract (`tuesday`) | final | **Built:** six two-twist panels, one per genre, each twist appearing twice (still named for Tuesday in the code; to become XMAS365™'s merger contract, then Leap Day's party with the cake relay, not built yet). Needs playing. |
 
 Pattern from playtesting: a first version often makes a good **learning level**
 before a real one; puzzles now ramp over 2–4 levels.
@@ -72,7 +72,7 @@ before a real one; puzzles now ramp over 2–4 levels.
 - **Learning levels:** the originals give no warm-up; our learning levels fix that, but 19 puzzles have become about 32 solves. **Use the originals' answer:** Clandestiny's "Nervous/Brave" modes and Dr. Brain's Novice/Expert/Genius. Make learning levels optional, a difficulty choice.
 - **Hints:** our biggest gap. *7th Guest* had a hint book (the third hint solves it), Dr. Brain hint coins, Clandestiny an easier mode, UHS graded hints. We have only the jack's glowing letters.
 - **Matched well:** free order (*Safecracker*), centrepiece gating, the meta finale (*Fool's Errand*), rules explained up front.
-- **Still to come:** the lighter layer (riddles, gags) and the found Xmas365 memos.
+- **Still to come:** the lighter layer (riddles, gags) and the found XMAS365™ memos.
 
 **Room balance** (the centrepiece should be the room's hardest).
 - **Egg Tree:** replaced by the knight's tour; only its learning level exists so far.

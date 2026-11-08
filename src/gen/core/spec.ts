@@ -1,9 +1,12 @@
 /** What a generator is asked for, and what it hands back. */
 export type Tier = 'easy' | 'medium' | 'hard';
 export type BoardShape = 'rect' | 'tree' | 'egg' | 'pie' | 'wreath';
+export type WordBoardSize = 4 | 5 | 6 | 7 | 9;
 
 export interface Spec<T extends string> {
   tier: Tier;
+  /** Optional explicit board size (4x4, 5x5, 6x6, 7x7, or 9x9 for Words). */
+  size?: WordBoardSize;
   /** Optional board silhouette (default: 'rect'). */
   shape?: BoardShape;
   /** Twists on, in any combination (none: the plain puzzle). */

@@ -1,4 +1,4 @@
-# Puzz: Script
+# XMAS365™: Script
 
 Every line in the game's story: Santa's memos, Leap Day's one-liners, the
 mascots, the contract and the party. The story itself is in
@@ -12,7 +12,7 @@ beat is written; expect rewrites after Playtest 1.
 
 ## Decided (2026-11-07)
 
-- **Santa writes every memo.** He signs as CEO of Xmas365 and writes to his
+- **Santa writes every memo.** He signs as CEO of XMAS365™ and writes to his
   staff, never to you. The humour is **full-throttle corporate buzzword-speak
   ("corpspeak": KPIs, sleigh-holder value, Q4 deliverables, right-sizing,
   synergistic verticals) colliding with shameless holiday puns**.
@@ -41,7 +41,7 @@ beat is written; expect rewrites after Playtest 1.
   He never imagines it's *someone* until he meets you.
 - **Santa appears once, at the loophole**, bursting in too late. Then he's a
   humbled guest at the party, where the mascots vote to let him keep his
-  twelve days of Christmas: **Xmas365 becomes Xmas12**.
+  twelve days of Christmas: **XMAS365™ becomes Xmas12**.
 - **The contract has one holiday per clause**, each on that holiday's genre
   panel. The last clause defines "Year" as 365 days, which is the loophole.
 - **The Feast keeps its roast**, and the freed Turkey insists it's a
@@ -52,7 +52,7 @@ beat is written; expect rewrites after Playtest 1.
 
 | Voice | Form | Length |
 |---|---|---|
-| **Memo** | Xmas365 internal memo: To / From / Re / body, signed by Santa. Shown once, then pinned to the hall corkboard. | ≤ 65 words |
+| **Memo** | XMAS365™ internal memo: To / From / Re / body, signed by Santa. Shown once, then pinned to the hall corkboard. | ≤ 65 words |
 | **Leap Day** | One dry line, usually a reaction to the memo just read. | ≤ 14 words |
 | **Mascot** | A caged plea, a thank-you, or a party line. A `/` starts a new line on screen. | ≤ 2 short lines |
 | **Santa** | Spoken, in person: only at the loophole and the party. | ≤ 2 short lines |
@@ -80,14 +80,20 @@ Thanksgiving ─┬─ Hot Dog  ──▶ Fourth of July ─┬─ Cupid's Bow  
 
 ## Prologue: the takeover
 
+### `P0`: the intro cinematic
+*New game: the end of the intro cinematic (`intro_cinematic.md`), close on Leap
+Day on the lone Feb 29 tile. Then the title card, then `P1`.*
+
+**Leap Day:** "Huh. Missed a spot."
+
 ### `P1`: the press release
 *New game. It's already pinned to the hall corkboard, and opens first.*
 
-> **XMAS365 · ALL-HANDS MEMO**
+> **XMAS365™ · ALL-HANDS MEMO**
 > **To:** All Verticals · **From:** S. Claus, CEO · **Re:** Maximizing
 > Sleigh-Holder Value!
 >
-> Thrilled to announce Xmas365 has finalized our hostile takeover of every
+> Thrilled to announce XMAS365™ has finalized our hostile takeover of every
 > holiday on the calendar! Going forward, all seasonal verticals will
 > synergize under one North Star KPI: **Christmas, 365 days a year.** Legacy
 > mascots have been right-sized into cages, and core assets cross-siloed.
@@ -103,13 +109,13 @@ Thanksgiving ─┬─ Hot Dog  ──▶ Fourth of July ─┬─ Cupid's Bow  
 ### `P3`: the hall
 *Signage (no prompt). Thanksgiving's door stands ajar.*
 
-- Over the hall: **HOLIDAY HALL · An Xmas365 Synergized Campus**
-- Over each room: **{Rebranded name} · an Xmas365 Subsidiary** (names below)
+- Over the hall: **HOLIDAY HALL · An XMAS365™ Synergized Campus**
+- Over each room: **{Rebranded name} · an XMAS365™ Subsidiary** (names below)
 
 ## Act 1: Thanksgiving, the guided opening
 
 ### `thanksgiving.enter`
-*Its warm-up beaten.* Room sign: **Pre-Christmas Table · an Xmas365 Subsidiary**
+*Its warm-up beaten.* Room sign: **Pre-Christmas Table · an XMAS365™ Subsidiary**
 
 > **To:** Pre-Christmas Dinner (fka Thanksgiving) · **Re:** Gobbling Up
 > Market Share
@@ -155,7 +161,7 @@ thank-you when its mascot is freed, and two bonus lines.
 
 ### Fourth of July
 
-**Room sign:** **Christmas in July Yard · an Xmas365 Subsidiary**
+**Room sign:** **Christmas in July Yard · an XMAS365™ Subsidiary**
 
 #### `fourth.enter`
 > **To:** Christmas in July (fka Fourth of July) · **Re:** Q3 Sparkle Alignment
@@ -225,7 +231,7 @@ the record, that platter is 100% *tofurkey*."
 
 ### Easter
 
-**Room sign:** **Eggnog Garden · an Xmas365 Subsidiary**
+**Room sign:** **Eggnog Garden · an XMAS365™ Subsidiary**
 
 #### `easter.enter`
 > **To:** Eggnog Day (fka Easter) · **Re:** Egg-cellent Q2
@@ -253,14 +259,14 @@ dash, antlers off, bye!"
 
 ### Valentine's
 
-**Room sign:** **Mistletoe Parlor · an Xmas365 Subsidiary**
+**Room sign:** **Mistletoe Parlor · an XMAS365™ Subsidiary**
 
 #### `valentines.enter`
 > **To:** Mistletoe Day (fka Valentine's Day) · **Re:** Scaling Romance
 >
 > Handwritten love notes are a bottleneck. One sender, one recipient, abysmal
 > conversion! We're replacing romance with automated bulk-mail blasts
-> ("Warm Regards from Xmas365"). Roses are now holly-berry red, and the
+> ("Warm Regards from XMAS365™"). Roses are now holly-berry red, and the
 > Teddy Bear is impounded. One-on-one hugs don't scale across Q1.
 >
 > *S. Claus, CEO*
@@ -281,7 +287,7 @@ full of junk mail. Help me put the heart back in here?"
 
 ### Halloween
 
-**Room sign:** **Ugly Sweater Porch · an Xmas365 Subsidiary**
+**Room sign:** **Ugly Sweater Porch · an XMAS365™ Subsidiary**
 
 #### `halloween.enter`
 > **To:** Ugly Sweater Night (fka Halloween) · **Re:** Brand Alignment:
@@ -338,7 +344,7 @@ you're in the hall.
 > **To:** Forensic Accounting · **Re:** THE 366TH DAY ANOMALY
 >
 > I've checked the master deck three times. Our entire valuation is built on
-> **Xmas365**, yet every pivot table spits out 366! Stop muttering about
+> **XMAS365™**, yet every pivot table spits out 366! Stop muttering about
 > "February's quadrennial edge-case" and delete the extra cell! Worse, we're
 > down three subsidiaries. That's half the portfolio!
 >
@@ -372,7 +378,7 @@ you're in the hall.
 >
 > The binding Master Merger Contract is on the podium in Holiday Hall,
 > awaiting my executive autograph. Once signed, all six holidays snap back
-> under Xmas365 ownership forever! Hold tight while I locate my platinum
+> under XMAS365™ ownership forever! Hold tight while I locate my platinum
 > fountain pen. Lukewarm eggnog will be served. Fun is compulsory!
 >
 > *S. Claus, CEO*
@@ -383,7 +389,7 @@ you're in the hall.
 *Entering the contract. A sign, as a document.*
 
 > **MASTER MERGER & SUBSUMPTION AGREEMENT**
-> between **Xmas365 Inc.** ("The Big Guy") and **All Other Holidays**
+> between **XMAS365™ Inc.** ("The Big Guy") and **All Other Holidays**
 > ("Sub-Brands").
 > **Term:** All 365 calendar days of the Fiscal Year, in perpetuity.
 > **Executive Signature:** ____________
@@ -488,7 +494,7 @@ one ever addressed to you.*
 > **To:** All Holidays (and Day 366) · **From:** S. Claus, Founder · **Re:**
 > Right-Sizing to Xmas12
 >
-> Effective today, Xmas365 has pivoted to **Xmas12**: twelve cosy days starting
+> Effective today, XMAS365™ has pivoted to **Xmas12**: twelve cosy days starting
 > Dec 25th, and 353 days of well-earned PTO for the elves, the reindeer, and
 > me. Plus one permanent VIP slot pencilled into every diary on earth:
 > **February 29th**. Happy Leap Day. See you every year!

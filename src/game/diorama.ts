@@ -72,10 +72,10 @@ export function getBayLightMood(bay: BayId, act = gameState.act()): BayLightMood
           sunIntensity: 1.45,
           sunOffsetAngle: -0.35,
           sunHeight: 13,
-          lightLocalPos: [0, 1.45, 0.88],
+          lightLocalPos: [0, 1.65, 1.85],
           lightColor: '#90cdf4',
           lightIntensity: 4.8,
-          lightDistance: 5.2,
+          lightDistance: 5.6,
         };
       }
       if (act === 4) {
@@ -88,10 +88,10 @@ export function getBayLightMood(bay: BayId, act = gameState.act()): BayLightMood
           sunIntensity: 1.55,
           sunOffsetAngle: -0.4,
           sunHeight: 11.5,
-          lightLocalPos: [0, 1.45, 0.88],
+          lightLocalPos: [0, 1.65, 1.85],
           lightColor: '#ffbe55',
           lightIntensity: 5.2,
-          lightDistance: 5.2,
+          lightDistance: 5.6,
         };
       }
       // Moody gaslight & shadowy spotlight rotunda
@@ -103,10 +103,10 @@ export function getBayLightMood(bay: BayId, act = gameState.act()): BayLightMood
         sunIntensity: 1.32,
         sunOffsetAngle: -0.45,
         sunHeight: 11.5,
-        lightLocalPos: [0, 1.45, 0.88],
+        lightLocalPos: [0, 1.65, 1.85],
         lightColor: '#ffa94d',
         lightIntensity: 4.8,
-        lightDistance: 5.0,
+        lightDistance: 5.6,
       };
     case 'halloween':
       // Eerie midnight indigo shadow + warm pumpkin jack-o'-lantern glow
@@ -1760,6 +1760,13 @@ function buildMascotStage(
   freed: boolean,
 ): { stage: THREE.Group; mascotMesh: THREE.Group } {
   const stage = new THREE.Group();
+  const hitCyl = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.42, 0.44, 0.92, 12),
+    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
+  );
+  hitCyl.position.set(0, 0.46, 0);
+  hitCyl.layers.set(2);
+  stage.add(hitCyl);
   const baseBot = cyl(0.36, 0.4, 0.09, '#5c3d24', 0, 0.045, 0, 16);
   const baseTop = cyl(0.33, 0.35, 0.04, freed ? '#48bb78' : accent, 0, 0.1, 0, 16);
   baseBot.receiveShadow = false;
@@ -1819,7 +1826,7 @@ function buildMascotStage(
     hookRing.position.set(0, cageTopY + cageRadius + 0.03, 0);
     cage.add(hookRing);
 
-    // Corporate Xmas365 red-and-gold padlock on the front-right bar
+    // Corporate XMAS365 red-and-gold padlock on the front-right bar
     const lockX = Math.sin(Math.PI / 8) * (cageRadius + 0.02);
     const lockZ = Math.cos(Math.PI / 8) * (cageRadius + 0.02);
     cage.add(box(0.09, 0.1, 0.04, '#c53030', lockX, 0.42, lockZ));
@@ -3150,9 +3157,9 @@ export function buildHolidayHallDiorama(callbacks: {
 
     // Grand wood-paneled foyer back wall, recessed wainscot panel, cornice beam, and side pillars
     bay.add(box(wallWidth + 0.4, 5.8, 0.28, wallHex, 0, 2.9, 0, false));
-    bay.add(box(wallWidth - 0.1, 3.35, 0.05, '#7a5938', 0, 2.02, 0.13, false));
-    bay.add(box(wallWidth - 0.26, 3.18, 0.07, panelHex, 0, 2.02, 0.14, false));
-    bay.add(box(wallWidth + 0.4, 0.34, 0.34, '#6b4f35', 0, 0.17, 0.04, false));
+    bay.add(box(wallWidth - 0.1, 3.66, 0.05, '#7a5938', 0, 1.9, 0.13, false));
+    bay.add(box(wallWidth - 0.26, 3.5, 0.07, panelHex, 0, 1.9, 0.14, false));
+    bay.add(box(wallWidth + 0.4, 0.12, 0.22, '#6b4f35', 0, 0.06, 0.04, false));
     bay.add(box(wallWidth + 0.4, 0.24, 0.38, '#4a3524', 0, 3.85, 0.05, false));
     for (const side of [-1, 1] as const) {
       bay.add(cyl(0.2, 0.24, 5.8, '#3b281a', side * (wallWidth / 2 - 0.04), 2.9, 0.14, 12, false));
@@ -3164,32 +3171,264 @@ export function buildHolidayHallDiorama(callbacks: {
     bay.add(cyl(0.48, 0.52, 0.045, '#5c3d24', 0, 0.025, 2.08, 20, false));
     bay.add(cyl(0.42, 0.44, 0.052, '#2f855a', 0, 0.03, 2.08, 20, false));
 
-    // Lower Foyer Raised Threshold Step (`ly = 0.56`) & Upper Gallery Balcony Ledge (`ly = 1.92`)
-    bay.add(box(3.46, 0.56, 0.52, '#4a321f', 0, 0.28, 0.24, false));
-    bay.add(box(3.52, 0.06, 0.56, '#7a5938', 0, 0.56, 0.25, false));
-    bay.add(box(3.52, 0.1, 0.56, '#5c3d24', 0, 1.9, 0.26, false));
-    bay.add(box(3.56, 0.045, 0.6, '#d69e2e', 0, 1.96, 0.27, false));
+    // Low ground-floor door sill (`ly = 0.04`) & Upper Gallery Balcony Ledge (`ly = 1.46`)
+    bay.add(box(3.68, 0.04, 0.44, '#7a5938', 0, 0.04, 0.25, false));
+    bay.add(box(3.68, 0.09, 0.54, '#5c3d24', 0, 1.41, 0.26, false));
+    bay.add(box(3.72, 0.04, 0.58, '#d69e2e', 0, 1.46, 0.27, false));
 
-    // Decorative brass balustrade posts between the upper balcony doors
-    for (const bx of [-1.72, -0.61, 0.61, 1.72]) {
-      bay.add(cyl(0.028, 0.032, 0.26, '#d69e2e', bx, 2.1, 0.48, 8, false));
-      bay.add(sphere(0.042, '#ecc94b', bx, 2.24, 0.48, false));
+    // Clean stacked wooden staircase on the left (`lx = -1.56`) rising from the ground floor
+    // (`y = 0.03`) up to the second-floor balcony (`y = 1.46`), completely clear of the left doors.
+    const stairsGroup = new THREE.Group();
+    const stairX = -1.56;
+    const stairW = 0.36;
+    const stepCount = 8;
+    const startZ = 1.48;
+    const backZ = 0.26;
+    const topFrontZ = 0.48;
+    const baseY = 0.03;
+    const topY = 1.45;
+    const climbY = topY - baseY;
+    const riserH = climbY / stepCount;
+    const treadRun = (startZ - topFrontZ) / (stepCount - 1);
+
+    for (let s = 0; s < stepCount; s++) {
+      const stepTopY = baseY + (s + 1) * riserH;
+      const stepFrontZ = startZ - s * treadRun;
+      const slabDepth = Math.max(0.16, stepFrontZ - backZ);
+      const slabCenterZ = backZ + slabDepth * 0.5;
+
+      // Horizontal stacked step tier extending back to the gallery wall (no vertical seams or gaps)
+      stairsGroup.add(
+        box(
+          stairW,
+          riserH,
+          slabDepth,
+          '#7a5938',
+          stairX,
+          stepTopY - riserH * 0.5,
+          slabCenterZ,
+          false,
+        ),
+      );
+      // Polished oak tread nosing at the front of each step
+      const treadZ = stepFrontZ - treadRun * 0.48;
+      stairsGroup.add(
+        box(stairW + 0.03, 0.034, treadRun + 0.02, '#9c6b3b', stairX, stepTopY, treadZ, false),
+      );
+      // Festive crimson stair runner carpet down the center of each tread
+      stairsGroup.add(
+        box(
+          stairW * 0.58,
+          0.04,
+          treadRun + 0.01,
+          '#b83232',
+          stairX,
+          stepTopY + 0.003,
+          treadZ,
+          false,
+        ),
+      );
     }
+    bay.add(stairsGroup);
 
-    // 1. ALL SIX HOLIDAY DOORS IN TWO TIERS (3 Upper Balcony + 3 Lower Main Floor)
-    //    Upper tier: Halloween (left), Christmas (center), Easter (right)
-    //    Lower tier: Thanksgiving (left, ajar with warm orange light!), Valentine's (center), Fourth of July (right)
+    // 1. ALL SIX HOLIDAY DOORS IN TWO TIERS IN CALENDAR ORDER
+    //    Shifted cleanly to the right of the left staircase (`lx = -0.82, +0.20, +1.22`) so
+    //    the staircase (`lx = -1.74..-1.38`) never overlaps the left doors (`lx = -1.22..-0.42`).
     const doorLayout: readonly { roomId: RoomId; lx: number; floorY: number }[] = [
-      { roomId: 'halloween', lx: -1.22, floorY: 1.98 },
-      { roomId: 'christmas', lx: 0, floorY: 1.98 },
-      { roomId: 'easter', lx: 1.22, floorY: 1.98 },
-      { roomId: 'thanksgiving', lx: -1.22, floorY: 0.59 },
-      { roomId: 'valentines', lx: 0, floorY: 0.59 },
-      { roomId: 'fourth', lx: 1.22, floorY: 0.59 },
+      { roomId: 'valentines', lx: -0.82, floorY: 1.48 },
+      { roomId: 'easter', lx: 0.2, floorY: 1.48 },
+      { roomId: 'fourth', lx: 1.22, floorY: 1.48 },
+      { roomId: 'halloween', lx: -0.82, floorY: 0.06 },
+      { roomId: 'thanksgiving', lx: 0.2, floorY: 0.06 },
+      { roomId: 'christmas', lx: 1.22, floorY: 0.06 },
     ];
 
     const doorFocusPos = bayToWorld(theta, 0, 1.92, 5.15);
     const doorFocusLook = bayToWorld(theta, 0, 1.38, 0.75);
+
+    const doorPalettes: Record<
+      RoomId,
+      {
+        frame: `#${string}`;
+        lintel: `#${string}`;
+        leaf: `#${string}`;
+        inset: `#${string}`;
+      }
+    > = {
+      halloween: {
+        frame: '#6b46c1',
+        lintel: '#dd6b20',
+        leaf: '#44337a',
+        inset: '#ed8936',
+      },
+      christmas: {
+        frame: '#c53030',
+        lintel: '#c53030',
+        leaf: '#22543d',
+        inset: '#2f855a',
+      },
+      easter: {
+        frame: '#805ad5',
+        lintel: '#f687b3',
+        leaf: '#38a169',
+        inset: '#fefcbf',
+      },
+      thanksgiving: {
+        frame: '#c05621',
+        lintel: '#ecc94b',
+        leaf: '#7b341e',
+        inset: '#dd6b20',
+      },
+      valentines: {
+        frame: '#d53f8c',
+        lintel: '#fbb6ce',
+        leaf: '#97266d',
+        inset: '#f687b3',
+      },
+      fourth: {
+        frame: '#2b6cb0',
+        lintel: '#e53e3e',
+        leaf: '#1e4e8c',
+        inset: '#ffffff',
+      },
+    };
+
+    const buildDoorHolidayEmblem = (roomId: RoomId): THREE.Group => {
+      const g = new THREE.Group();
+      const disc = cyl(0.145, 0.145, 0.022, '#fffaf0', 0, 0, 0, 18, false);
+      disc.rotation.x = Math.PI / 2;
+      g.add(disc);
+      const rim = cyl(0.16, 0.16, 0.016, '#1f2430', 0, 0, -0.004, 18, false);
+      rim.rotation.x = Math.PI / 2;
+      g.add(rim);
+
+      switch (roomId) {
+        case 'halloween': {
+          // Jack-o'-Lantern Pumpkin Emblem
+          const pumpkin = sphere(0.105, '#ed8936', 0, -0.01, 0.02, false);
+          pumpkin.scale.set(1.18, 0.95, 0.55);
+          g.add(pumpkin);
+          g.add(cyl(0.016, 0.024, 0.05, '#2f855a', 0, 0.095, 0.02, 8, false));
+          g.add(glowSphere(0.02, '#ffea79', -0.038, 0.015, 0.068, 1.1));
+          g.add(glowSphere(0.02, '#ffea79', 0.038, 0.015, 0.068, 1.1));
+          g.add(glowBox(0.075, 0.02, 0.018, '#ffea79', 0, -0.035, 0.068, 1.1));
+          break;
+        }
+        case 'christmas': {
+          // Evergreen Tree with Gold Topper Star & Red Ornaments
+          g.add(box(0.034, 0.05, 0.024, '#744210', 0, -0.095, 0.02, false));
+          const tier1 = cyl(0, 0.105, 0.1, '#22543d', 0, -0.03, 0.022, 10, false);
+          tier1.scale.z = 0.55;
+          const tier2 = cyl(0, 0.085, 0.095, '#2f855a', 0, 0.025, 0.025, 10, false);
+          tier2.scale.z = 0.55;
+          const tier3 = cyl(0, 0.062, 0.08, '#38a169', 0, 0.075, 0.028, 10, false);
+          tier3.scale.z = 0.55;
+          g.add(tier1, tier2, tier3);
+          g.add(glowSphere(0.026, '#ffea79', 0, 0.122, 0.035, 1.15));
+          g.add(sphere(0.018, '#e53e3e', -0.04, -0.02, 0.052, false));
+          g.add(sphere(0.018, '#e53e3e', 0.04, 0.015, 0.052, false));
+          break;
+        }
+        case 'easter': {
+          // High-contrast White Bunny Head with Tall Pink-Lined Ears
+          const bunnyDisc = cyl(0.14, 0.14, 0.025, '#553c9a', 0, 0, 0.002, 18, false);
+          bunnyDisc.rotation.x = Math.PI / 2;
+          g.add(bunnyDisc);
+          for (const side of [-1, 1] as const) {
+            const earOuter = box(0.044, 0.125, 0.024, '#ffffff', side * 0.044, 0.055, 0.024, false);
+            earOuter.rotation.z = -side * 0.08;
+            const earInner = box(0.022, 0.088, 0.026, '#ed64a6', side * 0.044, 0.055, 0.03, false);
+            earInner.rotation.z = -side * 0.08;
+            g.add(earOuter, earInner);
+          }
+          const head = sphere(0.082, '#ffffff', 0, -0.038, 0.03, false);
+          head.scale.set(1.16, 0.96, 0.58);
+          g.add(head);
+          g.add(sphere(0.015, '#1a202c', -0.032, -0.025, 0.075, false));
+          g.add(sphere(0.015, '#1a202c', 0.032, -0.025, 0.075, false));
+          g.add(sphere(0.018, '#ed64a6', 0, -0.048, 0.078, false));
+          break;
+        }
+        case 'thanksgiving': {
+          // Turkey Feather Fan + Pilgrim Hat Emblem
+          const featherColors: `#${string}`[] = [
+            '#c53030',
+            '#dd6b20',
+            '#ecc94b',
+            '#dd6b20',
+            '#c53030',
+          ];
+          for (let f = 0; f < 5; f++) {
+            const ang = (f - 2) * 0.36;
+            const feather = box(
+              0.038,
+              0.11,
+              0.018,
+              featherColors[f] ?? '#dd6b20',
+              Math.sin(ang) * 0.055,
+              Math.cos(ang) * 0.055 - 0.01,
+              0.018,
+              false,
+            );
+            feather.rotation.z = -ang;
+            g.add(feather);
+          }
+          const body = sphere(0.068, '#7b341e', 0, -0.035, 0.032, false);
+          body.scale.z = 0.65;
+          g.add(body);
+          g.add(sphere(0.045, '#8c5834', 0, 0.025, 0.045, false));
+          g.add(sphere(0.016, '#e53e3e', 0.014, 0.012, 0.08, false));
+          g.add(box(0.075, 0.014, 0.035, '#1a202c', 0, 0.068, 0.048, false));
+          g.add(box(0.048, 0.04, 0.032, '#1a202c', 0, 0.09, 0.048, false));
+          break;
+        }
+        case 'valentines': {
+          // Sculpted Crimson Heart + Golden Cupid Arrow
+          const lobeL = sphere(0.062, '#c53030', -0.044, 0.032, 0.028, false);
+          lobeL.scale.z = 0.55;
+          const lobeR = sphere(0.062, '#c53030', 0.044, 0.032, 0.028, false);
+          lobeR.scale.z = 0.55;
+          const tip = cyl(0, 0.106, 0.13, '#c53030', 0, -0.042, 0.028, 12, false);
+          tip.rotation.z = Math.PI;
+          tip.scale.z = 0.55;
+          const arrow = box(0.24, 0.02, 0.022, '#d69e2e', 0, 0, 0.052, false);
+          arrow.rotation.z = 0.42;
+          g.add(lobeL, lobeR, tip, arrow);
+          break;
+        }
+        case 'fourth': {
+          // Simplified 3D American Flag (5 Red & White Stripes + Blue Canton with Stars)
+          g.add(box(0.228, 0.162, 0.024, '#1f2430', 0, 0, 0.014, false));
+          const stripeH = 0.14 / 5;
+          for (let s = 0; s < 5; s++) {
+            const sy = 0.07 - stripeH * (s + 0.5);
+            g.add(
+              box(
+                0.21,
+                stripeH + 0.002,
+                0.028,
+                s % 2 === 0 ? '#e53e3e' : '#ffffff',
+                0,
+                sy,
+                0.022,
+                false,
+              ),
+            );
+          }
+          // Upper-left blue canton spanning the top 3 stripes
+          const cantonH = stripeH * 3;
+          const cantonY = 0.07 - cantonH * 0.5;
+          g.add(box(0.098, cantonH + 0.002, 0.034, '#1e4e8c', -0.056, cantonY, 0.026, false));
+          for (const sx of [-0.078, -0.034]) {
+            for (const sy of [cantonY + 0.018, cantonY - 0.018]) {
+              g.add(sphere(0.012, '#ffffff', sx, sy, 0.044, false));
+            }
+          }
+          break;
+        }
+      }
+      return g;
+    };
 
     for (const slot of doorLayout) {
       const room = ROOM_SPECS.find((r) => r.id === slot.roomId);
@@ -3201,16 +3440,28 @@ export function buildHolidayHallDiorama(callbacks: {
         ? (gameState.carriedItems().find((it) => it.homeRoom === room.id) ?? null)
         : null;
       const sign = gameState.getRoomSignage(room);
+      const pal = doorPalettes[room.id];
 
       const dg = new THREE.Group();
       dg.position.set(slot.lx, slot.floorY, 0.22);
       hallDoorTargets.set(room.id, new THREE.Vector3(slot.lx, slot.floorY + 0.04, 0.48));
 
-      // Doorway outer casing & lintel
-      const frameColor = complete ? '#ecc94b' : unlocked ? room.accent : '#4a5568';
-      dg.add(box(0.74, 0.88, 0.12, '#3b281a', 0, 0.44, 0, false));
+      // Generous invisible 3D raycast hit-box on layer 2 so tapping anywhere on the door is effortless
+      // without polluting the camera's Outline normal pass on layer 0
+      const hitMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(0.92, 1.12, 0.38),
+        new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
+      );
+      hitMesh.position.set(0, 0.5, 0.08);
+      hitMesh.layers.set(2);
+      dg.add(hitMesh);
+
+      // Doorway outer casing & lintel in the holiday's signature colors right from the start
+      const frameColor = complete ? '#ecc94b' : pal.frame;
+      const lintelColor = complete ? '#ecc94b' : pal.lintel;
+      dg.add(box(0.76, 0.88, 0.12, '#2d1d11', 0, 0.44, 0, false));
       dg.add(box(0.68, 0.84, 0.14, frameColor, 0, 0.42, 0.01, false));
-      dg.add(box(0.78, 0.07, 0.18, frameColor, 0, 0.86, 0.02, false));
+      dg.add(box(0.8, 0.08, 0.18, lintelColor, 0, 0.86, 0.02, false));
 
       // Master Holiday Lamp directly above the door lintel (replaces top-bar 0/6 counter)
       const lampMesh = complete
@@ -3269,25 +3520,29 @@ export function buildHolidayHallDiorama(callbacks: {
         dg.add(box(0.56, 0.78, 0.05, '#161b24', 0, 0.4, 0.03, false));
       }
 
-      // Hinged wooden door leaf (pivoted at left jamb x = -0.28, z = 0.06)
+      // Hinged holiday-colored door leaf (pivoted at left jamb x = -0.28, z = 0.06)
       const doorPivot = new THREE.Group();
       doorPivot.position.set(-0.28, 0, 0.06);
       const baseRotY = complete ? -0.82 : unlocked ? -0.48 : 0;
       doorPivot.rotation.y = baseRotY;
       hallDoorPivots.set(room.id, { pivot: doorPivot, baseRotY });
 
-      const leafColor = unlocked ? '#6b4428' : '#3d2818';
-      const panelInsetColor = unlocked ? '#8c5834' : '#2d1d11';
-      doorPivot.add(box(0.56, 0.78, 0.045, leafColor, 0.28, 0.4, 0, false));
-      doorPivot.add(box(0.42, 0.28, 0.052, panelInsetColor, 0.28, 0.58, 0, false));
-      doorPivot.add(box(0.42, 0.28, 0.052, panelInsetColor, 0.28, 0.22, 0, false));
+      doorPivot.add(box(0.56, 0.78, 0.045, pal.leaf, 0.28, 0.4, 0, false));
+      doorPivot.add(box(0.42, 0.3, 0.052, pal.inset, 0.28, 0.56, 0, false));
+      doorPivot.add(box(0.42, 0.22, 0.052, pal.inset, 0.28, 0.2, 0, false));
+
+      // 3D Holiday Icon Emblem mounted on the upper panel of the door leaf
+      const emblem = buildDoorHolidayEmblem(room.id);
+      emblem.position.set(0.28, 0.56, 0.032);
+      doorPivot.add(emblem);
+
       // Brass doorknob
-      doorPivot.add(sphere(0.032, '#ecc94b', 0.48, 0.38, 0.04, false));
+      doorPivot.add(sphere(0.032, '#ecc94b', 0.48, 0.34, 0.04, false));
 
       // Heavy brass padlock on locked doors
       if (!unlocked) {
         const lockGroup = new THREE.Group();
-        lockGroup.position.set(0.46, 0.38, 0.055);
+        lockGroup.position.set(0.46, 0.34, 0.055);
         lockGroup.add(
           box(0.11, 0.12, 0.04, unlockItem ? '#ffea79' : '#d69e2e', 0, -0.04, 0, false),
         );
@@ -3330,6 +3585,7 @@ export function buildHolidayHallDiorama(callbacks: {
         icon: complete ? '★' : unlockItem ? '✨' : unlocked ? room.icon : '🔒',
         status,
         accent: unlockItem ? '#d69e2e' : room.accent,
+        hiddenPill: true,
         worldPos: bayToWorld(theta, slot.lx * 1.24, slot.floorY + 0.08, 0.42),
         cameraPos: doorFocusPos,
         cameraLook: doorFocusLook,
@@ -3364,54 +3620,13 @@ export function buildHolidayHallDiorama(callbacks: {
     }
     bay.add(hallLeapDayActor);
 
-    // 3. Foreground Left: Hall Corkboard on a standing easel post (`lx = -1.24, lz = 1.44`)
-    const corkGroup = new THREE.Group();
-    corkGroup.position.set(-1.24, 0, 1.44);
-    corkGroup.rotation.y = 0.32;
-    corkGroup.add(cyl(0.04, 0.05, 0.92, '#5c3d24', -0.28, 0.46, 0, 8, false));
-    corkGroup.add(cyl(0.04, 0.05, 0.92, '#5c3d24', 0.28, 0.46, 0, 8, false));
-    corkGroup.add(box(0.76, 0.56, 0.06, '#5c3d24', 0, 0.66, 0, false));
-    corkGroup.add(box(0.68, 0.48, 0.07, '#c69760', 0, 0.66, 0.01, false));
-    corkGroup.add(box(0.66, 0.07, 0.08, act === 4 ? '#2f855a' : '#c53030', 0, 0.84, 0.015, false));
-    const memoCount = Math.min(12, Math.max(1, gameState.pinnedMemos.size));
-    for (let mIdx = 0; mIdx < memoCount; mIdx++) {
-      const col = mIdx % 4;
-      const row = Math.floor(mIdx / 4);
-      const mx = -0.22 + col * 0.145;
-      const my = 0.72 - row * 0.125;
-      const note = box(0.11, 0.1, 0.02, '#fffaf0', mx, my, 0.045, false);
-      note.rotation.z = (((mIdx * 7) % 5) - 2) * 0.04;
-      corkGroup.add(note);
-      corkGroup.add(
-        sphere(0.014, mIdx === 0 ? '#ecc94b' : '#e53e3e', mx, my + 0.035, 0.058, false),
-      );
-    }
-    bay.add(corkGroup);
-
-    const pinnedCount = gameState.pinnedMemos.size;
-    hotspots.push({
-      id: 'hall:story',
-      bay: 'hall',
-      label: '📌 Corkboard',
-      sublabel: `${pinnedCount} Memo${pinnedCount === 1 ? '' : 's'}`,
-      icon: '📌',
-      status: 'ready',
-      accent: '#38a169',
-      worldPos: bayToWorld(theta, -1.24, 0.14, 1.72),
-      cameraPos: doorFocusPos,
-      cameraLook: bayToWorld(theta, -1.24, 0.65, 1.44),
-      meshGroup: corkGroup,
-      onClick: () => {
-        if (callbacks.onOpenCorkboard) callbacks.onOpenCorkboard();
-        else callbacks.onShowStory();
-      },
-    });
-
-    // 4. Foreground Right: The Calendar Desk with a glowing Banker's Lamp (`lx = 1.24, lz = 1.44`)
+    // 3. Foreground Right: The Calendar Desk with a glowing Banker's Lamp (`lx = 1.26, lz = 2.08`)
+    //    Positioned in the foreground beside the rug so it never blocks the Christmas door behind it.
     //    Pill is hidden until your first warm-up is beaten (`deskUnlockedCount > 0`)!
     const deskGroup = new THREE.Group();
-    deskGroup.position.set(1.24, 0, 1.44);
+    deskGroup.position.set(1.26, 0, 2.08);
     deskGroup.rotation.y = -0.32;
+    deskGroup.scale.setScalar(0.84);
     deskGroup.add(box(0.82, 0.56, 0.52, '#8c6239', 0, 0.28, 0, false));
     deskGroup.add(box(0.88, 0.07, 0.56, '#5c3d24', 0, 0.58, 0, false));
     deskGroup.add(box(0.38, 0.05, 0.3, '#ffffff', -0.1, 0.64, 0, false));
@@ -3421,8 +3636,8 @@ export function buildHolidayHallDiorama(callbacks: {
     deskGroup.add(glowSphere(0.05, '#ffea79', 0.22, 0.75, -0.06, 1.1));
     bay.add(deskGroup);
 
-    const deskFocusPos = bayToWorld(theta, 0.5, 1.9, 3.7);
-    const deskFocusLook = bayToWorld(theta, 1.24, 0.65, 1.44);
+    const deskFocusPos = bayToWorld(theta, 0.5, 1.9, 4.1);
+    const deskFocusLook = bayToWorld(theta, 1.26, 0.58, 2.08);
     const deskUnlockedCount = gameState.unlockedDeskGenreCount();
     hotspots.push({
       id: 'desk:calendar',
@@ -3433,7 +3648,7 @@ export function buildHolidayHallDiorama(callbacks: {
       status: deskUnlockedCount >= 6 ? 'done' : 'ready',
       accent: '#805ad5',
       hiddenPill: deskUnlockedCount === 0,
-      worldPos: bayToWorld(theta, 1.24, 0.14, 1.72),
+      worldPos: bayToWorld(theta, 1.26, 0.12, 2.32),
       cameraPos: deskFocusPos,
       cameraLook: deskFocusLook,
       meshGroup: deskGroup,
@@ -3442,7 +3657,7 @@ export function buildHolidayHallDiorama(callbacks: {
       },
     });
 
-    // 5. Center Podium: Xmas365 Merger Contract (only spawns once all 6 door lamps are lit!)
+    // 5. Center Podium: XMAS365 Merger Contract (only spawns once all 6 door lamps are lit!)
     const finaleUnlocked = lampsLit >= 6;
     const finaleDone = gameState.solvedRuns.has('tuesday');
     if (finaleUnlocked) {
@@ -3457,7 +3672,7 @@ export function buildHolidayHallDiorama(callbacks: {
       hotspots.push({
         id: 'finale:tuesday',
         bay: 'hall',
-        label: act === 4 ? "🎉 Leap Day's Party" : '📜 Xmas365 Merger Contract',
+        label: act === 4 ? "🎉 Leap Day's Party" : '📜 XMAS365™ Merger Contract',
         sublabel: finaleDone ? '✓ Xmas12 · Day 366 Every Year!' : '6/6 Mascots Free · Red-Line It!',
         icon: finaleDone ? '🎉' : '📜',
         status: finaleDone ? 'done' : 'ready',
@@ -3851,25 +4066,34 @@ export function buildHolidayHallDiorama(callbacks: {
       void floating;
       // Animate Leap Day in Holiday Hall (door hop, intro pop-out, or idle breathing)
       if (activeDoorHop) {
-        const target = hallDoorTargets.get(activeDoorHop.roomId) ?? leapDayRestPos;
+        const doorTarget = hallDoorTargets.get(activeDoorHop.roomId) ?? leapDayRestPos;
+        // For second-floor doors, head calmly toward the foot of the left staircase;
+        // fade-out happens before Leap Day reaches the door or stairs so speed stays slow.
+        const headingTarget =
+          doorTarget.y > 1.2 ? new THREE.Vector3(-1.54, 0.14, 1.58) : doorTarget;
         const p = activeDoorHop.progress;
         const ease = p * p * (3 - 2 * p);
         hallLeapDayActor.visible = true;
         hallFloorSlip.visible = false;
-        hallLeapDayActor.position.lerpVectors(leapDayRestPos, target, ease);
-        // 3 energetic frog hops on the way to the threshold
-        const hopArc = Math.abs(Math.sin(p * Math.PI * 3)) * 0.32;
+
+        const fullDist = leapDayRestPos.distanceTo(headingTarget);
+        const maxTravel = 0.72;
+        const travelFraction = fullDist > 0.001 ? Math.min(1, maxTravel / fullDist) * ease : 0;
+        hallLeapDayActor.position.lerpVectors(leapDayRestPos, headingTarget, travelFraction);
+
+        const hopArc = Math.abs(Math.sin(p * Math.PI * 1.5)) * 0.15;
         hallLeapDayActor.position.y += hopArc;
-        const dx = target.x - leapDayRestPos.x;
-        const dz = target.z - leapDayRestPos.z;
-        hallLeapDayActor.rotation.y = Math.atan2(dx, dz) * Math.min(1, p * 2.5);
-        hallLeapDayActor.rotation.x = Math.cos(p * Math.PI * 3) * 0.18;
+        const dx = headingTarget.x - leapDayRestPos.x;
+        const dz = headingTarget.z - leapDayRestPos.z;
+        hallLeapDayActor.rotation.y = Math.atan2(dx, dz) * Math.min(1, p * 2.2);
+        hallLeapDayActor.rotation.x = Math.cos(p * Math.PI * 1.5) * 0.09;
+
         const doorEntry = hallDoorPivots.get(activeDoorHop.roomId);
         if (doorEntry) {
           doorEntry.pivot.rotation.y = THREE.MathUtils.lerp(
             doorEntry.baseRotY,
             -0.95,
-            Math.min(1, p * 1.4),
+            Math.min(1, p * 1.3),
           );
         }
       } else if (activeIntroPose) {
@@ -3880,45 +4104,51 @@ export function buildHolidayHallDiorama(callbacks: {
           const e = Math.max(0, activeIntroPose.elapsed);
           hallFloorSlip.visible = true;
           hallLeapDayActor.visible = true;
-          const popT = Math.min(1, e / 0.55);
+          const popT = Math.min(1, e / 0.75);
           const popScale =
-            popT < 1 ? popT * popT * (2.6 - 1.6 * popT) : 1 + Math.sin((e - 0.55) * 6) * 0.04;
+            popT < 1 ? popT * popT * (2.5 - 1.5 * popT) : 1 + Math.sin((e - 0.75) * 2.6) * 0.025;
           hallLeapDayActor.scale.setScalar(Math.max(0.01, popScale));
-          // Hop around on the foyer rug after popping out of the FEB 29 slip
-          const hopCycle = (e * 2.2) % 1;
+          // Calm, unhurried hops on the foyer rug with a brief rest between each hop
+          const cyclePos = Math.max(0, e - 0.75) * 0.78;
+          const hopIndex = Math.floor(cyclePos);
+          const hopPhase = cyclePos - hopIndex;
+          // Spend the first 52% of each cycle in a gentle hop, and 48% resting on the rug
+          const inAir = hopPhase < 0.52 ? hopPhase / 0.52 : 0;
           const hopHeight =
-            e < 0.55
-              ? Math.sin(popT * Math.PI) * 0.45
-              : Math.abs(Math.sin(hopCycle * Math.PI)) * 0.24;
-          const roamAngle = e * 1.9;
-          const roamRadius = Math.min(0.28, Math.max(0, (e - 0.45) * 0.22));
+            e < 0.75
+              ? Math.sin(popT * Math.PI) * 0.34
+              : inAir > 0
+                ? Math.sin(inAir * Math.PI) * 0.16
+                : 0;
+          const roamAngle = Math.max(0, e - 0.75) * 0.55;
+          const roamRadius = Math.min(0.16, Math.max(0, (e - 0.75) * 0.08));
           hallLeapDayActor.position.set(
             leapDayRestPos.x + Math.sin(roamAngle) * roamRadius,
             leapDayRestPos.y + hopHeight,
-            leapDayRestPos.z + (Math.cos(roamAngle) - 1) * roamRadius * 0.5,
+            leapDayRestPos.z + (Math.cos(roamAngle) - 1) * roamRadius * 0.4,
           );
-          hallLeapDayActor.rotation.y = Math.sin(roamAngle) * 0.45;
-          hallLeapDayActor.rotation.x = Math.cos(hopCycle * Math.PI) * 0.12;
+          hallLeapDayActor.rotation.y = Math.sin(roamAngle) * 0.28;
+          hallLeapDayActor.rotation.x = inAir > 0 ? Math.cos(inAir * Math.PI) * 0.08 : 0;
         } else {
           hallFloorSlip.visible = false;
           hallLeapDayActor.visible = true;
           hallLeapDayActor.scale.setScalar(1);
           hallLeapDayActor.position.set(
             leapDayRestPos.x,
-            leapDayRestPos.y + Math.abs(Math.sin(t * 2.1)) * 0.03,
+            leapDayRestPos.y + Math.abs(Math.sin(t * 1.15)) * 0.016,
             leapDayRestPos.z,
           );
-          hallLeapDayActor.rotation.set(0, Math.sin(t * 0.9) * 0.08, 0);
+          hallLeapDayActor.rotation.set(0, Math.sin(t * 0.55) * 0.05, 0);
         }
       } else {
         hallLeapDayActor.visible = true;
         hallLeapDayActor.scale.setScalar(1);
         hallLeapDayActor.position.set(
           leapDayRestPos.x,
-          leapDayRestPos.y + Math.abs(Math.sin(t * 2.1)) * 0.03,
+          leapDayRestPos.y + Math.abs(Math.sin(t * 1.15)) * 0.016,
           leapDayRestPos.z,
         );
-        hallLeapDayActor.rotation.set(0, Math.sin(t * 0.9) * 0.08, 0);
+        hallLeapDayActor.rotation.set(0, Math.sin(t * 0.55) * 0.05, 0);
       }
 
       // Subtle flame flicker + rising ember/spark particles on candles and the fireplace

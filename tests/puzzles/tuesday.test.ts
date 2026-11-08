@@ -8,7 +8,7 @@ import { problems as webProblems } from '../../src/gen/webs';
 import { problems as wordProblems } from '../../src/gen/words';
 import { FINALE_PANELS } from '../../src/proto/puzzles/tuesday';
 
-describe('Xmas365 Merger Contract Finale gauntlet (6 dual-twist panels)', () => {
+describe('XMAS365™ Merger Contract Finale gauntlet (6 dual-twist panels)', () => {
   it('covers all 6 genres and each panel passes its generator verifier', () => {
     expect(FINALE_PANELS.map((x) => x.genre)).toEqual([
       'webs',
@@ -48,7 +48,7 @@ describe('Xmas365 Merger Contract Finale gauntlet (6 dual-twist panels)', () => 
     }
   });
 
-  it('progresses through Acts I -> II -> III -> IV, pins Xmas365 memos, and updates room signage', () => {
+  it('progresses through Acts I -> II -> III -> IV, pins XMAS365™ memos, and updates room signage', () => {
     const state = new GameState();
     state.resetAll();
 
@@ -58,7 +58,7 @@ describe('Xmas365 Merger Contract Finale gauntlet (6 dual-twist panels)', () => 
     const halloween = ROOM_SPECS[0];
     expect(state.getRoomSignage(halloween).isAcquired).toBe(true);
     expect(state.getRoomSignage(halloween).title).toBe('Ugly Sweater Porch');
-    expect(state.getRoomSignage(halloween).subtitle).toBe('an Xmas365 Subsidiary');
+    expect(state.getRoomSignage(halloween).subtitle).toBe('an XMAS365™ Subsidiary');
     expect(state.isStrayUnlocked(halloween)).toBe(false);
     expect(state.isCenterpieceUnlocked(halloween)).toBe(false);
 
@@ -97,7 +97,7 @@ describe('Xmas365 Merger Contract Finale gauntlet (6 dual-twist panels)', () => 
     expect(state.pinnedMemos.has('E1')).toBe(true);
     expect(state.pinnedMemos.has('E3')).toBe(true);
 
-    // Complete all 6 rooms -> Act III (All 6 Xmas365 escalation memos E1..E6)
+    // Complete all 6 rooms -> Act III (All 6 XMAS365 escalation memos E1..E6)
     for (const r of ROOM_SPECS.slice(3)) {
       state.markRunSolved(r.warmup.id);
       state.markRunSolved(r.strays[0].proto.id);
@@ -109,7 +109,7 @@ describe('Xmas365 Merger Contract Finale gauntlet (6 dual-twist panels)', () => 
     state.onEnterBay('hall');
     expect(state.pinnedMemos.has('E6')).toBe(true);
 
-    // Beat the Xmas365 Merger Contract -> Act IV (Day 366 Party + Xmas12 Memo Y7)
+    // Beat the XMAS365 Merger Contract -> Act IV (Day 366 Party + Xmas12 Memo Y7)
     state.markRunSolved('tuesday');
     expect(state.act()).toBe(4);
     expect(state.freePlayUnlocked).toBe(true);

@@ -197,14 +197,62 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
       let activePane: HTMLElement | null = null;
       let lastOpenedIdx = -1;
       let stageHeightTimer = 0;
+      const AUTO_ADVANCE_MS = 1350;
+      const advanceBarFill = h('div', {
+        style: {
+          height: '100%',
+          width: '0%',
+          borderRadius: '999px',
+          background: 'linear-gradient(90deg, #38a169 0%, #48bb78 100%)',
+        },
+      });
+      const advanceBarTrack = h(
+        'div',
+        {
+          style: {
+            display: 'none',
+            width: '100%',
+            height: '6px',
+            borderRadius: '999px',
+            background: '#d8e8dc',
+            border: '1px solid #9ae6b4',
+            overflow: 'hidden',
+          },
+        },
+        advanceBarFill,
+      );
+
+      const stopAdvanceBar = (): void => {
+        advanceBarTrack.style.display = 'none';
+        advanceBarFill.style.transition = 'none';
+        advanceBarFill.style.width = '0%';
+      };
+
+      const startAdvanceBar = (durationMs: number): void => {
+        advanceBarFill.style.transition = 'none';
+        advanceBarFill.style.width = '0%';
+        advanceBarTrack.style.display = 'block';
+        void advanceBarFill.offsetWidth;
+        advanceBarFill.style.transition = `width ${durationMs}ms linear`;
+        advanceBarFill.style.width = '100%';
+      };
+
       const footer = h('div', {
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '6px',
+          minHeight: '34px',
+          margin: '8px 0 0',
+        },
+      });
+      const footerRow = h('div', {
         style: {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '12px',
           minHeight: '34px',
-          margin: '8px 0 0',
         },
       });
       const message = h('div', {
@@ -228,7 +276,8 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         },
         'Next panel ▸',
       );
-      footer.append(message, next);
+      footerRow.append(message, next);
+      footer.append(advanceBarTrack, footerRow);
 
       let at = Math.max(
         0,
@@ -303,6 +352,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
           clearTimeout(autoAdvanceTimer);
           autoAdvanceTimer = 0;
         }
+        stopAdvanceBar();
         const prevIdx = lastOpenedIdx;
         lastOpenedIdx = i;
         at = i;
@@ -374,10 +424,11 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
               message.textContent = text ? `✓ ${text}` : `✓ Panel ${i + 1} solved!`;
               next.style.visibility = 'visible';
               ctx.status(`Panel ${i + 1} of ${panels.length} solved`);
+              startAdvanceBar(AUTO_ADVANCE_MS);
               autoAdvanceTimer = window.setTimeout(() => {
                 autoAdvanceTimer = 0;
                 if (board.isConnected) open(nextIdx);
-              }, 1350);
+              }, AUTO_ADVANCE_MS);
             }
           },
           status: (text) => {

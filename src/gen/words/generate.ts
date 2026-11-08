@@ -14,7 +14,14 @@
  */
 import { Budget, within } from '../core/budget';
 import { type Rng, rng, shuffle } from '../core/rng';
-import { type Made, Rejections, type Spec, type Tier, trySeeds } from '../core/spec';
+import {
+  type Made,
+  Rejections,
+  type Spec,
+  type Tier,
+  type WordBoardSize,
+  trySeeds,
+} from '../core/spec';
 import { fillBoard } from './make';
 import { type Panel, type Spot, type Word, key, layOut } from './model';
 
@@ -39,11 +46,22 @@ export interface Shape {
   cuts: number;
 }
 
+export const WORD_BOARD_SIZES: readonly WordBoardSize[] = [4, 5, 6, 7, 9] as const;
+
+/** All five supported Words board sizes (4×4, 5×5, 6×6, 7×7, and 9×9 reserved for bonus levels). */
+export const SHAPES_BY_SIZE: Record<WordBoardSize, Shape> = {
+  4: { width: 4, height: 4, shortest: 3, longest: 6, margin: 1, dark: 2, code: 2, cuts: 5 },
+  5: { width: 5, height: 5, shortest: 4, longest: 8, margin: 1, dark: 2, code: 2, cuts: 8 },
+  6: { width: 6, height: 6, shortest: 4, longest: 8, margin: 1, dark: 3, code: 2, cuts: 11 },
+  7: { width: 7, height: 7, shortest: 4, longest: 8, margin: 2, dark: 3, code: 3, cuts: 15 },
+  9: { width: 9, height: 9, shortest: 5, longest: 9, margin: 2, dark: 5, code: 4, cuts: 21 },
+};
+
 /** A tier is a board size; the twists make it easier or harder as they fall. */
 export const SHAPES: Record<Tier, Shape> = {
-  easy: { width: 5, height: 5, shortest: 4, longest: 8, margin: 1, dark: 2, code: 2, cuts: 8 },
-  medium: { width: 7, height: 7, shortest: 4, longest: 8, margin: 2, dark: 3, code: 3, cuts: 15 },
-  hard: { width: 9, height: 9, shortest: 5, longest: 9, margin: 2, dark: 5, code: 4, cuts: 21 },
+  easy: SHAPES_BY_SIZE[5],
+  medium: SHAPES_BY_SIZE[7],
+  hard: SHAPES_BY_SIZE[9],
 };
 
 const ROUNDS = 40;
@@ -244,7 +262,7 @@ export function makePanel(
   why = new Rejections(),
 ): Made<Panel> | null {
   const on = new Set(spec.twists);
-  const shape = SHAPES[spec.tier];
+  const shape = spec.size ? SHAPES_BY_SIZE[spec.size] : SHAPES[spec.tier];
   const budget = new Budget(4_000_000);
   return (
     within(() => {
