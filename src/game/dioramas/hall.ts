@@ -1318,39 +1318,39 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
         }
       }
 
+      const canInteract = unlocked || unlockItem !== null;
+
       const glowColor =
         d.room.id === 'thanksgiving'
           ? '#ff8c24'
           : complete
             ? '#ffe082'
-            : unlocked
+            : canInteract
               ? '#ffae52'
               : '#161b24';
       const glowNum = hexToNumber(glowColor);
-      d.recessDarkMesh.visible = !(unlocked || complete);
-      d.recessGlowMesh.visible = unlocked || complete;
+      d.recessDarkMesh.visible = !(canInteract || complete);
+      d.recessGlowMesh.visible = canInteract || complete;
       d.recessGlowMat.color.setHex(glowNum);
       d.recessGlowMat.emissive.setHex(glowNum);
       d.recessGlowMat.emissiveIntensity = complete ? 1.15 : 1.05;
 
       const spillNum = hexToNumber(d.room.id === 'thanksgiving' ? '#ff922b' : glowColor);
-      d.thresholdSpillMesh.visible = unlocked || complete;
+      d.thresholdSpillMesh.visible = canInteract || complete;
       d.thresholdSpillMat.color.setHex(spillNum);
       d.thresholdSpillMat.emissive.setHex(spillNum);
 
-      const baseRotY = complete ? -0.82 : unlocked ? -0.48 : 0;
+      const baseRotY = complete ? -0.82 : canInteract ? -0.48 : 0;
       d.doorPivotEntry.baseRotY = baseRotY;
       if (!activeDoorHop || activeDoorHop.roomId !== d.room.id) {
         d.doorPivotEntry.pivot.rotation.y = baseRotY;
       }
 
-      d.lockGroup.visible = !unlocked;
+      d.lockGroup.visible = !canInteract;
       d.lockBodyMat.color.setHex(hexToNumber(unlockItem ? '#ffea79' : '#d69e2e'));
 
       d.completeFxGroup.visible = complete;
-      d.unlockedFxGroup.visible = !complete && unlocked;
-
-      const canInteract = unlocked || unlockItem !== null;
+      d.unlockedFxGroup.visible = !complete && canInteract;
       const sublabel = complete
         ? '★ Restored!'
         : unlockItem
