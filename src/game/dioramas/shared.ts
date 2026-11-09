@@ -230,7 +230,7 @@ export interface DioramaCallbacks {
 export interface BuiltDiorama {
   root: THREE.Group;
   hotspots: Hotspot3D[];
-  /** World-space anchor right above Leap Day's head in Holiday Hall (for the P2 speech bubble). */
+  /** World-space anchor right above Leap Day's head in Holiday Hall (for Leap Day's speech bubbles). */
   leapDayHeadWorldPos: THREE.Vector3;
   /** Update all bay meshes, materials, visibility flags, and hotspot descriptors in-place from `gameState`. */
   syncState: () => void;

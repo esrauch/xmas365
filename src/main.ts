@@ -209,10 +209,10 @@ let cagedPromptTimer: number | null = null;
 
 /**
  * One-line "barks" that play like a caged mascot's plea: a speech bubble at the bottom with
- * no button, which fades away on its own. Leap Day's one-off reactions work this way too: to
- * the opening memo (P2), the first relic freed (T2) and the first relic on a shelf (T3).
+ * no button, which fades away on its own. Leap Day's line on the first relic placed on a shelf
+ * (T3) works this way too. (Leap Day doesn't reply to memos.)
  */
-const BARK_BEATS: ReadonlySet<string> = new Set(['P2', 'T2', 'T3']);
+const BARK_BEATS: ReadonlySet<string> = new Set(['T3']);
 const BARK_SECONDS = 5;
 
 function isBarkBeat(beatId: BeatId | null): boolean {

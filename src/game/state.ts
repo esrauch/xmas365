@@ -1073,9 +1073,7 @@ export class GameState {
     if (!force && this.milestones.has(id)) return;
     if (!this.beatQueue.includes(id)) {
       if (id in MEMOS && id !== 'Y7') {
-        const barkIdx = this.beatQueue.findIndex(
-          (b) => b === 'P2' || b === 'T2' || b === 'T3' || b.endsWith('.caged'),
-        );
+        const barkIdx = this.beatQueue.findIndex((b) => b === 'T3' || b.endsWith('.caged'));
         if (barkIdx !== -1) {
           this.beatQueue.splice(barkIdx, 0, id);
           this.notify();
@@ -1133,7 +1131,6 @@ export class GameState {
   onEnterBay(bay: 'hall' | RoomId): void {
     if (bay === 'hall') {
       this.enqueueBeat('P1');
-      this.enqueueBeat('P2');
       if (this.hallPendingBeats.size > 0) {
         const pending = [...this.hallPendingBeats];
         this.hallPendingBeats.clear();
@@ -1160,11 +1157,10 @@ export class GameState {
     this.fillRunPanels(protoId, true);
     this.recomputeDerived();
 
-    // 1. First relic ever freed -> `T1` Logistics memo + `T2` Leap Day reaction
+    // 1. First relic ever freed -> `T1` Logistics memo
     const isStray = Object.values(STRAY_ITEMS).some((s) => s.proto.id === protoId);
     if (isStray) {
       this.enqueueBeat('T1');
-      this.enqueueBeat('T2');
     }
 
     // 2. A room's Intro Run beaten -> that room's memo (`<room>.enter`)
@@ -1223,7 +1219,6 @@ export class GameState {
       );
       if (!anyStraySolved) {
         this.milestones.delete('T1');
-        this.milestones.delete('T2');
       }
       this.recomputeDerived();
     }

@@ -27,9 +27,10 @@ beat is written; expect rewrites after Playtest 1.
   life"). Leap Day only reacts, in dry punny one-liners, until the loophole
   and the party, where Leap Day finally talks to Santa and the mascots.
 - **Each caged mascot's plea** is a yellow sticky note on its room's memo
-  (found when you beat the intro run). Leap Day's own sticky note is only on
-  the opening memo (`P2`); the other memos carry no Leap Day reaction.
-- **Freeing a relic is silent** (after the first one triggers `T1`/`T2`). Each
+  (found when you beat the intro run).
+- **Leap Day never replies to memos** (decided 2026-11-08): the opening memo's
+  reaction (`P2`) and the reaction to the first relic memo (`T2`) are dropped.
+- **Freeing a relic is silent** (after the first one triggers `T1`). Each
   room has one memo, found when you beat its intro run.
 - **The running gag:** every freed mascot thanks you when its fifth relic opens
   its cage, then gets your name or date wrong, each one differently. At the
@@ -109,11 +110,6 @@ Day on the lone Feb 29 tile. Then the title card, then `P1`.*
 >
 > *S. Claus, CEO ("Always Be Clausing")*
 
-### `P2`: Leap Day
-*P1 closed.*
-
-> **Leap Day:** "All 365 days. Funny how I never make the spreadsheet."
-
 ### `P3`: the hall
 *Signage (no prompt). Thanksgiving's door stands ajar.*
 
@@ -143,21 +139,15 @@ bail me out before I'm downsized into soup!"
 ### `T1`: the first relic freed
 *The first time any relic run is solved.*
 
-> **To:** Logistics · **Re:** Cross-Silo Relic Scrambling
+> **To:** Logistics · **Re:** Who Moved a Relic?
 >
-> Great work on the 30-relic shuffle! With five prized relics per holiday
-> locked away—one in each of the other five departments—their mascots aren't
-> going anywhere. Every cage has five padlocks wired to the five relic shelves
-> underneath it, and returning a relic to a locked department automatically
-> unlocks the door. So nothing goes home. Not one sock.
+> Logistics: a relic has left its assigned room. Unacceptable. Those relics
+> are the *locks*. Each mascot's cage holds five padlocks, one for each of its
+> holiday's relics, and every relic that gets home opens one, plus that
+> holiday's doors. Five home and the cage opens. Find the relic. Put it back
+> where it doesn't belong.
 >
 > *S. Claus, CEO*
-
-### `T2`: Leap Day's reaction to `T1`
-*`T1` closed; carrying a freed relic.*
-
-**Leap Day:** "Five relics per shelf, five padlocks per cage. Better start
-delivering."
 
 ### `T3`: the first relic placed on its home shelf
 *The first relic placed on its home shelf under a caged mascot (unlocking its room and popping the first padlock on the cage).*

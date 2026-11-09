@@ -184,8 +184,8 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
     header: 'XMAS365™ · LOGISTICS BRIEFING',
     to: 'Logistics',
     from: 'S. Claus, CEO',
-    re: 'Cross-Silo Relic Scrambling',
-    body: "Great work on the 30-relic shuffle! With five prized relics per holiday locked away—one in each of the other five departments—their mascots aren't going anywhere. Every cage has five padlocks wired to the five relic shelves underneath it, and returning a relic to a locked department automatically unlocks the door. So nothing goes home. Not one sock.",
+    re: 'Who Moved a Relic?',
+    body: "Logistics: a relic has left its assigned room. Unacceptable. Those relics are the *locks*. Each mascot's cage holds five padlocks, one for each of its holiday's relics, and every relic that gets home opens one, plus that holiday's doors. Five home and the cage opens. Find the relic. Put it back where it doesn't belong.",
     signoff: 'S. Claus, CEO',
   },
   'fourth.enter': {
@@ -300,12 +300,10 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
 
 export type DialogueBeatId =
   | 'P0'
-  | 'P2'
   | 'thanksgiving.caged'
   | 'thanksgiving.freed'
   | 'thanksgiving.bonus.offer'
   | 'thanksgiving.bonus.reward'
-  | 'T2'
   | 'T3'
   | 'fourth.caged'
   | 'fourth.freed'
@@ -373,16 +371,6 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
       },
     ],
   },
-  P2: {
-    id: 'P2',
-    kind: 'dialogue',
-    lines: [
-      {
-        speaker: 'leapday',
-        text: 'All 365 days. Funny how I never make the spreadsheet.',
-      },
-    ],
-  },
   'thanksgiving.caged': {
     id: 'thanksgiving.caged',
     kind: 'dialogue',
@@ -420,16 +408,6 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
       {
         speaker: 'turkey',
         text: 'Upper-crust execution! I shall wear a party hat *atop* my buckle hat. Double-hatted!',
-      },
-    ],
-  },
-  T2: {
-    id: 'T2',
-    kind: 'dialogue',
-    lines: [
-      {
-        speaker: 'leapday',
-        text: 'Five relics per shelf, five padlocks per cage. Better start delivering.',
       },
     ],
   },
