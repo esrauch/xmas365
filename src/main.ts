@@ -217,6 +217,19 @@ let cagedPromptTimer: number | null = null;
 const BARK_BEATS: ReadonlySet<string> = new Set(['P2', 'T2', 'T3']);
 const BARK_SECONDS = 5;
 
+function isBarkBeat(beatId: BeatId | null): boolean {
+  if (!beatId) return false;
+  return beatId.endsWith('.caged') || BARK_BEATS.has(beatId);
+}
+
+function dismissActiveBarkBeat(): void {
+  clearCagedPromptTimer();
+  const activeBeat = gameState.currentBeat();
+  if (activeBeat && isBarkBeat(activeBeat)) {
+    gameState.dismissBeat(activeBeat);
+  }
+}
+
 function clearCagedPromptTimer(): void {
   if (cagedPromptTimer !== null) {
     window.clearTimeout(cagedPromptTimer);
@@ -275,7 +288,12 @@ function renderActiveStoryBeat(): void {
   clearCagedPromptTimer();
   const beatId = gameState.currentBeat();
   const allowOverProtoModal =
-    activeModal === 'proto' && activeProtoId === 'clause' && isContractOverlayBeat(beatId);
+    activeModal === 'proto' &&
+    ((activeProtoId === 'clause' && isContractOverlayBeat(beatId)) ||
+      (beatId !== null &&
+        beatId in MEMOS &&
+        activeProtoId !== null &&
+        gameState.solvedRuns.has(activeProtoId)));
   if (activeModal !== 'none' && !allowOverProtoModal) {
     bottomStack.style.zIndex = '20';
     storyBannerHost.replaceChildren();
@@ -1081,9 +1099,9 @@ function rebuildScene(): void {
 
 function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
   if (isTransitioningBay && !opts?.instant) return;
-  clearCagedPromptTimer();
+  dismissActiveBarkBeat();
   const activeBeat = gameState.currentBeat();
-  if (activeBeat && activeBeat.endsWith('.caged')) {
+  if (activeBeat && activeBeat.endsWith('.freed')) {
     gameState.dismissBeat(activeBeat);
   }
   closeModal();
@@ -1625,6 +1643,7 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
     protoId === 'clause' ? FINALE_PROTO : PROTOS.find((p) => p.id === protoId);
   if (!proto) return;
 
+  dismissActiveBarkBeat();
   activeModal = 'proto';
   activeProtoId = proto.id;
   activeProtoWasSolvedOnOpen = gameState.solvedRuns.has(proto.id);
@@ -1676,13 +1695,16 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
           }
           return;
         }
+        if (!wasAlreadySolved && roomSpec && (proto.kind === 'intro' || proto.kind === 'home')) {
+          wasAlreadySolved = true;
+          closeModal();
+          rebuildScene();
+          showUnlockDialog(roomSpec, proto.kind);
+          return;
+        }
         rebuildScene();
         hotspotLayer.style.display = 'none';
         sideArrowsHost.style.display = 'none';
-        if (!wasAlreadySolved && roomSpec && (proto.kind === 'intro' || proto.kind === 'home')) {
-          wasAlreadySolved = true;
-          showUnlockDialog(roomSpec, proto.kind);
-        }
 
         const homeRoom = strayEntry
           ? ROOM_SPECS.find((r) => r.id === strayEntry.homeRoom)

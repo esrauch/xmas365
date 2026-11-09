@@ -136,9 +136,13 @@ describe('XMAS365™ Merger Contract Finale gauntlet (6 clauses × 22 puzzles = 
     state.onEnterBay('halloween');
     expect(state.pinnedMemos.has('halloween.enter')).toBe(false);
 
-    // Beat warmup -> finds the memo, and unlocks the Home Twist run
+    // Beat warmup panel-by-panel (as run.ts does) -> enqueues the memo popup and unlocks the Home Twist run
+    for (let i = 0; i < state.runPanelCount(halloween.warmup.id); i++) {
+      state.markPanelSolved(halloween.warmup.id, i);
+    }
     state.markRunSolved(halloween.warmup.id);
     expect(state.pinnedMemos.has('halloween.enter')).toBe(true);
+    expect(state.beatQueue).toContain('halloween.enter');
     expect(state.isHomeTwistUnlocked(halloween)).toBe(true);
     expect(state.isStrayUnlocked(halloween)).toBe(false);
 
@@ -146,8 +150,12 @@ describe('XMAS365™ Merger Contract Finale gauntlet (6 clauses × 22 puzzles = 
     state.markRunSolved(halloween.homeTwist.id);
     expect(state.isStrayUnlocked(halloween)).toBe(true);
 
-    // Beat a stray -> enters carry tray until placed on home shelf
+    // Beat a stray panel-by-panel -> enqueues T1 memo popup and enters carry tray until placed on home shelf
+    for (let i = 0; i < state.runPanelCount('jack'); i++) {
+      state.markPanelSolved('jack', i);
+    }
     state.markRunSolved('jack');
+    expect(state.beatQueue).toContain('T1');
     expect(state.carriedItems().map((x) => x.id)).toContain('jack');
 
     // Place all 5 Halloween relics -> frees Halloween mascot, completes Halloween, and queues E1 (5 relics)
@@ -155,6 +163,7 @@ describe('XMAS365™ Merger Contract Finale gauntlet (6 clauses × 22 puzzles = 
       state.markRunSolved(relicId);
       state.placeItem(relicId);
     }
+    expect(state.beatQueue).toContain('E1');
     expect(state.carriedItems().map((x) => x.id)).not.toContain('jack');
     expect(state.isRoomComplete(halloween)).toBe(true);
     expect(state.completedRoomCount()).toBe(1);

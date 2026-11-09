@@ -1942,6 +1942,9 @@ export function buildHolidayAlcoveBay(
   cageShelfGroup.position.set(0, 2.02, 0.42);
   cageShelfGroup.add(box(1.48, 0.16, 0.64, '#6b4928', 0, 0, 0, false));
   cageShelfGroup.add(box(1.38, 0.06, 0.58, '#d69e2e', 0, 0.1, 0, false));
+  cageShelfGroup.traverse((c) => {
+    c.castShadow = false;
+  });
   bay.add(cageShelfGroup);
 
   const {
@@ -1953,6 +1956,9 @@ export function buildHolidayAlcoveBay(
   } = buildMascotStageWithCage(room.id, room.accent);
   mascotStage.position.set(0, 2.05, 0.45);
   mascotStage.scale.setScalar(1.38);
+  mascotStage.traverse((c) => {
+    c.castShadow = false;
+  });
   bay.add(mascotStage);
   floating.push({ mesh: mascotMesh, phase: theta + 1.1, baseY: 0.12 });
 
@@ -2036,6 +2042,10 @@ export function buildHolidayAlcoveBay(
     emptyCap.receiveShadow = true;
     pg.add(emptyCap);
 
+    pg.traverse((c) => {
+      c.castShadow = false;
+    });
+
     bay.add(pg);
     return {
       reqId,
@@ -2106,13 +2116,13 @@ export function buildHolidayAlcoveBay(
   const centerHeroWorldPos = bayToWorld(theta, 0, 0.62, 1.15);
   const drainedScratchColor = new THREE.Color(0x4a5568);
 
-  // The mascot's exit: the 5th relic lifts the cage away and the mascot hops off its shelf
-  // toward the hall (about 1.5 s). `wasComplete` is null until the first sync, so a room that
-  // loads already restored doesn't replay it.
-  const EXIT_SECONDS = 1.5;
+  // The mascot's exit: the 5th relic lifts the cage away, the mascot hops down from the shelf
+  // onto the room floor (world y = 0.045 -> local y = -1.453), and bounces far off the side of the screen.
+  const EXIT_SECONDS = 2.15;
   const cageBaseY = cage.position.y;
   const mascotBase = mascotMesh.position.clone();
   const mascotBaseScale = mascotMesh.scale.x;
+  const floorLocalY = (0.045 - mascotStage.position.y) / mascotStage.scale.y;
   let wasComplete: boolean | null = null;
   let exitPending = false;
   let exitStart: number | null = null;
@@ -2272,6 +2282,7 @@ export function buildHolidayAlcoveBay(
             },
           ],
           accent: isCarried ? '#d69e2e' : room.accent,
+          hiddenPill: true,
           worldPos: bayToWorld(theta, ped.lx, ped.ly - 0.08, ped.lz + 0.22),
           cameraPos: cageFocusPos,
           cameraLook: bayToWorld(theta, ped.lx, ped.ly + 0.15, ped.lz),
@@ -2405,23 +2416,52 @@ export function buildHolidayAlcoveBay(
       if (!exitPending) return;
       exitStart ??= t;
       const u = Math.min(1, (t - exitStart) / EXIT_SECONDS);
-      // The cage lifts straight up and out of frame over the first third.
-      const lift = Math.min(1, u / 0.33);
+      // 1. The cage lifts straight up and out of frame over the first quarter.
+      const lift = Math.min(1, u / 0.25);
       cage.position.y = cageBaseY + lift * lift * 1.6;
-      // Then the mascot crouches, hops off the shelf's front edge and drops out of view.
-      const hop = Math.max(0, (u - 0.25) / 0.75);
-      const squash = u < 0.25 ? Math.sin((u / 0.25) * Math.PI) * 0.12 : 0;
-      mascotMesh.scale.set(
-        (1 + squash * 0.5) * mascotBaseScale,
-        (1 - squash) * mascotBaseScale,
-        (1 + squash * 0.5) * mascotBaseScale,
-      );
-      mascotMesh.position.set(
-        mascotBase.x + hop * 0.35,
-        mascotBase.y + Math.sin(hop * Math.PI) * 0.45 - hop * hop * 1.9,
-        mascotBase.z + hop * 0.9,
-      );
-      mascotMesh.rotation.y = hop * 0.6;
+      cage.visible = u < 0.27;
+
+      // 2. Mascot crouches (0..0.18), leaps down onto the floor (0.18..0.52),
+      //    then keeps bouncing at full size far off the side of the screen (0.52..1.0).
+      if (u < 0.18) {
+        const crouchT = u / 0.18;
+        const squash = Math.sin(crouchT * Math.PI) * 0.14;
+        mascotMesh.scale.set(
+          (1 + squash * 0.5) * mascotBaseScale,
+          (1 - squash) * mascotBaseScale,
+          (1 + squash * 0.5) * mascotBaseScale,
+        );
+        mascotMesh.position.copy(mascotBase);
+        mascotMesh.rotation.set(0, 0, 0);
+      } else if (u < 0.52) {
+        const jumpT = (u - 0.18) / 0.34;
+        const baseDropY = THREE.MathUtils.lerp(mascotBase.y, floorLocalY, jumpT * jumpT);
+        const jumpArc = Math.sin(jumpT * Math.PI) * 0.36;
+        mascotMesh.scale.setScalar(mascotBaseScale);
+        mascotMesh.position.set(
+          mascotBase.x + jumpT * 0.24,
+          Math.max(floorLocalY, baseDropY + jumpArc),
+          mascotBase.z + jumpT * 0.86,
+        );
+        mascotMesh.rotation.y = jumpT * 1.05;
+      } else {
+        const runT = (u - 0.52) / 0.48;
+        const hopSin = Math.abs(Math.sin(runT * Math.PI * 4));
+        const hopBounce = hopSin * 0.24;
+        const landSquash = (1 - hopSin) * 0.08;
+        mascotMesh.scale.set(
+          mascotBaseScale * (1 + landSquash * 0.4),
+          mascotBaseScale * (1 - landSquash),
+          mascotBaseScale * (1 + landSquash * 0.4),
+        );
+        mascotMesh.position.set(
+          mascotBase.x + 0.24 + runT * 2.35,
+          floorLocalY + hopBounce,
+          mascotBase.z + 0.86 + runT * 0.38,
+        );
+        mascotMesh.rotation.y = 1.05 + Math.sin(runT * Math.PI * 4) * 0.12;
+      }
+
       if (u >= 1) {
         exitPending = false;
         cage.visible = false;

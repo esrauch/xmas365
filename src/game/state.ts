@@ -1072,6 +1072,16 @@ export class GameState {
     }
     if (!force && this.milestones.has(id)) return;
     if (!this.beatQueue.includes(id)) {
+      if (id in MEMOS && id !== 'Y7') {
+        const barkIdx = this.beatQueue.findIndex(
+          (b) => b === 'P2' || b === 'T2' || b === 'T3' || b.endsWith('.caged'),
+        );
+        if (barkIdx !== -1) {
+          this.beatQueue.splice(barkIdx, 0, id);
+          this.notify();
+          return;
+        }
+      }
       this.beatQueue.push(id);
       this.notify();
     }
@@ -1147,31 +1157,28 @@ export class GameState {
   }
 
   markRunSolved(protoId: string): void {
-    const wasAlreadySolved = this.solvedRuns.has(protoId);
     this.fillRunPanels(protoId, true);
     this.recomputeDerived();
 
-    if (!wasAlreadySolved) {
-      // 1. First relic ever freed -> `T1` Logistics memo + `T2` Leap Day reaction
-      const isStray = Object.values(STRAY_ITEMS).some((s) => s.proto.id === protoId);
-      if (isStray) {
-        this.enqueueBeat('T1');
-        this.enqueueBeat('T2');
-      }
+    // 1. First relic ever freed -> `T1` Logistics memo + `T2` Leap Day reaction
+    const isStray = Object.values(STRAY_ITEMS).some((s) => s.proto.id === protoId);
+    if (isStray) {
+      this.enqueueBeat('T1');
+      this.enqueueBeat('T2');
+    }
 
-      // 2. A room's Intro Run beaten -> that room's memo (`<room>.enter`)
-      const warmupRoom = ROOM_SPECS.find((r) => r.warmup.id === protoId);
-      if (warmupRoom) this.enqueueBeat(ROOM_SCRIPT[warmupRoom.id].enterMemoId);
+    // 2. A room's Intro Run beaten -> that room's memo (`<room>.enter`)
+    const warmupRoom = ROOM_SPECS.find((r) => r.warmup.id === protoId);
+    if (warmupRoom) this.enqueueBeat(ROOM_SCRIPT[warmupRoom.id].enterMemoId);
 
-      // 3. Merger contract solved -> loophole & Santa confrontation (`C6.torn`), party (`Y1`, `Y2`, `Y4`), and `Y7` memo
-      if (protoId === 'clause') {
-        this.freePlayUnlocked = true;
-        this.enqueueBeat('C6.torn');
-        this.enqueueBeat('Y1');
-        this.enqueueBeat('Y2');
-        this.enqueueBeat('Y4');
-        this.enqueueBeat('Y7');
-      }
+    // 3. Merger contract solved -> loophole & Santa confrontation (`C6.torn`), party (`Y1`, `Y2`, `Y4`), and `Y7` memo
+    if (protoId === 'clause') {
+      this.freePlayUnlocked = true;
+      this.enqueueBeat('C6.torn');
+      this.enqueueBeat('Y1');
+      this.enqueueBeat('Y2');
+      this.enqueueBeat('Y4');
+      this.enqueueBeat('Y7');
     }
 
     this.recomputeDerived();
@@ -1343,26 +1350,25 @@ export class GameState {
       }
       this.recomputeDerived();
 
-      // 1. First relic ever placed on a shelf -> `T3` Leap Day line
-      this.enqueueBeat('T3');
-
-      // 2. If this was the 5th relic placed on `homeRoom`'s shelves, its cage opens & mascot is freed!
-      if (homeRoom && !wasRoomComplete && this.isRoomComplete(homeRoom)) {
-        if (this.completedRoomCount() === 1) {
-          this.firstRevertedHoliday = homeRoom.shortTitle;
-        }
-        this.enqueueBeat(ROOM_SCRIPT[homeRoom.id].freedBeatId);
-      }
-
-      // 3. Every 5 relics returned across the Hall (5, 10, 15, 20, 25, 30) triggers E1..E6
+      // 1. Every 5 relics returned across the Hall (5, 10, 15, 20, 25, 30) triggers E1..E6 immediately
       const totalPlaced = this.placedItems.size;
       if (totalPlaced % 5 === 0) {
         const escIdx = totalPlaced / 5;
         if (escIdx >= 1 && escIdx <= ROOM_SPECS.length) {
           const escId = `E${escIdx}` as MemoId;
-          this.pinMemo(escId);
-          this.hallPendingBeats.add(escId);
+          this.enqueueBeat(escId);
         }
+      }
+
+      // 2. First relic ever placed on a shelf -> `T3` Leap Day line
+      this.enqueueBeat('T3');
+
+      // 3. If this was the 5th relic placed on `homeRoom`'s shelves, its cage opens & mascot is freed!
+      if (homeRoom && !wasRoomComplete && this.isRoomComplete(homeRoom)) {
+        if (this.completedRoomCount() === 1) {
+          this.firstRevertedHoliday = homeRoom.shortTitle;
+        }
+        this.enqueueBeat(ROOM_SCRIPT[homeRoom.id].freedBeatId);
       }
 
       this.save();
