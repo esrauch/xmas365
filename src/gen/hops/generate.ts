@@ -51,13 +51,13 @@ export const SHAPES: Record<Tier, Shape> = {
  * Rocks added (or taken away) per twist, per tier, to keep a twist's board about as hard as a
  * plain one: twists that make the route harder to find (burrows, the dark) get more rocks (a
  * smaller lawn), and those that make it easier (courses, two bunnies) get fewer. Measured with
- * solver steps at each tier (see the twist difficulty audit in `revamp-centerpieces.md`).
+ * solver steps at each tier (the twist difficulty audit, `PUZZLE_DESIGN.md` §2.7).
  * Snowflakes get no rocks at all (a rock inside the frame would break the mirror).
  */
 export const ROCK_SHIFT: Record<Tier, Partial<Record<HopTwist, number>>> = {
   easy: { burrows: 1, dark: 1, courses: -1, colours: -1 },
   medium: { burrows: 3, dark: 2, courses: -3, colours: -3 },
-  hard: { burrows: 2, dark: 2, courses: -5, colours: -5 },
+  hard: { burrows: 3, dark: 2, courses: -5, colours: -5 },
 };
 
 /**
@@ -69,7 +69,7 @@ export const ROCK_SHIFT: Record<Tier, Partial<Record<HopTwist, number>>> = {
 export const SPARE_EGGS: Record<Tier, Partial<Record<HopTwist, number>>> = {
   easy: {},
   medium: { burrows: 1, dark: 1, snow: 2 },
-  hard: { snow: 1, dark: 1 },
+  hard: { burrows: 1, dark: 1, snow: 3 },
 };
 
 /** How many spare eggs a board of this tier and twists gets. */

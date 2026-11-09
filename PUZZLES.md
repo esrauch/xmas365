@@ -274,6 +274,10 @@ at every tier in seconds or less (eggs on hard is the slowest, ~6 s).
 
 ### Hops (Easter)
 
+The base game has **rocks**: squares the bunny can't hop onto. The generator uses
+them (and spare eggs) to keep each twist about as hard as a plain board
+(`PUZZLE_DESIGN.md` §2.7).
+
 - **Love Letters (⚙️):** some eggs show letters; each bunny's message
   of numbered blanks is its steps where its letters lie.
 - **Snowflakes (⚙️):** inside a frame, the trail's strokes mirror; it

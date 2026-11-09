@@ -142,6 +142,59 @@ Every random decision in `make.ts`, `generate.ts`, and `clues.ts` must flow thro
 - **✅ Do: Filter candidate actors by rule legality (`canTake`) before tie-breaking**
   - [`src/proto/hopsBoard.ts`](src/proto/hopsBoard.ts) now checks whether a single bunny can legally take the tapped cell first (`canR && !canB` or `canB && !canR`), and only falls back to active-bunny preference when both bunnies can legally step onto a shared white border cell.
 
+### 2.7 Twist Difficulty: Keep Every Twist About as Hard as Its Base (audit, 2026-11-08)
+
+A twist can make a board easier (it rules things out, acting as a hint) or harder
+(it hides information, or adds a long-range rule). Generators that trim clues to
+the minimum don't notice: a harder twist gets the same few hints as the plain
+puzzle. So each generator needs a **difficulty knob**, set per twist and size.
+
+**Measured** at 7×7: median solver steps for the uniqueness check on generated
+boards, relative to the plain puzzle (a rough proxy; ratings also use judgement,
+since some solvers finish plain boards almost by propagation alone).
+
+| Genre | Halloween (dark) | Valentine's (letters) | Fourth of July (colours) | Easter | Thanksgiving | Christmas (snow) |
+|---|---|---|---|---|---|---|
+| Webs | + 4× | = 13×† | − 3×* | eggs ++ 14× | cuts − 3×* | − 1× |
+| Carving | + 17× | = 56×† | 0 1.9× | basket 0 0.9× | cuts − 0.9× | + 3.4× |
+| Lights | + 1.1× | ++ 2.9× | 0 1.3× | eggs ++ 2.9× | slices − 0.9× | 0 1.0× |
+| Words | + 1.2× | = 3.8×† | 0 1.1× | eggs − 0.9× | cuts 0 1.0× | − 0.9× |
+| Hops | ++ 2.0× | = 0.4×† | −− 0.2× | burrows ++ 2.6× | courses −− 0.1× | − 0.7× |
+| Pictures | + 1.0× | +++ 184× | 0 1.0× | eggs 0 1.1× | portions 0 1.3× | 0 1.0× |
+
+\* tiny step counts; rated by how the twist plays (it rules moves out).
+† the solver brute-forces the letter code; players solve the words ahead first (trivially, with three-letter words), so letters play as = in Words, Hops, Webs and Carving.
+
+The full report, with the rating scale and the clue-adjustment rule, is [DIFFICULTY.md](DIFFICULTY.md).
+
+**Patterns:** hidden information (dark, letters) is always harder; Easter's
+number twists are hard in the path and network genres (Webs, Lights, Hops) but
+help in Words; fences and portions make things easier; snow and colours are
+mostly neutral.
+
+#### ✅ Do: Hops' knobs are rocks and spare eggs
+- **Rocks** are part of the base game ([`src/gen/hops/generate.ts`](src/gen/hops/generate.ts),
+  `SHAPES.rocks`, `placeRocks`): squares the bunny can't hop onto, which shrink the
+  lawn. `ROCK_SHIFT` adds rocks for harder twists (burrows, dark) and removes them
+  for easier ones (courses, two bunnies). Spooky's shadowed squares are then simply
+  "maybe a rock".
+- **Spare eggs** (`SPARE_EGGS`, `addSpareEggs`): the minimal-egg search takes back
+  what a smaller lawn gives, so harder twists also get a few true eggs back after
+  trimming, spread far from the others, and only while every twist still does its
+  work.
+- **Result at 7×7:** burrows 0.95×, dark 0.89×, snow 0.89×, letters 0.69× of the
+  plain board (which, with its own 3 rocks, now takes about 1,800 steps instead of
+  4,800). Courses and two bunnies stay easier (0.2×, 0.4×) with no rocks at all:
+  there's nothing left to take away. 9×9 boards vary a lot board to board; their
+  settings lean easier.
+
+#### Still to do: the other genres' knobs
+- **Carving:** a pre-carved rectangle; fewer `?` or letter sizes.
+- **Webs:** a pre-drawn thread; fewer dark knots or eggs.
+- **Lights:** pre-locked tiles, already turned the right way.
+- **Words:** one word already found.
+- **Pictures:** a few cells pre-filled; one letter's value revealed.
+
 ---
 
 ## 3. Lessons From the Design Lineage & Literature (Applied to Puzz)

@@ -9,6 +9,7 @@
  * - snowflakes (frosty frame, mirror line with ❄, and ghost mirror trail);
  * - letters (letter eggs on the board and message blank tiles above);
  * - the dark (shadowed squares ? that may be lawn or rock, lighting up when solved).
+ * Rocks (base game) are drawn as grey stones; the bunny can't hop onto them.
  */
 import { inside, mirrorKey } from '../gen/core/mirror';
 import {
@@ -417,6 +418,34 @@ export function mountHops(host: HTMLElement, panel: Panel, hooks: HopsHooks): ()
     const stepNumber = new Map<number, number>();
     routes.r.forEach((i, idx) => stepNumber.set(i, idx + 1));
     if (b.twoBunnies) routes.b.forEach((i, idx) => stepNumber.set(i, idx + 1));
+
+    // Rocks (base game): grey stones where the bunny can't hop
+    for (const [r, c] of panel.rocks ?? []) {
+      add('rect', {
+        x: c * cell + 2,
+        y: r * cell + 2,
+        width: cell - 4,
+        height: cell - 4,
+        rx: 8,
+        fill: '#c9c2b8',
+      });
+      add('ellipse', {
+        cx: c * cell + cell / 2,
+        cy: r * cell + cell * 0.56,
+        rx: cell * 0.32,
+        ry: cell * 0.24,
+        fill: '#8d8579',
+        stroke: '#6d665c',
+        'stroke-width': 1.5,
+      });
+      add('ellipse', {
+        cx: c * cell + cell * 0.42,
+        cy: r * cell + cell * 0.48,
+        rx: cell * 0.1,
+        ry: cell * 0.06,
+        fill: '#b3aca1',
+      });
+    }
 
     // Lawn / coloured / shadowed squares
     b.spots.forEach(([r, c], i) => {
