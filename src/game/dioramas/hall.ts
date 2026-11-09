@@ -38,6 +38,290 @@ export interface BuiltHallBay extends BuiltBay {
   animateHallActor: (t: number) => void;
 }
 
+function makeCorporateBannerTexture(): THREE.CanvasTexture | null {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 280;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  const w = canvas.width;
+  const h = canvas.height;
+
+  // Base woven canvas cloth gradient (aged cream/burlap with darker top/bottom fold shading)
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+  bgGrad.addColorStop(0, '#dfd0b2');
+  bgGrad.addColorStop(0.18, '#f6ecd7');
+  bgGrad.addColorStop(0.55, '#fbf4e4');
+  bgGrad.addColorStop(0.85, '#efe1c4');
+  bgGrad.addColorStop(1, '#d8c5a0');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, w, h);
+
+  // Subtle vertical drapery fold shading across the canvas width
+  for (let fx = 0; fx < w; fx += 8) {
+    const u = fx / w;
+    const wave = Math.sin(u * Math.PI * 7) * 0.5 + 0.5;
+    ctx.fillStyle = `rgba(110, 82, 48, ${(wave * 0.055).toFixed(3)})`;
+    ctx.fillRect(fx, 0, 8, h);
+  }
+
+  // Subtle horizontal & vertical fabric weave threads
+  ctx.strokeStyle = 'rgba(120, 90, 55, 0.08)';
+  ctx.lineWidth = 1;
+  for (let y = 4; y < h; y += 6) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+  for (let x = 4; x < w; x += 8) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+
+  // Diagonal candy-cane / corporate hazard stripes near the left and right swallowtail ends
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, 145, h);
+  ctx.rect(w - 145, 0, 145, h);
+  ctx.clip();
+  for (let i = -h; i < w + h; i += 36) {
+    ctx.fillStyle =
+      (Math.floor(i / 36) & 1) === 0 ? 'rgba(185, 28, 28, 0.22)' : 'rgba(34, 84, 61, 0.18)';
+    ctx.beginPath();
+    ctx.moveTo(i, 0);
+    ctx.lineTo(i + 20, 0);
+    ctx.lineTo(i - 60, h);
+    ctx.lineTo(i - 80, h);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+
+  // Top & bottom crimson and gold woven cloth selvedge bands
+  ctx.fillStyle = '#9b1c1c';
+  ctx.fillRect(0, 0, w, 16);
+  ctx.fillRect(0, h - 16, w, 16);
+  ctx.fillStyle = '#d69e2e';
+  ctx.fillRect(0, 16, w, 6);
+  ctx.fillRect(0, h - 22, w, 6);
+
+  // Stitched inner hem line
+  ctx.save();
+  ctx.strokeStyle = '#822727';
+  ctx.lineWidth = 3;
+  ctx.setLineDash([12, 8]);
+  ctx.strokeRect(28, 30, w - 56, h - 60);
+  ctx.restore();
+
+  // 8 brass grommet eyelets along the top hem matching the 3D hanging straps
+  const grommetCount = 8;
+  for (let i = 0; i < grommetCount; i++) {
+    const gx = 92 + (i / (grommetCount - 1)) * (w - 184);
+    const gy = 22;
+    ctx.fillStyle = '#b7791f';
+    ctx.beginPath();
+    ctx.arc(gx, gy, 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#2d1d11';
+    ctx.beginPath();
+    ctx.arc(gx, gy, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Top stenciled header: "UNDER NEW MANAGEMENT:"
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '900 44px "Arial Black", Impact, system-ui, sans-serif';
+  ctx.fillStyle = 'rgba(214, 158, 46, 0.45)';
+  ctx.fillText('UNDER NEW MANAGEMENT:', w * 0.5 + 3, 86 + 3);
+  ctx.fillStyle = '#1e293b';
+  ctx.fillText('UNDER NEW MANAGEMENT:', w * 0.5, 86);
+
+  // Main takeover title: "XMAS365™" (seamless bold painted lettering)
+  const mainX = w * 0.468;
+  const mainY = 186;
+  ctx.font = '900 108px "Arial Black", Impact, system-ui, sans-serif';
+  ctx.lineJoin = 'round';
+  const mainHalfW = ctx.measureText('XMAS365').width * 0.5;
+  // Deep block shadow
+  ctx.fillStyle = '#1e293b';
+  ctx.fillText('XMAS365', mainX + 6, mainY + 6);
+  // Warm gold outline offset
+  ctx.strokeStyle = '#d69e2e';
+  ctx.lineWidth = 10;
+  ctx.strokeText('XMAS365', mainX, mainY);
+  // Crimson corporate fill
+  ctx.fillStyle = '#b91c1c';
+  ctx.fillText('XMAS365', mainX, mainY);
+
+  // Superscript "TM" cleanly spaced beside XMAS365
+  const tmX = mainX + mainHalfW + 30;
+  const tmY = mainY - 32;
+  ctx.font = '900 36px "Arial Black", Impact, system-ui, sans-serif';
+  ctx.fillStyle = '#1e293b';
+  ctx.fillText('TM', tmX + 3, tmY + 3);
+  ctx.strokeStyle = '#d69e2e';
+  ctx.lineWidth = 6;
+  ctx.strokeText('TM', tmX, tmY);
+  ctx.fillStyle = '#b91c1c';
+  ctx.fillText('TM', tmX, tmY);
+  ctx.restore();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function buildCorporateBanner(): THREE.Group {
+  const group = new THREE.Group();
+  // Positioned higher in the upper hall span below the cornice beam (y = 3.85) with clear breathing room above the upper door lamps (y = 2.49)
+  group.position.set(0, 3.3, 0.34);
+
+  // 1. Ceiling iron mounting brackets on the cornice beam & V-rigged hemp suspension ropes
+  for (const side of [-1, 1] as const) {
+    const innerX = side * 1.12;
+    const outerX = side * 1.38;
+    // Iron cornice brackets at y = +0.52 (world y = 3.82)
+    group.add(box(0.08, 0.09, 0.08, '#1e293b', innerX, 0.52, -0.04, false));
+    group.add(sphere(0.036, '#d69e2e', innerX, 0.47, -0.01, false));
+    group.add(box(0.07, 0.08, 0.07, '#1e293b', outerX, 0.52, -0.04, false));
+
+    // Vertical main suspension rope from cornice bracket down to crossbar pole (y = +0.35)
+    group.add(cyl(0.016, 0.016, 0.18, '#c49a6c', innerX, 0.435, 0, 8, false));
+    // Angled guy-rope from outer bracket to pole collar
+    const guyRope = cyl(0.013, 0.013, 0.31, '#b78856', side * 1.25, 0.435, 0, 8, false);
+    guyRope.rotation.z = -side * 0.99;
+    group.add(guyRope);
+
+    // Brass rope knot collar on the crossbar pole
+    group.add(cyl(0.038, 0.038, 0.07, '#d69e2e', innerX, 0.35, 0, 12, false));
+  }
+
+  // 2. Horizontal wooden crossbar pole with candy-cane/gold finials
+  const poleWidth = 2.94;
+  const pole = cyl(0.028, 0.028, poleWidth, '#5c3d24', 0, 0.35, 0, 12, false);
+  pole.rotation.z = Math.PI / 2;
+  group.add(pole);
+
+  for (const side of [-1, 1] as const) {
+    const endX = side * (poleWidth * 0.5 + 0.02);
+    const collar = cyl(0.042, 0.034, 0.06, '#c53030', endX - side * 0.03, 0.35, 0, 12, false);
+    collar.rotation.z = Math.PI / 2;
+    group.add(collar);
+    group.add(sphere(0.058, '#ecc94b', endX + side * 0.02, 0.35, 0, false));
+
+    // Hanging crimson & gold side ribbons dangling from the outer crossbar ends
+    const ribbon = box(0.065, 0.42, 0.016, '#c53030', side * 1.38, 0.11, 0.01, false);
+    ribbon.rotation.z = side * 0.09;
+    group.add(ribbon);
+    group.add(sphere(0.03, '#ecc94b', side * 1.4, -0.1, 0.015, false));
+  }
+
+  // 3. 8 Brass hanging loops connecting the horizontal pole to the sagging cloth top hem
+  const bannerW = 2.68;
+  const bannerH = 0.68;
+  const ringCount = 8;
+  for (let i = 0; i < ringCount; i++) {
+    const u = 0.08 + (i / (ringCount - 1)) * 0.84;
+    const rx = (u - 0.5) * bannerW;
+    const catenarySag = Math.sin(u * Math.PI) * 0.095;
+    const strapLen = 0.065 + catenarySag;
+    const strapCenterY = 0.35 - strapLen * 0.5;
+    group.add(cyl(0.018, 0.018, strapLen, '#d69e2e', rx, strapCenterY, 0.015, 8, false));
+    group.add(sphere(0.024, '#ecc94b', rx, 0.35 - strapLen, 0.025, false));
+  }
+
+  // 4. Deformed 3D Draped Cloth Geometry (smooth catenary sag + swallowtail V-notches + smooth billow)
+  const segX = 40;
+  const segY = 14;
+  const clothGeo = new THREE.PlaneGeometry(bannerW, bannerH, segX, segY);
+  const posAttr = clothGeo.attributes.position;
+  if (posAttr) {
+    for (let i = 0; i < posAttr.count; i++) {
+      const vx = posAttr.getX(i);
+      const vy = posAttr.getY(i);
+      const u = vx / bannerW + 0.5; // 0..1 left to right
+      const v = vy / bannerH + 0.5; // 0..1 bottom to top
+
+      // Swallowtail V-notches cut inward on the left and right ends so the 3D outline is non-rectangular
+      const midPinch = 1 - Math.abs(v - 0.5) * 2; // 0 at top/bottom corners, 1 at vertical center
+      const endWeight = Math.pow(Math.abs(u - 0.5) * 2, 3.2); // active only near left/right ends
+      const notchedX = vx * (1 - 0.14 * midPinch * endWeight);
+
+      // Smooth gravity catenary sag across the span
+      const catenarySag = -Math.sin(u * Math.PI) * 0.095;
+      const drapedY = vy + catenarySag;
+
+      // Smooth forward cloth billow (no sharp normal creases across the letters)
+      const billowZ = Math.sin(u * Math.PI) * 0.046 + Math.sin(v * Math.PI) * 0.024;
+
+      posAttr.setXYZ(i, notchedX, drapedY, billowZ);
+    }
+    posAttr.needsUpdate = true;
+    clothGeo.computeVertexNormals();
+  }
+
+  const bannerTex = makeCorporateBannerTexture();
+  const clothMat = toonMaterial({
+    color: bannerTex ? 0xffffff : hexToNumber('#f6ecd7'),
+    ...(bannerTex
+      ? {
+          map: bannerTex,
+          emissive: 0xffffff,
+          emissiveMap: bannerTex,
+          emissiveIntensity: 0.32,
+        }
+      : {}),
+  });
+  const clothMesh = new THREE.Mesh(clothGeo, clothMat);
+  clothMesh.position.set(0, -0.04, 0.015);
+  clothMesh.castShadow = true;
+  clothMesh.receiveShadow = true;
+  group.add(clothMesh);
+
+  // 5. 9 Hanging 3D Gold Fringe Tassels along the sagging bottom hem of the cloth
+  const tasselCount = 9;
+  for (let i = 0; i < tasselCount; i++) {
+    const u = 0.1 + (i / (tasselCount - 1)) * 0.8;
+    const tx = (u - 0.5) * bannerW;
+    const catenarySag = -Math.sin(u * Math.PI) * 0.095;
+    const bottomY = -0.04 - bannerH * 0.5 + catenarySag;
+    const billowZ = Math.sin(u * Math.PI) * 0.048 + 0.018;
+    const tasselColor = i % 2 === 0 ? '#ecc94b' : '#c53030';
+    group.add(sphere(0.022, '#d69e2e', tx, bottomY - 0.01, billowZ, false));
+    group.add(cyl(0.012, 0.022, 0.055, tasselColor, tx, bottomY - 0.042, billowZ, 8, false));
+  }
+
+  // 6. Oversized 3D XMAS365™ Red Wax Corporate Seal & Ribbon Rosette pinned to bottom-right of cloth
+  const sealGroup = new THREE.Group();
+  sealGroup.position.set(1.02, -0.34, 0.055);
+  sealGroup.rotation.z = -0.14;
+  // Gold rosette backing & two notched ribbon tails
+  const rTailL = box(0.045, 0.14, 0.014, '#c53030', -0.028, -0.08, -0.006, false);
+  rTailL.rotation.z = -0.22;
+  const rTailR = box(0.045, 0.14, 0.014, '#22543d', 0.028, -0.08, -0.006, false);
+  rTailR.rotation.z = 0.22;
+  sealGroup.add(rTailL, rTailR);
+  const goldRim = cyl(0.082, 0.082, 0.02, '#ecc94b', 0, 0, 0, 14, false);
+  goldRim.rotation.x = Math.PI / 2;
+  sealGroup.add(goldRim);
+  const waxDisc = cyl(0.064, 0.064, 0.028, '#e53e3e', 0, 0, 0.006, 14, false);
+  waxDisc.rotation.x = Math.PI / 2;
+  sealGroup.add(waxDisc);
+  group.add(sealGroup);
+
+  // Hastily-hung corporate crooked tilt
+  group.rotation.z = -0.024;
+  return group;
+}
+
 function buildDoorHolidayEmblem(roomId: RoomId): THREE.Group {
   const g = new THREE.Group();
   const disc = cyl(0.145, 0.145, 0.022, '#fffaf0', 0, 0, 0, 18, false);
@@ -217,6 +501,10 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
   for (const side of [-1, 1] as const) {
     bay.add(cyl(0.2, 0.24, 5.8, '#3b281a', side * (WALL_WIDTH / 2 - 0.04), 2.9, 0.14, 12, false));
   }
+
+  // Hanging 3D cloth prop banner ("UNDER NEW MANAGEMENT: XMAS365") rigged below the cornice beam
+  const corporateBannerGroup = buildCorporateBanner();
+  bay.add(corporateBannerGroup);
 
   // Grand foyer carpet & central medallion rug
   const carpetMat = toonMaterial({ color: hexToNumber('#7b341e') });
@@ -719,19 +1007,78 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
     ox: number;
     oz: number;
     rotY: number;
+    hatY: number;
+    hatZ: number;
+    hatHex: `#${string}`;
+    pomHex: `#${string}`;
   }[] = [
     // Two rows of three: the back row first, then the front.
-    { roomId: 'thanksgiving', ox: -0.22, oz: -0.14, rotY: 0.35 },
-    { roomId: 'halloween', ox: 0.0, oz: -0.18, rotY: 0 },
-    { roomId: 'christmas', ox: 0.22, oz: -0.14, rotY: -0.35 },
-    { roomId: 'valentines', ox: -0.22, oz: 0.15, rotY: 0.45 },
-    { roomId: 'easter', ox: 0.0, oz: 0.19, rotY: 0 },
-    { roomId: 'fourth', ox: 0.22, oz: 0.15, rotY: -0.45 },
+    {
+      roomId: 'thanksgiving',
+      ox: -0.22,
+      oz: -0.14,
+      rotY: 0.35,
+      hatY: 0.9,
+      hatZ: 0.08,
+      hatHex: '#ed8936',
+      pomHex: '#ffea79',
+    },
+    {
+      roomId: 'halloween',
+      ox: 0.0,
+      oz: -0.18,
+      rotY: 0,
+      hatY: 0.66,
+      hatZ: 0.01,
+      hatHex: '#805ad5',
+      pomHex: '#ed8936',
+    },
+    {
+      roomId: 'christmas',
+      ox: 0.22,
+      oz: -0.14,
+      rotY: -0.35,
+      hatY: 1.06,
+      hatZ: 0,
+      hatHex: '#38a169',
+      pomHex: '#e53e3e',
+    },
+    {
+      roomId: 'valentines',
+      ox: -0.22,
+      oz: 0.15,
+      rotY: 0.45,
+      hatY: 0.88,
+      hatZ: 0.01,
+      hatHex: '#ed64a6',
+      pomHex: '#fff5f7',
+    },
+    {
+      roomId: 'easter',
+      ox: 0.0,
+      oz: 0.19,
+      rotY: 0,
+      hatY: 0.82,
+      hatZ: 0.01,
+      hatHex: '#ecc94b',
+      pomHex: '#f687b3',
+    },
+    {
+      roomId: 'fourth',
+      ox: 0.22,
+      oz: 0.15,
+      rotY: -0.45,
+      hatY: 0.98,
+      hatZ: 0.02,
+      hatHex: '#2b6cb0',
+      pomHex: '#ffffff',
+    },
   ];
 
   const cornerMascotEntries: {
     room: RoomSpec;
     group: THREE.Group;
+    hat: THREE.Group;
     worldPos: THREE.Vector3;
   }[] = [];
 
@@ -751,6 +1098,10 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
     mg.add(hitCyl);
 
     const mesh = buildMascotMesh(ROOM_MASCOT_ID[room.id], 0.34);
+    const guestHat = buildPartyHat(cSlot.hatHex, cSlot.pomHex, 0.72);
+    guestHat.position.set(0, cSlot.hatY, cSlot.hatZ);
+    guestHat.visible = false;
+    mesh.add(guestHat);
     mesh.traverse((c) => {
       c.castShadow = false;
       c.receiveShadow = false;
@@ -763,6 +1114,7 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
     cornerMascotEntries.push({
       room,
       group: mg,
+      hat: guestHat,
       worldPos: bayToWorld(theta, cornerX + cSlot.ox, 0.4, cornerZ + cSlot.oz),
     });
   }
@@ -801,6 +1153,10 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
   const ceoSantaMesh = buildMascotMesh('santa', 0.68);
   ceoSantaMesh.position.set(-0.04, 0.095, -0.02);
   ceoSantaMesh.rotation.y = 0.08;
+  const ceoSantaPartyHat = buildPartyHat('#38a169', '#ffea79', 0.82);
+  ceoSantaPartyHat.position.set(0, 0.94, 0);
+  ceoSantaPartyHat.visible = false;
+  ceoSantaMesh.add(ceoSantaPartyHat);
   santaConfrontGroup.add(ceoSantaMesh);
 
   // Oversized golden-framed XMAS365™ Merger Contract clipboard with glowing red wax seal
@@ -829,31 +1185,23 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
   // 5. Act 4 Surprise Party & 6-Tier Birthday Cake (`partyGroup`, pre-built once)
   const partyGroup = new THREE.Group();
 
-  // 5a. Festive Round Birthday Banquet Table & 6-Tier Holiday Cake at center-stage
+  // 5a. Festive 6-Tier Holiday Birthday Cake at the bottom-center foreground in front of Leap Day
   const partyCakeGroup = new THREE.Group();
-  partyCakeGroup.position.set(0, 0, 1.15);
+  partyCakeGroup.position.set(0, -0.02, 3.08);
+  partyCakeGroup.scale.setScalar(0.68);
 
-  const cakeHitMesh = new THREE.Mesh(
-    new THREE.BoxGeometry(1.3, 1.45, 1.2),
-    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
-  );
-  cakeHitMesh.position.set(0, 0.68, 0);
-  cakeHitMesh.layers.set(2);
-  partyCakeGroup.add(cakeHitMesh);
-
-  // Banquet table pedestal & cream/gold tablecloth
-  partyCakeGroup.add(cyl(0.28, 0.34, 0.08, '#5c3d24', 0, 0.04, 0, 16, false));
-  partyCakeGroup.add(cyl(0.12, 0.15, 0.42, '#7a5938', 0, 0.25, 0, 14, false));
-  partyCakeGroup.add(cyl(0.56, 0.62, 0.14, '#fffaf0', 0, 0.46, 0, 24, false));
-  partyCakeGroup.add(cyl(0.58, 0.58, 0.04, '#ecc94b', 0, 0.52, 0, 24, false));
+  // Low festive banquet platter & cream/gold tablecloth base
+  partyCakeGroup.add(cyl(0.48, 0.52, 0.05, '#5c3d24', 0, 0.025, 0, 24, false));
+  partyCakeGroup.add(cyl(0.54, 0.58, 0.09, '#fffaf0', 0, 0.08, 0, 24, false));
+  partyCakeGroup.add(cyl(0.56, 0.56, 0.035, '#ecc94b', 0, 0.13, 0, 24, false));
   for (let sw = 0; sw < 12; sw++) {
     const swAng = (sw / 12) * Math.PI * 2;
     partyCakeGroup.add(
-      sphere(0.032, '#d69e2e', Math.cos(swAng) * 0.58, 0.41, Math.sin(swAng) * 0.58, false),
+      sphere(0.03, '#d69e2e', Math.cos(swAng) * 0.56, 0.06, Math.sin(swAng) * 0.56, false),
     );
   }
   // Golden cake stand platter
-  partyCakeGroup.add(cyl(0.42, 0.36, 0.04, '#d69e2e', 0, 0.55, 0, 20, false));
+  partyCakeGroup.add(cyl(0.42, 0.36, 0.04, '#d69e2e', 0, 0.16, 0, 20, false));
 
   // 6-tier holiday-colored Birthday Cake with frosting piping
   const cakeTierColors: readonly `#${string}`[] = [
@@ -866,7 +1214,7 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
   ];
   const cakeTierRadii = [0.35, 0.295, 0.245, 0.195, 0.15, 0.11] as const;
   const cakeTierHeights = [0.095, 0.09, 0.085, 0.08, 0.075, 0.07] as const;
-  let cakeY = 0.57;
+  let cakeY = 0.18;
   for (let tIdx = 0; tIdx < 6; tIdx++) {
     const tr = cakeTierRadii[tIdx] ?? 0.15;
     const th = cakeTierHeights[tIdx] ?? 0.08;
@@ -881,7 +1229,7 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
 
   // 6 lit birthday candles with warm flickering flames around the cake tiers
   const candleRingRadius = 0.22;
-  const candleBaseY = 0.57 + 0.095 + 0.09;
+  const candleBaseY = 0.18 + 0.095 + 0.09;
   for (let cIdx = 0; cIdx < 6; cIdx++) {
     const cAng = (cIdx / 6) * Math.PI * 2 + 0.26;
     const cx = Math.cos(cAng) * candleRingRadius;
@@ -904,15 +1252,15 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
 
   partyGroup.add(partyCakeGroup);
 
-  // 5b. Overhead Festive Bunting / Confetti Garland
+  // 5b. Overhead Festive Bunting / Confetti Garland (high across the upper wall, clear of the upper doors)
   const partyBuntingGroup = new THREE.Group();
   const buntingCount = 12;
   for (let bIdx = 0; bIdx < buntingCount; bIdx++) {
     const u = bIdx / (buntingCount - 1);
     const bx = -1.48 + u * 2.96;
-    const sag = Math.sin(u * Math.PI) * 0.28;
-    const by = 2.68 - sag;
-    const bz = 0.88 + Math.sin(u * Math.PI) * 0.22;
+    const sag = Math.sin(u * Math.PI) * 0.24;
+    const by = 3.48 - sag;
+    const bz = 0.36 + Math.sin(u * Math.PI) * 0.08;
     const flagHex = cakeTierColors[bIdx % cakeTierColors.length] ?? '#ecc94b';
     const pennant = new THREE.Mesh(new THREE.ConeGeometry(0.068, 0.14, 4), mat(flagHex));
     pennant.position.set(bx, by - 0.06, bz);
@@ -924,102 +1272,8 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
   }
   partyGroup.add(partyBuntingGroup);
 
-  // 5c. All 6 freed holiday mascots + humbled Santa in a joyful semicircle, each wearing a cone party hat
-  const partyGuestsGroup = new THREE.Group();
-  const partySpots: readonly {
-    roomId: RoomId;
-    px: number;
-    pz: number;
-    rotY: number;
-    hatY: number;
-    hatZ: number;
-    hatHex: `#${string}`;
-    pomHex: `#${string}`;
-  }[] = [
-    {
-      roomId: 'halloween',
-      px: -0.82,
-      pz: 1.56,
-      rotY: 0.46,
-      hatY: 0.66,
-      hatZ: 0.01,
-      hatHex: '#805ad5',
-      pomHex: '#ed8936',
-    },
-    {
-      roomId: 'thanksgiving',
-      px: -0.5,
-      pz: 1.66,
-      rotY: 0.22,
-      hatY: 0.9,
-      hatZ: 0.08,
-      hatHex: '#ed8936',
-      pomHex: '#ffea79',
-    },
-    {
-      roomId: 'christmas',
-      px: 0.5,
-      pz: 1.66,
-      rotY: -0.22,
-      hatY: 1.06,
-      hatZ: 0,
-      hatHex: '#38a169',
-      pomHex: '#e53e3e',
-    },
-    {
-      roomId: 'valentines',
-      px: 0.82,
-      pz: 1.56,
-      rotY: -0.46,
-      hatY: 0.88,
-      hatZ: 0.01,
-      hatHex: '#ed64a6',
-      pomHex: '#fff5f7',
-    },
-    {
-      roomId: 'easter',
-      px: -0.68,
-      pz: 1.08,
-      rotY: 0.32,
-      hatY: 0.82,
-      hatZ: 0.01,
-      hatHex: '#ecc94b',
-      pomHex: '#f687b3',
-    },
-    {
-      roomId: 'fourth',
-      px: 0.68,
-      pz: 1.08,
-      rotY: -0.32,
-      hatY: 0.98,
-      hatZ: 0.02,
-      hatHex: '#2b6cb0',
-      pomHex: '#ffffff',
-    },
-  ];
-  for (const [pIdx, sp] of partySpots.entries()) {
-    const guest = buildMascotMesh(ROOM_MASCOT_ID[sp.roomId], 0.46);
-    const guestHat = buildPartyHat(sp.hatHex, sp.pomHex, 0.72);
-    guestHat.position.set(0, sp.hatY, sp.hatZ);
-    guest.add(guestHat);
-    guest.position.set(sp.px, 0.03, sp.pz);
-    guest.rotation.y = sp.rotY;
-    partyGuestsGroup.add(guest);
-    floating.push({ mesh: guest, phase: pIdx * 0.9 + 0.5, baseY: 0.03 });
-  }
-  const santaGuest = buildMascotMesh('santa', 0.48);
-  const santaPartyHat = buildPartyHat('#38a169', '#ffea79', 0.82);
-  santaPartyHat.position.set(0, 0.94, 0);
-  santaGuest.add(santaPartyHat);
-  santaGuest.position.set(-0.78, 0.03, 1.92);
-  santaGuest.rotation.y = 0.38;
-  partyGuestsGroup.add(santaGuest);
-  floating.push({ mesh: santaGuest, phase: 2.1, baseY: 0.03 });
-
-  partyGroup.add(partyGuestsGroup);
   partyGroup.visible = false;
   bay.add(partyGroup);
-  const partyCakeWorldPos = bayToWorld(theta, 0, 1.18, 1.25);
 
   const syncState = (hotspotsOut: Hotspot3D[]): void => {
     const act = gameState.act();
@@ -1033,7 +1287,9 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
     carpetMat.color.setHex(hexToNumber(act === 3 ? '#742a2a' : '#7b341e'));
 
     leapDayPartyHat.visible = finaleSolved;
-    santaConfrontGroup.visible = lampsLit >= 6 && !finaleSolved;
+    ceoSantaPartyHat.visible = finaleSolved;
+    corporateBannerGroup.visible = !finaleSolved;
+    santaConfrontGroup.visible = lampsLit >= 6;
     partyGroup.visible = finaleSolved;
 
     for (const d of builtDoors) {
@@ -1133,12 +1389,13 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
       });
     }
 
-    mascotCornerGroup.visible = !finaleSolved;
+    mascotCornerGroup.visible = true;
     const freedCornerMascots: RoomId[] = [];
     for (const entry of cornerMascotEntries) {
       const isFreed = gameState.isRoomComplete(entry.room);
-      entry.group.visible = isFreed && !finaleSolved;
-      if (isFreed && !finaleSolved) {
+      entry.group.visible = isFreed;
+      entry.hat.visible = finaleSolved;
+      if (isFreed) {
         freedCornerMascots.push(entry.room.id);
         hotspotsOut.push({
           id: `hall-mascot:${entry.room.id}`,
@@ -1160,7 +1417,7 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
       }
     }
 
-    if (freedCornerMascots.length > 0 && !finaleSolved) {
+    if (freedCornerMascots.length > 0) {
       hotspotsOut.push({
         id: 'hall:mascot-corner',
         bay: 'hall',
@@ -1184,39 +1441,24 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
     }
 
     const finaleUnlocked = lampsLit >= 6;
-    if (finaleUnlocked && !finaleSolved) {
+    if (finaleUnlocked) {
       hotspotsOut.push({
         id: 'finale:clause',
         bay: 'hall',
         kind: 'puzzle',
         label: '🎅 Merger Contract',
-        sublabel: `${gameState.voidedClauseCount()}/6 Voided · Red-Line!`,
+        sublabel: finaleSolved
+          ? '6/6 Voided ✓ · Free Play'
+          : `${gameState.voidedClauseCount()}/6 Voided · Red-Line!`,
         icon: '🎅',
-        status: 'ready',
+        status: finaleSolved ? 'done' : 'ready',
         hero: false,
-        accent: '#c53030',
+        accent: finaleSolved ? '#d69e2e' : '#c53030',
         worldPos: santaWorldPos,
         cameraPos: santaFocusPos,
         cameraLook: santaFocusLook,
         meshGroup: santaConfrontGroup,
         onClick: () => callbacks.onOpenProto(FINALE_PROTO.id, santaFocusPos, santaFocusLook),
-      });
-    } else if (finaleSolved) {
-      hotspotsOut.push({
-        id: 'finale:clause',
-        bay: 'hall',
-        kind: 'puzzle',
-        label: '🎂 Happy Birthday, Leap Day! · Xmas12 Party',
-        sublabel: '6/6 Clauses Voided ✓ · Review Merger Contract',
-        icon: '🎂',
-        status: 'done',
-        hero: false,
-        accent: '#d69e2e',
-        worldPos: partyCakeWorldPos,
-        cameraPos: doorFocusPos,
-        cameraLook: doorFocusLook,
-        meshGroup: partyGroup,
-        onClick: () => callbacks.onOpenProto(FINALE_PROTO.id, doorFocusPos, doorFocusLook),
       });
     }
   };
@@ -1333,6 +1575,9 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
       for (const fl of floating) {
         fl.mesh.position.y = fl.baseY + Math.abs(Math.sin(t * 1.9 + fl.phase)) * 0.028;
       }
+
+      corporateBannerGroup.rotation.z = -0.024 + Math.sin(t * 0.85) * 0.008;
+      corporateBannerGroup.rotation.x = Math.sin(t * 1.15 + 0.6) * 0.02;
     },
     syncState,
   };
