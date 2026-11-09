@@ -7,7 +7,6 @@
  * compensation and vertically tiered alcoves tailored for mobile portrait.
  */
 import * as THREE from 'three';
-import { common } from './content/palettes';
 import {
   type BeatId,
   type DialogueLine,
@@ -45,7 +44,6 @@ import { applyPaletteVars } from './ui/paletteVars';
 if (import.meta.env.DEV) installErrorOverlay();
 
 applyPaletteVars();
-document.body.style.setProperty('--backdrop', common.backdrop);
 
 const canvas = document.querySelector<HTMLCanvasElement>('#game');
 const ui = document.querySelector<HTMLDivElement>('#ui');
@@ -1218,12 +1216,13 @@ const ROOM_TINTS: Record<string, string> = {
 
 function showUnlockDialog(roomSpec: RoomSpec, kind: 'intro' | 'home'): void {
   const isWarmup = kind === 'intro';
+  const sizeText = roomSpec.id === 'christmas' ? '5×5 / 6×6 / 7×7' : '5×5 / 7×7 / 9×9';
   const titleText = isWarmup
     ? `${roomSpec.icon} ${roomSpec.homeTwist.title} Unlocked!`
     : `${roomSpec.icon} 5 Relic Runs Unlocked in ${roomSpec.shortTitle}!`;
   const detailText = isWarmup
-    ? `Beating the ${roomSpec.shortTitle} Intro Run (${roomSpec.warmup.title}) unlocked ${roomSpec.homeTwist.title} (Home Twist) and Free Play (5×5 / 7×7 / 9×9) on this rung!`
-    : `Beating ${roomSpec.homeTwist.title} unlocked all 5 foreign Relic Runs on the floor of ${roomSpec.shortTitle}, plus Free Play (5×5 / 7×7 / 9×9) on this rung!`;
+    ? `Beating the ${roomSpec.shortTitle} Intro Run (${roomSpec.warmup.title}) unlocked ${roomSpec.homeTwist.title} (Home Twist) and Free Play (${sizeText}) on this rung!`
+    : `Beating ${roomSpec.homeTwist.title} unlocked all 5 foreign Relic Runs on the floor of ${roomSpec.shortTitle}, plus Free Play (${sizeText}) on this rung!`;
 
   const overlay = h(
     'div',

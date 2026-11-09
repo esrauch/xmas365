@@ -37,11 +37,18 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
       /** Bumped on every new Free Play request, so a superseded one stops quietly. */
       let freePlayToken = 0;
 
-      const TIER_SIZE_LABELS: Record<Tier, string> = {
-        easy: '5×5',
-        medium: '7×7',
-        hard: '9×9',
-      };
+      const TIER_SIZE_LABELS: Record<Tier, string> =
+        freePlaySpec?.genre === 'lights'
+          ? {
+              easy: '5×5',
+              medium: '6×6',
+              hard: '7×7',
+            }
+          : {
+              easy: '5×5',
+              medium: '7×7',
+              hard: '9×9',
+            };
 
       // Row 0: Story vs Free Play (5×5 / 7×7 / 9×9) chooser bar (shown once rung is beaten or Free Play unlocked)
       const modeBar = h('div', {

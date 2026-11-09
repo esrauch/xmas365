@@ -4,57 +4,33 @@
   "tier": "medium",
   "panels": [
     {
-      "seed": 1,
-      "stats": {
-        "steps": 50
-      },
+      "seed": 122,
+      "stats": { "steps": 44 },
       "panel": {
         "name": "Lights, snow: medium 1",
-        "rows": ["6c4446c", "517fd15", "3a917a9", "2ac47ac", "447fd45", "3d1517d", "2ba9291"],
-        "plug": [6, 3],
-        "frame": {
-          "top": 1,
-          "left": 1,
-          "bottom": 4,
-          "right": 6,
-          "axis": "h"
-        }
+        "rows": ["2e82ac", "2baead", "2eab85", "2b82ed", "2eec15", "2913a9"],
+        "plug": [5, 3],
+        "frame": { "top": 0, "left": 0, "bottom": 3, "right": 3, "axis": "h" }
       }
     },
     {
-      "seed": 2,
-      "stats": {
-        "steps": 61
-      },
+      "seed": 138,
+      "stats": { "steps": 40 },
       "panel": {
         "name": "Lights, snow: medium 2",
-        "rows": ["2c446ac", "6bd7bc1", "38552bc", "2e93e85", "6beeb81", "38552e8", "2a93ab8"],
-        "plug": [6, 3],
-        "frame": {
-          "top": 1,
-          "left": 1,
-          "bottom": 6,
-          "right": 4,
-          "axis": "v"
-        }
+        "rows": ["2c4444", "6fbf95", "1783e9", "6b86bc", "52efc5", "129111"],
+        "plug": [5, 3],
+        "frame": { "top": 1, "left": 2, "bottom": 4, "right": 5, "axis": "h" }
       }
     },
     {
-      "seed": 3,
-      "stats": {
-        "steps": 58
-      },
+      "seed": 202,
+      "stats": { "steps": 37 },
       "panel": {
         "name": "Lights, snow: medium 3",
-        "rows": ["446c6c4", "57d1179", "793aab8", "7c6aae8", "57d447c", "1517d15", "2ba9381"],
-        "plug": [6, 3],
-        "frame": {
-          "top": 1,
-          "left": 0,
-          "bottom": 4,
-          "right": 5,
-          "axis": "h"
-        }
+        "rows": ["2eac68", "6d47bc", "17d169", "455478", "793d78", "382938"],
+        "plug": [5, 3],
+        "frame": { "top": 2, "left": 0, "bottom": 5, "right": 3, "axis": "v" }
       }
     }
   ]

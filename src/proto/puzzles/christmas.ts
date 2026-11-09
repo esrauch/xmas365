@@ -2,7 +2,7 @@
  * Christmas: the lights run (`revamp-centerpieces.md`). Net panels in seven
  * runs: the intro run on the fairy lights, the Christmas Tree home-twist run
  * (`snow`: mirrored frosty frame), and the five relic runs (Golden Egg,
- * Pumpkin Pie, Love Letter, Ice Pop, and Cauldron). Every panel is ≤ 7×7 and
+ * Pumpkin Pie, Love Letter, Ice Pop, and Cauldron). Every panel is ≤ 6×6 and
  * has a unique solution (`tests/puzzles/christmas.test.ts`).
  */
 import { type LightsPanel, mountLights } from '../netBoard';
@@ -58,8 +58,21 @@ export const TREE: LightsPanel[] = [
   },
   {
     name: 'Frost on the branches',
-    rows: ['...4...', '..2f8..', '..478..', '.6d7c4.', '.17d15.', '2a93ab8'],
+    rows: ['2e82ac', '2baead', '2eab85', '2b82ed', '2eec15', '2913a9'],
     plug: [5, 3],
+    frame: {
+      top: 0,
+      left: 0,
+      bottom: 3,
+      right: 3,
+      axis: 'h',
+    },
+    tip: '❄️ Snowflake: Inside the horizontal mirror frame, top and bottom partners rotate together.',
+  },
+  {
+    name: 'A taller tree',
+    rows: ['..4...', '.2f8..', '.2d4..', '46d7c.', '517d1.', '3a93a8'],
+    plug: [5, 2],
     frame: {
       top: 3,
       left: 1,
@@ -67,48 +80,8 @@ export const TREE: LightsPanel[] = [
       right: 4,
       axis: 'v',
     },
-    star: [0, 3],
-    tip: '❄️ Snowflake: Turn the mirrored lower branches to light the tree-top star.',
-  },
-  {
-    name: 'A taller tree',
-    rows: ['...4...', '..2bc..', '..6ad..', '.6d478.', '.17d14.', '2ad7abc', '2a93a81'],
-    plug: [6, 3],
-    frame: {
-      top: 4,
-      left: 1,
-      bottom: 6,
-      right: 4,
-      axis: 'v',
-    },
-    star: [0, 3],
-    tip: '❄️ Snowflake: Use the vertical mirror frame at the base to guide the upper boughs.',
-  },
-  {
-    name: 'The frosty wreath',
-    rows: ['6c4446c', '517fd15', '3a917a9', '2ac47ac', '447fd45', '3d1517d', '2ba9291'],
-    plug: [6, 3],
-    frame: {
-      top: 1,
-      left: 1,
-      bottom: 4,
-      right: 6,
-      axis: 'h',
-    },
-    tip: '❄️ Snowflake: Tiles inside the horizontal frosty frame reflect across the icy line.',
-  },
-  {
-    name: 'The Christmas Tree',
-    rows: ['2c446ac', '6bd7bc1', '38552bc', '2e93e85', '6beeb81', '38552e8', '2a93ab8'],
-    plug: [6, 3],
-    frame: {
-      top: 1,
-      left: 1,
-      bottom: 6,
-      right: 4,
-      axis: 'v',
-    },
-    tip: '❄️ Snowflake: Light the full 7×7 Christmas Tree with mirrored snowflake boughs.',
+    star: [0, 2],
+    tip: '❄️ Snowflake: Use the vertical mirror frame at the base to light the tree-top star.',
   },
 ];
 
@@ -122,23 +95,20 @@ export const EGG: LightsPanel[] = [
   },
   {
     name: 'A clutch of eggs',
-    rows: ['..2c4..', '.42bd4.', '6be83bc', '52b86c5', '3c2e939', '.3ad68.', '..2b9..'],
-    plug: [6, 3],
-    eggs: [
-      [3, 3, 11],
-      [1, 2, 14],
-    ],
-    tip: '🥚 Egg-Hunt: Route the wire so both eggs glow green at their exact step counts.',
+    rows: ['6aae8', '52c54', '52b95', '7e86d', '13a91'],
+    plug: [4, 2],
+    eggs: [[2, 1, 13]],
+    tip: '🥚 Egg-Hunt: Wind the 5×5 string so power reaches the egg in 13 wire steps.',
   },
   {
     name: 'The Golden Egg',
-    rows: ['686ac6c', '56b83d5', '392ea95', '6c69469', '53b853c', '542e96d', '13aba91'],
-    plug: [6, 3],
+    rows: ['2c2eac', '6b8169', '52eabc', '7eb829', '552eac', '13ab81'],
+    plug: [5, 3],
     eggs: [
-      [1, 3, 19],
-      [4, 3, 20],
+      [1, 2, 9],
+      [3, 3, 6],
     ],
-    tip: '🥚 Egg-Hunt: Wind the 7×7 string to hit step 19 and step 20 on the nose.',
+    tip: '🥚 Egg-Hunt: Route the 6×6 string so both eggs glow green at steps 6 and 9.',
   },
 ];
 
@@ -152,17 +122,17 @@ export const PIE: LightsPanel[] = [
   },
   {
     name: 'A bigger pie',
-    rows: ['..684..', '.2d47c.', '46fd154', '3d1547d', '2d47fd1', '.3d151.', '..129..'],
-    plug: [3, 3],
-    slices: ['..BBA..', '.BBBAA.', 'BBBBAAA', 'BBB*AAA', 'BBBAAAA', '.BBAAA.', '..BAA..'],
+    rows: ['2c684', '47fa9', '393c4', '2ec79', '293b8'],
+    plug: [2, 2],
+    slices: ['BBBBB', 'BBBBB', 'BB*AA', 'AAAAA', 'AAAAA'],
     tip: '🥧 Portioned: Keep every wire inside its own slice once it leaves the center plug.',
   },
   {
     name: 'The Pumpkin Pie',
-    rows: ['6e842ec', '13ed415', '6a917e9', '3c6ad54', '6bd413d', '3c17ead', '2b81129'],
-    plug: [3, 3],
-    slices: ['BBBBAAA', 'BBBBAAA', 'BBBBAAA', 'BBB*AAA', 'BBBAAAA', 'BBBAAAA', 'BBBAAAA'],
-    tip: '🥧 Portioned: Feed both halves of the 7×7 pie from the center without crossing the crust.',
+    rows: ['2e86ac', '6bad45', '544179', '3fd47c', '2d17d5', '2b8111'],
+    plug: [0, 3],
+    slices: ['BBB*AA', 'BBBBAA', 'BBBBAA', 'BBBAAA', 'BBBAAA', 'BBBAAA'],
+    tip: '🥧 Portioned: Feed both halves of the 6×6 pie from * without crossing the crust.',
   },
 ];
 
@@ -197,18 +167,18 @@ export const LOVELETTER: LightsPanel[] = [
   },
   {
     name: 'The Love Letter',
-    rows: ['42aec6c', '3ae97d1', '2eb813c', '6d2eaa9', '516b82c', '3c52ee9', '293a938'],
-    plug: [6, 3],
+    rows: ['4686ac', '57ad45', '3b8179', '42ec78', '3a953c', '2aaba9'],
+    plug: [5, 3],
     letters: [
-      [4, 4, 'S'],
-      [3, 2, 'N'],
-      [6, 1, 'O'],
-      [2, 1, 'W'],
+      [0, 5, 'G'],
+      [1, 4, 'O'],
+      [0, 3, 'L'],
+      [2, 2, 'D'],
     ],
-    message: '5 6 24 18',
-    word: 'SNOW',
-    blanks: [5, 6, 24, 18],
-    tip: '💌 Love-Letter: Spell SNOW across the 7×7 card at distances 5, 6, 24, and 18.',
+    message: '9 7 11 16',
+    word: 'GOLD',
+    blanks: [9, 7, 11, 16],
+    tip: '💌 Love-Letter: Spell GOLD across the 6×6 card at distances 9, 7, 11, and 16.',
   },
 ];
 
@@ -231,11 +201,11 @@ export const ICEPOP: LightsPanel[] = [
   },
   {
     name: 'The Ice Pop',
-    rows: ['6aac468', '3c2bbbc', '43c2ec1', '56d297c', '7956a95', '3817869', '2aab838'],
-    plug: [1, 1],
+    rows: ['2c46a8', '6d3d44', '178579', '452b94', '3be845', '2abab9'],
+    plug: [0, 0],
     bluePlug: [3, 3],
-    colours: ['rrrrrrr', 'rrrwrrr', 'rrrbbbr', 'rrrbbbb', 'rrrwbbb', 'rrwbbbb', 'wbbbbbb'],
-    tip: '🎆 Patriotic: Light the 7×7 Ice Pop from both plugs without letting Red and Blue touch.',
+    colours: ['rrbbbb', 'rrwbbb', 'rrwbbw', 'rwbbbr', 'rrrrrr', 'rrrrrr'],
+    tip: '🎆 Patriotic: Light the 6×6 Ice Pop from both plugs without letting Red and Blue touch.',
   },
 ];
 
@@ -262,14 +232,14 @@ export const CAULDRON: LightsPanel[] = [
   },
   {
     name: 'The Cauldron',
-    rows: ['2ec46ec', '697b955', '56d6811', '153fc6c', '4545795', '3d39169', '292aab8'],
-    plug: [3, 3],
+    rows: ['6a86c4', '3ac53d', '46fd29', '7957e8', '3c153c', '292b81'],
+    plug: [5, 3],
     dark: [
-      [5, 4],
-      [1, 0],
-      [0, 4],
+      [0, 2],
+      [4, 0],
+      [3, 2],
     ],
-    tip: '🎃 Spooky: Wire the 7×7 cauldron and deduce all three hidden ? tiles.',
+    tip: '🎃 Spooky: Wire the 6×6 cauldron and deduce all three hidden ? tiles.',
   },
 ];
 

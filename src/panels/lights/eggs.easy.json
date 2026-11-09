@@ -5,32 +5,32 @@
   "panels": [
     {
       "seed": 1,
-      "stats": { "steps": 47 },
+      "stats": { "steps": 45 },
       "panel": {
         "name": "Lights, eggs: easy 1",
-        "rows": ["4686c", "7b815", "52ec5", "3ad39", "2aba8"],
+        "rows": ["2c2ec", "6b855", "52e91", "7852c", "3aba9"],
         "plug": [4, 2],
-        "eggs": [[2, 1, 3]]
+        "eggs": [[1, 2, 7]]
       }
     },
     {
       "seed": 2,
-      "stats": { "steps": 42 },
+      "stats": { "steps": 40 },
       "panel": {
         "name": "Lights, eggs: easy 2",
-        "rows": ["6aac4", "52c55", "12bfd", "6e855", "13a91"],
+        "rows": ["6aac4", "52e95", "52bad", "7e845", "13a91"],
         "plug": [4, 2],
-        "eggs": [[3, 2, 3]]
+        "eggs": [[2, 1, 13]]
       }
     },
     {
       "seed": 3,
-      "stats": { "steps": 47 },
+      "stats": { "steps": 39 },
       "panel": {
         "name": "Lights, eggs: easy 3",
-        "rows": ["2c6c4", "6bd3d", "56b81", "512ec", "3aa91"],
+        "rows": ["46c44", "5153d", "3eb85", "692ed", "3aa91"],
         "plug": [4, 2],
-        "eggs": [[3, 2, 3]]
+        "eggs": [[2, 3, 7]]
       }
     }
   ]

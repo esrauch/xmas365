@@ -5,32 +5,32 @@
   "panels": [
     {
       "seed": 1,
-      "stats": { "steps": 51 },
+      "stats": { "steps": 40 },
       "panel": {
         "name": "Lights, slices: medium 1",
-        "rows": ["6e842ec", "13ed415", "6a917e9", "3c6ad54", "6bd413d", "3c17ead", "2b81129"],
-        "plug": [3, 3],
-        "slices": ["BBBBAAA", "BBBBAAA", "BBBBAAA", "BBB*AAA", "BBBAAAA", "BBBAAAA", "BBBAAAA"]
+        "rows": ["42c6ac", "3c7d45", "6bd17d", "56d451", "5517fc", "138111"],
+        "plug": [0, 3],
+        "slices": ["BBB*AA", "BBBBAA", "BBBBAA", "BBBAAA", "BBBAAA", "BBBAAA"]
       }
     },
     {
       "seed": 2,
-      "stats": { "steps": 63 },
+      "stats": { "steps": 38 },
       "panel": {
         "name": "Lights, slices: medium 2",
-        "rows": ["6e842c4", "13ed43d", "6ed17c5", "517a979", "52d42bc", "5417ee9", "3b81138"],
-        "plug": [3, 3],
-        "slices": ["BBBBAAA", "BBBBAAA", "BBBBAAA", "BBB*AAA", "BBBAAAA", "BBBAAAA", "BBBAAAA"]
+        "rows": ["42c6ac", "7c7d45", "55517d", "17d451", "2d17d4", "2b8139"],
+        "plug": [0, 3],
+        "slices": ["BBB*AA", "BBBBAA", "BBBBAA", "BBBAAA", "BBBAAA", "BBBAAA"]
       }
     },
     {
       "seed": 3,
-      "stats": { "steps": 52 },
+      "stats": { "steps": 37 },
       "panel": {
         "name": "Lights, slices: medium 3",
-        "rows": ["46aeaac", "396be85", "4696b81", "3b852e8", "42efaf8", "5293c7c", "3aaa911"],
-        "plug": [3, 3],
-        "slices": ["BBBBBBB", "BBBBBBB", "BBBBBBB", "BBB*AAA", "AAAAAAA", "AAAAAAA", "AAAAAAA"]
+        "rows": ["6a86ac", "3ead45", "6d4179", "53d43c", "3c17a9", "2b83a8"],
+        "plug": [0, 3],
+        "slices": ["BBB*AA", "BBBBAA", "BBBBAA", "BBBAAA", "BBBAAA", "BBBAAA"]
       }
     }
   ]

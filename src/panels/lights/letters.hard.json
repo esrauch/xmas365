@@ -4,90 +4,60 @@
   "tier": "hard",
   "panels": [
     {
-      "seed": 2,
-      "stats": { "steps": 221 },
+      "seed": 1,
+      "stats": { "steps": 123 },
       "panel": {
         "name": "Lights, letters: hard 1",
-        "rows": [
-          "2ac46aac4",
-          "42bbfe855",
-          "3e869543d",
-          "696f853a9",
-          "7813c7c2c",
-          "3eac553ad",
-          "692b93c45",
-          "3ae846939",
-          "2a92bbaa8"
-        ],
-        "plug": [8, 4],
+        "rows": ["42aec6c", "3ae97d1", "2eb813c", "6d2eaa9", "516b82c", "3c52ee9", "293a938"],
+        "plug": [6, 3],
         "letters": [
-          [2, 2, "C"],
-          [0, 5, "H"],
-          [6, 7, "I"],
-          [3, 8, "M"],
-          [6, 2, "E"]
+          [4, 4, "F"],
+          [3, 2, "R"],
+          [6, 1, "O"],
+          [2, 1, "S"],
+          [0, 3, "T"]
         ],
-        "message": "28 13 15 19 20",
-        "word": "CHIME",
-        "blanks": [28, 13, 15, 19, 20]
+        "message": "5 6 24 18 14",
+        "word": "FROST",
+        "blanks": [5, 6, 24, 18, 14]
+      }
+    },
+    {
+      "seed": 2,
+      "stats": { "steps": 163 },
+      "panel": {
+        "name": "Lights, letters: hard 2",
+        "rows": ["6ac6ac4", "52b9455", "3e86955", "692d2bd", "52abe81", "7c2c3ac", "13abaa9"],
+        "plug": [6, 3],
+        "letters": [
+          [3, 1, "L"],
+          [1, 5, "I"],
+          [1, 0, "G"],
+          [1, 1, "H"],
+          [4, 5, "T"]
+        ],
+        "message": "7 19 10 15 8",
+        "word": "LIGHT",
+        "blanks": [7, 19, 10, 15, 8]
       }
     },
     {
       "seed": 3,
-      "stats": { "steps": 278 },
-      "panel": {
-        "name": "Lights, letters: hard 2",
-        "rows": [
-          "6e86a86ec",
-          "57a92ad15",
-          "53c6aaf81",
-          "7c1782bac",
-          "556bee845",
-          "57b8552bd",
-          "554693e81",
-          "55556856c",
-          "1393b8391"
-        ],
-        "plug": [8, 4],
-        "letters": [
-          [5, 6, "L"],
-          [7, 2, "I"],
-          [8, 1, "G"],
-          [3, 5, "H"],
-          [7, 6, "T"]
-        ],
-        "message": "19 15 13 14 11",
-        "word": "LIGHT",
-        "blanks": [19, 15, 13, 14, 11]
-      }
-    },
-    {
-      "seed": 4,
-      "stats": { "steps": 267 },
+      "stats": { "steps": 196 },
       "panel": {
         "name": "Lights, letters: hard 3",
-        "rows": [
-          "6c46ac2c4",
-          "513b83ad5",
-          "5442eaad5",
-          "7b96d6855",
-          "3ea957c55",
-          "416a91795",
-          "3ab846969",
-          "6c2ebbafc",
-          "13abaa811"
-        ],
-        "plug": [8, 4],
+        "rows": ["42c6ac4", "52bd2b9", "7e83e84", "53c6fa9", "38393c4", "2ec6ad5", "293b839"],
+        "plug": [6, 3],
         "letters": [
-          [1, 4, "S"],
-          [7, 6, "H"],
-          [7, 7, "I"],
-          [6, 3, "N"],
-          [4, 4, "E"]
+          [3, 4, "C"],
+          [2, 1, "R"],
+          [2, 5, "O"],
+          [2, 6, "W"],
+          [1, 1, "N"]
         ],
-        "message": "19 5 6 21 16",
-        "word": "SHINE",
-        "blanks": [19, 5, 6, 21, 16]
+        "message": "6 12 8 9 11",
+        "word": "CROWN",
+        "blanks": [6, 12, 8, 9, 11]
       }
     }
   ]

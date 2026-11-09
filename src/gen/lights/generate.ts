@@ -38,8 +38,8 @@ export interface TierShape {
 
 export const SHAPES: Record<Tier, TierShape> = {
   easy: { width: 5, height: 5, eggs: 1, letters: 3, slices: 2, dark: 2, margin: 2 },
-  medium: { width: 7, height: 7, eggs: 2, letters: 4, slices: 2, dark: 3, margin: 3 },
-  hard: { width: 9, height: 9, eggs: 2, letters: 5, slices: 3, dark: 4, margin: 3 },
+  medium: { width: 6, height: 6, eggs: 2, letters: 4, slices: 2, dark: 3, margin: 3 },
+  hard: { width: 7, height: 7, eggs: 2, letters: 5, slices: 3, dark: 4, margin: 3 },
 };
 
 function buildBoardShape(tierShape: TierShape, kind: Spec<LightTwist>['shape'] = 'rect'): Shape {

@@ -23,7 +23,7 @@ body {
   margin: 0;
   height: 100dvh;
   overflow: hidden;
-  background: var(--backdrop, #2a3242);
+  background: #000000;
   color: var(--ink, #1f2430);
   font-family: system-ui, sans-serif;
   letter-spacing: 0.03em;
@@ -42,7 +42,7 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: var(--backdrop, #2a3242);
+  background: #000000;
   /* Establish containing block for all position:fixed game & UI descendants */
   transform: translateZ(0);
 }

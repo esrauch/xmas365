@@ -48,13 +48,13 @@ describe('Clause III (C3): Christmas · Lights (22-puzzle gauntlet)', () => {
     }
   });
 
-  it('has 22 distinct board layouts all <= 7x7 with a unique solution', () => {
+  it('has 22 distinct board layouts all <= 6x6 with a unique solution', () => {
     const seenLayouts = new Set<string>();
 
     for (const [idx, item] of CLAUSE_LIGHTS.panels.entries()) {
       const b = parse(item.panel);
-      expect(b.height, `panel ${idx} (${item.name}) height`).toBeLessThanOrEqual(7);
-      expect(b.width, `panel ${idx} (${item.name}) width`).toBeLessThanOrEqual(7);
+      expect(b.height, `panel ${idx} (${item.name}) height`).toBeLessThanOrEqual(6);
+      expect(b.width, `panel ${idx} (${item.name}) width`).toBeLessThanOrEqual(6);
 
       const layoutKey = item.panel.rows.join('/');
       expect(seenLayouts.has(layoutKey), `duplicate layout on panel ${idx} (${item.name})`).toBe(

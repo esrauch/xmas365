@@ -33,22 +33,22 @@ describe('Christmas lights run', () => {
   const twisted = [...TREE, ...EGG, ...PIE, ...LOVELETTER, ...ICEPOP, ...CAULDRON];
   const all = [...WARMUP, ...twisted];
 
-  it('defines 7 runs (5 intro + 5 home + 5×3 relic = 25 panels) with dimensions <= 7×7', () => {
+  it('defines 7 runs (5 intro + 3 home + 5×3 relic = 23 panels) with dimensions <= 6×6', () => {
     expect(fairylights.kind).toBe('intro');
     expect(tree.kind).toBe('home');
     for (const r of [goldenegg, pumpkinpie, loveletter, icepop, cauldron]) {
       expect(r.kind).toBe('relic');
     }
     expect(WARMUP).toHaveLength(5);
-    expect(TREE).toHaveLength(5);
+    expect(TREE).toHaveLength(3);
     for (const relic of [EGG, PIE, LOVELETTER, ICEPOP, CAULDRON]) {
       expect(relic).toHaveLength(3);
     }
-    expect(all).toHaveLength(25);
+    expect(all).toHaveLength(23);
     for (const p of all) {
       const b = parse(p);
-      expect(b.height, p.name).toBeLessThanOrEqual(7);
-      expect(b.width, p.name).toBeLessThanOrEqual(7);
+      expect(b.height, p.name).toBeLessThanOrEqual(6);
+      expect(b.width, p.name).toBeLessThanOrEqual(6);
     }
   });
 

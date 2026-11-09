@@ -4,31 +4,31 @@
   "tier": "easy",
   "panels": [
     {
-      "seed": 70,
+      "seed": 51,
       "stats": { "steps": 26 },
       "panel": {
         "name": "Lights, slices: easy 1",
-        "rows": ["6ac44", "16bb9", "2baec", "2ee95", "29129"],
+        "rows": ["2c684", "47fa9", "393c4", "2ec79", "293b8"],
         "plug": [2, 2],
         "slices": ["BBBBB", "BBBBB", "BB*AA", "AAAAA", "AAAAA"]
       }
     },
     {
-      "seed": 177,
+      "seed": 73,
       "stats": { "steps": 26 },
       "panel": {
         "name": "Lights, slices: easy 2",
-        "rows": ["6aeac", "54781", "393c4", "2e83d", "2baa9"],
+        "rows": ["2ac68", "2ed78", "2d3bc", "456e9", "39138"],
         "plug": [2, 2],
-        "slices": ["BBBBB", "BBBBB", "BB*AA", "AAAAA", "AAAAA"]
+        "slices": ["BBBAA", "BBBAA", "BB*AA", "BBAAA", "BBAAA"]
       }
     },
     {
-      "seed": 376,
-      "stats": { "steps": 27 },
+      "seed": 567,
+      "stats": { "steps": 26 },
       "panel": {
         "name": "Lights, slices: easy 3",
-        "rows": ["6c6ac", "17929", "2bc2c", "6ebad", "13829"],
+        "rows": ["2c444", "47fb9", "3956c", "2ebd5", "2b811"],
         "plug": [2, 2],
         "slices": ["BBBBB", "BBBBB", "BB*AA", "AAAAA", "AAAAA"]
       }

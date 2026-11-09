@@ -5,56 +5,32 @@
   "panels": [
     {
       "seed": 1,
-      "stats": {
-        "steps": 26
-      },
+      "stats": { "steps": 26 },
       "panel": {
         "name": "Lights, snow: easy 1",
         "rows": ["2eae8", "6d47c", "17d15", "45545", "39391"],
         "plug": [4, 2],
-        "frame": {
-          "top": 2,
-          "left": 0,
-          "bottom": 4,
-          "right": 3,
-          "axis": "v"
-        }
+        "frame": { "top": 2, "left": 0, "bottom": 4, "right": 3, "axis": "v" }
       }
     },
     {
       "seed": 2,
-      "stats": {
-        "steps": 33
-      },
+      "stats": { "steps": 33 },
       "panel": {
         "name": "Lights, snow: easy 2",
         "rows": ["682c4", "3c695", "47d45", "3d17d", "2ba91"],
         "plug": [4, 2],
-        "frame": {
-          "top": 0,
-          "left": 0,
-          "bottom": 2,
-          "right": 3,
-          "axis": "v"
-        }
+        "frame": { "top": 0, "left": 0, "bottom": 2, "right": 3, "axis": "v" }
       }
     },
     {
       "seed": 3,
-      "stats": {
-        "steps": 27
-      },
+      "stats": { "steps": 27 },
       "panel": {
         "name": "Lights, snow: easy 3",
         "rows": ["6e844", "53eb9", "52bec", "7e811", "13aa8"],
         "plug": [4, 2],
-        "frame": {
-          "top": 0,
-          "left": 2,
-          "bottom": 3,
-          "right": 4,
-          "axis": "h"
-        }
+        "frame": { "top": 0, "left": 2, "bottom": 3, "right": 4, "axis": "h" }
       }
     }
   ]

@@ -4,87 +4,33 @@
   "tier": "hard",
   "panels": [
     {
-      "seed": 4,
-      "stats": {
-        "steps": 106
-      },
+      "seed": 1,
+      "stats": { "steps": 50 },
       "panel": {
         "name": "Lights, snow: hard 1",
-        "rows": [
-          "2aaaaaae8",
-          "6ea82c2bc",
-          "53aec3e85",
-          "3c293eb85",
-          "2b86a92e9",
-          "2e83ac2f8",
-          "692c6be94",
-          "56ab96be9",
-          "3ba8292b8"
-        ],
-        "plug": [8, 4],
-        "frame": {
-          "top": 1,
-          "left": 0,
-          "bottom": 8,
-          "right": 6,
-          "axis": "h"
-        }
+        "rows": ["6c4446c", "517fd15", "3a917a9", "2ac47ac", "447fd45", "3d1517d", "2ba9291"],
+        "plug": [6, 3],
+        "frame": { "top": 1, "left": 1, "bottom": 4, "right": 6, "axis": "h" }
       }
     },
     {
-      "seed": 6,
-      "stats": {
-        "steps": 135
-      },
+      "seed": 2,
+      "stats": { "steps": 61 },
       "panel": {
         "name": "Lights, snow: hard 2",
-        "rows": [
-          "4442eaac4",
-          "7d7ed447d",
-          "17d117d15",
-          "455445545",
-          "3d3d79795",
-          "416d7c145",
-          "56d557c55",
-          "3d1551795",
-          "2b8392b81"
-        ],
-        "plug": [8, 4],
-        "frame": {
-          "top": 2,
-          "left": 0,
-          "bottom": 8,
-          "right": 7,
-          "axis": "v"
-        }
+        "rows": ["2c446ac", "6bd7bc1", "38552bc", "2e93e85", "6beeb81", "38552e8", "2a93ab8"],
+        "plug": [6, 3],
+        "frame": { "top": 1, "left": 1, "bottom": 6, "right": 4, "axis": "v" }
       }
     },
     {
-      "seed": 7,
-      "stats": {
-        "steps": 105
-      },
+      "seed": 3,
+      "stats": { "steps": 58 },
       "panel": {
         "name": "Lights, snow: hard 3",
-        "rows": [
-          "2c2ee8684",
-          "43e93e945",
-          "3abc6ba95",
-          "2c693c685",
-          "2fbc6bf85",
-          "2d4114785",
-          "47d447d45",
-          "793bd1179",
-          "12aabaab8"
-        ],
-        "plug": [8, 4],
-        "frame": {
-          "top": 0,
-          "left": 0,
-          "bottom": 6,
-          "right": 7,
-          "axis": "v"
-        }
+        "rows": ["446c6c4", "57d1179", "793aab8", "7c6aae8", "57d447c", "1517d15", "2ba9381"],
+        "plug": [6, 3],
+        "frame": { "top": 1, "left": 0, "bottom": 4, "right": 5, "axis": "h" }
       }
     }
   ]

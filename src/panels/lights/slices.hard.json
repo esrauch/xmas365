@@ -5,92 +5,32 @@
   "panels": [
     {
       "seed": 1,
-      "stats": { "steps": 101 },
+      "stats": { "steps": 50 },
       "panel": {
         "name": "Lights, slices: hard 1",
-        "rows": [
-          "6aae86ec4",
-          "3ac7a9539",
-          "4297c6b84",
-          "3e81512e9",
-          "47ac7ead4",
-          "7d479783d",
-          "555147c29",
-          "57fed17e8",
-          "111112938"
-        ],
-        "plug": [4, 4],
-        "slices": [
-          "BBBBBBBBB",
-          "BBBBBBBBB",
-          "ABBBBBBBC",
-          "AAABBBCCC",
-          "AAAA*CCCC",
-          "AAAAACCCC",
-          "AAAAACCCC",
-          "AAAAACCCC",
-          "AAAAACCCC"
-        ]
-      }
-    },
-    {
-      "seed": 2,
-      "stats": { "steps": 135 },
-      "panel": {
-        "name": "Lights, slices: hard 2",
-        "rows": [
-          "682c46eec",
-          "7ac791555",
-          "1453ea951",
-          "47b8782b8",
-          "3bc6d6e84",
-          "6879513e9",
-          "3ed43eafc",
-          "6917ed695",
-          "382911381"
-        ],
-        "plug": [4, 4],
-        "slices": [
-          "BBCCCCCCC",
-          "BBBCCCCCC",
-          "BBBCCCCCC",
-          "BBBBCCCCC",
-          "BBBB*AAAA",
-          "BBBBAAAAA",
-          "BBBAAAAAA",
-          "BBBAAAAAA",
-          "BBAAAAAAA"
-        ]
+        "rows": ["6e846e8", "1547954", "43d52b9", "52fbe84", "7ad43e9", "5417afc", "3b81291"],
+        "plug": [3, 3],
+        "slices": ["BBBCCCC", "BBBCCCC", "BBBCCCC", "BBB*AAA", "BBBAAAA", "BBBAAAA", "BBBAAAA"]
       }
     },
     {
       "seed": 3,
-      "stats": { "steps": 83 },
+      "stats": { "steps": 50 },
+      "panel": {
+        "name": "Lights, slices: hard 2",
+        "rows": ["2ac2aec", "2ed4695", "6917b81", "3c6d2ec", "2fd3e91", "2d16d6c", "2b81391"],
+        "plug": [3, 3],
+        "slices": ["BBBCCCC", "BBBCCCC", "BBBCCCC", "BBB*AAA", "BBBAAAA", "BBBAAAA", "BBBAAAA"]
+      }
+    },
+    {
+      "seed": 4,
+      "stats": { "steps": 50 },
       "panel": {
         "name": "Lights, slices: hard 3",
-        "rows": [
-          "6aac6c6a8",
-          "7829153ac",
-          "3ac447ee9",
-          "2efd7953c",
-          "4513d2969",
-          "7b82f82bc",
-          "12ec3ee81",
-          "4697e9384",
-          "39293aaa9"
-        ],
-        "plug": [4, 4],
-        "slices": [
-          "CCCCAAAAA",
-          "CCCCAAAAA",
-          "CCCCAAAAA",
-          "CCCCAAAAA",
-          "CCCC*AAAA",
-          "CCCBBBAAA",
-          "CBBBBBBBA",
-          "BBBBBBBBB",
-          "BBBBBBBBB"
-        ]
+        "rows": ["6842aac", "7ad42c5", "5417ab9", "3bebaec", "6ed4451", "1517f94", "2b813a9"],
+        "plug": [3, 3],
+        "slices": ["BBBCCCC", "BBBCCCC", "BBBCCCC", "BBB*AAA", "BBBAAAA", "BBBAAAA", "BBBAAAA"]
       }
     }
   ]

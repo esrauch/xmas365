@@ -4,96 +4,36 @@
   "tier": "hard",
   "panels": [
     {
-      "seed": 219,
-      "stats": { "steps": 86 },
+      "seed": 1,
+      "stats": { "steps": 50 },
       "panel": {
         "name": "Lights, colours: hard 1",
-        "rows": [
-          "2eec42c44",
-          "695556bf9",
-          "16d53947c",
-          "691568395",
-          "12abba869",
-          "6c6eeae94",
-          "53917c385",
-          "52c45382d",
-          "3a93baaa9"
-        ],
-        "plug": [1, 2],
-        "bluePlug": [7, 7],
-        "colours": [
-          "rrrwbbbbb",
-          "rrrwbbbbb",
-          "rrrwbbbbb",
-          "rrrrrrbbb",
-          "rrwrrrrbb",
-          "bbbbbbbbb",
-          "bbbbbbbbb",
-          "bbbbbbbbb",
-          "bbbbbbbbb"
-        ]
+        "rows": ["6ac6ac4", "3c392bd", "6b86e81", "52e9384", "5452c6d", "7956955", "383ba91"],
+        "plug": [2, 6],
+        "bluePlug": [3, 3],
+        "colours": ["rrrrrrr", "rrrrrrr", "rrrbbbr", "rbwbbbw", "rwbbbbb", "rrwbbbb", "rrbbbbb"]
       }
     },
     {
-      "seed": 303,
-      "stats": { "steps": 154 },
+      "seed": 4,
+      "stats": { "steps": 82 },
       "panel": {
         "name": "Lights, colours: hard 2",
-        "rows": [
-          "6c42c6c2c",
-          "513e95545",
-          "3ead4513d",
-          "2d4393ac5",
-          "2bd468695",
-          "4293bc56d",
-          "52ae83fd1",
-          "3c2bc6954",
-          "2baab92b9"
-        ],
-        "plug": [2, 2],
+        "rows": ["42c2ec4", "3c3c515", "6b87b85", "52e92e9", "3c12ad4", "692c6f9", "3aab938"],
+        "plug": [0, 3],
         "bluePlug": [5, 4],
-        "colours": [
-          "rrrrrwbbb",
-          "rrrrrwbbb",
-          "rrrrrbbbb",
-          "rrrrrbbbb",
-          "wrrbbbbbb",
-          "bwrbbbbbb",
-          "bbbbbbbbb",
-          "bbbbbbbbb",
-          "bbbbbbbbb"
-        ]
+        "colours": ["brrrrrb", "bwrrrrb", "bbbrwwb", "brrrbbb", "bbrbbbb", "bbwbbbb", "bbbbbbb"]
       }
     },
     {
-      "seed": 488,
-      "stats": { "steps": 118 },
+      "seed": 9,
+      "stats": { "steps": 72 },
       "panel": {
         "name": "Lights, colours: hard 3",
-        "rows": [
-          "6e8686c6c",
-          "53aba93d1",
-          "16ac6aebc",
-          "6bc3bc385",
-          "3c3829445",
-          "2946c2d79",
-          "44793ed14",
-          "555469169",
-          "3b93baab8"
-        ],
-        "plug": [3, 0],
-        "bluePlug": [8, 7],
-        "colours": [
-          "rrrrrrrrr",
-          "rrrrrrrrr",
-          "rrrrrrrrr",
-          "rrrrrrrrr",
-          "rrrrwrbrr",
-          "rwbbbbbrr",
-          "bbbbbbbww",
-          "bbbbbbbbb",
-          "bbbbbbbbb"
-        ]
+        "rows": ["44686ac", "3bbc3c1", "46eb83c", "5552ead", "3d12bc5", "2bae855", "2aab811"],
+        "plug": [5, 0],
+        "bluePlug": [4, 6],
+        "colours": ["rrrrbbb", "rrrrbbb", "rrrrrbb", "rrrbwbb", "rrwbwbb", "rrrwrbb", "rrrrrbb"]
       }
     }
   ]

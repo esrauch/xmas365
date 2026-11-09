@@ -4,57 +4,57 @@
   "tier": "medium",
   "panels": [
     {
-      "seed": 1,
-      "stats": { "steps": 129 },
+      "seed": 19,
+      "stats": { "steps": 99 },
       "panel": {
         "name": "Lights, letters: medium 1",
-        "rows": ["42aec6c", "3ae97d1", "2eb813c", "6d2eaa9", "516b82c", "3c52ee9", "293a938"],
-        "plug": [6, 3],
+        "rows": ["6ac684", "543ba9", "7d2eac", "516b85", "5692ed", "392a91"],
+        "plug": [5, 3],
         "letters": [
-          [4, 4, "S"],
-          [3, 2, "N"],
-          [6, 1, "O"],
-          [2, 1, "W"]
+          [1, 1, "S"],
+          [4, 3, "N"],
+          [1, 0, "O"],
+          [3, 2, "W"]
         ],
-        "message": "5 6 24 18",
+        "message": "18 3 17 9",
         "word": "SNOW",
-        "blanks": [5, 6, 24, 18]
+        "blanks": [18, 3, 17, 9]
       }
     },
     {
-      "seed": 2,
-      "stats": { "steps": 185 },
+      "seed": 277,
+      "stats": { "steps": 118 },
       "panel": {
         "name": "Lights, letters: medium 2",
-        "rows": ["6ac6ac4", "52b9455", "3e86955", "692d2bd", "52abe81", "7c2c3ac", "13abaa9"],
-        "plug": [6, 3],
+        "rows": ["4686ac", "57ad45", "3b8179", "42ec78", "3a953c", "2aaba9"],
+        "plug": [5, 3],
         "letters": [
-          [1, 5, "S"],
-          [1, 0, "T"],
-          [1, 1, "A"],
-          [4, 5, "R"]
+          [0, 5, "G"],
+          [1, 4, "O"],
+          [0, 3, "L"],
+          [2, 2, "D"]
         ],
-        "message": "19 10 15 8",
-        "word": "STAR",
-        "blanks": [19, 10, 15, 8]
+        "message": "9 7 11 16",
+        "word": "GOLD",
+        "blanks": [9, 7, 11, 16]
       }
     },
     {
-      "seed": 3,
-      "stats": { "steps": 201 },
+      "seed": 325,
+      "stats": { "steps": 107 },
       "panel": {
         "name": "Lights, letters: medium 3",
-        "rows": ["42c6ac4", "52bd2b9", "7e83e84", "53c6fa9", "38393c4", "2ec6ad5", "293b839"],
-        "plug": [6, 3],
+        "rows": ["2c2aac", "6946ad", "56bb85", "3b86c5", "42ed15", "3a93a9"],
+        "plug": [5, 3],
         "letters": [
-          [3, 4, "C"],
-          [2, 5, "O"],
-          [2, 1, "Z"],
-          [1, 1, "Y"]
+          [0, 2, "Y"],
+          [2, 0, "U"],
+          [4, 4, "L"],
+          [3, 2, "E"]
         ],
-        "message": "6 8 12 11",
-        "word": "COZY",
-        "blanks": [6, 8, 12, 11]
+        "message": "10 14 4 13",
+        "word": "YULE",
+        "blanks": [10, 14, 4, 13]
       }
     }
   ]

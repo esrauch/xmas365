@@ -5,7 +5,7 @@
   "panels": [
     {
       "seed": 1,
-      "stats": { "steps": 41 },
+      "stats": { "steps": 40 },
       "panel": {
         "name": "Lights, letters: easy 1",
         "rows": ["6c2e8", "53e94", "12be9", "6e83c", "13aa9"],
@@ -22,7 +22,7 @@
     },
     {
       "seed": 2,
-      "stats": { "steps": 45 },
+      "stats": { "steps": 44 },
       "panel": {
         "name": "Lights, letters: easy 2",
         "rows": ["6c2e8", "512bc", "7ae85", "5452d", "13ba9"],
@@ -39,7 +39,7 @@
     },
     {
       "seed": 3,
-      "stats": { "steps": 51 },
+      "stats": { "steps": 44 },
       "panel": {
         "name": "Lights, letters: easy 3",
         "rows": ["46ac4", "3d2b9", "47e84", "51545", "3abb9"],

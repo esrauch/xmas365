@@ -8,26 +8,26 @@
       "stats": { "steps": 26 },
       "panel": {
         "name": "Lights, plain: easy 1",
-        "rows": ["2aac4", "686b9", "3afc4", "6a955", "12ab9"],
-        "plug": [2, 2]
+        "rows": ["46aac", "516a9", "3c3ac", "6d42d", "13ba9"],
+        "plug": [4, 2]
       }
     },
     {
       "seed": 2,
-      "stats": { "steps": 28 },
+      "stats": { "steps": 26 },
       "panel": {
         "name": "Lights, plain: easy 2",
-        "rows": ["446ac", "55545", "3bf95", "46b85", "392a9"],
-        "plug": [2, 2]
+        "rows": ["6c6a8", "53d6c", "16b91", "43c6c", "3ab91"],
+        "plug": [4, 2]
       }
     },
     {
       "seed": 3,
-      "stats": { "steps": 27 },
+      "stats": { "steps": 26 },
       "panel": {
         "name": "Lights, plain: easy 3",
-        "rows": ["46ac4", "39695", "6afa9", "5692c", "13aa9"],
-        "plug": [2, 2]
+        "rows": ["6a868", "56ed4", "79115", "786a9", "3aba8"],
+        "plug": [4, 2]
       }
     }
   ]

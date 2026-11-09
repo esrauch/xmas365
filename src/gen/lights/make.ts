@@ -55,6 +55,28 @@ export function makePieSlices(
       slices: ['BBBAA', 'BBBBA', 'BBB*A', 'BBAAA', 'BBAAA'],
     };
   }
+  if (
+    height === 6 &&
+    width === 6 &&
+    numSlices === 2 &&
+    (!shape || shape.every((row) => !row.includes('.')))
+  ) {
+    return {
+      plug: [0, 3],
+      slices: ['BBB*AA', 'BBBBAA', 'BBBBAA', 'BBBAAA', 'BBBAAA', 'BBBAAA'],
+    };
+  }
+  if (
+    height === 7 &&
+    width === 7 &&
+    numSlices === 3 &&
+    (!shape || shape.every((row) => !row.includes('.')))
+  ) {
+    return {
+      plug: [3, 3],
+      slices: ['BBBCCCC', 'BBBCCCC', 'BBBCCCC', 'BBB*AAA', 'BBBAAAA', 'BBBAAAA', 'BBBAAAA'],
+    };
+  }
   const midR = Math.floor(height / 2);
   const midC = Math.floor(width / 2);
   if (!isInside(midR, midC)) {

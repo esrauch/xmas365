@@ -843,14 +843,7 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
     });
   }
 
-  // 2. Foreground Center: Leap Day on the Hall Rug + FEB 29 Calendar Slip
-  const hallFloorSlip = new THREE.Group();
-  hallFloorSlip.position.set(0, 0.058, 2.08);
-  hallFloorSlip.add(box(0.42, 0.012, 0.34, '#fffaf0', 0, 0, 0, false));
-  hallFloorSlip.add(box(0.42, 0.015, 0.08, '#c53030', 0, 0.001, -0.12, false));
-  hallFloorSlip.visible = false;
-  bay.add(hallFloorSlip);
-
+  // 2. Foreground Center: Leap Day on the Hall Rug
   const hallLeapDayActor = new THREE.Group();
   hallLeapDayActor.position.copy(leapDayRestPos);
   const leapDayMesh = buildMascotMesh('leapday', 0.68);
@@ -864,47 +857,6 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
   leapDayPartyHat.visible = false;
   hallLeapDayActor.add(leapDayPartyHat);
   bay.add(hallLeapDayActor);
-
-  // The year wheel: a rug of twelve month segments round Leap Day's lily pad
-  const MONTH_TINTS = [
-    '#9ec9e8', // Jan
-    '#f4a6c0', // Feb
-    '#9fd49a', // Mar
-    '#f6e58d', // Apr
-    '#c9b3e8', // May
-    '#b5e3a0', // Jun
-    '#7fa8e0', // Jul
-    '#f2c46b', // Aug
-    '#e8a65c', // Sep
-    '#f08a4b', // Oct
-    '#c98b5a', // Nov
-    '#e06a6a', // Dec
-  ];
-  const wheel = new THREE.Group();
-  wheel.position.set(leapDayRestPos.x, 0.042, leapDayRestPos.z);
-  const step = (Math.PI * 2) / 12;
-  const angleOf = (month: number): number => Math.PI / 2 - month * step - step / 2;
-  for (let m = 0; m < 12; m++) {
-    const seg = new THREE.Mesh(
-      new THREE.RingGeometry(0.56, 0.98, 6, 1, angleOf(m) - step / 2 + 0.03, step - 0.06),
-      mat(MONTH_TINTS[m] ?? '#e8d8b8'),
-    );
-    seg.rotation.x = -Math.PI / 2;
-    seg.receiveShadow = true;
-    wheel.add(seg);
-  }
-  const rim = new THREE.Mesh(new THREE.RingGeometry(0.98, 1.04, 48), mat('#5c3d24'));
-  rim.rotation.x = -Math.PI / 2;
-  rim.position.y = -0.002;
-  wheel.add(rim);
-  const febAngle = angleOf(1);
-  const slip = new THREE.Group();
-  slip.position.set(Math.cos(febAngle) * 1.17, 0.006, -Math.sin(febAngle) * 1.17);
-  slip.rotation.y = febAngle + 0.35;
-  slip.add(box(0.15, 0.012, 0.15, '#fffaf0', 0, 0, 0, false));
-  slip.add(box(0.15, 0.016, 0.04, '#c53030', 0, 0.002, -0.055, false));
-  wheel.add(slip);
-  bay.add(wheel);
 
   // Footlights along the front of the stage. This close to the rotunda's centre the hall's
   // slice is only ~1.8 wide (and a phone sees ~1.66 of it), so the row stays inside it.
@@ -1497,7 +1449,6 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
         const p = activeDoorHop.progress;
         const ease = p * p * (3 - 2 * p);
         hallLeapDayActor.visible = true;
-        hallFloorSlip.visible = false;
 
         const fullDist = leapDayRestPos.distanceTo(headingTarget);
         const maxTravel = 0.72;
@@ -1522,10 +1473,8 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
       } else if (activeIntroPose) {
         if (activeIntroPose.mode === 'hidden') {
           hallLeapDayActor.visible = false;
-          hallFloorSlip.visible = false;
         } else if (activeIntroPose.mode === 'pop') {
           const e = Math.max(0, activeIntroPose.elapsed);
-          hallFloorSlip.visible = true;
           hallLeapDayActor.visible = true;
           const popT = Math.min(1, e / 0.75);
           const popScale =
@@ -1551,7 +1500,6 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
           hallLeapDayActor.rotation.y = Math.sin(roamAngle) * 0.28;
           hallLeapDayActor.rotation.x = inAir > 0 ? Math.cos(inAir * Math.PI) * 0.08 : 0;
         } else {
-          hallFloorSlip.visible = false;
           hallLeapDayActor.visible = true;
           hallLeapDayActor.scale.setScalar(1);
           hallLeapDayActor.position.set(
