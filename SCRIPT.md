@@ -205,13 +205,13 @@ enough for government work, right?"
 **Room sign:** **Christmas+™ Hearth · 365/24/7 Crunch Mode**
 
 #### `christmas.enter`
-> **To:** Christmas+™ (fka Christmas) · **Re:** 365/24/7 Crunch Mode!
+> **To:** Christmas+™ (fka Christmas) · **Re:** Yes, Christmas Too
 >
-> Welcome to year-round peak season! To maximize elf-fficiency, sleep has
-> been deprecated and the tree restructured into a vertical org chart (note
-> my new corner office at the Star). The Snowman is in cold storage for
-> raising "work-life melt" concerns. Per my mandatory poll, morale is at
-> 110%!
+> Several of you have asked why we acquired Christmas when it's already ours.
+> It isn't. Christmas belongs to the Snowman, the elves and one cosy day in
+> December. XMAS365™ owns the *brand*. As of today, Christmas is
+> **Christmas+™**, running 365/24/7. The Snowman, who keeps insisting "one day
+> is the whole point," is in cold storage for brand misalignment.
 >
 > *S. Claus, CEO*
 
