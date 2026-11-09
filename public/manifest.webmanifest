@@ -1,6 +1,7 @@
 {
   "name": "XMAS365™",
   "short_name": "XMAS365",
+  "description": "A holiday puzzle game by Em Rauch.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
