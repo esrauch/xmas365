@@ -2,7 +2,7 @@ import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  // Relative base so the build works from any subpath (e.g. GitHub Pages /puzz/).
+  // Relative base so the build works from any subpath (e.g. GitHub Pages /xmas365/).
   base: './',
   build: {
     target: 'es2022',
