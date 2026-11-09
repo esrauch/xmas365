@@ -1098,6 +1098,9 @@ function rebuildScene(): void {
 
   buildHotspotDOM(activeDiorama.hotspots);
   syncBayUIAndHotspots();
+  if (!isRenderLoopRunning && !introActive) {
+    renderStaticSceneFrame();
+  }
 }
 
 function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
@@ -1207,7 +1210,7 @@ function closeModal(): void {
   modalHost.replaceChildren();
   hotspotLayer.style.display = '';
   sideArrowsHost.style.display = '';
-  resumeRenderLoop();
+  syncRenderLoop();
   renderActiveStoryBeat();
 }
 
@@ -1641,6 +1644,7 @@ export function openVictoryCreditsModal(): void {
     card,
   );
   modalHost.replaceChildren(backdrop);
+  syncRenderLoop();
 }
 
 function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THREE.Vector3): void {
@@ -1659,7 +1663,6 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
   isCameraFocused = true;
   focusPosTarget.copy(focusPos);
   focusLookTarget.copy(focusLook);
-  pauseRenderLoop();
 
   if (protoId === 'clause') {
     gameState.enqueueBeat('C0');
@@ -1893,6 +1896,7 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
   );
   modalHost.replaceChildren(backdrop);
   mountPuzzle();
+  syncRenderLoop(true);
 }
 
 function openCorkboardModal(initialMemoId?: MemoId): void {
@@ -2132,6 +2136,7 @@ function openCorkboardModal(initialMemoId?: MemoId): void {
   );
   modalHost.replaceChildren(backdrop);
   renderCorkboardContent();
+  syncRenderLoop();
 }
 
 function openSettingsModal(): void {
@@ -2988,6 +2993,7 @@ function openSettingsModal(): void {
   );
   modalHost.replaceChildren(backdrop);
   renderSettingsContent();
+  syncRenderLoop();
 }
 
 // 3D Raycasting + Horizontal Swipe to spin around Holiday Hall
@@ -3012,6 +3018,7 @@ function findHotspotFromObject(obj: THREE.Object3D | null): Hotspot3D | null {
 canvas.addEventListener('pointerdown', (e: PointerEvent) => {
   pointerDownX = e.clientX;
   pointerDownY = e.clientY;
+  syncRenderLoop();
 });
 
 canvas.addEventListener('pointerup', (e: PointerEvent) => {
@@ -3085,6 +3092,9 @@ gameState.subscribe(() => {
         return;
       }
       activeDiorama?.syncState();
+      if (!isRenderLoopRunning && !introActive) {
+        renderStaticSceneFrame();
+      }
       renderActiveStoryBeat();
     }
   } finally {
@@ -3093,7 +3103,13 @@ gameState.subscribe(() => {
 });
 
 if (startProtoId) {
-  openProtoModal(startProtoId, camPosCurrent.clone(), camLookCurrent.clone());
+  const hs = projectedPills.find(
+    (item) =>
+      item.hotspot.id === `puzzle:${startProtoId}` || item.hotspot.id === `finale:${startProtoId}`,
+  )?.hotspot;
+  const defaultPos = hs ? hs.cameraPos : bayToWorld(camAngleTarget, 0, 1.92, 5.15);
+  const defaultLook = hs ? hs.cameraLook : bayToWorld(camAngleTarget, 0, 1.38, 0.75);
+  openProtoModal(startProtoId, defaultPos.clone(), defaultLook.clone());
 }
 
 // --- COLD-START 3D INTRO CINEMATIC (`intro_cinematic.md`) & TAP TO START ---
@@ -3145,6 +3161,7 @@ function finishIntro(fromCinematic: boolean): void {
     renderActiveStoryBeat();
     layoutStableHotspots();
     hotspotLayer.classList.add('settled');
+    syncRenderLoop();
     return;
   }
 
@@ -3158,9 +3175,12 @@ function finishIntro(fromCinematic: boolean): void {
 
   window.setTimeout(() => {
     cleanupIntroCinematicScene();
+    introActive = false;
     activeDiorama?.setIntroPose('idle', 0);
-    hotspotLayer.style.display = '';
-    sideArrowsHost.style.display = '';
+    if (activeModal === 'none') {
+      hotspotLayer.style.display = '';
+      sideArrowsHost.style.display = '';
+    }
     topBar.style.display = 'flex';
     bottomStack.style.display = 'flex';
     renderTopBar();
@@ -3168,6 +3188,7 @@ function finishIntro(fromCinematic: boolean): void {
     renderSideArrows();
     layoutStableHotspots();
     hotspotLayer.classList.add('settled');
+    syncRenderLoop();
 
     const fadeWrapper = introHost.firstElementChild as HTMLElement | null;
     if (fadeWrapper) {
@@ -3177,10 +3198,10 @@ function finishIntro(fromCinematic: boolean): void {
     }
 
     window.setTimeout(() => {
-      introActive = false;
       introStage = 'none';
       introHost.replaceChildren();
       introHost.style.display = 'none';
+      syncRenderLoop();
       // Wait ~0.5s for Holiday Hall & Leap Day on the rug to register before opening P1
       window.setTimeout(() => {
         gameState.onEnterBay(currentBay);
@@ -3410,8 +3431,10 @@ function mountCinematicStageDOM(): void {
 }
 
 export function startIntroReplay(): void {
+  closeModal();
   introActive = true;
   mountCinematicStageDOM();
+  syncRenderLoop();
 }
 
 function mountIntroOverlay(): void {
@@ -3559,6 +3582,10 @@ function renderStaticSceneFrame(): void {
   const hPx = Math.max(1, view.canvas.clientHeight);
   syncCameraFov(w, hPx);
 
+  if (activeDiorama) {
+    activeDiorama.animate(performance.now() / 1000, currentBay);
+  }
+
   const mood = getBayLightMood(currentBay);
   targetLitColor.setRGB(mood.litTint[0], mood.litTint[1], mood.litTint[2]);
   targetShadeColor.setRGB(mood.shadeTint[0], mood.shadeTint[1], mood.shadeTint[2]);
@@ -3585,6 +3612,9 @@ function renderStaticSceneFrame(): void {
 }
 
 function onAnimationFrame(now: number): void {
+  if (activeModal !== 'none' && modalHost.childElementCount === 0) {
+    closeModal();
+  }
   fpsFrameCount++;
   const elapsedMs = now - fpsSampleStart;
   if (elapsedMs >= 166) {
@@ -3655,32 +3685,58 @@ function onAnimationFrame(now: number): void {
   view.render();
 }
 
-function pauseRenderLoop(): void {
-  renderStaticSceneFrame();
-  if (!isRenderLoopRunning) return;
-  isRenderLoopRunning = false;
-  view.renderer.setAnimationLoop(null);
-  if (isFpsEnabled()) {
-    fpsBadge.textContent = '3D PAUSED';
-    fpsBadge.style.color = '#a0aec0';
+function shouldPause3D(): boolean {
+  return (
+    !introActive &&
+    !isTransitioningBay &&
+    activeModal === 'proto' &&
+    modalHost.childElementCount > 0
+  );
+}
+
+function syncRenderLoop(forceStaticRender = false): void {
+  if (shouldPause3D()) {
+    if (forceStaticRender || isRenderLoopRunning) {
+      renderStaticSceneFrame();
+    }
+    if (isRenderLoopRunning) {
+      isRenderLoopRunning = false;
+      view.renderer.setAnimationLoop(null);
+    }
+    if (isFpsEnabled()) {
+      fpsBadge.textContent = '3D PAUSED';
+      fpsBadge.style.color = '#a0aec0';
+    }
+  } else if (!isRenderLoopRunning) {
+    isRenderLoopRunning = true;
+    fpsFrameCount = 0;
+    fpsSampleStart = performance.now();
+    view.renderer.setAnimationLoop(onAnimationFrame);
   }
 }
 
-function resumeRenderLoop(): void {
-  if (isRenderLoopRunning || activeModal === 'proto') return;
-  isRenderLoopRunning = true;
-  fpsFrameCount = 0;
-  fpsSampleStart = performance.now();
-  view.renderer.setAnimationLoop(onAnimationFrame);
-}
+new MutationObserver(() => {
+  if (modalHost.childElementCount === 0 && activeModal !== 'none') {
+    activeModal = 'none';
+    activeProtoId = null;
+    activeProtoWasSolvedOnOpen = false;
+    isCameraFocused = false;
+    hotspotLayer.style.display = '';
+    sideArrowsHost.style.display = '';
+  }
+  syncRenderLoop();
+}).observe(modalHost, { childList: true });
 
 window.addEventListener('resize', () => {
   if (!isRenderLoopRunning && !introActive) {
     renderStaticSceneFrame();
   }
 });
+window.addEventListener('focus', () => syncRenderLoop());
+window.addEventListener('pageshow', () => syncRenderLoop());
+document.addEventListener('visibilitychange', () => syncRenderLoop());
 
-resumeRenderLoop();
+syncRenderLoop();
 
 // Dev builds expose the view and gameState for debugging from the console.
 if (import.meta.env.DEV) Object.assign(window, { view, gameState });
