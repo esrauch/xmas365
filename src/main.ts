@@ -68,6 +68,11 @@ const focusPosTarget = new THREE.Vector3();
 const focusLookTarget = new THREE.Vector3();
 const camPosCurrent = bayToWorld(0, 0, 2.0, 5.15);
 const camLookCurrent = bayToWorld(0, 0, 1.35, 0.7);
+const targetLitColor = new THREE.Color();
+const targetShadeColor = new THREE.Color();
+let isRenderLoopRunning = false;
+let fpsFrameCount = 0;
+let fpsSampleStart = performance.now();
 
 function shortestAngleDelta(from: number, to: number): number {
   let diff = (to - from) % (Math.PI * 2);
@@ -1202,6 +1207,7 @@ function closeModal(): void {
   modalHost.replaceChildren();
   hotspotLayer.style.display = '';
   sideArrowsHost.style.display = '';
+  resumeRenderLoop();
   renderActiveStoryBeat();
 }
 
@@ -1653,6 +1659,7 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
   isCameraFocused = true;
   focusPosTarget.copy(focusPos);
   focusLookTarget.copy(focusLook);
+  pauseRenderLoop();
 
   if (protoId === 'clause') {
     gameState.enqueueBeat('C0');
@@ -1702,6 +1709,9 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
           return;
         }
         rebuildScene();
+        if (!isRenderLoopRunning) {
+          renderStaticSceneFrame();
+        }
         hotspotLayer.style.display = 'none';
         sideArrowsHost.style.display = 'none';
 
@@ -3544,13 +3554,37 @@ if (introActive) {
   }
 }
 
-const targetLitColor = new THREE.Color();
-const targetShadeColor = new THREE.Color();
+function renderStaticSceneFrame(): void {
+  const w = Math.max(1, view.canvas.clientWidth);
+  const hPx = Math.max(1, view.canvas.clientHeight);
+  syncCameraFov(w, hPx);
 
-let fpsFrameCount = 0;
-let fpsSampleStart = performance.now();
+  const mood = getBayLightMood(currentBay);
+  targetLitColor.setRGB(mood.litTint[0], mood.litTint[1], mood.litTint[2]);
+  targetShadeColor.setRGB(mood.shadeTint[0], mood.shadeTint[1], mood.shadeTint[2]);
+  celUniforms.celLitTint.value.copy(targetLitColor);
+  celUniforms.celShadeTint.value.copy(targetShadeColor);
+  celUniforms.celShadeGamma.value = mood.shadeGamma;
 
-view.renderer.setAnimationLoop((now) => {
+  camAngleCurrent = camAngleTarget;
+  const overviewPos = bayToWorld(camAngleCurrent, 0, 1.92, 5.15);
+  const overviewLook = bayToWorld(camAngleCurrent, 0, 1.38, 0.75);
+
+  if (isCameraFocused) {
+    camPosCurrent.copy(focusPosTarget);
+    camLookCurrent.copy(focusLookTarget);
+  } else {
+    camPosCurrent.copy(overviewPos);
+    camLookCurrent.copy(overviewLook);
+  }
+  view.camera.position.copy(camPosCurrent);
+  view.camera.lookAt(camLookCurrent);
+  view.camera.updateMatrixWorld();
+
+  view.render();
+}
+
+function onAnimationFrame(now: number): void {
   fpsFrameCount++;
   const elapsedMs = now - fpsSampleStart;
   if (elapsedMs >= 166) {
@@ -3564,8 +3598,8 @@ view.renderer.setAnimationLoop((now) => {
   }
 
   // Guarantee horizontal FOV on mobile portrait so dioramas never clip off the sides
-  const w = Math.max(1, canvas.clientWidth);
-  const hPx = Math.max(1, canvas.clientHeight);
+  const w = Math.max(1, view.canvas.clientWidth);
+  const hPx = Math.max(1, view.canvas.clientHeight);
   syncCameraFov(w, hPx);
 
   if (introActive) {
@@ -3619,7 +3653,34 @@ view.renderer.setAnimationLoop((now) => {
   view.camera.updateMatrixWorld();
 
   view.render();
+}
+
+function pauseRenderLoop(): void {
+  renderStaticSceneFrame();
+  if (!isRenderLoopRunning) return;
+  isRenderLoopRunning = false;
+  view.renderer.setAnimationLoop(null);
+  if (isFpsEnabled()) {
+    fpsBadge.textContent = '3D PAUSED';
+    fpsBadge.style.color = '#a0aec0';
+  }
+}
+
+function resumeRenderLoop(): void {
+  if (isRenderLoopRunning || activeModal === 'proto') return;
+  isRenderLoopRunning = true;
+  fpsFrameCount = 0;
+  fpsSampleStart = performance.now();
+  view.renderer.setAnimationLoop(onAnimationFrame);
+}
+
+window.addEventListener('resize', () => {
+  if (!isRenderLoopRunning && !introActive) {
+    renderStaticSceneFrame();
+  }
 });
+
+resumeRenderLoop();
 
 // Dev builds expose the view and gameState for debugging from the console.
 if (import.meta.env.DEV) Object.assign(window, { view, gameState });
