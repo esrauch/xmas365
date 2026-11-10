@@ -1210,6 +1210,9 @@ function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
 }
 
 function closeModal(): void {
+  if (activeModal === 'proto') {
+    gameState.setActivePuzzle(null);
+  }
   activeModal = 'none';
   activeProtoId = null;
   activeProtoWasSolvedOnOpen = false;
@@ -3088,6 +3091,49 @@ if (startRoomParam && BAY_ORDER.includes(startRoomParam)) {
     camAngleTarget = getBayAngle(matchingRoom.id);
     camAngleCurrent = camAngleTarget;
   }
+} else if (
+  !introActive &&
+  gameState.activePuzzle &&
+  gameState.isValidActivePuzzle(gameState.activePuzzle)
+) {
+  const savedRoom = gameState.getRoomForProto(gameState.activePuzzle.protoId);
+  if (savedRoom) {
+    currentBay = savedRoom.id;
+    camAngleTarget = getBayAngle(savedRoom.id);
+    camAngleCurrent = camAngleTarget;
+  }
+}
+
+function restoreSavedActivePuzzleModal(): boolean {
+  const saved = gameState.activePuzzle;
+  if (!saved) return false;
+  if (!gameState.isValidActivePuzzle(saved)) {
+    gameState.setActivePuzzle(null);
+    return false;
+  }
+  const targetRoom = gameState.getRoomForProto(saved.protoId);
+  const targetBay: BayId = targetRoom ? targetRoom.id : 'hall';
+  if (currentBay !== targetBay) {
+    currentBay = targetBay;
+    camAngleTarget = getBayAngle(targetBay);
+    camAngleCurrent = camAngleTarget;
+    syncBayUIAndHotspots();
+    hotspotLayer.classList.add('settled');
+  }
+  const hs = projectedPills.find(
+    (item) =>
+      item.hotspot.id === `proto:${saved.protoId}` || item.hotspot.id === `finale:${saved.protoId}`,
+  )?.hotspot;
+  const defaultPos = hs ? hs.cameraPos : bayToWorld(camAngleTarget, 0, 1.92, 5.15);
+  const defaultLook = hs ? hs.cameraLook : bayToWorld(camAngleTarget, 0, 1.38, 0.75);
+  try {
+    openProtoModal(saved.protoId, defaultPos.clone(), defaultLook.clone());
+    gameState.onEnterBay(currentBay);
+    return true;
+  } catch {
+    closeModal();
+    return false;
+  }
 }
 
 // Build initial Holiday Hall scene
@@ -3124,11 +3170,13 @@ gameState.subscribe(() => {
 if (startProtoId) {
   const hs = projectedPills.find(
     (item) =>
-      item.hotspot.id === `puzzle:${startProtoId}` || item.hotspot.id === `finale:${startProtoId}`,
+      item.hotspot.id === `proto:${startProtoId}` || item.hotspot.id === `finale:${startProtoId}`,
   )?.hotspot;
   const defaultPos = hs ? hs.cameraPos : bayToWorld(camAngleTarget, 0, 1.92, 5.15);
   const defaultLook = hs ? hs.cameraLook : bayToWorld(camAngleTarget, 0, 1.38, 0.75);
   openProtoModal(startProtoId, defaultPos.clone(), defaultLook.clone());
+} else if (!introActive && !startRoomParam) {
+  restoreSavedActivePuzzleModal();
 }
 
 // --- COLD-START 3D INTRO CINEMATIC (`intro_cinematic.md`) ---
@@ -3173,18 +3221,22 @@ function finishIntro(): void {
     cleanupIntroCinematicScene();
     introActive = false;
     activeDiorama?.setIntroPose('idle', 0);
-    if (activeModal === 'none') {
-      hotspotLayer.style.display = '';
-      sideArrowsHost.style.display = '';
-    }
     topBar.style.display = 'flex';
     bottomStack.style.display = 'flex';
+    restoreSavedActivePuzzleModal();
     renderTopBar();
     renderCarryTray();
     renderSideArrows();
     layoutStableHotspots();
     hotspotLayer.classList.add('settled');
-    syncRenderLoop();
+    if (activeModal === 'none') {
+      hotspotLayer.style.display = '';
+      sideArrowsHost.style.display = '';
+    } else {
+      hotspotLayer.style.display = 'none';
+      sideArrowsHost.style.display = 'none';
+    }
+    syncRenderLoop(true);
 
     const fadeWrapper = introHost.firstElementChild as HTMLElement | null;
     if (fadeWrapper) {
@@ -3625,6 +3677,9 @@ function syncRenderLoop(forceStaticRender = false): void {
 
 new MutationObserver(() => {
   if (modalHost.childElementCount === 0 && activeModal !== 'none') {
+    if (activeModal === 'proto') {
+      gameState.setActivePuzzle(null);
+    }
     activeModal = 'none';
     activeProtoId = null;
     activeProtoWasSolvedOnOpen = false;

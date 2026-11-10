@@ -7,7 +7,7 @@
 import { cancelGenerating, generateInBrowser } from '../gen/client';
 import type { Tier } from '../gen/core/spec';
 import { gameState, getCompactRulePill, getRunFreePlaySpec, getRunIdentity } from '../game/state';
-import { type Proto, h } from './kit';
+import { type Proto, h, panelSignature, setBoardPersistence } from './kit';
 
 export interface PanelHooks {
   /** The panel's solved; `message` is shown under it. */
@@ -29,6 +29,9 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
     panels,
     mount(host, ctx) {
       const done = gameState.solvedPanels;
+      const savedActive =
+        gameState.activePuzzle?.protoId === proto.id ? { ...gameState.activePuzzle } : null;
+      let initialRestoreConsumed = false;
       let autoAdvanceTimer = 0;
       const freePlaySpec = getRunFreePlaySpec(proto.id);
       let activeFreePlayTier: Tier | null = null;
@@ -429,10 +432,16 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
       footerRow.append(message, next);
       footer.append(advanceBarTrack, footerRow);
 
-      let at = Math.max(
-        0,
-        panels.findIndex((_, i) => !done.has(`${proto.id}:${i}`)),
-      );
+      let at =
+        savedActive &&
+        typeof savedActive.panelIdx === 'number' &&
+        savedActive.panelIdx >= 0 &&
+        savedActive.panelIdx < panels.length
+          ? savedActive.panelIdx
+          : Math.max(
+              0,
+              panels.findIndex((_, i) => !done.has(`${proto.id}:${i}`)),
+            );
       if (panels.every((_, k) => done.has(`${proto.id}:${k}`))) {
         gameState.markRunSolved(proto.id);
       }
@@ -526,11 +535,39 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         activePane = nextPane;
         board.append(nextPane);
 
+        const sig = panelSignature(fpPanel);
+        let restoredBoardState: unknown;
+        if (!initialRestoreConsumed) {
+          initialRestoreConsumed = true;
+          if (
+            savedActive?.freePlay &&
+            savedActive.freePlay.tier === tier &&
+            savedActive.freePlay.seed === seed &&
+            savedActive.panelSig === sig
+          ) {
+            restoredBoardState = savedActive.boardState;
+          }
+        }
+        gameState.setActivePuzzle({
+          protoId: proto.id,
+          panelIdx: at,
+          freePlay: { tier, seed, panel: fpPanel },
+          panelSig: sig,
+          ...(restoredBoardState !== undefined ? { boardState: restoredBoardState } : {}),
+        });
+        setBoardPersistence(nextPane, {
+          initialState: restoredBoardState,
+          onChange: (state) => {
+            gameState.updateActiveBoardState(state);
+          },
+        });
+
         let panelSolved = false;
         mountPanel(nextPane, fpPanel, {
           solved: (text) => {
             if (panelSolved) return;
             panelSolved = true;
+            gameState.setActivePuzzle(null);
             gameState.incrementFreePlaySolved(proto.id, tier);
             updateFreePlayTitle(tier, seed);
             renderModeBar();
@@ -676,14 +713,55 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         activePane = nextPane;
         board.append(nextPane);
 
+        const sig = panelSignature(panel);
+        let restoredBoardState: unknown;
+        if (!initialRestoreConsumed) {
+          initialRestoreConsumed = true;
+          if (
+            savedActive &&
+            !savedActive.freePlay &&
+            savedActive.panelIdx === i &&
+            savedActive.panelSig === sig
+          ) {
+            restoredBoardState = savedActive.boardState;
+          }
+        }
+        gameState.setActivePuzzle({
+          protoId: proto.id,
+          panelIdx: i,
+          panelSig: sig,
+          ...(restoredBoardState !== undefined ? { boardState: restoredBoardState } : {}),
+        });
+        setBoardPersistence(nextPane, {
+          initialState: restoredBoardState,
+          onChange: (state) => {
+            gameState.updateActiveBoardState(state);
+          },
+        });
+
         let panelSolved = false;
         mountPanel(nextPane, panel, {
           solved: (text) => {
             panelSolved = true;
             gameState.markPanelSolved(proto.id, i);
             const allSolved = panels.every((_, k) => done.has(`${proto.id}:${k}`));
+            const nextUnsolvedAfter = panels.findIndex(
+              (_, k) => k > i && !done.has(`${proto.id}:${k}`),
+            );
+            const anyUnsolved = panels.findIndex((_, k) => !done.has(`${proto.id}:${k}`));
+            const nextUnsolved = nextUnsolvedAfter !== -1 ? nextUnsolvedAfter : anyUnsolved;
             renderStrip(i, i, allSolved);
             if (allSolved || i === panels.length - 1) {
+              if (allSolved || nextUnsolved === -1) {
+                gameState.setActivePuzzle(null);
+              } else {
+                const nextPanel = panels[nextUnsolved] as P;
+                gameState.setActivePuzzle({
+                  protoId: proto.id,
+                  panelIdx: nextUnsolved,
+                  panelSig: panelSignature(nextPanel),
+                });
+              }
               message.className = '';
               message.textContent = '';
               next.style.visibility = 'hidden';
@@ -693,9 +771,17 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
               ctx.solved();
             } else {
               const nextIdx =
-                panels.findIndex((_, k) => k > i && !done.has(`${proto.id}:${k}`)) !== -1
-                  ? panels.findIndex((_, k) => k > i && !done.has(`${proto.id}:${k}`))
-                  : Math.min(i + 1, panels.length - 1);
+                nextUnsolvedAfter !== -1 ? nextUnsolvedAfter : Math.min(i + 1, panels.length - 1);
+              if (nextUnsolved !== -1) {
+                const nextPanel = panels[nextUnsolved] as P;
+                gameState.setActivePuzzle({
+                  protoId: proto.id,
+                  panelIdx: nextUnsolved,
+                  panelSig: panelSignature(nextPanel),
+                });
+              } else {
+                gameState.setActivePuzzle(null);
+              }
               message.className = '';
               message.style.color = '#276749';
               message.style.fontSize = '14.5px';
@@ -746,6 +832,26 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         }
       });
       host.append(modeBar, strip, topRow, helpBox, metaRow, board, footer);
+      const isFreePlayUnlocked =
+        Boolean(freePlaySpec) && (gameState.solvedRuns.has(proto.id) || gameState.freePlayUnlocked);
+      if (savedActive?.freePlay && isFreePlayUnlocked) {
+        try {
+          activeFreePlayTier = savedActive.freePlay.tier;
+          strip.style.display = 'none';
+          newFreePlayBtn.style.display = 'inline-block';
+          renderModeBar();
+          mountFreePlayPanel(
+            savedActive.freePlay.tier,
+            savedActive.freePlay.panel as P,
+            savedActive.freePlay.seed,
+          );
+          return;
+        } catch {
+          activeFreePlayTier = null;
+          currentFreePlayPanel = null;
+          initialRestoreConsumed = true;
+        }
+      }
       open(at);
     },
   };

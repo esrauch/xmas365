@@ -12,7 +12,7 @@ import {
   ROOM_SCRIPT,
 } from '../content/script';
 import type { Tier } from '../gen/core/spec';
-import type { Proto } from '../proto/kit';
+import { type Proto, panelSignature } from '../proto/kit';
 import {
   cauldron,
   fairylights,
@@ -673,6 +673,15 @@ export const FINALE_PROTO = clause;
 export const SAVE_KEY = 'puzz.save';
 export const SAVE_VERSION = 2;
 
+export interface ActivePuzzleSave {
+  protoId: string;
+  panelIdx?: number;
+  clauseIdx?: number;
+  freePlay?: { tier: Tier; seed: number; panel: unknown };
+  panelSig?: string;
+  boardState?: unknown;
+}
+
 export interface SaveData {
   version: number;
   /** Solved puzzle keys (`<protoId>:<idx>` for room runs, `clause:<genre>:<idx>` for Merger Contract clauses). */
@@ -689,6 +698,8 @@ export interface SaveData {
   freePlayUnlocked: boolean;
   /** Solved Free Play board counts keyed by `<protoId>:<tier>` (`easy` | `medium` | `hard`). */
   freePlayCounts?: Record<string, number>;
+  /** Currently open puzzle modal and in-progress board state, if any. */
+  activePuzzle?: ActivePuzzleSave;
 }
 
 function getRoomProtos(): Proto[] {
@@ -725,6 +736,7 @@ export class GameState {
   readonly freePlayCounts = new Map<string, number>();
   firstRevertedHoliday = 'Thanksgiving';
   freePlayUnlocked = false;
+  activePuzzle: ActivePuzzleSave | null = null;
 
   constructor() {
     this.loadFromStorage();
@@ -901,6 +913,7 @@ export class GameState {
       firstRevertedHoliday: this.firstRevertedHoliday,
       freePlayUnlocked: this.freePlayUnlocked,
       ...(Object.keys(fpObj).length > 0 ? { freePlayCounts: fpObj } : {}),
+      ...(this.activePuzzle ? { activePuzzle: this.activePuzzle } : {}),
     };
   }
 
@@ -1015,6 +1028,57 @@ export class GameState {
     this.recomputeDerived();
     if (this.solvedRuns.has('clause')) {
       this.freePlayUnlocked = true;
+    }
+
+    this.activePuzzle = null;
+    if (
+      obj.activePuzzle &&
+      typeof obj.activePuzzle === 'object' &&
+      !Array.isArray(obj.activePuzzle)
+    ) {
+      const ap = obj.activePuzzle as Partial<ActivePuzzleSave>;
+      if (
+        typeof ap.protoId === 'string' &&
+        (ap.protoId === 'clause' || getRoomProtos().some((p) => p.id === ap.protoId))
+      ) {
+        const sanitized: ActivePuzzleSave = { protoId: ap.protoId };
+        if (typeof ap.panelIdx === 'number' && Number.isInteger(ap.panelIdx) && ap.panelIdx >= 0) {
+          sanitized.panelIdx = ap.panelIdx;
+        }
+        if (
+          typeof ap.clauseIdx === 'number' &&
+          Number.isInteger(ap.clauseIdx) &&
+          ap.clauseIdx >= 0 &&
+          ap.clauseIdx < CLAUSE_GENRES.length
+        ) {
+          sanitized.clauseIdx = ap.clauseIdx;
+        }
+        if (
+          ap.freePlay &&
+          typeof ap.freePlay === 'object' &&
+          (ap.freePlay.tier === 'easy' ||
+            ap.freePlay.tier === 'medium' ||
+            ap.freePlay.tier === 'hard') &&
+          typeof ap.freePlay.seed === 'number' &&
+          ap.freePlay.panel &&
+          typeof ap.freePlay.panel === 'object'
+        ) {
+          sanitized.freePlay = {
+            tier: ap.freePlay.tier,
+            seed: ap.freePlay.seed,
+            panel: ap.freePlay.panel,
+          };
+        }
+        if (typeof ap.panelSig === 'string') {
+          sanitized.panelSig = ap.panelSig;
+        }
+        if (ap.boardState !== undefined) {
+          sanitized.boardState = ap.boardState;
+        }
+        if (this.isValidActivePuzzle(sanitized)) {
+          this.activePuzzle = sanitized;
+        }
+      }
     }
 
     if (persistAndNotify) {
@@ -1447,6 +1511,7 @@ export class GameState {
     this.freePlayCounts.clear();
     this.firstRevertedHoliday = 'Thanksgiving';
     this.freePlayUnlocked = false;
+    this.activePuzzle = null;
     try {
       localStorage.removeItem(SAVE_KEY);
       for (const k of Object.values(LEGACY_KEYS)) {
@@ -1472,6 +1537,90 @@ export class GameState {
     this.freePlayUnlocked = on;
     this.save();
     this.notify();
+  }
+
+  /** Persist or clear the currently open puzzle modal and its active panel/board state. */
+  setActivePuzzle(next: ActivePuzzleSave | null, notify = false): void {
+    this.activePuzzle = next ? { ...next } : null;
+    this.save();
+    if (notify) this.notify();
+  }
+
+  /** Update the in-progress board state of the currently open puzzle without triggering global UI re-renders. */
+  updateActiveBoardState(boardState: unknown): void {
+    if (!this.activePuzzle) return;
+    if (boardState === undefined) {
+      delete this.activePuzzle.boardState;
+    } else {
+      this.activePuzzle.boardState = boardState;
+    }
+    this.save();
+  }
+
+  /** Return the holiday room specification where `protoId` lives, or `null` if it's `'clause'` or unknown. */
+  getRoomForProto(protoId: string): RoomSpec | null {
+    return (
+      ROOM_SPECS.find(
+        (r) =>
+          r.warmup.id === protoId ||
+          r.homeTwist.proto.id === protoId ||
+          r.strays.some((s) => s.proto.id === protoId),
+      ) ?? null
+    );
+  }
+
+  /** Whether a puzzle run (`protoId`) exists and is currently unlocked to open. */
+  isProtoUnlocked(protoId: string): boolean {
+    if (protoId === 'clause') {
+      return (
+        this.completedRoomCount() >= 6 || this.freePlayUnlocked || this.solvedRuns.has('clause')
+      );
+    }
+    const room = this.getRoomForProto(protoId);
+    if (!room || !this.isRoomUnlocked(room)) return false;
+    if (room.warmup.id === protoId) return true;
+    if (room.homeTwist.proto.id === protoId) return this.isHomeTwistUnlocked(room);
+    if (room.strays.some((s) => s.proto.id === protoId)) return this.isStrayUnlocked(room);
+    return false;
+  }
+
+  /**
+   * Check whether a saved `ActivePuzzleSave` matches the current puzzle definitions and unlocked progression.
+   * Returns `false` if the run is locked, out of bounds, or its panel definition (`panelSig`) has changed.
+   */
+  isValidActivePuzzle(ap: ActivePuzzleSave | null | undefined): boolean {
+    if (!ap || !ap.protoId || !this.isProtoUnlocked(ap.protoId)) return false;
+    if (ap.protoId === 'clause') {
+      if (ap.clauseIdx === undefined) return true;
+      const clauseDef = ALL_CLAUSES[ap.clauseIdx];
+      if (!clauseDef) return false;
+      if (ap.panelIdx === undefined) return false;
+      const item = clauseDef.panels[ap.panelIdx];
+      if (!item) return false;
+      if (ap.panelSig !== undefined && panelSignature(item.panel) !== ap.panelSig) {
+        return false;
+      }
+      return true;
+    }
+    const proto = getRoomProtos().find((p) => p.id === ap.protoId);
+    if (!proto) return false;
+    if (ap.freePlay) {
+      if (!(this.solvedRuns.has(proto.id) || this.freePlayUnlocked)) return false;
+      if (ap.panelSig !== undefined && panelSignature(ap.freePlay.panel) !== ap.panelSig) {
+        return false;
+      }
+      return true;
+    }
+    const panels = proto.panels ?? [];
+    if (ap.panelIdx === undefined || ap.panelIdx < 0 || ap.panelIdx >= panels.length) {
+      return false;
+    }
+    const targetPanel = panels[ap.panelIdx];
+    if (!targetPanel) return false;
+    if (ap.panelSig !== undefined && panelSignature(targetPanel) !== ap.panelSig) {
+      return false;
+    }
+    return true;
   }
 
   /** Number of this room's 5 Home Relics currently placed on its shelves (`0..5`). */

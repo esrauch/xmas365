@@ -6,7 +6,7 @@
  * blanks, coded letters as their number, until a word through them is found
  * (a coded letter is then revealed everywhere, and in the key).
  */
-import { blip } from './kit';
+import { blip, getBoardPersistence } from './kit';
 import {
   type Panel,
   type Spot,
@@ -42,6 +42,41 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
   let shake = 0;
   let hintedWord: number | null = null;
   let lastFoundWord: number | null = null;
+
+  const persist = getBoardPersistence(host);
+  try {
+    const init = persist?.initialState as { found?: unknown; hintedWord?: unknown } | undefined;
+    if (init && Array.isArray(init.found)) {
+      const cand = new Set<number>();
+      let valid = true;
+      for (const idx of init.found) {
+        if (
+          typeof idx !== 'number' ||
+          !Number.isInteger(idx) ||
+          idx < 0 ||
+          idx >= panel.words.length
+        ) {
+          valid = false;
+          break;
+        }
+        cand.add(idx);
+      }
+      if (valid && cand.size < panel.words.length) {
+        for (const idx of cand) found.add(idx);
+        if (
+          typeof init.hintedWord === 'number' &&
+          Number.isInteger(init.hintedWord) &&
+          init.hintedWord >= 0 &&
+          init.hintedWord < panel.words.length &&
+          !found.has(init.hintedWord)
+        ) {
+          hintedWord = init.hintedWord;
+        }
+      }
+    }
+  } catch {
+    // Abandon invalid or stale board state.
+  }
 
   const top = document.createElement('div');
   Object.assign(top.style, { margin: '0 0 6px' });
@@ -241,6 +276,7 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
         hooks.solved();
         return;
       }
+      persist?.onChange({ found: [...found], hintedWord });
     } else if (path.length > 1) {
       shake = 6;
       blip(150, 120, 40);
@@ -535,6 +571,7 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
         hooks.solved();
         return;
       }
+      persist?.onChange({ found: [...found], hintedWord });
       render();
       return;
     }
@@ -548,6 +585,7 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
     if (nextWord !== undefined) {
       hintedWord = nextWord;
       blip(620, 70, 10);
+      persist?.onChange({ found: [...found], hintedWord });
       render();
     }
   };

@@ -14,7 +14,7 @@
  * Solved, the picture glows and chimes (and a message's blanks fill in).
  */
 import { mirrorSquare } from '../gen/core/mirror';
-import { blip, h } from './kit';
+import { blip, getBoardPersistence, h } from './kit';
 import {
   type Panel,
   type Run,
@@ -62,6 +62,69 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
   const lockedCells = new Set<string>();
   let tool = 1;
   let done = false;
+
+  const persist = getBoardPersistence(host);
+  const emitState = (): void => {
+    persist?.onChange({
+      grid: grid.map((row) => [...row]),
+      tool,
+      locked: [...lockedCells],
+    });
+  };
+  try {
+    const init = persist?.initialState as
+      { grid?: unknown; tool?: unknown; locked?: unknown } | undefined;
+    if (init && Array.isArray(init.grid) && init.grid.length === H) {
+      let valid = true;
+      const cand: number[][] = [];
+      for (let r = 0; r < H && valid; r++) {
+        const row = init.grid[r];
+        if (!Array.isArray(row) || row.length !== W) {
+          valid = false;
+          break;
+        }
+        const candRow: number[] = [];
+        for (let cc = 0; cc < W; cc++) {
+          const val = row[cc];
+          if (
+            typeof val !== 'number' ||
+            !Number.isInteger(val) ||
+            (val !== 0 && val !== CROSS && (val < 1 || val > palette.length))
+          ) {
+            valid = false;
+            break;
+          }
+          candRow.push(val);
+        }
+        cand.push(candRow);
+      }
+      if (valid && !matches(panel, cand)) {
+        for (let r = 0; r < H; r++) {
+          for (let cc = 0; cc < W; cc++) {
+            (grid[r] as number[])[cc] = cand[r]?.[cc] ?? 0;
+          }
+        }
+        if (
+          typeof init.tool === 'number' &&
+          (init.tool === CROSS || (init.tool >= 1 && init.tool <= palette.length))
+        ) {
+          tool = init.tool;
+        }
+        if (Array.isArray(init.locked)) {
+          for (const k of init.locked) {
+            if (typeof k === 'string') {
+              const [r, cc] = k.split(',').map(Number);
+              if (r !== undefined && cc !== undefined && r >= 0 && r < H && cc >= 0 && cc < W) {
+                lockedCells.add(k);
+              }
+            }
+          }
+        }
+      }
+    }
+  } catch {
+    // Abandon invalid or stale board state.
+  }
 
   // The message's blanks, as tiles (letter panels).
   const note = panel.message
@@ -159,6 +222,7 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
             },
             onclick: () => {
               tool = value;
+              emitState();
               drawBar();
             },
           },
@@ -403,6 +467,7 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
       hooks.solved();
       return;
     }
+    emitState();
     drawPortionBar();
     render();
   };
@@ -820,6 +885,7 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
         hooks.solved();
         return;
       }
+      emitState();
       drawPortionBar();
       render();
     };

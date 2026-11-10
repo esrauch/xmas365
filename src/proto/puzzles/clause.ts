@@ -17,7 +17,7 @@ import type { Panel as WebPanel } from '../../gen/webs';
 import type { Panel as WordPanel } from '../../gen/words';
 import { mountWeb } from '../hashiBoard';
 import { mountHops } from '../hopsBoard';
-import { type Proto, h } from '../kit';
+import { type Proto, h, panelSignature, setBoardPersistence } from '../kit';
 import { mountLights } from '../netBoard';
 import { mountPicture } from '../pictureBoard';
 import type { PanelHooks } from '../run';
@@ -98,6 +98,9 @@ export const clause: Proto = {
   rules:
     'Each of the 6 clauses covers one holiday Base across 22 bite-sized puzzles: 6 Twist Reminders, all 15 Double Twist combinations, and 1 All-6-Twists Finale.',
   mount(host, ctx) {
+    const savedActive =
+      gameState.activePuzzle?.protoId === 'clause' ? { ...gameState.activePuzzle } : null;
+    let initialRestoreConsumed = false;
     let autoAdvanceTimer = 0;
 
     const clearTimer = (): void => {
@@ -119,6 +122,8 @@ export const clause: Proto = {
 
     const renderChecklist = (): void => {
       clearTimer();
+      initialRestoreConsumed = true;
+      gameState.setActivePuzzle({ protoId: 'clause' });
       ctx.status('');
       const voidedCount = gameState.voidedClauseCount();
       const totalSolved = ALL_CLAUSES.reduce(
@@ -402,11 +407,14 @@ export const clause: Proto = {
 
       const panels = clauseDef.panels;
       let at =
-        initialPanelIdx ??
-        Math.max(
-          0,
-          panels.findIndex((_, i) => !gameState.isClausePanelSolved(clauseDef.genre, i)),
-        );
+        typeof initialPanelIdx === 'number' &&
+        initialPanelIdx >= 0 &&
+        initialPanelIdx < panels.length
+          ? initialPanelIdx
+          : Math.max(
+              0,
+              panels.findIndex((_, i) => !gameState.isClausePanelSolved(clauseDef.genre, i)),
+            );
       let activePane: HTMLElement | null = null;
 
       // Row 0: Clause navigation header (Back button + Clause title)
@@ -819,6 +827,33 @@ export const clause: Proto = {
         activePane = pane;
         boardStage.replaceChildren(pane);
 
+        const sig = panelSignature(item.panel);
+        let restoredBoardState: unknown;
+        if (!initialRestoreConsumed) {
+          initialRestoreConsumed = true;
+          if (
+            savedActive &&
+            savedActive.clauseIdx === clauseIdx &&
+            savedActive.panelIdx === idx &&
+            savedActive.panelSig === sig
+          ) {
+            restoredBoardState = savedActive.boardState;
+          }
+        }
+        gameState.setActivePuzzle({
+          protoId: 'clause',
+          clauseIdx,
+          panelIdx: idx,
+          panelSig: sig,
+          ...(restoredBoardState !== undefined ? { boardState: restoredBoardState } : {}),
+        });
+        setBoardPersistence(pane, {
+          initialState: restoredBoardState,
+          onChange: (state) => {
+            gameState.updateActiveBoardState(state);
+          },
+        });
+
         let solvedHere = false;
         mountClauseBoard(clauseDef.genre, pane, item.panel, {
           solved: (text) => {
@@ -830,11 +865,34 @@ export const clause: Proto = {
             const allClausesVoided = gameState.voidedClauseCount() >= ALL_CLAUSES.length;
 
             if (allClausesVoided) {
+              gameState.setActivePuzzle(null);
               message.style.color = '#276749';
               message.textContent = '🎉 All 6 Merger Contract Clauses Voided!';
               nextBtn.style.visibility = 'hidden';
               ctx.solved();
               return;
+            }
+
+            const nextUnsolvedAfter = panels.findIndex(
+              (_, k) => k > idx && !gameState.isClausePanelSolved(clauseDef.genre, k),
+            );
+            const anyUnsolvedInClause = panels.findIndex(
+              (_, k) => !gameState.isClausePanelSolved(clauseDef.genre, k),
+            );
+            const nextUnsolved = nextUnsolvedAfter !== -1 ? nextUnsolvedAfter : anyUnsolvedInClause;
+
+            if (clauseNowVoided || nextUnsolved === -1 || idx === panels.length - 1) {
+              gameState.setActivePuzzle({ protoId: 'clause' });
+            } else {
+              const nextItem = panels[nextUnsolved];
+              if (nextItem) {
+                gameState.setActivePuzzle({
+                  protoId: 'clause',
+                  clauseIdx,
+                  panelIdx: nextUnsolved,
+                  panelSig: panelSignature(nextItem.panel),
+                });
+              }
             }
 
             if (clauseNowVoided && idx === panels.length - 1) {
@@ -849,11 +907,8 @@ export const clause: Proto = {
               return;
             }
 
-            const nextUnsolved = panels.findIndex(
-              (_, k) => k > idx && !gameState.isClausePanelSolved(clauseDef.genre, k),
-            );
             const targetIdx =
-              nextUnsolved !== -1 ? nextUnsolved : Math.min(idx + 1, panels.length - 1);
+              nextUnsolvedAfter !== -1 ? nextUnsolvedAfter : Math.min(idx + 1, panels.length - 1);
 
             message.style.color = '#276749';
             message.textContent = text ? `✓ ${text}` : `✓ Puzzle ${idx + 1} solved!`;
@@ -891,6 +946,15 @@ export const clause: Proto = {
       openPanel(at);
     };
 
-    renderChecklist();
+    if (
+      savedActive &&
+      typeof savedActive.clauseIdx === 'number' &&
+      savedActive.clauseIdx >= 0 &&
+      savedActive.clauseIdx < ALL_CLAUSES.length
+    ) {
+      openClauseRunner(savedActive.clauseIdx, savedActive.panelIdx);
+    } else {
+      renderChecklist();
+    }
   },
 };

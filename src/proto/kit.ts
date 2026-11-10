@@ -31,6 +31,29 @@ export interface Ctx {
   status(text: string): void;
 }
 
+export interface BoardPersistenceHooks {
+  initialState?: unknown;
+  onChange(state: unknown): void;
+}
+
+const boardPersistence = new WeakMap<HTMLElement, BoardPersistenceHooks>();
+
+export function setBoardPersistence(host: HTMLElement, hooks: BoardPersistenceHooks): void {
+  boardPersistence.set(host, hooks);
+}
+
+export function getBoardPersistence(host: HTMLElement): BoardPersistenceHooks | undefined {
+  return boardPersistence.get(host);
+}
+
+export function panelSignature(panel: unknown): string {
+  try {
+    return JSON.stringify(panel);
+  } catch {
+    return '';
+  }
+}
+
 type Child = Node | string | null | undefined | false;
 
 /** Make an element: h('button', { class: 'x', onclick: … }, 'Label'). */

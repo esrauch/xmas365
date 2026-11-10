@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { GameState, ROOM_SPECS, STRAY_ITEMS, getRunIdentity } from '../../src/game/state';
+import { panelSignature } from '../../src/proto/kit';
 import {
   ALL_CLAUSES,
   CLAUSE_PANEL_COUNT,
@@ -259,5 +260,100 @@ describe('XMAS365™ Merger Contract Finale gauntlet (6 clauses × 22 puzzles = 
     expect(state.freePlaySolvedCount(tg.warmup.id, 'medium')).toBe(1);
 
     expect(state.importSaveJson('not-json').ok).toBe(false);
+  });
+
+  it('persists activePuzzle and abandons stale or mismatched puzzle save states cleanly', () => {
+    const state = new GameState();
+    state.resetAll();
+
+    const tg = ROOM_SPECS[1]; // Thanksgiving starts unlocked
+    const breadboardPanels = tg.warmup.panels ?? [];
+    const panel2 = breadboardPanels[2];
+    const sig2 = panelSignature(panel2);
+
+    // 1. Valid activePuzzle on an unlocked run round-trips with its boardState
+    state.setActivePuzzle({
+      protoId: tg.warmup.id,
+      panelIdx: 2,
+      panelSig: sig2,
+      boardState: { rects: [{ r: 0, c: 0, h: 1, w: 2 }], locked: [] },
+    });
+    state.updateActiveBoardState({ rects: [{ r: 0, c: 0, h: 2, w: 2 }], locked: ['0,0,2,2'] });
+
+    const savedJson = state.exportSaveJson();
+    state.resetAll();
+    expect(state.activePuzzle).toBeNull();
+
+    expect(state.importSaveJson(savedJson)).toEqual({ ok: true });
+    expect(state.activePuzzle).toEqual({
+      protoId: tg.warmup.id,
+      panelIdx: 2,
+      panelSig: sig2,
+      boardState: { rects: [{ r: 0, c: 0, h: 2, w: 2 }], locked: ['0,0,2,2'] },
+    });
+
+    // 2. If the puzzle definition changed (panelSig mismatch), the stale activePuzzle is abandoned
+    const staleSigJson = JSON.stringify({
+      ...JSON.parse(savedJson),
+      activePuzzle: {
+        protoId: tg.warmup.id,
+        panelIdx: 2,
+        panelSig: '{"modified":true}',
+        boardState: { rects: [{ r: 0, c: 0, h: 2, w: 2 }] },
+      },
+    });
+    expect(state.importSaveJson(staleSigJson)).toEqual({ ok: true });
+    expect(state.activePuzzle).toBeNull();
+
+    // 3. Out-of-bounds panelIdx or locked room run is abandoned
+    const outOfBoundsJson = JSON.stringify({
+      ...JSON.parse(savedJson),
+      activePuzzle: {
+        protoId: tg.warmup.id,
+        panelIdx: 99,
+        panelSig: sig2,
+      },
+    });
+    expect(state.importSaveJson(outOfBoundsJson)).toEqual({ ok: true });
+    expect(state.activePuzzle).toBeNull();
+
+    const lockedRoomJson = JSON.stringify({
+      ...JSON.parse(savedJson),
+      activePuzzle: {
+        protoId: 'cobwebs',
+        panelIdx: 0,
+        panelSig: panelSignature(ROOM_SPECS[0].warmup.panels?.[0]),
+      },
+    });
+    expect(state.importSaveJson(lockedRoomJson)).toEqual({ ok: true });
+    expect(state.activePuzzle).toBeNull();
+
+    // 4. Merger Contract ('clause') activePuzzle round-trips when unlocked and abandons when stale
+    state.setFreePlay(true);
+    const clausePanel = ALL_CLAUSES[5]?.panels[3]?.panel;
+    const clauseSig = panelSignature(clausePanel);
+    state.setActivePuzzle({
+      protoId: 'clause',
+      clauseIdx: 5,
+      panelIdx: 3,
+      panelSig: clauseSig,
+      boardState: { grid: [[0, 1]], tool: 1 },
+    });
+    const clauseJson = state.exportSaveJson();
+    state.resetAll();
+    expect(state.importSaveJson(clauseJson)).toEqual({ ok: true });
+    expect(state.activePuzzle?.protoId).toBe('clause');
+    expect(state.activePuzzle?.clauseIdx).toBe(5);
+    expect(state.activePuzzle?.panelIdx).toBe(3);
+
+    const staleClauseJson = JSON.stringify({
+      ...JSON.parse(clauseJson),
+      activePuzzle: {
+        ...JSON.parse(clauseJson).activePuzzle,
+        panelSig: '{"changed":true}',
+      },
+    });
+    expect(state.importSaveJson(staleClauseJson)).toEqual({ ok: true });
+    expect(state.activePuzzle).toBeNull();
   });
 });

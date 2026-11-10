@@ -24,7 +24,7 @@ import {
   splitRoutes,
   trailSegments,
 } from './hops';
-import { blip, h } from './kit';
+import { blip, getBoardPersistence, h } from './kit';
 
 const NS = 'http://www.w3.org/2000/svg';
 const BURROW = ['#8d6e63', '#5c6bc0', '#26a69a'];
@@ -149,6 +149,102 @@ export function mountHops(host: HTMLElement, panel: Panel, hooks: HopsHooks): ()
 
   const floorOf = (which: 'r' | 'b'): number =>
     which === 'r' ? (b.redStart === undefined ? 0 : 1) : b.blueStart === undefined ? 0 : 1;
+
+  const persist = getBoardPersistence(host);
+  const emitState = (): void => {
+    persist?.onChange({
+      r: [...routes.r],
+      b: [...routes.b],
+      lastBunny,
+      hintOwner: [...hintOwner.entries()],
+      hintSteps: [...hintOwner.keys()].map((spot) => [spot, b.given.get(spot) ?? 0]),
+    });
+  };
+  try {
+    const init = persist?.initialState as
+      | {
+          r?: unknown;
+          b?: unknown;
+          lastBunny?: unknown;
+          hintOwner?: unknown;
+          hintSteps?: unknown;
+        }
+      | undefined;
+    if (init && Array.isArray(init.r) && Array.isArray(init.b)) {
+      const seen = new Set<number>();
+      const validRoute = (which: 'r' | 'b', arr: unknown[]): number[] | null => {
+        const startSpot = which === 'r' ? b.redStart : b.twoBunnies ? b.blueStart : undefined;
+        if (startSpot !== undefined) {
+          if (arr.length === 0 || arr[0] !== startSpot) return null;
+        } else if (which === 'b' && !b.twoBunnies && arr.length > 0) {
+          return null;
+        }
+        const out: number[] = [];
+        for (let k = 0; k < arr.length; k++) {
+          const s = arr[k];
+          if (
+            typeof s !== 'number' ||
+            !Number.isInteger(s) ||
+            s < 0 ||
+            s >= b.spots.length ||
+            seen.has(s) ||
+            !canTake(which, s)
+          ) {
+            return null;
+          }
+          if (k > 0) {
+            const prev = out[k - 1] as number;
+            if (!(b.hops[prev] ?? []).includes(s)) return null;
+          }
+          seen.add(s);
+          out.push(s);
+        }
+        return out;
+      };
+      const candR = validRoute('r', init.r);
+      const candB = validRoute('b', init.b);
+      if (candR && candB) {
+        const comb = b.twoBunnies ? [...candR, ...candB] : candR;
+        if (!solved(b, comb)) {
+          routes.r = candR;
+          routes.b = candB;
+          if (init.lastBunny === 'r' || init.lastBunny === 'b') {
+            lastBunny = init.lastBunny;
+          }
+          if (Array.isArray(init.hintSteps) && Array.isArray(init.hintOwner)) {
+            const ownerMap = new Map<number, 'r' | 'b'>();
+            for (const pair of init.hintOwner) {
+              if (
+                Array.isArray(pair) &&
+                typeof pair[0] === 'number' &&
+                (pair[1] === 'r' || pair[1] === 'b')
+              ) {
+                ownerMap.set(pair[0], pair[1]);
+              }
+            }
+            for (const pair of init.hintSteps) {
+              if (
+                Array.isArray(pair) &&
+                typeof pair[0] === 'number' &&
+                typeof pair[1] === 'number' &&
+                pair[0] >= 0 &&
+                pair[0] < b.spots.length &&
+                !b.given.has(pair[0]) &&
+                !b.letterAt.has(pair[0]) &&
+                ownerMap.has(pair[0])
+              ) {
+                b.given.set(pair[0], pair[1]);
+                hintOwner.set(pair[0], ownerMap.get(pair[0]) as 'r' | 'b');
+                if (b.dark[pair[0]]) b.dark[pair[0]] = false;
+              }
+            }
+          }
+        }
+      }
+    }
+  } catch {
+    // Abandon invalid or stale board state.
+  }
 
   let moved = false;
   let wasBunny = false;
@@ -381,6 +477,7 @@ export function mountHops(host: HTMLElement, panel: Panel, hooks: HopsHooks): ()
       launchHopsCelebration();
       hooks.solved();
     } else {
+      emitState();
       drawNote();
       render();
     }
@@ -831,6 +928,7 @@ export function mountHops(host: HTMLElement, panel: Panel, hooks: HopsHooks): ()
       b.given.set(spot, stepNum);
       hintOwner.set(spot, bunny);
       if (b.dark[spot]) b.dark[spot] = false;
+      emitState();
       blip(660, 70, 10);
       flashSpots([spot]);
     };

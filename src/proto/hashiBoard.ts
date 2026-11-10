@@ -27,7 +27,7 @@ import {
   wallsBetween,
 } from '../gen/webs';
 import { inside, mirrorKey } from '../gen/core/mirror';
-import { blip, h } from './kit';
+import { blip, getBoardPersistence, h } from './kit';
 
 const NS = 'http://www.w3.org/2000/svg';
 const PIECE_COLOURS = ['#e8e4f0', '#8fd3ff', '#ffb36b', '#c79bff', '#7fe0a8', '#ff8fb6'];
@@ -52,6 +52,25 @@ export function mountWeb(host: HTMLElement, panel: Panel, hooks: BoardHooks): ()
       );
     });
     if (idx >= 0) threads[idx] = count;
+  }
+  const persist = getBoardPersistence(host);
+  try {
+    const init = persist?.initialState as { threads?: unknown } | undefined;
+    if (init && Array.isArray(init.threads) && init.threads.length === web.links.length) {
+      const cand = init.threads.map((x) =>
+        typeof x === 'number' && (x === 0 || x === 1 || x === 2) ? x : -1,
+      );
+      const noCross = cand.every(
+        (v, i) => v >= 0 && (v === 0 || !(web.crosses[i] ?? []).some((j) => (cand[j] ?? 0) > 0)),
+      );
+      if (noCross && !solved(web, cand)) {
+        for (let i = 0; i < cand.length; i++) {
+          threads[i] = cand[i] ?? 0;
+        }
+      }
+    }
+  } catch {
+    // Abandon invalid or stale board state.
   }
   const avail = Math.min(host.clientWidth || 360, 560);
   const flagged = [...web.rowFlags, ...web.colFlags].some((f) => f !== null);
@@ -450,6 +469,8 @@ export function mountWeb(host: HTMLElement, panel: Panel, hooks: BoardHooks): ()
       [660, 880, 1100].forEach((f, i) => setTimeout(() => blip(f, 160), i * 110));
       navigator.vibrate?.([20, 40, 20]);
       hooks.solved(web, threads);
+    } else {
+      persist?.onChange({ threads: [...threads] });
     }
   };
 

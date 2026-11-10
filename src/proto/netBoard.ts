@@ -11,7 +11,7 @@
  * - fair shares / slices (one serving wire from the middle per slice, no wires across slice walls).
  */
 import { inFrame, mirrorSquare } from '../gen/core/mirror';
-import { blip, h } from './kit';
+import { blip, getBoardPersistence, h } from './kit';
 import {
   DIRS,
   E,
@@ -74,6 +74,72 @@ export function mountLights(
   let shakeTileKey: string | null = null;
   const lockedTiles = new Set<string>();
   const revealed = (): Set<string> => (done ? new Set([...darkSet, ...lockedTiles]) : lockedTiles);
+  const persist = getBoardPersistence(host);
+  try {
+    const init = persist?.initialState as { grid?: unknown; locked?: unknown } | undefined;
+    if (init && Array.isArray(init.grid) && init.grid.length === b.height) {
+      let valid = true;
+      const cand: number[][] = [];
+      for (let r = 0; r < b.height && valid; r++) {
+        const row = init.grid[r];
+        if (!Array.isArray(row) || row.length !== b.width) {
+          valid = false;
+          break;
+        }
+        const candRow: number[] = [];
+        for (let c = 0; c < b.width; c++) {
+          const val = row[c];
+          const base = grid[r]?.[c] ?? -1;
+          if (typeof val !== 'number' || !Number.isInteger(val)) {
+            valid = false;
+            break;
+          }
+          if (base < 0) {
+            if (val >= 0) {
+              valid = false;
+              break;
+            }
+            candRow.push(-1);
+          } else {
+            const rot0 = base;
+            const rot1 = turn(rot0);
+            const rot2 = turn(rot1);
+            const rot3 = turn(rot2);
+            if (val !== rot0 && val !== rot1 && val !== rot2 && val !== rot3) {
+              valid = false;
+              break;
+            }
+            candRow.push(val);
+          }
+        }
+        cand.push(candRow);
+      }
+      if (valid && !solved(b, cand)) {
+        for (let r = 0; r < b.height; r++) {
+          for (let c = 0; c < b.width; c++) {
+            (grid[r] as number[])[c] = cand[r]?.[c] ?? -1;
+          }
+        }
+        if (Array.isArray(init.locked)) {
+          for (const k of init.locked) {
+            if (typeof k === 'string') {
+              const [r, c] = k.split(',').map(Number);
+              if (
+                r !== undefined &&
+                c !== undefined &&
+                b.inside(r, c) &&
+                (grid[r]?.[c] ?? -1) === (b.solution[r]?.[c] ?? -2)
+              ) {
+                lockedTiles.add(k);
+              }
+            }
+          }
+        }
+      }
+    }
+  } catch {
+    // Abandon invalid or stale board state.
+  }
   const W = b.width * cell + pad;
   const H = b.height * cell + pad;
 
@@ -263,6 +329,10 @@ export function mountLights(
       launchLightsCelebration();
       hooks.solved();
     } else {
+      persist?.onChange({
+        grid: grid.map((row) => [...row]),
+        locked: [...lockedTiles],
+      });
       drawNote();
       render();
     }

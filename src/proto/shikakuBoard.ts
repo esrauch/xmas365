@@ -22,7 +22,7 @@ import {
   solve,
   solved,
 } from '../gen/carving';
-import { blip } from './kit';
+import { blip, getBoardPersistence } from './kit';
 
 const NS = 'http://www.w3.org/2000/svg';
 const DISH: Record<string, string> = { T: '🦃', P: '🥧', C: '🍒' };
@@ -124,6 +124,58 @@ export function mountCarving(host: HTMLElement, panel: Panel, hooks: CarveHooks)
     x.r < y.r + y.h && y.r < x.r + x.h && x.c < y.c + y.w && y.c < x.c + x.w;
   const inside = (x: Rect, r: number, c: number): boolean =>
     r >= x.r && r < x.r + x.h && c >= x.c && c < x.c + x.w;
+
+  const persist = getBoardPersistence(host);
+  try {
+    const init = persist?.initialState as { rects?: unknown; locked?: unknown } | undefined;
+    if (init && Array.isArray(init.rects)) {
+      const cand: Rect[] = [];
+      let valid = true;
+      for (const item of init.rects) {
+        if (!item || typeof item !== 'object') {
+          valid = false;
+          break;
+        }
+        const { r, c, h, w } = item as Record<string, unknown>;
+        if (
+          typeof r !== 'number' ||
+          typeof c !== 'number' ||
+          typeof h !== 'number' ||
+          typeof w !== 'number' ||
+          !Number.isInteger(r) ||
+          !Number.isInteger(c) ||
+          !Number.isInteger(h) ||
+          !Number.isInteger(w) ||
+          r < 0 ||
+          c < 0 ||
+          h < 1 ||
+          w < 1 ||
+          r + h > b.height ||
+          c + w > b.width
+        ) {
+          valid = false;
+          break;
+        }
+        const rx: Rect = { r, c, h, w };
+        if (cand.some((other) => overlaps(rx, other))) {
+          valid = false;
+          break;
+        }
+        cand.push(rx);
+      }
+      if (valid && !solved(b, cand)) {
+        rects = cand;
+        if (Array.isArray(init.locked)) {
+          const validKeys = new Set(rects.map(rectKey));
+          for (const k of init.locked) {
+            if (typeof k === 'string' && validKeys.has(k)) lockedRectKeys.add(k);
+          }
+        }
+      }
+    }
+  } catch {
+    // Abandon invalid or stale board state.
+  }
 
   svg.addEventListener('pointerdown', (e) => {
     if (done) return;
@@ -304,7 +356,13 @@ export function mountCarving(host: HTMLElement, panel: Panel, hooks: CarveHooks)
       launchCarvingCelebration();
       drawNote(true);
       hooks.solved();
-    } else render();
+    } else {
+      persist?.onChange({
+        rects: rects.map((x) => ({ r: x.r, c: x.c, h: x.h, w: x.w })),
+        locked: [...lockedRectKeys],
+      });
+      render();
+    }
   };
 
   const render = (): void => {
