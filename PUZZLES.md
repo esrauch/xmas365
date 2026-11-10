@@ -295,8 +295,10 @@ them (and spare eggs) to keep each twist about as hard as a plain board
 
 All six columns are in the generator (⚙️), generating across easy, medium, and hard.
 
-- **Love Letters (Cupid's Bow, ✅; ⚙️):** some clue numbers are letters; a message
-  fills in.
+- **Love Letters (Cupid's Bow, ✅; ⚙️):** every letter of a fireworks word
+  (BOOM, GLOW, LIGHT, ...) is a run length, so the message is all numbered
+  blanks: unscramble the clue letters into the word to learn the numbers, then
+  solve the picture.
 - **Snowflakes (⚙️):** inside a frosty frame, the filled squares mirror; clues
   cover whole lines, so they differ outside the frame.
 - **Spooky (Witch's Broom, ✅; ⚙️):** some clues are in the dark (at most one

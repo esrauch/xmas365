@@ -30,7 +30,7 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
       key: 'letters',
       icon: '💌',
       label: 'Love-Letter',
-      rule: 'Letter clues stand for run lengths; same letter = same length, different letters = different lengths, filling the message blanks.',
+      rule: 'Letter clues stand for run lengths; same letter = same length, different letters = different lengths. The message blanks spell a word: unscramble it to learn the lengths.',
     },
     {
       key: 'colours',
@@ -81,12 +81,12 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
       twists: ['letters'],
       tip: '💌 Love Letters: Equal letters mean equal run lengths; distinct letters differ.',
       explain:
-        'In Fireworks, letter clues replace run lengths: every matching letter has the exact same length, different letters have different lengths, and solving them fills the message blanks.',
+        'In Fireworks, letter clues replace run lengths: every matching letter has the exact same length, different letters have different lengths, and the numbered message blanks spell a word, so unscrambling the letters into it gives each length.',
       panel: {
         name: 'Secret Sparkler',
         rows: ['..#.', '.###', '####', '.#.#'],
-        letters: 'T S',
-        message: '31AR',
+        letters: 'M ZO',
+        message: '3441',
       },
     },
     {
@@ -160,8 +160,8 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
           ['col', 1, 1],
           ['col', 0, 0],
         ],
-        letters: 'T S',
-        message: '31AR',
+        letters: 'ABNG',
+        message: '2134',
       },
     },
     {
@@ -246,8 +246,8 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
         name: 'Crimson Verse',
         rows: ['.RR..', 'RRR..', 'RRR.B', 'RRBB.', 'R....'],
         palette: 'RB',
-        letters: 'TB',
-        message: '2URS1',
+        letters: 'OGLW',
+        message: '2314',
       },
     },
     {
@@ -264,8 +264,8 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
           [0, 3, 2],
           [1, 1, 2],
         ],
-        letters: 'RS',
-        message: '2TA1',
+        letters: 'ELVO',
+        message: '2431',
       },
     },
     {
@@ -279,8 +279,8 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
         name: 'Sweet Shares',
         rows: ['.####', '##.##', '###..', '.#.#.', '....#'],
         portions: ['AABBB', 'AAABB', 'AAAAB', 'ABAAB', 'BBBBB'],
-        letters: '  LV',
-        message: '3O4E',
+        letters: 'IRFE',
+        message: '3124',
       },
     },
     {
@@ -292,10 +292,10 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
         'Filled squares inside the frosty frame mirror across its centerline, helping you work out the exact value of each letter clue.',
       panel: {
         name: 'Icy Valentine',
-        rows: ['#..#.', '....#', '#..##', '.##.#', '..#..'],
+        rows: ['#####', '....#', '#..#.', '.##.#', '..#..'],
         frame: { top: 0, bottom: 3, left: 0, right: 3, axis: 'v' },
-        letters: ' OW',
-        message: 'GL23',
+        letters: 'BO  M',
+        message: '1225',
       },
     },
     {
@@ -414,8 +414,8 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
           ['row', 2, 1],
           ['col', 5, 1],
         ],
-        letters: 'SR',
-        message: '1TA2',
+        letters: 'PO',
+        message: '121',
       },
     },
   ],

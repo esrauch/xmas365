@@ -5,41 +5,32 @@
   "panels": [
     {
       "seed": 2,
-      "stats": {
-        "steps": 20,
-        "without letters": 2
-      },
+      "stats": { "steps": 168, "without letters": 2 },
       "panel": {
         "name": "Picture grids, letters: medium 1",
         "rows": [".#..##.", ".#..###", ".#####.", ".#####.", "######.", ".#####.", ".#..##."],
-        "letters": " TH  I",
-        "message": "L6G32"
+        "letters": " OEVL",
+        "message": "5243"
+      }
+    },
+    {
+      "seed": 4,
+      "stats": { "steps": 139, "without letters": 2 },
+      "panel": {
+        "name": "Picture grids, letters: medium 2",
+        "rows": [".#...##", "..##.##", "..##.##", "..##.##", "..##.##", "#.###.#", "..#####"],
+        "letters": " BG A N",
+        "message": "2573"
       }
     },
     {
       "seed": 5,
-      "stats": {
-        "steps": 76,
-        "without letters": 2
-      },
-      "panel": {
-        "name": "Picture grids, letters: medium 2",
-        "rows": [".#.....", ".####..", "#######", ".#####.", ".#####.", ".####..", ".#####."],
-        "letters": "   ARH",
-        "message": "6E45T"
-      }
-    },
-    {
-      "seed": 6,
-      "stats": {
-        "steps": 109,
-        "without letters": 2
-      },
+      "stats": { "steps": 2069, "without letters": 2 },
       "panel": {
         "name": "Picture grids, letters: medium 3",
-        "rows": ["#.....#", "#.....#", "#..####", "#######", "#.#####", "#.###.#", "#...##."],
-        "letters": "    THN",
-        "message": "7IG65"
+        "rows": [".#.....", ".####..", "#######", ".#####.", ".#####.", ".####..", ".#####."],
+        "letters": "N A GB",
+        "message": "6315"
       }
     }
   ]

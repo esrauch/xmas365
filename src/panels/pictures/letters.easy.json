@@ -5,41 +5,32 @@
   "panels": [
     {
       "seed": 1,
-      "stats": {
-        "steps": 9,
-        "without letters": 2
-      },
+      "stats": { "steps": 2363, "without letters": 2 },
       "panel": {
         "name": "Picture grids, letters: easy 1",
         "rows": ["#####", "####.", "#####", ".####", "..##."],
-        "letters": " AR",
-        "message": "SP23K"
+        "letters": "  ZIF",
+        "message": "5433"
       }
     },
     {
       "seed": 4,
-      "stats": {
-        "steps": 9,
-        "without letters": 2
-      },
+      "stats": { "steps": 684, "without letters": 2 },
       "panel": {
         "name": "Picture grids, letters: easy 2",
         "rows": [".####", "#####", ".##.#", ".####", ".####"],
-        "letters": "E  I",
-        "message": "SH4N1"
+        "letters": "O  ZM",
+        "message": "4115"
       }
     },
     {
-      "seed": 11,
-      "stats": {
-        "steps": 9,
-        "without letters": 2
-      },
+      "seed": 5,
+      "stats": { "steps": 286, "without letters": 2 },
       "panel": {
         "name": "Picture grids, letters: easy 3",
-        "rows": ["..#..", ".##..", "#####", "#.###", "#####"],
-        "letters": "VE",
-        "message": "LO12"
+        "rows": ["####.", "####.", "####.", "###..", "#####"],
+        "letters": "I  FZ",
+        "message": "4155"
       }
     }
   ]

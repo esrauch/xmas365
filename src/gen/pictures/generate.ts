@@ -22,14 +22,15 @@ export interface Shape {
   height: number;
   margin: number;
   dark: number;
+  /** Most distinct letters in the coded word. */
   letters: number;
   eggs: number;
 }
 
 export const SHAPES: Record<Tier, Shape> = {
-  easy: { width: 5, height: 5, margin: 2, dark: 2, letters: 2, eggs: 2 },
-  medium: { width: 7, height: 7, margin: 2, dark: 3, letters: 3, eggs: 3 },
-  hard: { width: 9, height: 9, margin: 3, dark: 4, letters: 3, eggs: 4 },
+  easy: { width: 5, height: 5, margin: 2, dark: 2, letters: 3, eggs: 2 },
+  medium: { width: 7, height: 7, margin: 2, dark: 3, letters: 4, eggs: 3 },
+  hard: { width: 9, height: 9, margin: 3, dark: 4, letters: 5, eggs: 4 },
 };
 
 export const MESSAGES = [
@@ -45,56 +46,53 @@ export const MESSAGES = [
   'BOOM',
   'BURST',
   'NIGHT',
+  'BANG',
+  'ZOOM',
+  'FIZZ',
+  // Two letters: only for boards with few run lengths (longer words go first).
+  'WOW',
+  'POP',
 ];
 
 /**
- * Encode `count` distinct run lengths in `p` as letters from a word in
- * `MESSAGES`, verifying that replacing those letters with dark '?' clues leaves
- * at least `margin` answers while keeping 1 answer with the letter code.
+ * Encode every letter of a word from `MESSAGES` (at most `maxLetters` distinct
+ * letters) as a run length in `p`, so the message is all blanks: the player
+ * unscrambles the clue letters into the word, which gives the numbers. Verifies
+ * that replacing the letters with dark '?' clues leaves at least `margin`
+ * answers while keeping 1 answer with the letter code.
  */
 function encodeLetters(
   p: Panel,
-  count: number,
+  maxLetters: number,
   margin: number,
   random: Rng,
   budget: Budget,
 ): Panel | null {
   const c = clues(p);
-  const freq = new Map<number, number>();
+  const lengths = new Set<number>();
   for (const line of [...c.rows, ...c.cols]) {
-    for (const run of line) {
-      if (!run.hidden && run.n >= 1 && run.n <= 9) {
-        freq.set(run.n, (freq.get(run.n) ?? 0) + 1);
-      }
-    }
+    for (const run of line) if (!run.hidden && run.n >= 1 && run.n <= 9) lengths.add(run.n);
   }
-  const availableLengths = [...freq.keys()].sort((a, b) => (freq.get(a) ?? 0) - (freq.get(b) ?? 0));
-  if (availableLengths.length < count) return null;
-
+  const available = [...lengths];
+  // The longest words that fit first (a stable sort keeps the shuffle within a length),
+  // and two-letter words only when the board has just two run lengths.
+  const most = Math.min(maxLetters, available.length);
   const words = shuffle(
     random,
-    MESSAGES.filter((w) => new Set(w).size >= count),
-  );
-  // Prefer less-frequent run lengths first so we don't hide every '1' on a 9×9 board
-  const pool = availableLengths.slice(0, Math.min(availableLengths.length, count + 2));
-  for (let attempt = 0; attempt < 8; attempt++) {
-    const chosenLengths =
-      attempt === 0 ? availableLengths.slice(0, count) : shuffle(random, pool).slice(0, count);
-    const totalAffected = chosenLengths.reduce((sum, n) => sum + (freq.get(n) ?? 0), 0);
-    if (totalAffected > 10) continue;
-    const word = words[attempt % words.length];
-    if (!word) continue;
-    const distinctWordLetters = shuffle(random, [...new Set(word)]).slice(0, count);
-    const maxN = Math.max(...chosenLengths);
-    const lettersArr = new Array<string>(maxN).fill(' ');
+    MESSAGES.filter((w) => new Set(w).size <= most && new Set(w).size >= Math.min(3, most)),
+  ).sort((a, b) => new Set(b).size - new Set(a).size);
+  for (const word of words.slice(0, 8)) {
+    const distinct = [...new Set(word)];
+    const chosenLengths = shuffle(random, available).slice(0, distinct.length);
+    const lettersArr = new Array<string>(Math.max(...chosenLengths)).fill(' ');
     const letterToDigit = new Map<string, string>();
     chosenLengths.forEach((n, idx) => {
-      const ch = distinctWordLetters[idx] as string;
+      const ch = distinct[idx] as string;
       lettersArr[n - 1] = ch;
       letterToDigit.set(ch, String(n));
     });
     const letters = lettersArr.join('');
-    const message = [...word].map((ch) => letterToDigit.get(ch) ?? ch).join('');
+    const message = [...word].map((ch) => letterToDigit.get(ch) as string).join('');
     const candidate: Panel = { ...p, letters, message };
     const subBudget = new Budget(8_000, budget.deadline);
     const ok = within(() => {
@@ -117,7 +115,8 @@ function onHasBoardTwist(p: Panel): boolean {
  * Check whether `p` has clear opening footholds: at least one row or column
  * that is already complete from its side clue alone (no-X full line for
  * Patriotic `colours`, or numbers + mandatory gaps summing to line length),
- * and at least one generously sized visible run number.
+ * and at least one generously sized visible run number. Letter runs count at
+ * their values: the message's word gives them away.
  */
 function hasOpeningFoothold(p: Panel): boolean {
   const c = clues(p);
@@ -126,7 +125,7 @@ function hasOpeningFoothold(p: Panel): boolean {
   const isColoured = Boolean(p.palette && p.palette.length > 1);
 
   const lineComplete = (runs: Run[], L: number): boolean => {
-    if (runs.length === 0 || runs.some((r) => r.hidden || r.letter)) return false;
+    if (runs.length === 0 || runs.some((r) => r.hidden && !r.letter)) return false;
     if (isColoured) {
       // Patriotic: a full line with no X (runs sum directly to L, no same-colour gaps)
       const noSameGap = runs.every((r, i) => i === 0 || runs[i - 1]?.colour !== r.colour);
@@ -146,7 +145,7 @@ function hasOpeningFoothold(p: Panel): boolean {
   if (completeCount < 1) return false;
 
   const visibleNums = [...c.rows, ...c.cols].flatMap((runs) =>
-    runs.filter((r) => !r.hidden && !r.letter).map((r) => r.n),
+    runs.filter((r) => !r.hidden || r.letter).map((r) => r.n),
   );
   const minMaxRun = isColoured
     ? Math.max(3, Math.floor(Math.min(H, W) / 2))

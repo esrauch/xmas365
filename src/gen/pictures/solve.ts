@@ -127,71 +127,25 @@ function withLetters(c: Clues, value: (letter: string) => number): Clues {
   return { rows: c.rows.map(set), cols: c.cols.map(set) };
 }
 
-/** Fast O(H + W) arithmetic filter: every line's minimum span (run lengths + required gaps) must fit in L. */
-function linesFit(c: Clues): boolean {
-  const H = c.rows.length;
-  const W = c.cols.length;
-  const fitsLine = (runs: Run[], L: number): boolean => {
-    let minSpan = 0;
-    for (let i = 0; i < runs.length; i++) {
-      const r = runs[i] as Run;
-      minSpan += r.hidden ? 1 : r.n;
-      const next = runs[i + 1];
-      if (next !== undefined && next.colour === r.colour) minSpan += 1;
-    }
-    return minSpan <= L;
-  };
-  return c.rows.every((runs) => fitsLine(runs, W)) && c.cols.every((runs) => fitsLine(runs, H));
-}
-
 const sameGrid = (g: number[][] | null, want: number[][]): boolean =>
   !!g && g.every((row, r) => row.every((v, c) => v === want[r]?.[c]));
 
 /**
  * Can the panel be solved by line logic alone, to exactly its picture? With
- * letters, as a player would: the true letter values solve it line by line,
- * and every other way of giving the letters values leads to a contradiction
- * that line logic finds (so the letters can be worked out by trying).
+ * letters, as a player would: the message spells out a word, so unscrambling
+ * the clue letters gives their values, and those values solve it line by line.
  */
 export function logical(p: Panel): boolean {
   const c = clues(p);
   const want = picture(p);
   if (!p.letters) return sameGrid(solveLines(c, p.frame), want);
-  const letters = [...new Set([...p.letters].filter((ch) => ch !== ' '))];
-  const truth = (letter: string): number => p.letters?.indexOf(letter) ?? -1;
-  if (
-    !sameGrid(
-      solveLines(
-        withLetters(c, (l) => truth(l) + 1),
-        p.frame,
-      ),
-      want,
-    )
-  )
-    return false;
-  const maxLen = Math.max(c.rows.length, c.cols.length);
-  const values = new Map<string, number>();
-  const used = new Set<number>();
-  const others = (k: number): boolean => {
-    if (k === letters.length) {
-      const isTruth = letters.every((l) => values.get(l) === truth(l) + 1);
-      if (isTruth) return true;
-      const candidateClues = withLetters(c, (l) => values.get(l) ?? 0);
-      if (!linesFit(candidateClues)) return true;
-      return solveLines(candidateClues, p.frame) === null;
-    }
-    const l = letters[k] as string;
-    for (let v = 1; v <= maxLen; v++) {
-      if (used.has(v)) continue;
-      values.set(l, v);
-      used.add(v);
-      const ok = others(k + 1);
-      used.delete(v);
-      if (!ok) return false;
-    }
-    return true;
-  };
-  return others(0);
+  return sameGrid(
+    solveLines(
+      withLetters(c, (l) => (p.letters?.indexOf(l) ?? -1) + 1),
+      p.frame,
+    ),
+    want,
+  );
 }
 
 /** Logic's best grid for a panel (letters at their true values), for the search. */

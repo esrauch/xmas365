@@ -5,10 +5,7 @@
   "panels": [
     {
       "seed": 1,
-      "stats": {
-        "steps": 38,
-        "without letters": 3
-      },
+      "stats": { "steps": 6267, "without letters": 3 },
       "panel": {
         "name": "Picture grids, letters: hard 1",
         "rows": [
@@ -22,54 +19,48 @@
           "....##...",
           "....##..#"
         ],
-        "letters": "  F   R I",
-        "message": "397E"
+        "letters": "G L  I TH",
+        "message": "36198"
       }
     },
     {
-      "seed": 2,
-      "stats": {
-        "steps": 88,
-        "without letters": 3
-      },
+      "seed": 8,
+      "stats": { "steps": 704, "without letters": 3 },
       "panel": {
         "name": "Picture grids, letters: hard 2",
         "rows": [
-          "......##.",
-          "....#.##.",
+          "######.#.",
           "#########",
-          ".#.#####.",
-          "...#####.",
-          "#..####..",
-          "...######",
-          "......##.",
-          "..#...##."
+          "#######..",
+          ".######..",
+          "#######..",
+          "##...#...",
+          ".#####...",
+          "##...#...",
+          "##...#..."
         ],
-        "letters": " OMB",
-        "message": "4223"
+        "letters": "F M ELA",
+        "message": "16735"
       }
     },
     {
-      "seed": 3,
-      "stats": {
-        "steps": 180,
-        "without letters": 3
-      },
+      "seed": 9,
+      "stats": { "steps": 1182, "without letters": 3 },
       "panel": {
         "name": "Picture grids, letters: hard 3",
         "rows": [
-          "##.###...",
-          ".#####...",
-          "######...",
           "#########",
-          "#####...#",
-          "#####....",
-          ".#.......",
-          ".#....#..",
+          "######.#.",
+          ".########",
+          "######.#.",
+          "######.#.",
+          "########.",
+          "#.###....",
+          "..##..#..",
           ".#......."
         ],
-        "letters": "  LW O",
-        "message": "G364"
+        "letters": " HG   TIN",
+        "message": "98327"
       }
     }
   ]

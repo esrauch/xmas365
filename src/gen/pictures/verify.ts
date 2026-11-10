@@ -152,7 +152,7 @@ export function problems(p: Panel, margin: number, budget = new Budget(2_000_000
     }
   }
 
-  // Letters: at least 2 distinct letters shown in clues, and message fills in cleanly.
+  // Letters: at least 2 distinct letters shown in clues, and the message is all blanks that fill in cleanly.
   if (p.letters && p.letters.trim().length > 0) {
     const shown = new Set<string>();
     for (const line of [...c.rows, ...c.cols]) {
@@ -162,6 +162,7 @@ export function problems(p: Panel, margin: number, budget = new Budget(2_000_000
     const filled = fillMessage(p);
     if (!filled || filled.includes('_') || /[0-9]/.test(filled))
       out.push('message blanks do not fill in cleanly');
+    if (/[^0-9 ]/.test(p.message ?? '')) out.push('message has letters that are not coded');
   }
 
   // Colours: both R and B present and balanced, and at least one touching R/B pair in a row or column.
