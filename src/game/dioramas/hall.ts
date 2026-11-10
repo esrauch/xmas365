@@ -941,18 +941,9 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
   bay.add(dust);
   const hallDust = { geo: dustGeo, base, seed };
 
-  // 3. Foreground Right: The Freed Mascots' Corner, where the Calendar Desk used to sit. It sits
-  // just behind and right of the year-wheel (centre 1.25 / 1.6, rug radius 0.38): its top ring
-  // clears the wheel's edge (1.04 from Leap Day; only the low outer ring tucks under it), and the
-  // whole corner stays inside a portrait phone's view at that depth.
-  const mascotCornerGroup = new THREE.Group();
+  // 3. Foreground Right: The Freed Mascots' Corner, where the Calendar Desk used to sit.
   const cornerX = 1.25;
   const cornerZ = 1.6;
-  mascotCornerGroup.position.set(cornerX, 0, cornerZ);
-  mascotCornerGroup.add(cyl(0.36, 0.38, 0.026, '#5c3d24', 0, 0.013, 0, 24, false));
-  mascotCornerGroup.add(cyl(0.31, 0.33, 0.032, '#2d3748', 0, 0.018, 0, 24, false));
-  mascotCornerGroup.add(cyl(0.26, 0.28, 0.036, '#b7791f', 0, 0.022, 0, 24, false));
-  bay.add(mascotCornerGroup);
 
   const cornerSlots: readonly {
     roomId: RoomId;
@@ -1341,7 +1332,6 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
       });
     }
 
-    mascotCornerGroup.visible = true;
     const freedCornerMascots: RoomId[] = [];
     for (const entry of cornerMascotEntries) {
       const isFreed = gameState.isRoomComplete(entry.room);
@@ -1381,7 +1371,6 @@ export function buildHallBay(callbacks: DioramaCallbacks): BuiltHallBay {
         worldPos: cornerWorldPos,
         cameraPos: cornerFocusPos,
         cameraLook: cornerFocusLook,
-        meshGroup: mascotCornerGroup,
         onClick: () => {
           const picked =
             freedCornerMascots[lastChattedCornerIdx % freedCornerMascots.length] ??

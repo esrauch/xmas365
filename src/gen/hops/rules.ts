@@ -69,8 +69,14 @@ export function solved(b: Board, route: number[], rules: Rules = {}): boolean {
     if (b.redStart !== undefined && red[0] !== b.redStart) return false;
     if (b.blueStart !== undefined && blue[0] !== b.blueStart) return false;
     if (!rules.noDarkLength) {
-      if (b.redLength !== undefined && red.length !== b.redLength) return false;
-      if (b.blueLength !== undefined && blue.length !== b.blueLength) return false;
+      if (!rules.noColours) {
+        if (b.redLength !== undefined && red.length !== b.redLength) return false;
+        if (b.blueLength !== undefined && blue.length !== b.blueLength) return false;
+      } else if (b.redLength !== undefined && b.blueLength !== undefined) {
+        const matchDirect = red.length === b.redLength && blue.length === b.blueLength;
+        const matchSwapped = red.length === b.blueLength && blue.length === b.redLength;
+        if (!matchDirect && !matchSwapped) return false;
+      }
     }
   } else if (b.redStart !== undefined && route[0] !== b.redStart) {
     return false;
@@ -106,7 +112,7 @@ export function solved(b: Board, route: number[], rules: Rules = {}): boolean {
         continue;
       if (rules.noDarkLength && b.dark.some(Boolean) && g === b.blueLength && b.colour[i] === sec)
         continue;
-      const col = b.colour[i];
+      const col = rules.noColours && g > 1 ? 'w' : b.colour[i];
       if (col === 'r') {
         if (red[g - 1] !== i) return false;
       } else if (col === sec) {

@@ -4,60 +4,87 @@
   "tier": "hard",
   "panels": [
     {
-      "seed": 4,
-      "stats": { "steps": 9, "without snow": 3 },
+      "seed": 1,
+      "stats": {
+        "steps": 9,
+        "without snow": 3
+      },
       "panel": {
         "name": "Picture grids, snow: hard 1",
         "rows": [
-          ".....#.#.",
-          "#......##",
+          "....#..#.",
+          "#..##..#.",
           ".#.##.#..",
-          "...##...#",
+          "..####..#",
           "..####...",
           "#..##..#.",
           ".#.##.#.#",
-          "...####..",
-          "...#####."
+          "....###..",
+          "....##..#"
         ],
-        "frame": { "top": 1, "bottom": 6, "left": 0, "right": 7, "axis": "v" }
+        "frame": {
+          "top": 1,
+          "bottom": 6,
+          "left": 0,
+          "right": 7,
+          "axis": "v"
+        }
+      }
+    },
+    {
+      "seed": 4,
+      "stats": {
+        "steps": 9,
+        "without snow": 3
+      },
+      "panel": {
+        "name": "Picture grids, snow: hard 2",
+        "rows": [
+          "...#...#.",
+          "#..##..##",
+          ".#.##.#..",
+          "..####...",
+          "..####...",
+          "#..##..#.",
+          ".#.##.#..",
+          "..#####..",
+          ".#.######"
+        ],
+        "frame": {
+          "top": 1,
+          "bottom": 6,
+          "left": 0,
+          "right": 7,
+          "axis": "v"
+        }
       }
     },
     {
       "seed": 5,
-      "stats": { "steps": 9, "without snow": 3 },
-      "panel": {
-        "name": "Picture grids, snow: hard 2",
-        "rows": [
-          ".......#.",
-          "#......#.",
-          ".#.##.#.#",
-          "..####...",
-          "..####..#",
-          "#..##..#.",
-          ".#.##.#..",
-          "..###.#..",
-          ".#####..."
-        ],
-        "frame": { "top": 1, "bottom": 6, "left": 0, "right": 7, "axis": "v" }
-      }
-    },
-    {
-      "seed": 7,
-      "stats": { "steps": 9, "without snow": 3 },
+      "stats": {
+        "steps": 9,
+        "without snow": 3
+      },
       "panel": {
         "name": "Picture grids, snow: hard 3",
         "rows": [
-          "..##...#.",
-          "#..##..##",
+          "..#.#..#.",
+          "#..##..#.",
           ".#.##.#..",
-          "........#",
+          "..####...",
           "..####...",
           "#..##..#.",
           ".#.##.#..",
-          "..##.##.#",
-          "..#####.#"
+          "..#####.#",
+          ".######.."
         ],
-        "frame": { "top": 1, "bottom": 6, "left": 0, "right": 7, "axis": "v" }
+        "frame": {
+          "top": 1,
+          "bottom": 6,
+          "left": 0,
+          "right": 7,
+          "axis": "v"
+        }
       }
     }
   ]

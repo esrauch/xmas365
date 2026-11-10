@@ -48,14 +48,14 @@ describe('Clause V (C5): Easter · Hops (CLAUSE_HOPS)', () => {
     expect(twistsOf(boss.panel)).toEqual(HOP_TWISTS);
   });
 
-  it('has 22 distinct panels, all <= 7x7 and each with a unique solution', () => {
+  it('has 22 distinct panels, all <= 6x6 and each with a unique solution', () => {
     const signatures = new Set<string>();
     for (const [idx, item] of CLAUSE_HOPS.panels.entries()) {
       const { panel } = item;
       const height = panel.rows.length;
       const width = panel.rows[0]?.length ?? 0;
-      expect(height, `panel ${idx} (${item.name}) height`).toBeLessThanOrEqual(7);
-      expect(width, `panel ${idx} (${item.name}) width`).toBeLessThanOrEqual(7);
+      expect(height, `panel ${idx} (${item.name}) height`).toBeLessThanOrEqual(6);
+      expect(width, `panel ${idx} (${item.name}) width`).toBeLessThanOrEqual(6);
 
       const sig = `${panel.rows.join('/')}${JSON.stringify(panel.given)}`;
       expect(signatures.has(sig), `duplicate signature at panel ${idx} (${item.name})`).toBe(false);

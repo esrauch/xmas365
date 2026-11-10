@@ -4,33 +4,42 @@
   "tier": "medium",
   "panels": [
     {
-      "seed": 7,
-      "stats": { "steps": 1288, "without letters": 2 },
+      "seed": 2,
+      "stats": {
+        "steps": 20,
+        "without letters": 2
+      },
       "panel": {
         "name": "Picture grids, letters: medium 1",
-        "rows": [".##....", "...#...", "...#...", "..####.", "#.##.##", "#####.#", "..####."],
-        "letters": " B  MO",
-        "message": "2665"
+        "rows": [".#..##.", ".#..###", ".#####.", ".#####.", "######.", ".#####.", ".#..##."],
+        "letters": " TH  I",
+        "message": "L6G32"
       }
     },
     {
-      "seed": 9,
-      "stats": { "steps": 1251, "without letters": 2 },
+      "seed": 5,
+      "stats": {
+        "steps": 76,
+        "without letters": 2
+      },
       "panel": {
         "name": "Picture grids, letters: medium 2",
-        "rows": ["##..##.", "#.##.#.", "####.##", "####.#.", ".######", "..#...#", "......#"],
-        "letters": "  RAP",
-        "message": "S543K"
+        "rows": [".#.....", ".####..", "#######", ".#####.", ".#####.", ".####..", ".#####."],
+        "letters": "   ARH",
+        "message": "6E45T"
       }
     },
     {
-      "seed": 14,
-      "stats": { "steps": 2843, "without letters": 2 },
+      "seed": 6,
+      "stats": {
+        "steps": 109,
+        "without letters": 2
+      },
       "panel": {
         "name": "Picture grids, letters: medium 3",
-        "rows": ["..#....", "######.", ".##....", "######.", "..##.##", "#..###.", "#..#..."],
-        "letters": " OM  B",
-        "message": "6223"
+        "rows": ["#.....#", "#.....#", "#..####", "#######", "#.#####", "#.###.#", "#...##."],
+        "letters": "    THN",
+        "message": "7IG65"
       }
     }
   ]

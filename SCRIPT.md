@@ -329,7 +329,7 @@ you're in the hall (`E1` at 5 relics returned, `E2` at 10, `E3` at 15, `E4` at
 > Who is putting confiscated holiday relics back on their home shelves?! Five
 > padlocks have already clicked open across the campus, and someone keeps
 > opening locked subsidiary doors without a ticket. Circle back and lock down
-> those shelves before EOD! Probably a rogue intern.
+> those shelves before EOD!
 >
 > *S. Claus, CEO*
 

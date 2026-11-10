@@ -106,21 +106,22 @@ export function solve(
     for (const [i, n] of b.given) {
       if (rules.noDarkLength && hasDark && n === b.redLength && b.colour[i] === 'r') continue;
       if (rules.noDarkLength && hasDark && n === b.blueLength && b.colour[i] === sec) continue;
-      if (b.colour[i] === 'r') redGivenAt.set(n, i);
-      else if (b.colour[i] === sec) blueGivenAt.set(n, i);
+      const c = n === 1 ? b.colour[i] : colour(i);
+      if (c === 'r') redGivenAt.set(n, i);
+      else if (c === sec) blueGivenAt.set(n, i);
     }
     const redNumbers = [...redGivenAt.keys()].sort((x, y) => x - y);
     const blueNumbers = [...blueGivenAt.keys()].sort((x, y) => x - y);
 
     const reqRedMand = b.spots.filter((_, i) => !b.dark[i] && colour(i) === 'r').length;
+    const lockRedLen = !rules.noDarkLength && !rules.noColours && b.redLength !== undefined;
     const minRedSteps = Math.max(
       1,
       letters ? Math.max(0, ...b.blanks) : 0,
       ...redNumbers,
-      !rules.noDarkLength && b.redLength !== undefined ? b.redLength : 0,
+      lockRedLen ? (b.redLength as number) : 0,
     );
-    const maxRedSteps =
-      !rules.noDarkLength && b.redLength !== undefined ? b.redLength : b.length - 1;
+    const maxRedSteps = lockRedLen ? (b.redLength as number) : b.length - 1;
 
     const fits = (i: number, n: number, tone: 'r' | 'b' | 'g'): boolean => {
       const c = colour(i);
@@ -133,8 +134,8 @@ export function solve(
           ((g === b.redLength && b.colour[i] === 'r') ||
             (g === b.blueLength && b.colour[i] === sec));
         if (!ignoreLast) {
-          if ((b.colour[i] === tone || b.colour[i] === 'w') && g !== n) return false;
-          if (b.colour[i] !== 'w' && b.colour[i] !== tone) return false;
+          if ((c === tone || c === 'w') && g !== n) return false;
+          if (c !== 'w' && c !== tone) return false;
         }
       }
       const givenMap = tone === 'r' ? redGivenAt : blueGivenAt;

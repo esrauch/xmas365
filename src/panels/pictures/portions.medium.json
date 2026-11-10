@@ -4,30 +4,39 @@
   "tier": "medium",
   "panels": [
     {
-      "seed": 6,
-      "stats": { "steps": 9, "without portions": 2 },
+      "seed": 4,
+      "stats": {
+        "steps": 12,
+        "without portions": 2
+      },
       "panel": {
         "name": "Picture grids, portions: medium 1",
-        "rows": [".#.....", "#.#.#..", "...###.", "#####.#", "..####.", "#..##.#", ".#..##."],
-        "portions": ["AAAAAAB", "AAAAABB", "AAAAABB", "AAABBBB", "AAAABBB", "ABBBBBB", "BBBBBBB"]
+        "rows": [".#...##", "..##...", "..##.#.", "..##..#", ".###...", "#.###.#", "..#####"],
+        "portions": ["AAAAAAA", "AAABAAB", "AABBAAB", "AAABBBB", "AAABBBB", "ABAAABB", "BBBBBBB"]
       }
     },
     {
       "seed": 9,
-      "stats": { "steps": 9, "without portions": 2 },
+      "stats": {
+        "steps": 9,
+        "without portions": 2
+      },
       "panel": {
         "name": "Picture grids, portions: medium 2",
-        "rows": ["##..##.", "#.##.#.", "####.##", "####.#.", "..#####", "#.....#", ".#....#"],
-        "portions": ["AAAAABB", "AAAAABB", "AAAABBB", "AAABBBB", "AABBBBB", "ABBBBBB", "BBBBBBB"]
+        "rows": ["#######", "######.", "#######", "######.", "#####..", "..#..#.", ".##...#"],
+        "portions": ["AABBBBB", "AAABBBB", "AAAAAAB", "AABBBBB", "AAAABAB", "AABAAAB", "BBBBBBB"]
       }
     },
     {
       "seed": 11,
-      "stats": { "steps": 38, "without portions": 2 },
+      "stats": {
+        "steps": 11,
+        "without portions": 2
+      },
       "panel": {
         "name": "Picture grids, portions: medium 3",
-        "rows": [".....#.", "#.###..", ".##..#.", ".##...#", ".#.....", ".#.....", ".#....."],
-        "portions": ["AAAAAAB", "AABAAAB", "AABAAAB", "ABBBBBB", "AABBBBB", "ABBBBBB", "BBBBBBB"]
+        "rows": ["....#..", "...##..", "######.", "#..##..", ".#..###", "..#.#..", "...##.."],
+        "portions": ["AAAAAAB", "AAAAABB", "AAAABBB", "AAAABBB", "AABBBBB", "ABBBBBB", "BBBBBBB"]
       }
     }
   ]

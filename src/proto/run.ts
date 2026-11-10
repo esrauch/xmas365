@@ -38,17 +38,23 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
       let freePlayToken = 0;
 
       const TIER_SIZE_LABELS: Record<Tier, string> =
-        freePlaySpec?.genre === 'lights'
+        freePlaySpec?.genre === 'hops'
           ? {
-              easy: '5×5',
-              medium: '6×6',
-              hard: '7×7',
+              easy: '4×4',
+              medium: '5×5',
+              hard: '6×6',
             }
-          : {
-              easy: '5×5',
-              medium: '7×7',
-              hard: '9×9',
-            };
+          : freePlaySpec?.genre === 'lights'
+            ? {
+                easy: '5×5',
+                medium: '6×6',
+                hard: '7×7',
+              }
+            : {
+                easy: '5×5',
+                medium: '7×7',
+                hard: '9×9',
+              };
 
       // Row 0: Story vs Free Play (5×5 / 7×7 / 9×9) chooser bar (shown once rung is beaten or Free Play unlocked)
       const modeBar = h('div', {

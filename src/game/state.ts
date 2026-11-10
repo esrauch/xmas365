@@ -1085,7 +1085,7 @@ export class GameState {
     }
   }
 
-  /** Whether the player has any existing save progress (so "Tap to start" goes straight to the hall). */
+  /** Whether the player has any existing save progress (so cold start goes straight to the hall). */
   hasSaveProgress(): boolean {
     return (
       this.milestones.has('P0') ||

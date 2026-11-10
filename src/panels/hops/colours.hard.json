@@ -5,122 +5,62 @@
   "panels": [
     {
       "seed": 2,
-      "stats": { "eggs": 6, "steps": 1856 },
+      "stats": {
+        "eggs": 6,
+        "steps": 195
+      },
       "panel": {
         "name": "Bunny hops, colours: hard 1",
-        "rows": [
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########"
-        ],
+        "rows": ["######", "######", "######", "######", "######", "######"],
         "given": [
-          [4, 0, 1],
-          [4, 1, 10],
-          [1, 4, 20],
-          [7, 1, 1],
-          [5, 7, 15],
-          [4, 7, 18]
+          [3, 3, 1],
+          [4, 2, 3],
+          [3, 4, 6],
+          [3, 5, 7],
+          [0, 1, 1],
+          [0, 4, 10]
         ],
-        "colours": [
-          "rrrrrwbbb",
-          "rrrrrrbbr",
-          "rrrwbbbbr",
-          "rrrrbbbbr",
-          "rrrrbbbbr",
-          "rwrrbbbbr",
-          "rbwbbbbbr",
-          "rbbbbbbbr",
-          "rrrrrrrrr"
-        ]
+        "colours": ["bbbbbb", "bbwwwb", "wrrrrb", "rrrrrr", "rrrrrr", "rrrrrr"]
       }
     },
     {
       "seed": 3,
-      "stats": { "eggs": 10, "steps": 3215 },
+      "stats": {
+        "eggs": 7,
+        "steps": 64
+      },
       "panel": {
         "name": "Bunny hops, colours: hard 2",
-        "rows": [
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########"
-        ],
+        "rows": ["######", "######", "######", "######", "######", "######"],
         "given": [
-          [0, 8, 1],
-          [7, 4, 22],
-          [6, 6, 27],
-          [5, 4, 30],
-          [4, 6, 35],
-          [5, 1, 1],
-          [6, 0, 3],
-          [1, 2, 20],
-          [2, 3, 22],
-          [1, 5, 25]
+          [5, 0, 1],
+          [4, 0, 4],
+          [5, 2, 9],
+          [5, 4, 15],
+          [0, 4, 1],
+          [0, 2, 7],
+          [0, 1, 10]
         ],
-        "colours": [
-          "bbbbbbbbr",
-          "bbbbbbbwr",
-          "bbbbbbbbr",
-          "bbbbbbwbr",
-          "bbbrrrrrr",
-          "bbbwrrrrr",
-          "bbrrrrrrr",
-          "wrrrrrrrr",
-          "rrrrrrrrr"
-        ]
+        "colours": ["bbbbbb", "bbbbbb", "bbwbwb", "rwrwrr", "rrrrrr", "rrrrrr"]
       }
     },
     {
-      "seed": 4,
-      "stats": { "eggs": 11, "steps": 847 },
+      "seed": 5,
+      "stats": {
+        "eggs": 5,
+        "steps": 614
+      },
       "panel": {
         "name": "Bunny hops, colours: hard 3",
-        "rows": [
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########",
-          "#########"
-        ],
+        "rows": ["######", "######", "######", "######", "######", "######"],
         "given": [
-          [8, 0, 1],
-          [6, 8, 11],
-          [0, 7, 18],
-          [0, 5, 28],
-          [5, 7, 35],
-          [7, 1, 45],
-          [0, 0, 1],
-          [1, 4, 10],
-          [3, 2, 18],
-          [4, 3, 22],
-          [6, 3, 32]
+          [5, 2, 1],
+          [4, 1, 13],
+          [1, 5, 1],
+          [1, 3, 9],
+          [5, 5, 15]
         ],
-        "colours": [
-          "bbbbbrrrr",
-          "bbbbbrrrr",
-          "bbbbbrrrr",
-          "bbbbwrrrr",
-          "bbbbbrrrr",
-          "bwbbwrrrr",
-          "wrrbbrrrr",
-          "rrrrrrrrr",
-          "rrrrrrrrr"
-        ]
+        "colours": ["rwbbbb", "rrwbbb", "rrwbbb", "rrrrbb", "rrrwbb", "rrrbbb"]
       }
     }
   ]

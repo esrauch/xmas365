@@ -4,88 +4,97 @@
   "tier": "hard",
   "panels": [
     {
-      "seed": 40,
-      "stats": { "steps": 15, "without portions": 3 },
+      "seed": 11,
+      "stats": {
+        "steps": 21,
+        "without portions": 3
+      },
       "panel": {
         "name": "Picture grids, portions: hard 1",
         "rows": [
-          "..#.#....",
-          "..#.#..#.",
-          "..#...#..",
-          "#....##..",
-          "###...#..",
-          "#######.#",
-          "###......",
-          "###.#..#.",
-          "##...#..#"
+          ".#.......",
+          ".....#...",
+          "..#.##...",
+          "#########",
+          "##.####..",
+          ".######..",
+          "..#..#.#.",
+          "#....#..#",
+          ".#...#..."
         ],
         "portions": [
           "AAAAAAAAB",
-          "AAAAAAABB",
           "AAAAAAAAB",
           "AAAAAAAAB",
+          "AAABAABBB",
+          "AAABBABAB",
+          "ABBBBABAB",
           "AABAAAAAB",
-          "ABBBBAAAB",
-          "BBBAAAAAB",
-          "BBBAABAAB",
+          "ABBBBBBBB",
           "BBBBBBBBB"
         ]
       }
     },
     {
-      "seed": 45,
-      "stats": { "steps": 212, "without portions": 3 },
+      "seed": 15,
+      "stats": {
+        "steps": 42,
+        "without portions": 3
+      },
       "panel": {
         "name": "Picture grids, portions: hard 2",
         "rows": [
-          "....#.#..",
-          "#.#...#..",
-          "#####.##.",
-          "#..##.#..",
-          "..####.#.",
-          "....#...#",
-          "..#...#..",
-          "...#.###.",
-          "....##..#"
+          "....#....",
+          "##.###...",
+          "#########",
+          ".#####...",
+          "######.#.",
+          "...###..#",
+          "....#....",
+          "..#......",
+          "...#....."
         ],
         "portions": [
           "AAAAAAAAB",
-          "AAAAAABAB",
-          "AAAAAABBB",
-          "AAAABAAAB",
-          "AAABBAAAB",
+          "AAABBBAAB",
+          "AAAABBBBB",
+          "AAAAAAAAB",
+          "AAABBBAAB",
           "AAABBBBBB",
           "AAABBBBBB",
-          "ABBBBBBBB",
+          "AAABBBBBB",
           "BBBBBBBBB"
         ]
       }
     },
     {
-      "seed": 70,
-      "stats": { "steps": 38, "without portions": 3 },
+      "seed": 23,
+      "stats": {
+        "steps": 22,
+        "without portions": 3
+      },
       "panel": {
         "name": "Picture grids, portions: hard 3",
         "rows": [
-          ".##......",
-          ".##.#....",
-          "#....#...",
-          "####..#.#",
-          "##.######",
-          "....#####",
-          "....#####",
-          "#...#..#.",
-          ".#.##.#.."
+          "....#.#..",
+          "....#..#.",
+          "....##..#",
+          "###.#####",
+          ".####.###",
+          ".########",
+          "######..#",
+          ".##.#.#..",
+          ".......#."
         ],
         "portions": [
-          "AAAAAAAAB",
-          "AAAAABABB",
-          "AAAABBBBB",
-          "AAAAABBBB",
           "AAAAAAABB",
-          "AAABABBBB",
-          "AABBABBBB",
-          "ABBBBBBBB",
+          "AAAAAABBB",
+          "AAAAAAABB",
+          "AAAABBBBB",
+          "AAAABABBB",
+          "AABAAABBB",
+          "AABABAABB",
+          "AABABAABB",
           "BBBBBBBBB"
         ]
       }

@@ -32,7 +32,7 @@ describe('Easter bunny-hop room (7 runs, 25 panels)', () => {
   ];
   const all: Panel[] = [...HUTCH, ...twistPanels];
 
-  it('has 7 runs (intro, home, and 5 relics) totaling 25 panels, all <= 7x7', () => {
+  it('has 7 runs (intro, home, and 5 relics) totaling 25 panels, all <= 6x6', () => {
     expect(allRuns).toHaveLength(7);
     expect(hutch.kind).toBe('intro');
     expect(eggtree.kind).toBe('home');
@@ -46,8 +46,8 @@ describe('Easter bunny-hop room (7 runs, 25 panels)', () => {
     }
     expect(all).toHaveLength(25);
     for (const p of all) {
-      expect(p.rows.length, `${p.name} height`).toBeLessThanOrEqual(7);
-      expect(p.rows[0]?.length ?? 0, `${p.name} width`).toBeLessThanOrEqual(7);
+      expect(p.rows.length, `${p.name} height`).toBeLessThanOrEqual(6);
+      expect(p.rows[0]?.length ?? 0, `${p.name} width`).toBeLessThanOrEqual(6);
     }
   });
 

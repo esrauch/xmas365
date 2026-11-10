@@ -4,30 +4,57 @@
   "tier": "easy",
   "panels": [
     {
-      "seed": 4,
-      "stats": { "steps": 5, "without snow": 2 },
+      "seed": 55,
+      "stats": {
+        "steps": 5,
+        "without snow": 2
+      },
       "panel": {
         "name": "Picture grids, snow: easy 1",
-        "rows": ["#..#.", "....#", "#..#.", ".##.#", "..#.."],
-        "frame": { "top": 0, "bottom": 3, "left": 0, "right": 3, "axis": "v" }
+        "rows": ["#####", "....#", "#..#.", ".##.#", "..#.."],
+        "frame": {
+          "top": 0,
+          "bottom": 3,
+          "left": 0,
+          "right": 3,
+          "axis": "v"
+        }
       }
     },
     {
-      "seed": 9,
-      "stats": { "steps": 5, "without snow": 2 },
+      "seed": 122,
+      "stats": {
+        "steps": 5,
+        "without snow": 2
+      },
       "panel": {
         "name": "Picture grids, snow: easy 2",
-        "rows": ["####.", "....#", "#..#.", ".##..", "..#.."],
-        "frame": { "top": 0, "bottom": 3, "left": 0, "right": 3, "axis": "v" }
+        "rows": ["#####", "....#", "#..#.", ".##..", "..#.#"],
+        "frame": {
+          "top": 0,
+          "bottom": 3,
+          "left": 0,
+          "right": 3,
+          "axis": "v"
+        }
       }
     },
     {
-      "seed": 13,
-      "stats": { "steps": 5, "without snow": 2 },
+      "seed": 328,
+      "stats": {
+        "steps": 5,
+        "without snow": 2
+      },
       "panel": {
         "name": "Picture grids, snow: easy 3",
-        "rows": [".##..", "....#", "#..#.", ".##..", "..#.#"],
-        "frame": { "top": 0, "bottom": 3, "left": 0, "right": 3, "axis": "v" }
+        "rows": ["#####", "....#", "#..#.", ".##..", "..#.."],
+        "frame": {
+          "top": 0,
+          "bottom": 3,
+          "left": 0,
+          "right": 3,
+          "axis": "v"
+        }
       }
     }
   ]

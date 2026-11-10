@@ -42,9 +42,9 @@ export interface Shape {
 }
 
 export const SHAPES: Record<Tier, Shape> = {
-  easy: { width: 5, height: 5, courses: 2, letters: 3, burrows: 1, rocks: 1, margin: 2 },
-  medium: { width: 7, height: 7, courses: 3, letters: 4, burrows: 1, rocks: 3, margin: 3 },
-  hard: { width: 9, height: 9, courses: 4, letters: 5, burrows: 2, rocks: 5, margin: 3 },
+  easy: { width: 4, height: 4, courses: 2, letters: 3, burrows: 1, rocks: 1, margin: 2 },
+  medium: { width: 5, height: 5, courses: 2, letters: 3, burrows: 1, rocks: 1, margin: 3 },
+  hard: { width: 6, height: 6, courses: 3, letters: 4, burrows: 1, rocks: 2, margin: 3 },
 };
 
 /**
@@ -55,9 +55,9 @@ export const SHAPES: Record<Tier, Shape> = {
  * Snowflakes get no rocks at all (a rock inside the frame would break the mirror).
  */
 export const ROCK_SHIFT: Record<Tier, Partial<Record<HopTwist, number>>> = {
-  easy: { burrows: 1, dark: 1, courses: -1, colours: -1 },
-  medium: { burrows: 3, dark: 2, courses: -3, colours: -3 },
-  hard: { burrows: 3, dark: 2, courses: -5, colours: -5 },
+  easy: { burrows: 0, dark: 0, courses: -1, colours: -1 },
+  medium: { burrows: 1, dark: 1, courses: -1, colours: -1 },
+  hard: { burrows: 2, dark: 1, courses: -2, colours: -2 },
 };
 
 /**
@@ -68,8 +68,8 @@ export const ROCK_SHIFT: Record<Tier, Partial<Record<HopTwist, number>>> = {
  */
 export const SPARE_EGGS: Record<Tier, Partial<Record<HopTwist, number>>> = {
   easy: {},
-  medium: { burrows: 1, dark: 1, snow: 2 },
-  hard: { burrows: 1, dark: 1, snow: 3 },
+  medium: { burrows: 1, dark: 1, snow: 1 },
+  hard: { burrows: 1, dark: 1, snow: 2 },
 };
 
 /** How many spare eggs a board of this tier and twists gets. */
@@ -95,8 +95,8 @@ function makePanel(spec: Spec<HopTwist>, seed: number, why: Rejections): Made<Pa
   }
   const random = rng(mixedSeed);
   const isTree = spec.shape === 'tree';
-  const boardH = isTree && shape.height <= 5 ? 7 : shape.height;
-  const boardW = isTree && shape.width <= 5 ? 7 : shape.width;
+  const boardH = isTree && shape.height <= 5 ? 5 : shape.height;
+  const boardW = isTree && shape.width <= 5 ? 5 : shape.width;
   const rows = isTree ? treeRows(boardH, boardW, 0.5) : rect(boardH, boardW);
   const golden: Spot | undefined = isTree ? [0, Math.floor(boardW / 2)] : undefined;
 
@@ -222,11 +222,14 @@ function makePanel(spec: Spec<HopTwist>, seed: number, why: Rejections): Made<Pa
     const uturn = findDarkUTurn(baseBoard, route, splitIdx);
     if (!uturn) return why.no('no dark u-turn');
     const [aSpot, bSpot, uIdx] = uturn as [number, number, number];
+    const evenTwoBunnies = splitIdx !== undefined && route.length % 2 === 0;
     const endIdx = splitIdx !== undefined ? splitIdx : route.length;
 
-    const rockSpot = route[endIdx - 1] as number;
-    const newLastSpot = route[endIdx - 2] as number;
-    if (uIdx + 3 !== endIdx - 2) return why.no('dark u-turn not at end');
+    const rockIdx = evenTwoBunnies ? (splitIdx as number) : endIdx - 1;
+    const lastIdx = evenTwoBunnies ? (splitIdx as number) - 1 : endIdx - 2;
+    const rockSpot = route[rockIdx] as number;
+    const newLastSpot = route[lastIdx] as number;
+    if (uIdx + 3 !== lastIdx) return why.no('dark u-turn not at end');
 
     const [rr, rc] = baseBoard.spots[rockSpot] as Spot;
     const [ar, ac] = baseBoard.spots[aSpot] as Spot;
@@ -260,9 +263,10 @@ function makePanel(spec: Spec<HopTwist>, seed: number, why: Rejections): Made<Pa
       [rr, rc],
     ];
 
-    // Remove rockSpot from route (and adjust splitIdx if two bunnies)
-    route = [...route.slice(0, endIdx - 1), ...route.slice(endIdx)];
-    if (splitIdx !== undefined) splitIdx--;
+    // Remove rockSpot from route (and adjust splitIdx if rock was before splitIdx)
+    preservedSpots.delete(rockSpot);
+    route = [...route.slice(0, rockIdx), ...route.slice(rockIdx + 1)];
+    if (splitIdx !== undefined && !evenTwoBunnies) splitIdx--;
 
     // Rebuild baseBoard for the updated rows & route
     baseBoard = parse({
@@ -472,11 +476,21 @@ export function generate(
   why = new Rejections(),
 ): Made<Panel>[] {
   const out: Made<Panel>[] = [];
+  const seen = new Set<string>();
   const deadline = Date.now() + seconds * 1000;
   let seed = from;
   while (out.length < count && Date.now() < deadline) {
     const left = (deadline - Date.now()) / 1000;
-    const found = trySeeds(seed, left, (s) => within(() => makePanel(spec, s, why)));
+    const found = trySeeds(seed, left, (s) =>
+      within(() => {
+        const res = makePanel(spec, s, why);
+        if (!res) return null;
+        const sig = JSON.stringify(res.panel);
+        if (seen.has(sig)) return null;
+        seen.add(sig);
+        return res;
+      }),
+    );
     if (!found) break;
     out.push(found.result);
     seed = found.seed + 1;

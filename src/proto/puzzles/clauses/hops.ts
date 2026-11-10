@@ -2,9 +2,9 @@
  * Clause V (`C5`): Easter · Bunny Hops (`hops`) — 22-panel contract gauntlet.
  *
  * Progression:
- * - Panels 0–5 (`intro`, 6 panels): Compact teaching boards introducing each twist in `HOP_TWISTS` order.
- * - Panels 6–20 (`duo`, 15 panels): All 15 two-twist combinations (`easy` 5×5).
- * - Panel 21 (`all6`, 1 panel): Boss puzzle combining all 6 twists at once (6×6).
+ * - Panels 0–5 (`intro`, 6 panels): Compact teaching boards (`<= 4×4`) introducing each twist in `HOP_TWISTS` order.
+ * - Panels 6–20 (`duo`, 15 panels): All 15 two-twist combinations (`medium` 5×5).
+ * - Panel 21 (`all6`, 1 panel): Boss puzzle combining all 6 twists at once (`hard` 6×6).
  */
 
 import type { Panel as HopPanel } from '../../hops';

@@ -37,7 +37,14 @@ import { PROTOS } from './proto/puzzles';
 import { ALL_CLAUSES, CLAUSE_PANEL_COUNT } from './proto/puzzles/clauses';
 import { celUniforms } from './render/toon';
 import { View } from './render/view';
-import { isFpsEnabled, isSoundEnabled, setFpsEnabled, setSoundEnabled } from './settings';
+import {
+  isFpsEnabled,
+  isShowIntroOnLoadEnabled,
+  isSoundEnabled,
+  setFpsEnabled,
+  setShowIntroOnLoadEnabled,
+  setSoundEnabled,
+} from './settings';
 import { buildMemoSheet, renderFormattedText, showMemoOverlay } from './ui/memo';
 import { applyPaletteVars } from './ui/paletteVars';
 
@@ -140,7 +147,7 @@ const modalHost = h('div', {});
 /** A new memo fills the screen here (`ui/memo.ts`), above everything else. */
 const memoHost = h('div', {});
 
-/** Cold-start calendar-stamping & Tap to Start overlay. */
+/** Cold-start 3D intro cinematic overlay. */
 const introHost = h('div', {
   style: {
     position: 'fixed',
@@ -1225,7 +1232,12 @@ const ROOM_TINTS: Record<string, string> = {
 
 function showUnlockDialog(roomSpec: RoomSpec, kind: 'intro' | 'home'): void {
   const isWarmup = kind === 'intro';
-  const sizeText = roomSpec.id === 'christmas' ? '5×5 / 6×6 / 7×7' : '5×5 / 7×7 / 9×9';
+  const sizeText =
+    roomSpec.id === 'easter'
+      ? '4×4 / 5×5 / 6×6'
+      : roomSpec.id === 'christmas'
+        ? '5×5 / 6×6 / 7×7'
+        : '5×5 / 7×7 / 9×9';
   const titleText = isWarmup
     ? `${roomSpec.icon} ${roomSpec.homeTwist.title} Unlocked!`
     : `${roomSpec.icon} 5 Relic Runs Unlocked in ${roomSpec.shortTitle}!`;
@@ -2212,6 +2224,7 @@ function openSettingsModal(): void {
   const renderSettingsContent = (): void => {
     const soundOn = isSoundEnabled();
     const fpsOn = isFpsEnabled();
+    const introOn = isShowIntroOnLoadEnabled();
     const act = gameState.act();
     const lamps = gameState.completedRoomCount();
     const voidedClauses = gameState.voidedClauseCount();
@@ -2315,17 +2328,19 @@ function openSettingsModal(): void {
               fontWeight: '800',
               fontSize: '13px',
               cursor: 'pointer',
-              background: '#ebf8ff',
-              color: '#1a365d',
-              border: '2px solid #2b6cb0',
-              boxShadow: '0 2px 0 #1e4e8c',
+              background: introOn ? '#2b6cb0' : '#4a5568',
+              color: '#fff',
+              border: '2px solid #1f2430',
+              boxShadow: '0 2px 0 #1f2430',
             },
             onclick: () => {
-              closeModal();
-              startIntroReplay();
+              const next = !isShowIntroOnLoadEnabled();
+              setShowIntroOnLoadEnabled(next);
+              blip(523, 55);
+              renderSettingsContent();
             },
           },
-          '🎬 Replay Intro',
+          introOn ? '🎬 Show Intro on Load: ON' : '🎬 Show Intro on Load: OFF',
         ),
       ),
       h(
@@ -3050,8 +3065,12 @@ canvas.addEventListener('pointerup', (e: PointerEvent) => {
 const startRoomParam = params.get('room') as BayId | null;
 const startProtoId = params.get('p');
 
-// Cold-start intro runs on normal launch unless deep-linking into a room/puzzle or ?intro=0
-introActive = !startRoomParam && !startProtoId && params.get('intro') !== '0';
+// Cold-start intro runs on launch when Show Intro on Load is enabled (unless deep-linking or ?intro=0)
+introActive =
+  !startRoomParam &&
+  !startProtoId &&
+  params.get('intro') !== '0' &&
+  (isShowIntroOnLoadEnabled() || params.get('introTime') !== null);
 
 if (startRoomParam && BAY_ORDER.includes(startRoomParam)) {
   currentBay = startRoomParam;
@@ -3112,8 +3131,8 @@ if (startProtoId) {
   openProtoModal(startProtoId, defaultPos.clone(), defaultLook.clone());
 }
 
-// --- COLD-START 3D INTRO CINEMATIC (`intro_cinematic.md`) & TAP TO START ---
-type IntroStage = 'none' | 'tap_to_start' | 'cinematic' | 'fading_out';
+// --- COLD-START 3D INTRO CINEMATIC (`intro_cinematic.md`) ---
+type IntroStage = 'none' | 'cinematic' | 'fading_out';
 let introStage: IntroStage = 'none';
 const activeIntroCinematic: BuiltIntroCinematic = buildIntroCinematic();
 let introStartTime: number | null = null;
@@ -3137,33 +3156,10 @@ function cleanupIntroCinematicScene(): void {
   introSceneMounted = false;
 }
 
-function finishIntro(fromCinematic: boolean): void {
+function finishIntro(): void {
   if (!introActive || introStage === 'fading_out') return;
   holdPointerDownAt = null;
   gameState.markIntroSeen();
-
-  if (!fromCinematic) {
-    // Returning player with a save: go straight from "Tap to start" to Holiday Hall
-    cleanupIntroCinematicScene();
-    introActive = false;
-    introStage = 'none';
-    introHost.replaceChildren();
-    introHost.style.display = 'none';
-    activeDiorama?.setIntroPose('idle', 0);
-    hotspotLayer.style.display = '';
-    sideArrowsHost.style.display = '';
-    topBar.style.display = 'flex';
-    bottomStack.style.display = 'flex';
-    gameState.onEnterBay(currentBay);
-    renderTopBar();
-    renderCarryTray();
-    renderSideArrows();
-    renderActiveStoryBeat();
-    layoutStableHotspots();
-    hotspotLayer.classList.add('settled');
-    syncRenderLoop();
-    return;
-  }
 
   // Close the letterbox bars over the 3D intro scene, then fade open into Holiday Hall
   introStage = 'fading_out';
@@ -3399,7 +3395,7 @@ function mountCinematicStageDOM(): void {
         if (introStartTime !== null) {
           const elapsed = (performance.now() - introStartTime) / 1000;
           if (elapsed >= 21.6) {
-            finishIntro(true);
+            finishIntro();
             return;
           }
         }
@@ -3430,88 +3426,8 @@ function mountCinematicStageDOM(): void {
   introHost.replaceChildren(stageWrapper);
 }
 
-export function startIntroReplay(): void {
-  closeModal();
-  introActive = true;
-  mountCinematicStageDOM();
-  syncRenderLoop();
-}
-
-function mountIntroOverlay(): void {
-  hotspotLayer.style.display = 'none';
-  sideArrowsHost.style.display = 'none';
-  topBar.style.display = 'none';
-  bottomStack.style.display = 'none';
-  storyBannerHost.replaceChildren();
-  leapBubbleHost.replaceChildren();
-  hideMemoOverlay();
-  introHost.style.display = 'block';
-  introStage = 'tap_to_start';
-  introPrecompiled = false;
-  introSceneMounted = false;
-  activeDiorama?.setIntroPose('idle', 0);
-
-  // Plain dark "Tap to start" screen with no logo (`intro_cinematic.md`)
-  const tapScreen = h(
-    'div',
-    {
-      class: 'interactive',
-      style: {
-        position: 'fixed',
-        inset: '0',
-        background: '#140d09',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '14px',
-        cursor: 'pointer',
-        userSelect: 'none',
-        pointerEvents: 'auto',
-      },
-      onclick: () => {
-        if (gameState.hasSaveProgress()) {
-          finishIntro(false);
-        } else {
-          mountCinematicStageDOM();
-        }
-      },
-    },
-    h(
-      'div',
-      {
-        style: {
-          fontSize: '18px',
-          fontWeight: '800',
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-          color: '#fdf8ec',
-          padding: '12px 26px',
-          borderRadius: '999px',
-          border: '1.5px solid rgba(253, 248, 236, 0.32)',
-          background: 'rgba(255, 255, 255, 0.04)',
-        },
-      },
-      'Tap to start',
-    ),
-  );
-
-  introHost.replaceChildren(tapScreen);
-}
-
 function updateIntroCinematic(now: number): void {
   if (!introActive) return;
-
-  // Pre-compile shaders during the "Tap to start" screen so Shot 1 never stutters
-  if (introStage === 'tap_to_start') {
-    if (!introPrecompiled) {
-      introPrecompiled = true;
-      view.renderer.compile(view.scene, view.camera);
-      activeIntroCinematic.precompile(view);
-    }
-    return;
-  }
-
   if (introStage === 'fading_out' || introStage === 'none') return;
 
   // Check 1-second hold-to-skip
@@ -3520,7 +3436,7 @@ function updateIntroCinematic(now: number): void {
     const pct = Math.min(100, (heldMs / 1000) * 100);
     if (holdSkipFillEl) holdSkipFillEl.style.width = `${pct.toFixed(1)}%`;
     if (heldMs >= 1000) {
-      finishIntro(true);
+      finishIntro();
       return;
     }
   }
@@ -3564,17 +3480,13 @@ function updateIntroCinematic(now: number): void {
       titlePromptEl.style.opacity = '1';
     }
     if (elapsed >= 27.0) {
-      finishIntro(true);
+      finishIntro();
     }
   }
 }
 
 if (introActive) {
-  if (params.get('introTime') !== null) {
-    mountCinematicStageDOM();
-  } else {
-    mountIntroOverlay();
-  }
+  mountCinematicStageDOM();
 }
 
 function renderStaticSceneFrame(): void {
@@ -3634,10 +3546,6 @@ function onAnimationFrame(now: number): void {
 
   if (introActive) {
     updateIntroCinematic(now);
-    // Do not render the 3D scene while the opaque "Tap to Start" cover fills the viewport
-    if (introStage === 'tap_to_start') {
-      return;
-    }
     if (introSceneMounted) {
       view.render(activeIntroCinematic.scene);
       return;

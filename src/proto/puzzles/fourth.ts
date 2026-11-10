@@ -48,31 +48,31 @@ export const FINALE: StoryPanel[] = [
   {
     name: 'Red and blue',
     tip: '🎆 Two runs of the same color need a white gap; Red and Blue runs can touch directly!',
-    rows: ['..B..', 'RRBB.', '.BRRB', '...R.', '.R.B.'],
+    rows: ['..B..', 'RRRBB', '.BRRB', '..R..', '.R.B.'],
     palette: 'RB',
   },
   {
     name: 'Two-tone flare',
     tip: '🎆 Pick Red or Blue paint from the bar to fill each colored clue run in order',
-    rows: ['.RR..', 'RRR..', 'RRR.B', 'RRBB.', 'R....'],
+    rows: ['.RR..', 'RRRBB', 'RRBBB', '.RBB.', '..B..'],
     palette: 'RB',
   },
   {
     name: 'A rocket',
     tip: '🎆 Adjacent Red and Blue runs need no empty square between them',
-    rows: ['..B....', 'RRBBRR.', '.BR....', 'BBRRBB.', '..BB.RB', 'R..BRR.', 'B..R...'],
+    rows: ['...R...', '..RRR..', '.RRBRR.', '.RRRRR.', '.BBRBB.', 'BBRRRBB', 'BB.R.BB'],
     palette: 'RB',
   },
   {
     name: 'Starburst',
     tip: '🎆 Match each row and column’s Red and Blue run counts to light the starburst',
-    rows: ['..RR...', '..R....', 'R.R.RB.', 'RRRRB.B', '..RB...', '.RBB...', '.B.B..B'],
+    rows: ['..BBR..', '.BBRBB.', 'RRBBBRR', 'RRRBRRR', 'RRBBBRR', '.BBBRB.', '..RBB..'],
     palette: 'RB',
   },
   {
     name: 'The Grand Finale',
     tip: '🎆 Weave Red and Blue runs across the 7×7 sky to complete the Grand Finale',
-    rows: ['..BBR..', 'RRBBRR.', '..RRBB.', '.BRRBBR', '.R..RR.', '.R.....', '...R...'],
+    rows: ['.RRBBB.', 'RRRBBBB', 'RRBBRBB', '.BBBBRR', 'BBRRRRR', 'BBBRRRR', '.BB.RR.'],
     palette: 'RB',
   },
 ];
@@ -200,7 +200,7 @@ export const SNOWGLOBE: StoryPanel[] = [
   {
     name: 'The Snow Globe',
     tip: '❄️ Use symmetry inside the frosty frame alongside the row and column clues',
-    rows: ['..#..#.', '##..##.', '..##...', '#....##', '.#..#..', '....#..', '.##..#.'],
+    rows: ['..#..#.', '##..##.', '..##...', '#....##', '.#..#..', '...####', '#######'],
     frame: { top: 1, bottom: 4, left: 0, right: 5, axis: 'v' },
   },
 ];

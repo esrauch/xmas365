@@ -12,9 +12,11 @@ export interface Settings {
   volume: number;
   /** Show live FPS counter overlay. */
   showFps?: boolean;
+  /** Play the 3D intro cinematic on page load (defaults to true). */
+  showIntroOnLoad?: boolean;
 }
 
-const DEFAULTS: Settings = { volume: 1, showFps: false };
+const DEFAULTS: Settings = { volume: 1, showFps: false, showIntroOnLoad: true };
 
 export function loadSettings(): Settings {
   try {
@@ -25,6 +27,7 @@ export function loadSettings(): Settings {
     return {
       volume: typeof parsed.volume === 'number' ? parsed.volume : DEFAULTS.volume,
       showFps: typeof parsed.showFps === 'boolean' ? parsed.showFps : false,
+      showIntroOnLoad: typeof parsed.showIntroOnLoad === 'boolean' ? parsed.showIntroOnLoad : true,
     };
   } catch {
     return { ...DEFAULTS };
@@ -60,4 +63,14 @@ export function isFpsEnabled(): boolean {
 export function setFpsEnabled(enabled: boolean): void {
   const cur = cachedSettings ?? loadSettings();
   saveSettings({ ...cur, showFps: enabled });
+}
+
+export function isShowIntroOnLoadEnabled(): boolean {
+  cachedSettings ??= loadSettings();
+  return cachedSettings.showIntroOnLoad !== false;
+}
+
+export function setShowIntroOnLoadEnabled(enabled: boolean): void {
+  const cur = cachedSettings ?? loadSettings();
+  saveSettings({ ...cur, showIntroOnLoad: enabled });
 }

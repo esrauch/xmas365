@@ -4,29 +4,35 @@
   "tier": "medium",
   "panels": [
     {
-      "seed": 14,
-      "stats": { "steps": 7 },
+      "seed": 11,
+      "stats": {
+        "steps": 7
+      },
       "panel": {
         "name": "Picture grids, colours: medium 1",
-        "rows": ["..B....", "RRBBRR.", ".BR....", "BBRRBB.", "..BB.RB", "R..BRR.", "B..R..."],
+        "rows": ["....R..", "...RR..", "RRRRRB.", "RR.RB..", "RRRBBBB", "...BB..", ".B.BB.."],
+        "palette": "RB"
+      }
+    },
+    {
+      "seed": 13,
+      "stats": {
+        "steps": 7
+      },
+      "panel": {
+        "name": "Picture grids, colours: medium 2",
+        "rows": ["..R.RRR", "RRRRRRB", "RRRRRBB", "RRRRB..", "R.RBB..", "RRBBBB.", "..B...."],
         "palette": "RB"
       }
     },
     {
       "seed": 31,
-      "stats": { "steps": 7 },
-      "panel": {
-        "name": "Picture grids, colours: medium 2",
-        "rows": ["..RR...", "..R....", "R.R.RB.", "RRRRB.B", "..RB...", ".RBB...", ".B.B..B"],
-        "palette": "RB"
-      }
-    },
-    {
-      "seed": 34,
-      "stats": { "steps": 7 },
+      "stats": {
+        "steps": 7
+      },
       "panel": {
         "name": "Picture grids, colours: medium 3",
-        "rows": ["..BBR..", "RRBBRR.", "..RRBB.", ".BRRBBR", ".R..RR.", ".R.....", "...R..."],
+        "rows": [".BB....", ".BB....", "BBB.BRR", ".BB.RRR", ".BB.RRR", ".BRR...", ".RR...R"],
         "palette": "RB"
       }
     }

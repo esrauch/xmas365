@@ -4,58 +4,64 @@
   "tier": "hard",
   "panels": [
     {
-      "seed": 53,
-      "stats": { "steps": 9 },
+      "seed": 11,
+      "stats": {
+        "steps": 9
+      },
       "panel": {
         "name": "Picture grids, colours: hard 1",
         "rows": [
-          "..RR.RR..",
-          ".R..RRR..",
-          "RRRR.RRB.",
-          "..RR.RB..",
-          "..RRRBB.B",
-          "..RRB....",
-          "..RBBB...",
-          "..BB.....",
-          ".....B..."
+          ".B.......",
+          ".....B...",
+          "..B.BB...",
+          "BBBBBBRRR",
+          "BB.BBRR..",
+          ".BBBRRRRR",
+          "BBB..R...",
+          "..R..R...",
+          ".....R..."
         ],
         "palette": "RB"
       }
     },
     {
-      "seed": 69,
-      "stats": { "steps": 9 },
+      "seed": 32,
+      "stats": {
+        "steps": 9
+      },
       "panel": {
         "name": "Picture grids, colours: hard 2",
         "rows": [
-          "BBRRBB...",
-          ".BRRBBR..",
-          ".RBBRR..R",
-          "..B.R....",
-          "BBRR..R..",
-          "BBRR.....",
-          "RRBBRRB.R",
-          "RRBBR.BB.",
-          ".B...BR.."
+          "...R.....",
+          ".....R...",
+          "..RRRRRBB",
+          ".....R.B.",
+          ".....B.B.",
+          "RRRRBBBBB",
+          ".....BBB.",
+          ".....B.B.",
+          "RBBBBBBB."
         ],
         "palette": "RB"
       }
     },
     {
-      "seed": 87,
-      "stats": { "steps": 9 },
+      "seed": 42,
+      "stats": {
+        "steps": 9
+      },
       "panel": {
         "name": "Picture grids, colours: hard 3",
         "rows": [
-          ".B....B..",
-          ".BBB.....",
-          ".BB...BR.",
-          "BB....RR.",
-          ".B..BRRRR",
-          ".....RRRR",
-          "B.B..R.RR",
-          "BBR..RRRR",
-          ".RR......"
+          "..R......",
+          "RRRRRRRRB",
+          ".....R...",
+          "...R.RBB.",
+          "...RRBBB.",
+          "....BBBB.",
+          "..RBBBBB.",
+          "...BBBBB.",
+          "RBBBBBBBB"
         ],
         "palette": "RB"
       }

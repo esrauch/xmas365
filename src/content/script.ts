@@ -239,7 +239,7 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
     to: 'Change-Management Taskforce',
     from: 'S. Claus, CEO',
     re: 'Unauthorized Relic Restocking',
-    body: 'Who is putting confiscated holiday relics back on their home shelves?! Five padlocks have already clicked open across the campus, and someone keeps opening locked subsidiary doors without a ticket. Circle back and lock down those shelves before EOD! Probably a rogue intern.',
+    body: 'Who is putting confiscated holiday relics back on their home shelves?! Five padlocks have already clicked open across the campus, and someone keeps opening locked subsidiary doors without a ticket. Circle back and lock down those shelves before EOD!',
     signoff: 'S. Claus, CEO',
   },
   E2: {

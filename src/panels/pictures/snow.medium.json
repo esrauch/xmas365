@@ -4,30 +4,57 @@
   "tier": "medium",
   "panels": [
     {
-      "seed": 1,
-      "stats": { "steps": 7, "without snow": 2 },
+      "seed": 4,
+      "stats": {
+        "steps": 7,
+        "without snow": 2
+      },
       "panel": {
         "name": "Picture grids, snow: medium 1",
-        "rows": ["..#..#.", "##..##.", "..##...", "#....##", ".#..#..", "....#..", ".##..#."],
-        "frame": { "top": 1, "bottom": 4, "left": 0, "right": 5, "axis": "v" }
+        "rows": [".#...##", "..##..#", "..##..#", "#....##", ".#..#.#", "..###.#", "..#####"],
+        "frame": {
+          "top": 1,
+          "bottom": 4,
+          "left": 0,
+          "right": 5,
+          "axis": "v"
+        }
       }
     },
     {
-      "seed": 4,
-      "stats": { "steps": 7, "without snow": 2 },
+      "seed": 8,
+      "stats": {
+        "steps": 7,
+        "without snow": 2
+      },
       "panel": {
         "name": "Picture grids, snow: medium 2",
-        "rows": ["#...##.", "..##..#", "..##..#", "#....#.", ".#..#.#", "...##..", "...##.."],
-        "frame": { "top": 1, "bottom": 4, "left": 0, "right": 5, "axis": "v" }
+        "rows": ["######.", "#######", "..##...", "#....#.", ".#..#.#", "....#..", "##....."],
+        "frame": {
+          "top": 1,
+          "bottom": 4,
+          "left": 0,
+          "right": 5,
+          "axis": "v"
+        }
       }
     },
     {
-      "seed": 5,
-      "stats": { "steps": 7, "without snow": 2 },
+      "seed": 9,
+      "stats": {
+        "steps": 7,
+        "without snow": 2
+      },
       "panel": {
         "name": "Picture grids, snow: medium 3",
-        "rows": ["#......", ".####..", "..##..#", "#....##", ".#..#..", "..###.#", ".####.."],
-        "frame": { "top": 1, "bottom": 4, "left": 0, "right": 5, "axis": "v" }
+        "rows": ["#######", "######.", "..##..#", "#....#.", ".#..#..", "..#.#..", ".##.#.."],
+        "frame": {
+          "top": 1,
+          "bottom": 4,
+          "left": 0,
+          "right": 5,
+          "axis": "v"
+        }
       }
     }
   ]

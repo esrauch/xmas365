@@ -5,44 +5,70 @@
   "panels": [
     {
       "seed": 1,
-      "stats": { "eggs": 3, "steps": 400 },
+      "stats": {
+        "eggs": 2,
+        "steps": 104
+      },
       "panel": {
         "name": "Bunny hops, snow: easy 1",
-        "rows": ["#####", "#####", "#####", "#####", "#####"],
+        "rows": ["####", "####", "####", "####"],
         "given": [
-          [0, 4, 1],
-          [1, 2, 18],
-          [0, 0, 25]
+          [3, 2, 1],
+          [0, 0, 12]
         ],
-        "frame": { "top": 1, "left": 0, "bottom": 4, "right": 3, "axis": "h" }
-      }
-    },
-    {
-      "seed": 2,
-      "stats": { "eggs": 3, "steps": 159 },
-      "panel": {
-        "name": "Bunny hops, snow: easy 2",
-        "rows": ["#####", "#####", "#####", "#####", "#####"],
-        "given": [
-          [0, 4, 1],
-          [1, 2, 10],
-          [2, 0, 25]
-        ],
-        "frame": { "top": 1, "left": 1, "bottom": 4, "right": 4, "axis": "h" }
+        "frame": {
+          "top": 0,
+          "left": 0,
+          "bottom": 2,
+          "right": 3,
+          "axis": "v"
+        }
       }
     },
     {
       "seed": 3,
-      "stats": { "eggs": 3, "steps": 1069 },
+      "stats": {
+        "eggs": 3,
+        "steps": 76
+      },
+      "panel": {
+        "name": "Bunny hops, snow: easy 2",
+        "rows": ["####", "####", "####", "####"],
+        "given": [
+          [0, 3, 1],
+          [0, 0, 10],
+          [3, 0, 13]
+        ],
+        "frame": {
+          "top": 1,
+          "left": 0,
+          "bottom": 3,
+          "right": 3,
+          "axis": "v"
+        }
+      }
+    },
+    {
+      "seed": 5,
+      "stats": {
+        "eggs": 3,
+        "steps": 93
+      },
       "panel": {
         "name": "Bunny hops, snow: easy 3",
-        "rows": ["#####", "#####", "#####", "#####", "#####"],
+        "rows": ["####", "####", "####", "####"],
         "given": [
-          [0, 4, 1],
-          [1, 4, 2],
-          [0, 1, 22]
+          [3, 0, 1],
+          [1, 0, 15],
+          [0, 0, 16]
         ],
-        "frame": { "top": 0, "left": 0, "bottom": 3, "right": 3, "axis": "h" }
+        "frame": {
+          "top": 0,
+          "left": 1,
+          "bottom": 3,
+          "right": 3,
+          "axis": "h"
+        }
       }
     }
   ]

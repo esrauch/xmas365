@@ -13,7 +13,7 @@ import {
   pickDarkClues,
   setupSnowAndSwitches,
 } from './make';
-import { type Panel, clues } from './model';
+import { type Panel, type Run, clues } from './model';
 import { countSolutions, logical, solve } from './solve';
 import { type PictureTwist, problems, without } from './verify';
 
@@ -111,6 +111,47 @@ function encodeLetters(
 
 function onHasBoardTwist(p: Panel): boolean {
   return Boolean(p.eggs?.length || p.portions?.length || p.frame);
+}
+
+/**
+ * Check whether `p` has clear opening footholds: at least one row or column
+ * that is already complete from its side clue alone (no-X full line for
+ * Patriotic `colours`, or numbers + mandatory gaps summing to line length),
+ * and at least one generously sized visible run number.
+ */
+function hasOpeningFoothold(p: Panel): boolean {
+  const c = clues(p);
+  const H = p.rows.length;
+  const W = p.rows[0]?.length ?? 0;
+  const isColoured = Boolean(p.palette && p.palette.length > 1);
+
+  const lineComplete = (runs: Run[], L: number): boolean => {
+    if (runs.length === 0 || runs.some((r) => r.hidden || r.letter)) return false;
+    if (isColoured) {
+      // Patriotic: a full line with no X (runs sum directly to L, no same-colour gaps)
+      const noSameGap = runs.every((r, i) => i === 0 || runs[i - 1]?.colour !== r.colour);
+      const sum = runs.reduce((s, r) => s + r.n, 0);
+      if (noSameGap && sum === L) return true;
+    }
+    const minSpan = runs.reduce(
+      (s, r, i) => s + r.n + (i > 0 && runs[i - 1]?.colour === r.colour ? 1 : 0),
+      0,
+    );
+    return minSpan === L;
+  };
+
+  const completeCount =
+    c.rows.filter((r) => lineComplete(r, W)).length +
+    c.cols.filter((col) => lineComplete(col, H)).length;
+  if (completeCount < 1) return false;
+
+  const visibleNums = [...c.rows, ...c.cols].flatMap((runs) =>
+    runs.filter((r) => !r.hidden && !r.letter).map((r) => r.n),
+  );
+  const minMaxRun = isColoured
+    ? Math.max(3, Math.floor(Math.min(H, W) / 2))
+    : Math.ceil(Math.min(H, W) / 2);
+  return Math.max(0, ...visibleNums) >= minMaxRun;
 }
 
 /** One attempt at a picture-grid panel from one seed (null: try the next seed). */
@@ -234,6 +275,8 @@ export function makePanel(
         if (!encoded) return why.no('no letter encoding fits');
         p = encoded;
       }
+
+      if (!hasOpeningFoothold(p)) return why.no('weak opening foothold');
 
       const bad = problems(p, shape.margin, budget);
       if (bad.length) return why.no(`check: ${(bad[0] ?? '').replace(/[0-9,]+/g, '#')}`);

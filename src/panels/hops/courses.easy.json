@@ -5,43 +5,48 @@
   "panels": [
     {
       "seed": 1,
-      "stats": { "eggs": 2, "steps": 96 },
+      "stats": {
+        "eggs": 3,
+        "steps": 47
+      },
       "panel": {
         "name": "Bunny hops, courses: easy 1",
-        "rows": ["#####", "#####", "#####", "#####", "#####"],
+        "rows": ["####", "####", "####", "####"],
         "given": [
-          [2, 4, 1],
-          [0, 4, 25]
+          [0, 0, 1],
+          [2, 2, 13],
+          [2, 3, 14]
         ],
-        "portions": ["AABBB", "AABBB", "ABBBA", "ABBBA", "AAAAA"]
+        "portions": ["AABB", "AABB", "AABB", "AABB"]
       }
     },
     {
       "seed": 2,
-      "stats": { "eggs": 3, "steps": 66 },
+      "stats": {
+        "eggs": 2,
+        "steps": 23
+      },
       "panel": {
         "name": "Bunny hops, courses: easy 2",
-        "rows": ["#####", "#####", "#####", "#####", "#####"],
+        "rows": ["####", "####", "####", "####"],
         "given": [
-          [2, 0, 1],
-          [4, 2, 21],
-          [4, 0, 23]
+          [1, 2, 1],
+          [3, 2, 3]
         ],
-        "portions": ["AAAAA", "ABBBA", "ABBBA", "BBBAA", "BBBAA"]
+        "portions": ["BBBB", "BAAB", "AAAB", "AAAB"]
       }
     },
     {
-      "seed": 3,
-      "stats": { "eggs": 3, "steps": 114 },
+      "seed": 4,
+      "stats": {
+        "eggs": 1,
+        "steps": 48
+      },
       "panel": {
         "name": "Bunny hops, courses: easy 3",
-        "rows": ["#####", "#####", "#####", "#####", "#####"],
-        "given": [
-          [4, 2, 1],
-          [3, 1, 7],
-          [0, 1, 24]
-        ],
-        "portions": ["BBBBB", "BBBBB", "AAABB", "AAAAA", "AAAAA"]
+        "rows": ["####", "####", "####", "####"],
+        "given": [[0, 1, 1]],
+        "portions": ["AABB", "AAAB", "AAAB", "BBBB"]
       }
     }
   ]

@@ -4,48 +4,51 @@
   "tier": "medium",
   "panels": [
     {
-      "seed": 1,
-      "stats": { "eggs": 5, "steps": 157 },
+      "seed": 2,
+      "stats": {
+        "eggs": 2,
+        "steps": 93
+      },
       "panel": {
         "name": "Bunny hops, courses: medium 1",
-        "rows": ["#######", "#######", "#######", "#######", "#######", "#######", "#######"],
+        "rows": ["#####", "#####", "#####", "#####", "#####"],
         "given": [
-          [2, 0, 1],
-          [1, 1, 27],
-          [4, 3, 40],
-          [1, 4, 46],
-          [1, 3, 47]
+          [1, 1, 1],
+          [2, 3, 18]
         ],
-        "portions": ["AAAAAAA", "ABBCCCA", "ABBCCCA", "BBBCCCA", "BBBCCCA", "BBCCCCA", "BBBBBAA"]
-      }
-    },
-    {
-      "seed": 2,
-      "stats": { "eggs": 3, "steps": 361 },
-      "panel": {
-        "name": "Bunny hops, courses: medium 2",
-        "rows": ["#######", "#######", "#######", "#######", "#######", "#######", "#######"],
-        "given": [
-          [6, 2, 1],
-          [2, 5, 42],
-          [3, 3, 49]
-        ],
-        "portions": ["BBCCCCB", "BBCCCCB", "BBCCCCB", "ABCCCCB", "ABBBBBB", "AAAAAAA", "AAAAAAA"]
+        "portions": ["BBBBB", "BABBB", "BABBA", "AAAAA", "AAAAA"]
       }
     },
     {
       "seed": 3,
-      "stats": { "eggs": 4, "steps": 638 },
+      "stats": {
+        "eggs": 2,
+        "steps": 151
+      },
+      "panel": {
+        "name": "Bunny hops, courses: medium 2",
+        "rows": ["#####", "#####", "#####", "#####", "#####"],
+        "given": [
+          [3, 3, 1],
+          [0, 4, 21]
+        ],
+        "portions": ["AABBB", "AABBB", "AABBB", "AAAAB", "AAABB"]
+      }
+    },
+    {
+      "seed": 4,
+      "stats": {
+        "eggs": 2,
+        "steps": 69
+      },
       "panel": {
         "name": "Bunny hops, courses: medium 3",
-        "rows": ["#######", "#######", "#######", "#######", "#######", "#######", "#######"],
+        "rows": ["#####", "#####", "#####", "#####", "#####"],
         "given": [
-          [0, 0, 1],
-          [4, 0, 5],
-          [4, 4, 43],
-          [2, 4, 49]
+          [1, 1, 1],
+          [4, 3, 6]
         ],
-        "portions": ["AAACCCC", "AAABCCC", "AABBCCC", "AABBCCC", "AABBCCC", "AABBBBB", "AABBBBB"]
+        "portions": ["BBBBB", "BAAAB", "BAAAA", "BAAAA", "BBBAA"]
       }
     }
   ]

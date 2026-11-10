@@ -4,27 +4,33 @@
   "tier": "easy",
   "panels": [
     {
-      "seed": 4,
-      "stats": { "steps": 5 },
+      "seed": 1,
+      "stats": {
+        "steps": 5
+      },
       "panel": {
         "name": "Picture grids, plain: easy 1",
-        "rows": ["...#.", ".#.##", ".###.", "#####", "..#.."]
+        "rows": ["#####", "####.", "#####", ".####", "..##."]
       }
     },
     {
-      "seed": 6,
-      "stats": { "steps": 5 },
+      "seed": 2,
+      "stats": {
+        "steps": 5
+      },
       "panel": {
         "name": "Picture grids, plain: easy 2",
-        "rows": ["#..#.", "..##.", "##.##", ".##.#", "...#."]
+        "rows": ["#..##", "#####", "####.", "#####", "#..##"]
       }
     },
     {
-      "seed": 7,
-      "stats": { "steps": 5 },
+      "seed": 3,
+      "stats": {
+        "steps": 5
+      },
       "panel": {
         "name": "Picture grids, plain: easy 3",
-        "rows": ["....#", "..#..", ".###.", "##.##", ".###."]
+        "rows": [".###.", "#####", "####.", "####.", "...#."]
       }
     }
   ]

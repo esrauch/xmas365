@@ -438,8 +438,8 @@ export function splitTwoBunnies(
   random: Rng,
 ): { route: number[]; splitIdx: number } {
   const N = fullRoute.length;
-  const minSplit = Math.max(5, Math.floor(N * 0.4));
-  const maxSplit = Math.min(N - 5, Math.ceil(N * 0.6));
+  const minSplit = Math.max(5, Math.floor(N * 0.45));
+  const maxSplit = Math.min(N - 5, Math.ceil(N * 0.65));
   const splitIdx = minSplit + Math.floor(random() * (maxSplit - minSplit + 1));
 
   const redRoute = fullRoute.slice(0, splitIdx);
@@ -572,9 +572,10 @@ export function colourTwoBunnies(
  * (given by the last egg) essential to determine which dark squares are lawn vs rock.
  */
 export function findDarkUTurn(b: Board, route: number[], splitIdx?: number): number[] | null {
+  const evenTwoBunnies = splitIdx !== undefined && route.length % 2 === 0;
   const endIdx = splitIdx !== undefined ? splitIdx : route.length;
-  // Look near the end of the first bunny's route (e.g. within last 6 steps)
-  for (let k = endIdx - 4; k >= Math.max(1, endIdx - 8); k--) {
+  const k = evenTwoBunnies ? endIdx - 4 : endIdx - 5;
+  if (k >= 1) {
     const u = route[k] as number;
     const a = route[k + 1] as number;
     const bSpot = route[k + 2] as number;

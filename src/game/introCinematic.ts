@@ -239,17 +239,17 @@ function makeLogoSlamTexture(): THREE.CanvasTexture {
     ctx.strokeRect(-420, -110, 840, 220);
 
     // XMAS365™ wordmark in red & green italic
-    ctx.font = 'italic 900 132px system-ui, -apple-system, sans-serif';
+    ctx.font = 'italic 900 120px system-ui, -apple-system, sans-serif';
     ctx.textBaseline = 'middle';
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#c53030';
-    ctx.fillText('XMAS', 40, -16);
+    const wXmas = ctx.measureText('XMAS').width;
+    const w365 = ctx.measureText('365™').width;
+    const gap = 8;
+    const startX = -(wXmas + gap + w365) * 0.5;
     ctx.textAlign = 'left';
+    ctx.fillStyle = '#c53030';
+    ctx.fillText('XMAS', startX, -16);
     ctx.fillStyle = '#2f855a';
-    ctx.fillText('365', 44, -16);
-    ctx.font = '900 44px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = '#1f2430';
-    ctx.fillText('™', 318, -56);
+    ctx.fillText('365™', startX + wXmas + gap, -16);
 
     // Tagline underneath
     ctx.textAlign = 'center';
@@ -690,16 +690,6 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
   leapDayActor.rotation.y = 0.14;
   const leapDayMesh = buildMascotMesh('leapday', 0.56);
   leapDayActor.add(leapDayMesh);
-
-  // Glasses glint highlight spheres for the pause on Leap Day (`t ≈ 17.1s`)
-  const glintMat = trackMat(
-    new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 }),
-  );
-  const glintL = new THREE.Mesh(trackGeo(new THREE.SphereGeometry(0.032, 8, 8)), glintMat);
-  const glintR = new THREE.Mesh(trackGeo(new THREE.SphereGeometry(0.032, 8, 8)), glintMat);
-  glintL.position.set(-0.066, 0.32, 0.105);
-  glintR.position.set(0.066, 0.32, 0.105);
-  leapDayActor.add(glintL, glintR);
   scene.add(leapDayActor);
 
   // Compute steamroller pose (world X, Z, heading angle Y, front drum world X, and paper roll radius scale)
@@ -844,13 +834,13 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
       // Shot 2 (2.8–4.2s): Eases toward the floor's left edge, lower, as the steamroller rolls in at January
       const u = easeInOutCubic((t - 2.8) / 1.4);
       camPos.set(
-        THREE.MathUtils.lerp(0.32, -2.1, u),
-        THREE.MathUtils.lerp(5.45, 2.55, u),
-        THREE.MathUtils.lerp(4.75, 1.55, u),
+        THREE.MathUtils.lerp(0.32, -2.07, u),
+        THREE.MathUtils.lerp(5.45, 2.5, u),
+        THREE.MathUtils.lerp(4.75, 1.5, u),
       );
       camLook.set(
-        THREE.MathUtils.lerp(0, -1.95, u),
-        THREE.MathUtils.lerp(0.05, 0.32, u),
+        THREE.MathUtils.lerp(0, -1.7, u),
+        THREE.MathUtils.lerp(0.05, 0.28, u),
         THREE.MathUtils.lerp(0.05, laneCenterZ(0), u),
       );
     } else if (t < 6.6) {
@@ -863,12 +853,12 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
       // Shot 4 (6.6–7.3s): Holds as the roller swings round at April's end into Lane 2
       const u = easeInOutCubic((t - 6.6) / 0.7);
       camPos.set(
-        THREE.MathUtils.lerp(1.53, 1.8, u),
-        THREE.MathUtils.lerp(2.5, 2.65, u),
-        THREE.MathUtils.lerp(1.5, 2.95, u),
+        THREE.MathUtils.lerp(1.53, 1.95, u),
+        THREE.MathUtils.lerp(2.5, 2.6, u),
+        THREE.MathUtils.lerp(1.5, 3.0, u),
       );
       camLook.set(
-        THREE.MathUtils.lerp(1.9, 1.7, u),
+        THREE.MathUtils.lerp(1.9, 1.65, u),
         0.28,
         THREE.MathUtils.lerp(laneCenterZ(0), laneCenterZ(1), u),
       );
@@ -882,12 +872,12 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
       // Shot 6 (9.3–10.0s): Holds as the roller turns down into Lane 3
       const u = easeInOutCubic((t - 9.3) / 0.7);
       camPos.set(
-        THREE.MathUtils.lerp(-1.55, -1.75, u),
-        THREE.MathUtils.lerp(2.6, 2.68, u),
-        THREE.MathUtils.lerp(3.0, 4.45, u),
+        THREE.MathUtils.lerp(-1.55, -1.8, u),
+        THREE.MathUtils.lerp(2.6, 2.65, u),
+        THREE.MathUtils.lerp(3.0, 4.5, u),
       );
       camLook.set(
-        THREE.MathUtils.lerp(-1.85, -1.65, u),
+        THREE.MathUtils.lerp(-1.85, -1.5, u),
         0.28,
         THREE.MathUtils.lerp(laneCenterZ(1), laneCenterZ(2), u),
       );
@@ -908,7 +898,11 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
         THREE.MathUtils.lerp(2.65, 6.8, u),
         THREE.MathUtils.lerp(4.5, -0.35, u) + shakeZ,
       );
-      camLook.set(shakeX * 0.5, 0.1, THREE.MathUtils.lerp(laneCenterZ(2), -0.55, u) + shakeZ * 0.5);
+      camLook.set(
+        THREE.MathUtils.lerp(1.95, 0, u) + shakeX * 0.5,
+        THREE.MathUtils.lerp(0.28, 0.1, u),
+        THREE.MathUtils.lerp(laneCenterZ(2), -0.55, u) + shakeZ * 0.5,
+      );
     } else if (t < 21.0) {
       // Shot 9 (14.2–16.4s), Pause on Leap Day (16.4–18.2s) & Shot 10 (18.2–21.0s):
       // Tilts and pans down past the calendar's bottom edge over bare floor and settles low and close
@@ -944,7 +938,15 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
   return {
     scene,
     precompile(view: View): void {
+      for (const entry of lanePaperMeshes) entry.mesh.visible = true;
+      for (const puff of smokePuffs) puff.mesh.visible = true;
+      logoSlamMesh.visible = true;
+      confettiInstanced.visible = true;
       view.renderer.compile(scene, view.camera);
+      for (const entry of lanePaperMeshes) entry.mesh.visible = false;
+      for (const puff of smokePuffs) puff.mesh.visible = false;
+      logoSlamMesh.visible = false;
+      confettiInstanced.visible = false;
     },
     update(elapsedSec: number, view: View): void {
       // Warm golden-hour cel shading palette for the calendar floor
@@ -1061,22 +1063,12 @@ export function buildIntroCinematic(): BuiltIntroCinematic {
         }
       }
 
-      // 5. Leap Day on the lone Feb 29 tile (Shots 9 & 10: blink + glasses light glint during the pause)
+      // 5. Leap Day on the lone Feb 29 tile (Shots 9 & 10: blink + idle breath during the pause)
       const blinkWindow = elapsedSec >= 16.95 && elapsedSec <= 17.14;
       const idleBreath = 1 + Math.sin(elapsedSec * 2.2) * 0.02;
       leapDayActor.scale.set(1, blinkWindow ? 0.94 : idleBreath, 1);
       leapDayActor.rotation.y =
         0.14 + (elapsedSec > 15.8 ? Math.sin((elapsedSec - 15.8) * 1.3) * 0.07 : 0);
-
-      if (elapsedSec >= 17.1 && elapsedSec <= 17.7) {
-        const gPulse = Math.sin(((elapsedSec - 17.1) / 0.6) * Math.PI);
-        glintMat.opacity = gPulse * 0.95;
-        const gs = 0.6 + gPulse * 0.9;
-        glintL.scale.setScalar(gs);
-        glintR.scale.setScalar(gs);
-      } else {
-        glintMat.opacity = 0;
-      }
 
       // 6. Position camera for current shot
       evaluateCamera(elapsedSec);

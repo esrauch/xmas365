@@ -75,8 +75,8 @@ export function makeBaseGrid(H: number, W: number, random: Rng): number[][] {
     const kind = randInt(random, 0, 2);
     if (kind === 0) {
       // Filled rectangle
-      const h = randInt(random, 2, Math.max(2, Math.floor(H * 0.6)));
-      const w = randInt(random, 2, Math.max(2, Math.floor(W * 0.6)));
+      const h = randInt(random, 2, Math.max(2, Math.ceil(H * 0.7)));
+      const w = randInt(random, 2, Math.max(2, Math.ceil(W * 0.7)));
       const r0 = randInt(random, 0, H - h);
       const c0 = randInt(random, 0, W - w);
       for (let r = r0; r < r0 + h; r++)
@@ -91,38 +91,55 @@ export function makeBaseGrid(H: number, W: number, random: Rng): number[][] {
         if (cc + d >= 0 && cc + d < W) (grid[cr] as number[])[cc + d] = 1;
       }
     } else {
-      // Thick bar
+      // Thick bar (often full-span to give complete foothold lines)
       if (random() < 0.5) {
         const r = randInt(random, 0, H - 1);
-        const c0 = randInt(random, 0, Math.floor(W / 2));
-        const c1 = randInt(random, c0 + 1, W - 1);
+        const full = random() < 0.6;
+        const c0 = full ? 0 : randInt(random, 0, Math.floor(W / 3));
+        const c1 = full ? W - 1 : randInt(random, Math.max(c0 + 2, Math.floor(W * 0.6)), W - 1);
         for (let c = c0; c <= c1; c++) (grid[r] as number[])[c] = 1;
       } else {
         const c = randInt(random, 0, W - 1);
-        const r0 = randInt(random, 0, Math.floor(H / 2));
-        const r1 = randInt(random, r0 + 1, H - 1);
+        const full = random() < 0.6;
+        const r0 = full ? 0 : randInt(random, 0, Math.floor(H / 3));
+        const r1 = full ? H - 1 : randInt(random, Math.max(r0 + 2, Math.floor(H * 0.6)), H - 1);
         for (let r = r0; r <= r1; r++) (grid[r] as number[])[c] = 1;
       }
     }
   }
-  // Sprinkle a few toggles so lines aren't all solid blocks
-  const toggles = Math.max(2, Math.floor((H * W) / 7));
+  // Light toggles for variety while keeping large contiguous runs intact
+  const toggles = Math.max(1, Math.floor((H * W) / 14));
   for (let i = 0; i < toggles; i++) {
     const r = randInt(random, 0, H - 1);
     const c = randInt(random, 0, W - 1);
     (grid[r] as number[])[c] = (grid[r]?.[c] ?? 0) ? 0 : 1;
   }
-  // Ensure every row and column has at least one filled cell and at least one empty cell
+  // Guarantee at least one completely filled row or column as an immediate foothold
+  if (random() < 0.5) {
+    const r = randInt(random, 0, H - 1);
+    for (let c = 0; c < W; c++) (grid[r] as number[])[c] = 1;
+  } else {
+    const c = randInt(random, 0, W - 1);
+    for (let r = 0; r < H; r++) (grid[r] as number[])[c] = 1;
+  }
+  // Ensure every row and column has at least one filled cell
   for (let r = 0; r < H; r++) {
     const row = grid[r] as number[];
     if (row.every((v): boolean => v === 0)) row[randInt(random, 0, W - 1)] = 1;
-    if (row.every((v): boolean => v > 0)) row[randInt(random, 0, W - 1)] = 0;
   }
   for (let c = 0; c < W; c++) {
     if (grid.every((row) => (row[c] ?? 0) === 0))
       (grid[randInt(random, 0, H - 1)] as number[])[c] = 1;
-    if (grid.every((row) => (row[c] ?? 0) > 0))
-      (grid[randInt(random, 0, H - 1)] as number[])[c] = 0;
+  }
+  // Ensure the board as a whole has enough empty cells so it is not a solid block
+  let emptyCount = grid.reduce((s, row) => s + row.filter((v) => v === 0).length, 0);
+  for (let tries = 0; tries < 20 && emptyCount < Math.max(4, H); tries++) {
+    const r = randInt(random, 0, H - 1);
+    const c = randInt(random, 0, W - 1);
+    if ((grid[r]?.[c] ?? 0) > 0) {
+      (grid[r] as number[])[c] = 0;
+      emptyCount++;
+    }
   }
   return grid;
 }

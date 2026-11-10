@@ -4,33 +4,42 @@
   "tier": "easy",
   "panels": [
     {
-      "seed": 4,
-      "stats": { "steps": 14, "without letters": 2 },
+      "seed": 1,
+      "stats": {
+        "steps": 9,
+        "without letters": 2
+      },
       "panel": {
         "name": "Picture grids, letters: easy 1",
-        "rows": ["...#.", ".#.##", ".###.", "#####", "..#.."],
-        "letters": "  ES",
-        "message": "4HIN3"
+        "rows": ["#####", "####.", "#####", ".####", "..##."],
+        "letters": " AR",
+        "message": "SP23K"
       }
     },
     {
-      "seed": 7,
-      "stats": { "steps": 395, "without letters": 2 },
+      "seed": 4,
+      "stats": {
+        "steps": 9,
+        "without letters": 2
+      },
       "panel": {
         "name": "Picture grids, letters: easy 2",
-        "rows": ["....#", "..#..", ".###.", "##.##", ".###."],
-        "letters": "BR",
-        "message": "1U2ST"
+        "rows": [".####", "#####", ".##.#", ".####", ".####"],
+        "letters": "E  I",
+        "message": "SH4N1"
       }
     },
     {
-      "seed": 9,
-      "stats": { "steps": 17, "without letters": 2 },
+      "seed": 11,
+      "stats": {
+        "steps": 9,
+        "without letters": 2
+      },
       "panel": {
         "name": "Picture grids, letters: easy 3",
-        "rows": ["####.", "..###", "####.", "###..", ".#..."],
-        "letters": " E L",
-        "message": "4OV2"
+        "rows": ["..#..", ".##..", "#####", "#.###", "#####"],
+        "letters": "VE",
+        "message": "LO12"
       }
     }
   ]
