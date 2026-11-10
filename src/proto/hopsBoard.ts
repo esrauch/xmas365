@@ -9,7 +9,7 @@
  * - snowflakes (frosty frame, mirror line with ❄, and ghost mirror trail);
  * - letters (letter eggs on the board and message blank tiles above);
  * - the dark (shadowed squares ? that may be lawn or rock, lighting up when solved).
- * Rocks (base game) are drawn as grey stones; the bunny can't hop onto them.
+ * Rocks (base game) are stone squares (the same 🪨 as a revealed dark rock); the bunny can't hop onto them.
  */
 import { inside, mirrorKey } from '../gen/core/mirror';
 import {
@@ -516,7 +516,21 @@ export function mountHops(host: HTMLElement, panel: Panel, hooks: HopsHooks): ()
     routes.r.forEach((i, idx) => stepNumber.set(i, idx + 1));
     if (b.twoBunnies) routes.b.forEach((i, idx) => stepNumber.set(i, idx + 1));
 
-    // Rocks (base game): grey stones where the bunny can't hop
+    // A rock's stone on its square: the same icon for base rocks and revealed dark rocks.
+    const drawRockIcon = (r: number, c: number): void => {
+      add(
+        'text',
+        {
+          x: c * cell + cell / 2,
+          y: r * cell + cell * 0.64,
+          'text-anchor': 'middle',
+          'font-size': cell * 0.4,
+        },
+        '🪨',
+      );
+    };
+
+    // Rocks (base game): stone squares where the bunny can't hop
     for (const [r, c] of panel.rocks ?? []) {
       add('rect', {
         x: c * cell + 2,
@@ -524,24 +538,9 @@ export function mountHops(host: HTMLElement, panel: Panel, hooks: HopsHooks): ()
         width: cell - 4,
         height: cell - 4,
         rx: 8,
-        fill: '#c9c2b8',
+        fill: '#d7ccc8',
       });
-      add('ellipse', {
-        cx: c * cell + cell / 2,
-        cy: r * cell + cell * 0.56,
-        rx: cell * 0.32,
-        ry: cell * 0.24,
-        fill: '#8d8579',
-        stroke: '#6d665c',
-        'stroke-width': 1.5,
-      });
-      add('ellipse', {
-        cx: c * cell + cell * 0.42,
-        cy: r * cell + cell * 0.48,
-        rx: cell * 0.1,
-        ry: cell * 0.06,
-        fill: '#b3aca1',
-      });
+      drawRockIcon(r, c);
     }
 
     // Lawn / coloured / shadowed squares
@@ -600,16 +599,7 @@ export function mountHops(host: HTMLElement, panel: Panel, hooks: HopsHooks): ()
           '?',
         );
       } else if (inDark && done && !visitedSet.has(i)) {
-        add(
-          'text',
-          {
-            x: c * cell + cell / 2,
-            y: r * cell + cell * 0.64,
-            'text-anchor': 'middle',
-            'font-size': cell * 0.4,
-          },
-          '🪨',
-        );
+        drawRockIcon(r, c);
       }
     });
 
