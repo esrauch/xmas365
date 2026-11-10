@@ -5,10 +5,7 @@
   "panels": [
     {
       "seed": 1,
-      "stats": {
-        "steps": 21,
-        "without eggs": 2
-      },
+      "stats": { "steps": 21, "without eggs": 2 },
       "panel": {
         "name": "Picture grids, eggs: medium 1",
         "rows": ["...#...", "#.##...", "#.###..", "#######", "..##...", ".##.#..", ".....#."],
@@ -21,10 +18,7 @@
     },
     {
       "seed": 4,
-      "stats": {
-        "steps": 7,
-        "without eggs": 2
-      },
+      "stats": { "steps": 7, "without eggs": 2 },
       "panel": {
         "name": "Picture grids, eggs: medium 2",
         "rows": [".#...##", "..##...", "..##.#.", "..##..#", "..##...", "#.###.#", "..#####"],
@@ -36,18 +30,15 @@
       }
     },
     {
-      "seed": 7,
-      "stats": {
-        "steps": 15,
-        "without eggs": 2
-      },
+      "seed": 10,
+      "stats": { "steps": 9, "without eggs": 2 },
       "panel": {
         "name": "Picture grids, eggs: medium 3",
-        "rows": ["#..###.", "..####.", "#.####.", "...###.", ".#..##.", "..#.###", "...###."],
+        "rows": ["####..#", ".##.#..", "..#..#.", ".##....", ".##....", ".##....", "#######"],
         "eggs": [
-          [2, 4, 4],
-          [4, 1, 1],
-          [5, 4, 2]
+          [0, 6, 5],
+          [1, 4, 3],
+          [2, 5, 2]
         ]
       }
     }

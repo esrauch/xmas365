@@ -4,47 +4,38 @@
   "tier": "easy",
   "panels": [
     {
-      "seed": 1,
-      "stats": {
-        "steps": 6,
-        "without eggs": 2
-      },
+      "seed": 5,
+      "stats": { "steps": 5, "without eggs": 2 },
       "panel": {
         "name": "Picture grids, eggs: easy 1",
-        "rows": ["#..##", ".#.#.", "..###", ".####", "..##."],
+        "rows": ["####.", "####.", "###..", "##.#.", "##..#"],
         "eggs": [
-          [0, 0, 1],
-          [1, 3, 2]
+          [3, 3, 3],
+          [4, 4, 3]
         ]
       }
     },
     {
-      "seed": 2,
-      "stats": {
-        "steps": 6,
-        "without eggs": 2
-      },
+      "seed": 12,
+      "stats": { "steps": 5, "without eggs": 2 },
       "panel": {
         "name": "Picture grids, eggs: easy 2",
-        "rows": ["...##", "#..##", ".#.#.", "..###", "#..##"],
+        "rows": ["#..#.", "##..#", "###..", "#....", "##..."],
         "eggs": [
-          [1, 0, 1],
-          [4, 3, 2]
+          [0, 3, 2],
+          [1, 4, 3]
         ]
       }
     },
     {
-      "seed": 4,
-      "stats": {
-        "steps": 6,
-        "without eggs": 2
-      },
+      "seed": 13,
+      "stats": { "steps": 6, "without eggs": 2 },
       "panel": {
         "name": "Picture grids, eggs: easy 3",
-        "rows": ["..###", "#..##", ".#..#", "..###", ".####"],
+        "rows": [".##..", "##.#.", "##..#", "#.#..", "###.."],
         "eggs": [
-          [1, 0, 1],
-          [2, 4, 2]
+          [1, 3, 3],
+          [2, 1, 2]
         ]
       }
     }

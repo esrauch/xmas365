@@ -210,20 +210,35 @@ export function makePanel(
         ...(portions ? { portions } : {}),
       };
 
-      // Place eggs on each 'eggs' switch's top-left filled corner (s.r, s.c),
-      // then add hint eggs in other multi-run rows up to shape.eggs (at most 1 egg per row).
+      // Place an egg on each 'eggs' switch, then add hint eggs in other multi-run rows up to
+      // shape.eggs (at most 1 egg per row). An egg numbered 1 just says "nothing filled to its
+      // left", which gives the row's start straight away, so eggs only ever show 2 or more:
+      // a switch's egg goes on whichever of its filled squares has the higher number.
       if (on.has('eggs')) {
         const c = clues(p);
         const eggSwitches = switches.filter((s) => s.owner === 'eggs');
         const eggs: [number, number, number][] = [];
         const usedRows = new Set<number>();
+        const nthFilled = (r: number, col: number): number =>
+          (grid[r] ?? []).slice(0, col + 1).filter((v) => v > 0).length;
         for (const s of eggSwitches) {
-          if ((c.rows[s.r]?.length ?? 0) < 2) return why.no('egg switch row has only 1 run');
-          const row = grid[s.r] ?? [];
-          if ((row[s.c] ?? 0) <= 0) return why.no('egg switch corner not filled');
-          const n = row.slice(0, s.c + 1).filter((v) => v > 0).length;
-          eggs.push([s.r, s.c, n]);
-          usedRows.add(s.r);
+          if ((grid[s.r]?.[s.c] ?? 0) <= 0) return why.no('egg switch corner not filled');
+          // The switch's filled squares (in its two rows), each with its number in its row.
+          const spots: [number, number, number][] = [];
+          for (const [r, col] of [
+            [s.r, s.c],
+            [s.r, s.c + 1],
+            [s.r + 1, s.c],
+            [s.r + 1, s.c + 1],
+          ] as const) {
+            if ((grid[r]?.[col] ?? 0) > 0 && (c.rows[r]?.length ?? 0) >= 2) {
+              spots.push([r, col, nthFilled(r, col)]);
+            }
+          }
+          const best = spots.sort((a, b) => b[2] - a[2])[0];
+          if (!best || best[2] < 2) return why.no('egg would read 1');
+          eggs.push(best);
+          usedRows.add(best[0]);
         }
         if (!eggs.length) return why.no('no eggs placed');
 
@@ -239,19 +254,14 @@ export function makePanel(
               rowCandidates.push([r, col, count]);
             }
           }
-          // Prefer n >= 2 when available in this row
-          const preferred = rowCandidates.filter(([, , n]) => n >= 2);
-          const pickFrom = preferred.length ? preferred : rowCandidates;
+          // Only eggs numbered 2 or more (a 1 gives the row's start away)
+          const pickFrom = rowCandidates.filter(([, , n]) => n >= 2);
           if (pickFrom.length) {
             const chosen = shuffle(random, pickFrom)[0];
             if (chosen) candidates.push(chosen);
           }
         }
-        // Prefer rows where chosen egg has n >= 2
-        const shuffled = shuffle(random, candidates).sort(
-          (a, b) => (b[2] >= 2 ? 1 : 0) - (a[2] >= 2 ? 1 : 0),
-        );
-        for (const cand of shuffled) {
+        for (const cand of shuffle(random, candidates)) {
           if (eggs.length >= shape.eggs) break;
           eggs.push(cand);
         }

@@ -153,12 +153,12 @@ export const CHOCOBUNNY: StoryPanel[] = [
   },
   {
     name: 'The Chocolate Bunny',
-    tip: '🥚 An egg marked 1 is the very first filled square in its row — everything to its left is empty!',
-    rows: ['.#.....', '#.#.#..', '...###.', '#####.#', '..####.', '#..##.#', '.#..##.'],
+    tip: '🥚 An egg counts filled squares from the left of its row: a 3 means two filled squares come before it',
+    rows: ['...#...', '#####..', '#####..', '#.#####', '###..##', '.#.#...', '##..#.#'],
     eggs: [
-      [1, 4, 3],
-      [3, 6, 6],
-      [5, 0, 1],
+      [3, 2, 2],
+      [4, 5, 4],
+      [6, 4, 3],
     ],
   },
 ];
