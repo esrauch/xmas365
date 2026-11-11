@@ -1350,6 +1350,9 @@ export class GameState {
   markClauseVoided(clauseIdx: number, forceTrigger = false): boolean {
     const wasVoided = !forceTrigger && this.isClauseVoided(clauseIdx);
     this.fillClausePanels(clauseIdx, true);
+    if (this.activePuzzle?.protoId === 'clause' && this.activePuzzle.clauseIdx === clauseIdx) {
+      this.activePuzzle = { protoId: 'clause' };
+    }
     if (!wasVoided) {
       const allVoided = this.voidedClauseCount() >= CLAUSE_GENRES.length;
       if (allVoided) {
@@ -1371,6 +1374,13 @@ export class GameState {
    */
   setClauseVoided(clauseIdx: number, voided: boolean): void {
     this.fillClausePanels(clauseIdx, voided);
+    if (
+      voided &&
+      this.activePuzzle?.protoId === 'clause' &&
+      this.activePuzzle.clauseIdx === clauseIdx
+    ) {
+      this.activePuzzle = { protoId: 'clause' };
+    }
     if (!voided) {
       for (const b of ['C6.torn', 'Y1', 'Y2', 'Y4', 'Y5', 'Y6', 'Y7']) {
         this.milestones.delete(b);

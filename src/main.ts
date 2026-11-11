@@ -1349,6 +1349,9 @@ function showUnlockDialog(roomSpec: RoomSpec, kind: 'intro' | 'home'): void {
 }
 
 export function openVictoryCreditsModal(): void {
+  if (activeModal === 'proto') {
+    gameState.setActivePuzzle(null);
+  }
   activeModal = 'credits';
   activeProtoId = null;
   isCameraFocused = false;
@@ -1913,6 +1916,9 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
 }
 
 function openCorkboardModal(initialMemoId?: MemoId): void {
+  if (activeModal === 'proto') {
+    gameState.setActivePuzzle(null);
+  }
   activeModal = 'corkboard';
   hotspotLayer.style.display = 'none';
   sideArrowsHost.style.display = 'none';
@@ -2153,6 +2159,9 @@ function openCorkboardModal(initialMemoId?: MemoId): void {
 }
 
 function openSettingsModal(): void {
+  if (activeModal === 'proto') {
+    gameState.setActivePuzzle(null);
+  }
   activeModal = 'settings';
   hotspotLayer.style.display = 'none';
   sideArrowsHost.style.display = 'none';
@@ -3053,7 +3062,9 @@ canvas.addEventListener('pointerdown', (e: PointerEvent) => {
   syncRenderLoop();
 });
 
-canvas.addEventListener('pointerup', (e: PointerEvent) => {
+// Hotspots open on `click`, not `pointerup`: on a phone the browser sends a `click` after the
+// tap's `pointerup`, which would otherwise land on whatever the hotspot just opened.
+canvas.addEventListener('click', (e: MouseEvent) => {
   if (introActive || isTransitioningBay || activeModal !== 'none' || !activeDiorama) return;
   const dx = e.clientX - pointerDownX;
   const dy = e.clientY - pointerDownY;

@@ -352,5 +352,15 @@ describe('XMAS365™ Merger Contract Finale gauntlet (6 clauses × 22 puzzles = 
     });
     expect(state.importSaveJson(staleClauseJson)).toEqual({ ok: true });
     expect(state.activePuzzle).toBeNull();
+
+    // 5. Voiding a clause clears activePuzzle.clauseIdx if it was pointing inside that clause
+    state.setActivePuzzle({
+      protoId: 'clause',
+      clauseIdx: 1,
+      panelIdx: 0,
+      panelSig: panelSignature(ALL_CLAUSES[1]?.panels[0]?.panel),
+    });
+    state.setClauseVoided(1, true);
+    expect(state.activePuzzle).toEqual({ protoId: 'clause' });
   });
 });
