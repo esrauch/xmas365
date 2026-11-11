@@ -526,7 +526,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       panel: {
         name: 'Spooky + Portions',
         theme: 'Sweet treats',
-        rows: ['FDGEA', 'UJCOO', 'EEOTC', 'LEFTR', 'LYFAT'],
+        rows: ['FDGEM', 'UJCRA', 'EEOTE', 'LEFTR', 'LYFAT'],
         words: [
           {
             word: 'FUDGE',
@@ -539,7 +539,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'COCOA',
+            word: 'CREAM',
             cells: [
               [1, 2],
               [1, 3],
@@ -605,7 +605,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       panel: {
         name: 'Spooky + Snowflakes',
         theme: 'Garden of love',
-        rows: ['GANG', 'DRPI', 'NERS', 'FAIL', 'ELYL'],
+        rows: ['GAET', 'DRIL', 'NEOV', 'FAIL', 'ELYL'],
         words: [
           {
             word: 'GARDEN',
@@ -628,7 +628,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'SPRING',
+            word: 'VIOLET',
             cells: [
               [2, 3],
               [1, 2],
@@ -671,10 +671,10 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       panel: {
         name: 'Love Letters + Red, White & Blue',
         theme: 'Sweet treats',
-        rows: ['EKUCT', 'APUGA', 'CODCT', 'NRUTA', 'ATSRE'],
+        rows: ['ELRTT', 'FUUGA', 'FODCT', 'NRUTA', 'ATSRE'],
         words: [
           {
-            word: 'CUPCAKE',
+            word: 'TRUFFLE',
             cells: [
               [0, 3],
               [0, 2],
@@ -738,7 +738,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       panel: {
         name: 'Love Letters + Egg Hunt',
         theme: 'Love letters',
-        rows: ['ADERA', 'DTSTE', 'ROAMD', 'ENERP', 'SSSEV'],
+        rows: ['ADEME', 'DTSTO', 'ROAMP', 'ENERP', 'SSSEV'],
         words: [
           {
             word: 'ADDRESS',
@@ -762,7 +762,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'DEAR',
+            word: 'POEM',
             cells: [
               [2, 4],
               [1, 4],
@@ -808,7 +808,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       panel: {
         name: 'Love Letters + Portions',
         theme: 'Love letters',
-        rows: ['MIERA', 'STRHE', 'SOYMD', 'INERE', 'VESEV'],
+        rows: ['MIDTS', 'SRRHO', 'SAYMP', 'ICRPE', 'VEEAP'],
         words: [
           {
             word: 'MISSIVE',
@@ -823,7 +823,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'NOTE',
+            word: 'CARD',
             cells: [
               [3, 1],
               [2, 1],
@@ -832,7 +832,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'DEAR',
+            word: 'POST',
             cells: [
               [2, 4],
               [1, 4],
@@ -851,7 +851,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'VERSE',
+            word: 'PAPER',
             cells: [
               [4, 4],
               [4, 3],
@@ -884,7 +884,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       panel: {
         name: 'Love Letters + Snowflakes',
         theme: 'Love notes',
-        rows: ['EUOD', 'RTVE', 'ECER', 'LUDT', 'DDNE'],
+        rows: ['EUIM', 'RTNE', 'ECER', 'LUDT', 'DDNE'],
         words: [
           {
             word: 'CUDDLE',
@@ -918,7 +918,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'DOVE',
+            word: 'MINE',
             cells: [
               [0, 3],
               [0, 2],
@@ -947,7 +947,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       panel: {
         name: 'Red, White & Blue + Egg Hunt',
         theme: 'Table for two',
-        rows: ['RHCDI', 'ETAPN', 'ISUPE', 'PPPIL', 'EREPE'],
+        rows: ['RHCWI', 'ETAPN', 'ISUPE', 'PPPIL', 'EREPE'],
         words: [
           {
             word: 'PITCHER',
@@ -962,7 +962,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'DINE',
+            word: 'WINE',
             cells: [
               [0, 3],
               [0, 4],
@@ -1018,7 +1018,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       panel: {
         name: 'Red, White & Blue + Portions',
         theme: 'Love letters',
-        rows: ['DEKRE', 'NEVET', 'GESRT', 'IPKEE', 'SSAEL'],
+        rows: ['DEKRE', 'NEQUT', 'GELIT', 'IPKLE', 'SSAEL'],
         words: [
           {
             word: 'SIGNED',
@@ -1056,7 +1056,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'VERSE',
+            word: 'QUILL',
             cells: [
               [1, 2],
               [1, 3],
@@ -1169,10 +1169,10 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       panel: {
         name: 'Egg Hunt + Portions',
         theme: 'Love notes',
-        rows: ['LOED', 'EVAR', 'OERO', 'RSPE', 'TALE'],
+        rows: ['BEOF', 'UAND', 'OERO', 'RSPE', 'TALE'],
         words: [
           {
-            word: 'LOVE',
+            word: 'BEAU',
             cells: [
               [0, 0],
               [0, 1],
@@ -1181,7 +1181,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'DEAR',
+            word: 'FOND',
             cells: [
               [0, 3],
               [0, 2],
@@ -1309,10 +1309,10 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       panel: {
         name: 'Portions + Snowflakes',
         theme: 'Love notes',
-        rows: ['LOED', 'EVAR', 'OERO', 'RSPE', 'NOTE'],
+        rows: ['CUEP', 'ETCK', 'ODSO', 'BNUL', 'WARM'],
         words: [
           {
-            word: 'LOVE',
+            word: 'CUTE',
             cells: [
               [0, 0],
               [0, 1],
@@ -1321,7 +1321,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'DEAR',
+            word: 'PECK',
             cells: [
               [0, 3],
               [0, 2],
@@ -1330,7 +1330,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'ROSE',
+            word: 'BOND',
             cells: [
               [3, 0],
               [2, 0],
@@ -1339,7 +1339,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'ROPE',
+            word: 'SOUL',
             cells: [
               [2, 2],
               [2, 3],
@@ -1348,7 +1348,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'NOTE',
+            word: 'WARM',
             cells: [
               [4, 0],
               [4, 1],
@@ -1386,10 +1386,10 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       panel: {
         name: 'Clause IV Finale: Full Heartstrings',
         theme: 'Love notes',
-        rows: ['LOKS', 'EVIS', 'OECA', 'RSRE', 'DOVE'],
+        rows: ['HOWN', 'DLIK', 'USCA', 'HGRE', 'GLOW'],
         words: [
           {
-            word: 'LOVE',
+            word: 'HOLD',
             cells: [
               [0, 0],
               [0, 1],
@@ -1398,7 +1398,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'KISS',
+            word: 'WINK',
             cells: [
               [0, 2],
               [1, 2],
@@ -1407,7 +1407,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'ROSE',
+            word: 'HUGS',
             cells: [
               [3, 0],
               [2, 0],
@@ -1425,7 +1425,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'DOVE',
+            word: 'GLOW',
             cells: [
               [4, 0],
               [4, 1],

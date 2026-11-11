@@ -62,6 +62,16 @@ describe("Clause IV (C4): Valentine's · Heartstrings (words)", () => {
     expect(seen.size).toBe(CLAUSE_PANEL_COUNT);
   });
 
+  it('never reuses a theme word across its 22 puzzles', () => {
+    const where = new Map<string, number>();
+    for (const [idx, item] of CLAUSE_WORDS.panels.entries()) {
+      for (const { word } of item.panel.words) {
+        expect(where.has(word), `${word} in panel ${idx} and panel ${where.get(word)}`).toBe(false);
+        where.set(word, idx);
+      }
+    }
+  });
+
   it('verifies twistsOf, unique whole-board answer, and eachWordOnce on all 22 panels', () => {
     for (const [idx, item] of CLAUSE_WORDS.panels.entries()) {
       const p = item.panel;
