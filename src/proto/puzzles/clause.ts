@@ -858,6 +858,7 @@ export const clause: Proto = {
         mountClauseBoard(clauseDef.genre, pane, item.panel, {
           solved: (text) => {
             solvedHere = true;
+            const wasVoided = gameState.isClauseVoided(clauseIdx);
             gameState.markClausePanelSolved(clauseDef.genre, idx);
             renderPips(idx);
 
@@ -895,7 +896,8 @@ export const clause: Proto = {
               }
             }
 
-            if (clauseNowVoided && idx === panels.length - 1) {
+            // The solve that voids the clause (from any puzzle) goes back to the checklist.
+            if (clauseNowVoided && !wasVoided) {
               message.style.color = '#276749';
               message.textContent = `🎉 ${clauseDef.title} VOIDED!`;
               nextBtn.textContent = '← Contract Checklist ▸';
@@ -950,7 +952,9 @@ export const clause: Proto = {
       savedActive &&
       typeof savedActive.clauseIdx === 'number' &&
       savedActive.clauseIdx >= 0 &&
-      savedActive.clauseIdx < ALL_CLAUSES.length
+      savedActive.clauseIdx < ALL_CLAUSES.length &&
+      // A voided clause is done: open on the checklist, not back inside it.
+      !gameState.isClauseVoided(savedActive.clauseIdx)
     ) {
       openClauseRunner(savedActive.clauseIdx, savedActive.panelIdx);
     } else {
