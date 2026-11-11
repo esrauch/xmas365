@@ -30,13 +30,13 @@
       "stats": { "plain": 4, "without cuts": 4, "steps": 3 },
       "panel": {
         "name": "Webs, letters and cuts: medium 3",
-        "rows": [".EO..VE", ".....E.", ".......", ".EL..O.", ".......", "EO...L.", ".E...L."],
+        "rows": [".WE..TW", ".....W.", ".......", ".WS..E.", ".......", "WE...S.", ".W...S."],
         "walls": [
           [3, 1, "v"],
           [5, 1, "h"]
         ],
-        "letters": " ELOV    ",
-        "message": "3452"
+        "letters": " WSET",
+        "message": "32445"
       }
     }
   ]

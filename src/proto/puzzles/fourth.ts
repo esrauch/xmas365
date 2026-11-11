@@ -90,15 +90,15 @@ export const BOW: StoryPanel[] = [
     name: 'A love letter',
     tip: '💌 The numbered blanks spell a word: unscramble the clue letters into it to learn each letter’s length',
     rows: ['#######', '##...##', '#.#.#.#', '#..#..#', '#######'],
-    letters: 'BO  M',
-    message: '1225',
+    letters: 'HC  R E',
+    message: '21775',
   },
   {
     name: 'Heart on fire',
     tip: '💌 Unscramble the letters into the message first, then solve the picture with the numbers it gives',
     rows: ['......#', '.##.##.', '#######', '#######', '.#####.', '.####..', '#..#...'],
-    letters: 'IE  F R',
-    message: '5172',
+    letters: 'AZ EL B',
+    message: '75124',
   },
 ];
 

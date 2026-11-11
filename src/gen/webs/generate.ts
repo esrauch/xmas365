@@ -14,6 +14,7 @@ import { type Tagged, chooseClues, margins } from '../core/clues';
 import { type Frame, symmetricIn } from '../core/mirror';
 import { type Rng, rng, shuffle } from '../core/rng';
 import { type Made, Rejections, type Spec, type Tier, trySeeds } from '../core/spec';
+import { WORD_RULES, type WordRule, wordsFor } from '../core/words';
 import { colourWeb, makeMirroredWeb, makeWeb, wholeBoard } from './make';
 import { type Panel, type Wall, type Web, parse, wallsBetween } from './model';
 import { distances, strokes } from './rules';
@@ -31,8 +32,6 @@ export interface Shape {
   margin: number;
   /** Knots to put in the dark. */
   dark: number;
-  /** Counts to write as letters. */
-  letters: number;
 }
 
 /** A tier is a board size; the twists make it easier or harder as they fall. */
@@ -45,7 +44,6 @@ export const SHAPES: Record<Tier, Shape> = {
     doubles: 0.35,
     margin: 2,
     dark: 2,
-    letters: 4,
   },
   medium: {
     width: 7,
@@ -55,7 +53,6 @@ export const SHAPES: Record<Tier, Shape> = {
     doubles: 0.35,
     margin: 3,
     dark: 3,
-    letters: 5,
   },
   hard: {
     width: 9,
@@ -65,28 +62,41 @@ export const SHAPES: Record<Tier, Shape> = {
     doubles: 0.35,
     margin: 3,
     dark: 5,
-    letters: 5,
   },
 };
 
-/** 4–5 letter words for the letters' messages (Valentine's in the spider's room); every unique letter of the word is assigned to a number on the board. */
+/** Valentine's-in-the-spider's-room words; every unique letter is a thread count (`core/words.ts` picks by tier). */
 export const MESSAGES = [
-  'LOVE',
+  // Easy: 3 or 4 unique letters.
+  'MOON',
   'KISS',
+  'LOVE',
+  'GLOW',
+  'DARK',
+  'FANG',
+  'BOO',
+  // Medium: 4 unique letters in 5.
   'SWEET',
+  'TREAT',
+  'SPELL',
+  'SPOOK',
+  'BROOM',
+  'SKULL',
+  // 5 unique letters, 5 or 6 long.
   'HEART',
   'CANDY',
-  'TREAT',
-  'MOON',
   'TRICK',
   'NIGHT',
   'GHOST',
   'MAGIC',
   'CHARM',
-  'SPELL',
-  'GLOW',
-  'DARK',
-  'FANG',
+  'WITCH',
+  'RAVEN',
+  'CRYPT',
+  'HAUNT',
+  'GHOUL',
+  'FANGS',
+  'CREEPY',
 ];
 
 const ANSWER_LIST = 300;
@@ -133,16 +143,15 @@ function darken(
   return done ? q : null;
 }
 
-/** Pick a word and assign each of its unique letters to a distinct visible number on the board. */
-function encode(p: Panel, maxCount: number, random: Rng): Panel | null {
+/** Pick a word that suits `rule` and assign each of its unique letters to a distinct visible number on the board. */
+function encode(p: Panel, rule: WordRule, random: Rng): Panel | null {
   const shown = [
     ...new Set(
       p.rows.flatMap((row) => [...row].flatMap((ch) => (/[1-9]/.test(ch) ? [Number(ch)] : []))),
     ),
   ];
-  for (const word of shuffle(random, MESSAGES)) {
-    const letters = [...new Set([...word].filter((ch) => /[A-Z]/.test(ch)))];
-    if (letters.length > maxCount || letters.length > shown.length) continue;
+  for (const word of wordsFor(MESSAGES, rule, shown.length, (w) => shuffle(random, w))) {
+    const letters = [...new Set(word)];
     const values = shuffle(random, shown).slice(0, letters.length);
     const code = new Map(values.map((v, i) => [v, letters[i] as string]));
     const rows = p.rows.map((row) =>
@@ -225,7 +234,7 @@ export function makePanel(
       if (!adding.length) {
         if (solve(web, 2, {}, budget).length !== 1) return why.no('not one answer');
         if (on.has('letters')) {
-          const q = encode(p, shape.letters, random);
+          const q = encode(p, WORD_RULES[spec.tier], random);
           if (!q) return why.no('no message fits');
           p = q;
         }
@@ -345,7 +354,7 @@ export function makePanel(
           return [Number(r), Number(c), side === 'v' ? 'v' : 'h'] as Wall;
         });
       if (on.has('letters')) {
-        const q = encode(out, shape.letters, random);
+        const q = encode(out, WORD_RULES[spec.tier], random);
         if (!q) return why.no('no message fits');
         out = q;
       }

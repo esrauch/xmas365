@@ -145,12 +145,12 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
       twists: ['dark', 'letters'],
       tip: '🎃 Spooky + 💌 Love Letters: Dark (?) knots are free; letter knots share counts.',
       explain:
-        'Combine dark (?) knots that accept any count with coded letter knots (L, O, V, and E) that unscramble into LOVE.',
+        'Combine dark (?) knots that accept any count with coded letter knots (L, O, V, and E) that unscramble into SKULL.',
       panel: {
         name: 'Midnight Valentine',
-        rows: ['....L..', 'O...V.2', '..1..?.', '....E..', '4.?....', '....O..', '2.4..O.'],
-        letters: 'LO E V   ',
-        message: '1264',
+        rows: ['....U..', 'S...L.S', '..U..?.', '....K..', 'K.?....', '....S..', 'S.K..S.'],
+        letters: 'US K L',
+        message: '24166',
       },
     },
     // 14: dark + colours
@@ -217,12 +217,12 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
       twists: ['letters', 'colours'],
       tip: '💌 Love Letters + 🎆 Red, White & Blue: Letter knots obey both color and count rules.',
       explain:
-        'Red and blue knots never link to their own color while L, O, V, and E unscramble into LOVE.',
+        'Red and blue knots never link to their own color while L, O, V, and E unscramble into SPELL.',
       panel: {
         name: 'Painted Postcard',
-        rows: ['......V', 'L..V..E', '..O...L', 'E.E.V..', '.......', 'L......', 'L.L...V'],
-        letters: 'OVLE     ',
-        message: '3124',
+        rows: ['......E', 'P..E..L', '..S...P', 'L.L.E..', '.......', 'P......', 'P.P...E'],
+        letters: 'SEPL',
+        message: '13244',
         colours: ['......r', 'b..r..b', '..b...r', 'r.b.r..', '.......', 'b......', '..r...b'],
       },
     },
@@ -266,12 +266,12 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
       twists: ['letters', 'snow'],
       tip: '💌 Love Letters + ❄️ Snowflakes: Mirrored joins and equal letters solve together.',
       explain:
-        'Symmetry across the vertical snowflake line pairs with unscrambling M, O, and N into MOON to spin the web.',
+        'Symmetry across the vertical snowflake line pairs with unscrambling M, O, and N into BROOM to spin the web.',
       panel: {
         name: 'Frosted Note',
-        rows: ['O..O..2', '.......', '.2...2.', 'N.....2', '.3.M.O.', '.......', '2..O..3'],
-        letters: '  NOM    ',
-        message: '5443',
+        rows: ['O..O..B', '.......', '.B...B.', 'R.....B', '.R.M.O.', '.......', 'B..O..R'],
+        letters: ' BROM',
+        message: '23445',
         frame: { top: 0, left: 0, bottom: 6, right: 6, axis: 'v' },
       },
     },
@@ -382,9 +382,9 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
         'The final Clause I boss web! Balance dark (?) knots, coded K/I/S letters, red/blue colors, the 5-hop egg from 🕷, the fence bar, and horizontal snowflake symmetry all at once.',
       panel: {
         name: 'The Grand Cobweb',
-        rows: ['?.....2', '.......', 'K....3S', 'S......', '5....3I', '.......', 'S.....2'],
-        letters: ' ISK     ',
-        message: '4233',
+        rows: ['?.....S', '.......', 'K....OO', 'O......', 'P....OS', '.......', 'O.....S'],
+        letters: ' SOKP',
+        message: '25334',
         colours: ['r.....b', '.......', 'b.....r', 'r......', 'b....rb', '.......', 'r......'],
         frame: { top: 0, left: 0, bottom: 6, right: 6, axis: 'h' },
         home: [0, 0],

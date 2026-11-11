@@ -85,16 +85,16 @@ export const CHOCOLATES: Panel[] = [
     tip: '💌 Love-Letter: Equal letters take equal thread counts and fill the message blanks.',
   },
   {
-    name: 'Sweet kiss',
-    rows: ['...I...', 'K..S.4K', '.....2.', '1......', '.......', 'I..6.K.', '.K.6.K.'],
-    letters: 'IK  S    ',
-    message: '2155',
-    tip: '💌 Love-Letter: Match all K, I, and S knots to decode the final chocolate note.',
+    name: 'Haunted heart',
+    rows: ['...H...', 'T..N.AT', '.....T.', 'H......', '.......', 'H..U.T.', '.T.U.T.'],
+    letters: 'HT ANU',
+    message: '14652',
+    tip: '💌 Love-Letter: Unscramble the five letters into the message to decode the final chocolate note.',
   },
 ];
 
 /** What each message reads once its web is spun. */
-export const MESSAGES = ['MOON', 'TREAT', 'KISS'];
+export const MESSAGES = ['MOON', 'TREAT', 'HAUNT'];
 
 export const STAR: Panel[] = [
   {

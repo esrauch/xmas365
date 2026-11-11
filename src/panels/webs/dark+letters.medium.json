@@ -28,9 +28,9 @@
       "stats": { "plain": 1, "steps": 3 },
       "panel": {
         "name": "Webs, dark and letters: medium 3",
-        "rows": ["WW..G..", "?...O..", "O......", ".......", "L...L.?", ".?..O..", "G.....G"],
-        "letters": " GWO L   ",
-        "message": "2643"
+        "rows": ["UU..S..", "?...L..", "L......", ".......", "K...K.?", ".?..L..", "S.....S"],
+        "letters": " SUL K",
+        "message": "26344"
       }
     }
   ]

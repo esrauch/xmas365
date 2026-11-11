@@ -9,19 +9,19 @@
       "panel": {
         "name": "Webs, letters and snow: hard 1",
         "rows": [
-          "T...WWE.T",
+          "H...TTN.H",
           ".........",
-          "........1",
-          "S...W.S.W",
-          "..T...S..",
-          "E...T.E.E",
-          "........T",
+          "........G",
+          "I...T.I.T",
+          "..H...I..",
+          "N...H.N.N",
+          "........H",
           ".........",
-          "W...EWW.1"
+          "T...NTT.G"
         ],
         "frame": { "top": 0, "left": 0, "bottom": 8, "right": 8, "axis": "h" },
-        "letters": " TWES    ",
-        "message": "53442"
+        "letters": "GHTNI",
+        "message": "45123"
       }
     },
     {

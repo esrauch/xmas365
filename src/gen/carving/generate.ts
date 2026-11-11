@@ -16,6 +16,7 @@ import { Budget, within } from '../core/budget';
 import { type Tagged, chooseClues, margins } from '../core/clues';
 import { type Frame, area, frames, offAxis, symmetricIn } from '../core/mirror';
 import { type Rng, rng, shuffle } from '../core/rng';
+import { WORD_RULES, type WordRule, wordsFor } from '../core/words';
 import { type Made, Rejections, type Spec, type Tier, trySeeds } from '../core/spec';
 import { carve, colourCarving } from './make';
 import { type Cell, type Colour, type Panel, type Rect, type Wall, parse, rowsOf } from './model';
@@ -32,15 +33,13 @@ export interface Shape {
   margin: number;
   /** Sizes to put in the dark. */
   dark: number;
-  /** Sizes to write as letters. */
-  letters: number;
   /** Foods each portion's Easter basket gets (one of each). */
   dishes: number;
 }
 
 /** A tier is a board size; the twists make it easier or harder as they fall. */
 export const SHAPES: Record<Tier, Shape> = {
-  easy: { width: 5, height: 5, minArea: 2, maxArea: 6, margin: 2, dark: 1, letters: 4, dishes: 2 },
+  easy: { width: 5, height: 5, minArea: 2, maxArea: 6, margin: 2, dark: 1, dishes: 2 },
   medium: {
     width: 7,
     height: 7,
@@ -48,30 +47,51 @@ export const SHAPES: Record<Tier, Shape> = {
     maxArea: 8,
     margin: 3,
     dark: 2,
-    letters: 5,
     dishes: 3,
   },
-  hard: { width: 9, height: 9, minArea: 2, maxArea: 9, margin: 3, dark: 3, letters: 5, dishes: 3 },
+  hard: { width: 9, height: 9, minArea: 2, maxArea: 9, margin: 3, dark: 3, dishes: 3 },
 };
 
-/** Words for the letters' messages (Valentine's at the Thanksgiving table). */
+/** Thanksgiving-table words for the letters' messages; every unique letter is a size (`core/words.ts` picks by tier). */
 export const MESSAGES = [
+  // Easy: 3 or 4 unique letters.
+  'PIE',
+  'YAM',
+  'FOOD',
+  'FEED',
   'CORN',
-  'FEAST',
-  'GRAVY',
-  'LOVE',
-  'SWEET',
-  'HEART',
-  'TREAT',
-  'KISS',
   'WARM',
   'BAKE',
+  'LOVE',
+  // Medium: 4 unique letters in 5.
+  'SWEET',
+  'TREAT',
+  'STUFF',
+  'GREET',
+  'APPLE',
+  'BERRY',
+  'TOAST',
+  'CHEER',
+  // 5 unique letters, 5 or 6 long.
+  'FEAST',
+  'GRAVY',
+  'HEART',
   'ROAST',
   'CIDER',
   'SPICE',
   'MAPLE',
   'HONEY',
-  'COOK',
+  'ACORN',
+  'PECAN',
+  'BREAD',
+  'TABLE',
+  'CRUMB',
+  'SAUCE',
+  'PLATE',
+  'GRACE',
+  'CARVE',
+  'GREENS',
+  'DINNER',
 ];
 /** Easter baskets: every portion gets one of each (egg, carrot, chocolate), as the board shows them. */
 const BASKET = ['🥚', '🥕', '🍫'];
@@ -89,24 +109,19 @@ type CarveClue =
   | { twist: 'snow'; frame: Frame };
 
 /**
- * Encode every unique letter of a word from `MESSAGES` (at most `maxLetters`
- * distinct letters) as a size on the board, so the message is all numbered
- * blanks: the player unscrambles the word first and then solves the board.
+ * Encode every unique letter of a word from `MESSAGES` (one that suits `rule`)
+ * as a size on the board, so the message is all numbered blanks: the player
+ * unscrambles the word first and then solves the board.
  */
 function encode(
   cells: Cell[][],
-  maxLetters: number,
+  rule: WordRule,
   random: Rng,
 ): { sizeLetters: string; message: string } | null {
   const sizes = [
     ...new Set(cells.flat().flatMap((x) => (x.n !== undefined && x.n <= 9 ? [x.n] : []))),
   ];
-  if (sizes.length < 3) return null;
-  const most = Math.min(maxLetters, sizes.length);
-  const words = shuffle(
-    random,
-    MESSAGES.filter((w) => new Set(w).size <= most && new Set(w).size >= Math.min(3, most)),
-  ).sort((a, b) => new Set(b).size - new Set(a).size);
+  const words = wordsFor(MESSAGES, rule, sizes.length, (w) => shuffle(random, w));
   for (const word of words) {
     const letters = [...new Set(word)];
     const values = shuffle(random, sizes).slice(0, letters.length);
@@ -262,7 +277,7 @@ export function makePanel(
       if (!adding.length) {
         if (!unique()) return why.no('not one answer');
         if (on.has('letters')) {
-          letters = encode(cells, shape.letters, random);
+          letters = encode(cells, WORD_RULES[spec.tier], random);
           if (!letters) return why.no('no message fits');
         }
         return finish(panelOf(), { plain: 1 });
@@ -385,7 +400,7 @@ export function makePanel(
       if (!chosen) return why.no(failed);
       // 4. Encode letters if requested, then check the panel from scratch.
       if (on.has('letters')) {
-        letters = encode(cells, shape.letters, random);
+        letters = encode(cells, WORD_RULES[spec.tier], random);
         if (!letters) return why.no('no message fits');
       }
       const out: Panel = { ...panelOf() };

@@ -30,10 +30,10 @@
       "stats": { "plain": 4, "without snow": 4, "steps": 1 },
       "panel": {
         "name": "Webs, letters and snow: medium 3",
-        "rows": ["......O", "...G...", "G..LG..", "W..W..3", "3..WO..", "...O...", "......O"],
+        "rows": ["......H", "...T...", "T..WT..", "I..I..C", "C..IH..", "...H...", "......H"],
         "frame": { "top": 0, "left": 0, "bottom": 6, "right": 6, "axis": "h" },
-        "letters": "OG W L   ",
-        "message": "2614"
+        "letters": "HTCI W",
+        "message": "64231"
       }
     }
   ]

@@ -8,9 +8,9 @@
       "stats": { "plain": 1, "steps": 1 },
       "panel": {
         "name": "Webs, letters: medium 1",
-        "rows": ["K4K...S", ".......", "...I.K4", ".I.....", "..4.K..", "..S...S", "......I"],
-        "letters": "IKS      ",
-        "message": "2133"
+        "rows": ["ERE...T", ".......", "...A.ER", ".A.....", "..R.E..", "..T...T", "......A"],
+        "letters": "AETR",
+        "message": "34213"
       }
     },
     {

@@ -160,8 +160,8 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
           ['col', 4, 1],
           ['row', 4, 0],
         ],
-        letters: '  IFZ',
-        message: '4355',
+        letters: ' SWTE',
+        message: '23554',
       },
     },
     {
@@ -247,8 +247,8 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
         name: 'Crimson Verse',
         rows: ['.RR..', 'RRR..', 'RRR.B', 'RRBB.', 'R....'],
         palette: 'RB',
-        letters: 'OGLW',
-        message: '2314',
+        letters: 'HRCE',
+        message: '31442',
       },
     },
     {
@@ -265,8 +265,8 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
           [3, 3, 3],
           [4, 4, 3],
         ],
-        letters: 'MB  O',
-        message: '2551',
+        letters: 'HNE S',
+        message: '51332',
       },
     },
     {
@@ -280,8 +280,8 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
         name: 'Sweet Shares',
         rows: ['.####', '##.##', '###..', '.#.#.', '....#'],
         portions: ['AABBB', 'AAABB', 'AAAAB', 'ABAAB', 'BBBBB'],
-        letters: 'IRFE',
-        message: '3124',
+        letters: 'ASTR',
+        message: '23142',
       },
     },
     {
@@ -293,10 +293,10 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
         'Filled squares inside the frosty frame mirror across its centerline, helping you work out the exact value of each letter clue.',
       panel: {
         name: 'Icy Valentine',
-        rows: ['#####', '....#', '#..#.', '.##.#', '..#..'],
-        frame: { top: 0, bottom: 3, left: 0, right: 3, axis: 'v' },
-        letters: 'BO  M',
-        message: '1225',
+        rows: ['.#...##', '..##..#', '..##..#', '#....##', '.#..#.#', '..###.#', '..#####'],
+        frame: { top: 1, bottom: 4, left: 0, right: 5, axis: 'v' },
+        letters: 'TIL G H',
+        message: '32571',
       },
     },
     {

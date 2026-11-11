@@ -139,12 +139,12 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     twists: ['dark', 'letters'],
     tip: '🎃 Spooky + 💌 Love Letters: Any-area ? clues meet coded letter areas.',
     explain:
-      'Unscramble C, O, and K into the message to learn their areas, while the ? rectangle can take any area at all.',
+      'Unscramble the letters into STUFF to learn their areas, while the ? rectangle can take any area at all.',
     panel: {
       name: 'Secret Recipe',
-      rows: ['K . . ? .', '. . O . .', '2 . . . .', '. . . C .', '2 . K . O'],
-      sizeLetters: ' O K C   ',
-      message: '6224',
+      rows: ['U . . S .', '. . . . .', '? . . F .', '. . S . .', '. . S . T'],
+      sizeLetters: ' SFT U   ',
+      message: '24633',
     },
   },
   {
@@ -218,17 +218,15 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     twists: ['letters', 'cuts'],
     tip: '💌 Love Letters + 🥧 Portions: Letter areas stopped by a fence.',
     explain:
-      'Unscramble the letters into PIE to learn their areas while respecting the fence boundaries.',
+      'Unscramble the letters into GREET to learn their areas while respecting the fence boundaries.',
     panel: {
       name: 'Carved Initials',
-      rows: ['. . P . .', '. 4 . . E', 'I . E . .', '. 2 . E .', '2 . . . 2'],
-      sizeLetters: ' IEP     ',
-      message: '423',
+      rows: ['T . . . .', '. . . . .', 'R . . . G', '. . . E .', 'E . G . E'],
+      sizeLetters: ' E GTR   ',
+      message: '46225',
       walls: [
-        [1, 3, 'h'],
-        [1, 1, 'v'],
-        [2, 1, 'h'],
-        [3, 0, 'h'],
+        [2, 0, 'h'],
+        [3, 3, 'v'],
       ],
     },
   },
@@ -251,14 +249,22 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     name: 'Sweet Parcel',
     section: 'duo',
     twists: ['letters', 'basket'],
-    tip: '💌 Love Letters + 🥚 Easter Baskets: Coded areas and fair shares of 🥚 and 🥕.',
+    tip: '💌 Love Letters + 🥚 Easter Baskets: Coded areas and fair shares of 🥚, 🥕 and 🍫.',
     explain:
-      'Every rectangle needs one 🥚 and one 🥕 while F, O, and D take the areas from unscrambling FOOD.',
+      'Every rectangle needs one 🥚, one 🥕 and one 🍫 while the letters take the areas from unscrambling BERRY.',
     panel: {
       name: 'Sweet Parcel',
-      rows: ['. . . D 🥕', '. 🥚 🥕 . 🥚', '🥕 . . 🥚 .', '🥚 . 🥕 . 🥚', '🥕 🥚 O 🥕 F'],
-      sizeLetters: '  OF D   ',
-      message: '4336',
+      rows: [
+        'Y 🥚 B 🥚 . 🥚 .',
+        '. . 🥕 🍫 🍫 🥕 🥕',
+        '🥚 . . 🥕 🥚 . .',
+        '. 🍫 . . . E 🍫',
+        '🍫 . . 🍫 🍫 . 🥚',
+        '🥕 🥕 . 🥚 🥕 . .',
+        '. . . 🥚 🍫 R 🥕',
+      ],
+      sizeLetters: '   B RYE ',
+      message: '48667',
     },
   },
   {

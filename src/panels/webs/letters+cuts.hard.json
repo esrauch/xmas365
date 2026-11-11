@@ -33,19 +33,19 @@
       "panel": {
         "name": "Webs, letters and cuts: hard 2",
         "rows": [
-          "E..W5..E.",
+          "Y..D5..Y.",
           ".........",
-          "..E.T.E..",
-          "W...W..W.",
-          ".......S.",
-          "W4S.4...W",
+          "..Y.C.Y..",
+          "D...D..D.",
+          ".......A.",
+          "DNA.N...D",
           ".........",
-          "..W.W.E.W",
-          ".EE......"
+          "..D.D.Y.D",
+          ".YY......"
         ],
         "walls": [[5, 1, "v"]],
-        "letters": "SEW  T   ",
-        "message": "13226"
+        "letters": "AYDN C",
+        "message": "61432"
       }
     },
     {
@@ -54,19 +54,19 @@
       "panel": {
         "name": "Webs, letters and cuts: hard 3",
         "rows": [
-          ".SE......",
-          "E.P.S.L.E",
+          ".NS......",
+          "S.F.N.G.S",
           ".........",
-          "..P...P..",
+          "..F...F..",
           ".........",
-          ".EP5..5.L",
-          ".S.......",
-          "...ES...E",
-          "S.E...L.E"
+          ".SFA..A.G",
+          ".N.......",
+          "...SN...S",
+          "N.S...G.S"
         ],
         "walls": [[4, 0, "h"]],
-        "letters": "SELP     ",
-        "message": "14233"
+        "letters": "NSGFA",
+        "message": "45132"
       }
     }
   ]

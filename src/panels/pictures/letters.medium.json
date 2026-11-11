@@ -9,8 +9,8 @@
       "panel": {
         "name": "Picture grids, letters: medium 1",
         "rows": [".#..##.", ".#..###", ".#####.", ".#####.", "######.", ".#####.", ".#..##."],
-        "letters": " OEVL",
-        "message": "5243"
+        "letters": "ZBALE",
+        "message": "24315"
       }
     },
     {
@@ -19,8 +19,8 @@
       "panel": {
         "name": "Picture grids, letters: medium 2",
         "rows": [".#...##", "..##.##", "..##.##", "..##.##", "..##.##", "#.###.#", "..#####"],
-        "letters": " BG A N",
-        "message": "2573"
+        "letters": "ALG E M",
+        "message": "32517"
       }
     },
     {
@@ -29,8 +29,8 @@
       "panel": {
         "name": "Picture grids, letters: medium 3",
         "rows": [".#.....", ".####..", "#######", ".#####.", ".#####.", ".####..", ".#####."],
-        "letters": "N A GB",
-        "message": "6315"
+        "letters": "P KSRA",
+        "message": "416534"
       }
     }
   ]

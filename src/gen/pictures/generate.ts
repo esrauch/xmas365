@@ -4,6 +4,7 @@
  */
 import { Budget, within } from '../core/budget';
 import { type Rng, rng, shuffle } from '../core/rng';
+import { WORD_RULES, type WordRule, wordsFor } from '../core/words';
 import { type Made, Rejections, type Spec, type Tier, trySeeds } from '../core/spec';
 import {
   colourGrid,
@@ -22,57 +23,62 @@ export interface Shape {
   height: number;
   margin: number;
   dark: number;
-  /** Most distinct letters in the coded word. */
-  letters: number;
   eggs: number;
 }
 
 export const SHAPES: Record<Tier, Shape> = {
-  easy: { width: 5, height: 5, margin: 2, dark: 2, letters: 3, eggs: 2 },
-  medium: { width: 7, height: 7, margin: 2, dark: 3, letters: 4, eggs: 3 },
-  hard: { width: 9, height: 9, margin: 3, dark: 4, letters: 5, eggs: 4 },
+  easy: { width: 5, height: 5, margin: 2, dark: 2, eggs: 2 },
+  medium: { width: 7, height: 7, margin: 2, dark: 3, eggs: 3 },
+  hard: { width: 9, height: 9, margin: 3, dark: 4, eggs: 4 },
 };
 
+/** Fireworks and summer-night words; every unique letter is a run length (`core/words.ts` picks by tier). */
 export const MESSAGES = [
-  'SPARK',
-  'SHINE',
-  'GLOW',
-  'FLAME',
-  'STAR',
-  'HEART',
-  'LOVE',
-  'FIRE',
-  'LIGHT',
+  // Easy: 3 or 4 unique letters.
   'BOOM',
-  'BURST',
-  'NIGHT',
-  'BANG',
   'ZOOM',
   'FIZZ',
-  // Two letters: only for boards with few run lengths (longer words go first).
-  'WOW',
-  'POP',
+  'GLOW',
+  'STAR',
+  'LOVE',
+  'FIRE',
+  'BANG',
+  // Medium: 4 unique letters in 5.
+  'STARS',
+  'CHEER',
+  'SWEET',
+  'SHEEN',
+  // 5 unique letters, 5 or 6 long.
+  'SPARK',
+  'SHINE',
+  'FLAME',
+  'HEART',
+  'LIGHT',
+  'BURST',
+  'NIGHT',
+  'BLAST',
+  'FLASH',
+  'BLAZE',
+  'FLARE',
+  'GLEAM',
+  'GLINT',
+  'SPARKS',
+  'PARADE',
 ];
 
 /**
- * Encode every letter of a word from `MESSAGES` (at most `maxLetters` distinct
- * letters) as a run length in `p`, so the message is all blanks: the player
- * unscrambles the clue letters into the word, which gives the numbers.
+ * Encode every letter of a word from `MESSAGES` (one that suits `rule`) as a
+ * run length in `p`, so the message is all blanks: the player unscrambles the
+ * clue letters into the word, which gives the numbers.
  */
-function encodeLetters(p: Panel, maxLetters: number, random: Rng): Panel | null {
+export function encodeLetters(p: Panel, rule: WordRule, random: Rng): Panel | null {
   const c = clues(p);
   const lengths = new Set<number>();
   for (const line of [...c.rows, ...c.cols]) {
     for (const run of line) if (!run.hidden && run.n >= 1 && run.n <= 9) lengths.add(run.n);
   }
   const available = [...lengths];
-  // The longest words that fit first (a stable sort keeps the shuffle within a length),
-  // and two-letter words only when the board has just two run lengths.
-  const most = Math.min(maxLetters, available.length);
-  const words = shuffle(
-    random,
-    MESSAGES.filter((w) => new Set(w).size <= most && new Set(w).size >= Math.min(3, most)),
-  ).sort((a, b) => new Set(b).size - new Set(a).size);
+  const words = wordsFor(MESSAGES, rule, available.length, (w) => shuffle(random, w));
   for (const word of words.slice(0, 8)) {
     const distinct = [...new Set(word)];
     const chosenLengths = shuffle(random, available).slice(0, distinct.length);
@@ -251,7 +257,7 @@ export function makePanel(
       // Verify unique solution before encoding letters, then assign letters to numbers on the board
       if (countSolutions(p, 2, {}, budget) !== 1) return why.no('not uniquely solvable');
       if (on.has('letters')) {
-        const encoded = encodeLetters(p, shape.letters, random);
+        const encoded = encodeLetters(p, WORD_RULES[spec.tier], random);
         if (!encoded) return why.no('no letter encoding fits');
         p = encoded;
       }

@@ -65,6 +65,6 @@ describe('Thanksgiving carving run', () => {
   });
 
   it('each letter message spells a real word', () => {
-    expect(LOCKET.map(fillMessage)).toEqual(['SWEET', 'CORN', 'HEART']);
+    expect(LOCKET.map(fillMessage)).toEqual(['SWEET', 'STUFF', 'HEART']);
   });
 });

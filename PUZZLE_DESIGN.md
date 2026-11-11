@@ -119,6 +119,12 @@ Every random decision in `make.ts`, `generate.ts`, and `clues.ts` must flow thro
 - **✅ Do: Always require at least 2 distinct letters (2–3 by tier) that decode a real theme word**
   - Enforced across all 5 generators' `verify.ts` files (`shown.size < 2` / `distinct.size < 2` / `p.code.length < 2`).
 
+#### ✅ Do: Size the unscrambled word to the board (decided 2026-11-11)
+- In **Fireworks, Carving and Webs** the message spells a whole word and every unique letter is a coded value, so the unscramble is a puzzle of its own. Three unique letters unscramble at a glance; four in five letters (SWEET) is still easy; five unique in five or six letters is the shortest that makes the player think.
+- **Teaching boards** (easy free play, a relic run's first board, a clause's intro reminder): 3 or 4 unique letters. **Main boards** (medium, a run's later boards, a clause's two-twist boards): at least 4 unique in 5 or more. **Hard**: 5 unique in 5 or 6.
+- A board can only hold as many unique letters as it has distinct values, so the generators pick layouts with enough (`src/gen/core/words.ts`, `WORD_RULES`); [`tests/puzzles/loveLetterWords.test.ts`](tests/puzzles/loveLetterWords.test.ts) holds the pinned boards to it, with no word repeated within a clause.
+- **Exempt: the Carving and Fireworks Contract bosses** (FEED and POP). Their hand-made all-six boards hold only 3 and 2 values (a basket board sizes fewer than half its portions, and the dark takes one; the Fireworks picture has only runs of 1 and 2), and neither generator makes all-six boards.
+
 ---
 
 ### 2.5 Fair Shares, Cuts & Burrows (`courses`, `slices`, `cuts`, `burrows`)

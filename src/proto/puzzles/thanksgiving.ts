@@ -193,10 +193,10 @@ export const LOCKET: Panel[] = [
     tip: '💌 Love-Letter: Same letter = same rectangle area; different letters = different areas.',
   },
   {
-    name: 'Golden corn',
-    rows: ['. . N . .', '. O 2 . .', '. . C . 2', 'R . . 2 O', '. . N . .'],
-    sizeLetters: ' ONCR    ',
-    message: '4253',
+    name: 'Stuffing',
+    rows: ['. . F . .', '. T T . .', '. . U . T', 'S . . T T', '. . F . .'],
+    sizeLetters: ' TFUS    ',
+    message: '52433',
     tip: '💌 Love-Letter: The numbered blanks spell a word: unscramble the clue letters into it to learn each letter’s area.',
   },
   {
