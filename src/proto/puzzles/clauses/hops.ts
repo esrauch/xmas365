@@ -203,7 +203,7 @@ const PANELS: readonly ClausePanelItem<HopPanel>[] = [
         [1, 3, 7],
         [1, 1, 1],
       ],
-      portions: ['BBAAA', 'BBAAA', 'BBAAA', 'BBAAB', 'BBBBB'],
+      portions: ['BBAAA', 'BBCCA', 'BBCCA', 'DBCCD', 'DDDDD'],
       colours: ['bbrrr', 'bbrrr', 'bwrrw', 'bwrrb', 'bbbbb'],
     },
   },
@@ -559,7 +559,7 @@ const PANELS: readonly ClausePanelItem<HopPanel>[] = [
         [5, 5, 1],
         [1, 3, 17],
       ],
-      portions: ['.AAABB', 'AAABBB', 'AAABBB', 'AAABBB', 'AAABBB', 'AAABBB'],
+      portions: ['.ACCBB', 'AACDBB', 'AACDDB', 'AACDDB', 'ACCDDB', 'ACCDDB'],
       colours: ['.rrrbb', 'rrrbbb', 'rrrwbb', 'rrrbbb', 'rrrbbb', 'rrwbbb'],
       burrows: [
         [

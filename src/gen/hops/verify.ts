@@ -96,6 +96,15 @@ export function problems(p: Panel, margin: number, budget = new Budget(2_000_000
     if (m < margin) out.push(`without ${twist}, ${m} answers (want ${margin})`);
   }
 
+  // Courses with two bunnies: a course is one bunny's, so each bunny's route must cross
+  // at least two courses (a course that is a bunny's whole colour zone does nothing).
+  if (p.portions && p.colours)
+    splitRoutes(b, answer).forEach((route, i) => {
+      const courses = new Set(route.map((s) => b.portion[s]).filter((x) => x !== undefined));
+      if (route.length && courses.size < 2)
+        out.push(`the ${i === 0 ? 'red' : 'blue'} bunny stays in one course`);
+    });
+
   // Courses: each course portion must be a single orthogonally connected region on the board.
   if (p.portions) {
     const byCourse = new Map<string, number[]>();
