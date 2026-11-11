@@ -72,26 +72,29 @@ export const SPIDER: Panel[] = [
 export const CHOCOLATES: Panel[] = [
   {
     name: 'A love note',
-    rows: ['OL..4', '.....', '.....', '.4.O.', 'O...3'],
-    message: '52VE',
+    rows: ['OL..M', '.....', '.....', '.4.O.', 'O...N'],
+    letters: ' ONML    ',
+    message: '4223',
     tip: '💌 Love-Letter: Same letter = same thread count; different letters = different counts.',
   },
   {
     name: 'Be mine',
-    rows: ['..E....', '158...B', '.E.....', '12B.B.5', '......2', '.......', '....2..'],
-    message: 'W24',
+    rows: ['..E....', 'T5R...A', '.E.....', '12A.A.5', '......2', '.......', '....2..'],
+    letters: 'TE A   R ',
+    message: '18241',
     tip: '💌 Love-Letter: Equal letters take equal thread counts and fill the message blanks.',
   },
   {
     name: 'Sweet kiss',
-    rows: ['...I...', 'K..5.4K', '.....2.', '1......', '.......', 'I..6.K.', '.K.6.K.'],
-    message: '21SS',
-    tip: '💌 Love-Letter: Match all K knots and all I knots to decode the final chocolate note.',
+    rows: ['...I...', 'K..S.4K', '.....2.', '1......', '.......', 'I..6.K.', '.K.6.K.'],
+    letters: 'IK  S    ',
+    message: '2155',
+    tip: '💌 Love-Letter: Match all K, I, and S knots to decode the final chocolate note.',
   },
 ];
 
 /** What each message reads once its web is spun. */
-export const MESSAGES = ['LOVE', 'WEB', 'KISS'];
+export const MESSAGES = ['MOON', 'TREAT', 'KISS'];
 
 export const STAR: Panel[] = [
   {

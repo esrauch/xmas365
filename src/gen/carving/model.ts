@@ -64,6 +64,8 @@ export interface Board {
   dishes: string[];
   /** Portions may hold no number (when there are flags or dishes). */
   numberless: boolean;
+  /** The size each coded letter stands for (from sizeLetters). */
+  letterSize: Map<string, number>;
   rowMarks: (number | null)[];
   colMarks: (number | null)[];
   /** Cut keys ("r,c,v" / "r,c,h"). */
@@ -80,7 +82,21 @@ export interface Rect {
 
 export const wallKey = ([r, c, side]: Wall): string => `${r},${c},${side}`;
 
+/** The message with its numbered blanks filled from `sizeLetters`. */
+export function fillMessage(panel: Panel): string {
+  if (!panel.message) return '';
+  return [...panel.message]
+    .map((ch) =>
+      /[0-9]/.test(ch) ? (panel.sizeLetters?.[Number(ch) - 1] ?? '_').replace(' ', '_') : ch,
+    )
+    .join('');
+}
+
 export function parse(panel: Panel): Board {
+  const letterSize = new Map<string, number>();
+  [...(panel.sizeLetters ?? '')].forEach((ch, i) => {
+    if (ch !== ' ') letterSize.set(ch, i + 1);
+  });
   const cells = panel.rows.map((row, r) =>
     row
       .trim()
@@ -110,6 +126,7 @@ export function parse(panel: Panel): Board {
     cells,
     dishes,
     numberless: dishes.length > 0 || marked,
+    letterSize,
     rowMarks,
     colMarks,
     walls: new Set((panel.walls ?? []).map(wallKey)),

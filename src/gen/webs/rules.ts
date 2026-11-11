@@ -64,6 +64,8 @@ export function letterValues(web: Web, threads: number[]): Map<string, number> |
   const values = new Map<string, number>();
   for (const [k, knot] of web.knots.entries()) {
     if (knot.clue.kind !== 'letter') continue;
+    const want = web.letterCounts.get(knot.clue.letter);
+    if (want !== undefined && want !== t[k]) return null;
     const v = values.get(knot.clue.letter);
     if (v === undefined) values.set(knot.clue.letter, t[k] ?? 0);
     else if (v !== t[k]) return null;

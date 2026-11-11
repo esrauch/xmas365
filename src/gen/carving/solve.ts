@@ -37,7 +37,7 @@ export function solve(
       for (let h = 1; r + h <= H; h++)
         for (let w = 1; c + w <= W; w++) {
           const x = { r, c, h, w };
-          if (!problem(b, x)) out.push(x);
+          if (!problem(b, x) && letterSizes(b, [x])) out.push(x);
         }
       return out;
     }),

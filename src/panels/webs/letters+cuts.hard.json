@@ -4,69 +4,69 @@
   "tier": "hard",
   "panels": [
     {
-      "seed": 5,
-      "stats": { "plain": 4, "without cuts": 4, "steps": 13 },
+      "seed": 3,
+      "stats": { "plain": 3, "without cuts": 3, "steps": 1 },
       "panel": {
         "name": "Webs, letters and cuts: hard 1",
         "rows": [
-          "1........",
-          "......1..",
-          ".........",
-          "....22EEB",
-          "W...6.B.E",
-          "..2.B....",
-          "..3.3.E..",
-          "B26...E..",
-          "..E..1..."
+          "....HT..H",
+          "RH.......",
+          "T..TEET..",
+          "......TH.",
+          "......R..",
+          "......R..",
+          "A...A.EE.",
+          "A........",
+          "T...T..T."
         ],
-        "message": "534",
         "walls": [
-          [6, 2, "v"],
-          [7, 1, "v"]
-        ]
+          [0, 4, "v"],
+          [4, 6, "h"]
+        ],
+        "letters": "HRTAE    ",
+        "message": "15423"
       }
     },
     {
-      "seed": 18,
-      "stats": { "plain": 4, "without cuts": 4, "steps": 22 },
+      "seed": 21,
+      "stats": { "plain": 3, "without cuts": 3, "steps": 7 },
       "panel": {
         "name": "Webs, letters and cuts: hard 2",
         "rows": [
-          "....2..3.",
-          "..3...E3.",
-          "..W...7.3",
-          ".....2B1.",
-          "..5..6W.2",
-          ".....3.3.",
-          "..1......",
+          "E..W5..E.",
           ".........",
-          "2...32.2."
+          "..E.T.E..",
+          "W...W..W.",
+          ".......S.",
+          "W4S.4...W",
+          ".........",
+          "..W.W.E.W",
+          ".EE......"
         ],
-        "message": "465",
-        "walls": [
-          [3, 5, "v"],
-          [6, 5, "h"]
-        ]
+        "walls": [[5, 1, "v"]],
+        "letters": "SEW  T   ",
+        "message": "13226"
       }
     },
     {
-      "seed": 23,
-      "stats": { "plain": 5, "without cuts": 5, "steps": 28 },
+      "seed": 28,
+      "stats": { "plain": 6, "without cuts": 6, "steps": 11 },
       "panel": {
         "name": "Webs, letters and cuts: hard 3",
         "rows": [
-          "B4.4...33",
-          "....1....",
-          "..E......",
-          "..54...1.",
-          "25W54...4",
-          "...3.....",
+          ".SE......",
+          "E.P.S.L.E",
           ".........",
-          ".B.......",
-          "B..34B..."
+          "..P...P..",
+          ".........",
+          ".EP5..5.L",
+          ".S.......",
+          "...ES...E",
+          "S.E...L.E"
         ],
-        "message": "612",
-        "walls": [[4, 0, "v"]]
+        "walls": [[4, 0, "h"]],
+        "letters": "SELP     ",
+        "message": "14233"
       }
     }
   ]

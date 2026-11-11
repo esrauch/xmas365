@@ -6,7 +6,7 @@
  * pointless.
  */
 import { Budget } from '../core/budget';
-import { type Panel, key, wellFormed } from './model';
+import { type Panel, isVowel, key, letterAt, placeIn, wellFormed } from './model';
 import { type Without, answers, framedOptions, truthOf } from './solve';
 
 export type WordTwist = 'dark' | 'letters' | 'colours' | 'eggs' | 'cuts' | 'snow';
@@ -68,11 +68,14 @@ export function problems(p: Panel, margin: number, budget = new Budget(4_000_000
     if (loose < margin)
       out.push(`without ${twist}, ${loose} words lie more than one way (want ${margin})`);
   }
-  // The dark: at most one per word, never its first or last letter.
+  // The dark: at most one per word, only on a vowel, never its first or last letter.
   for (const w of p.words) {
     const keys = w.cells.map(key);
     const dark = keys.filter((k) => (p.dark ?? []).some((d) => key(d) === k));
     if (dark.length > 1) out.push(`${w.word} has two dark letters`);
+    for (const d of p.dark ?? [])
+      if (keys.includes(key(d)) && !isVowel(letterAt(p, d)))
+        out.push(`${w.word}'s dark letter is not a vowel`);
     if (dark.some((k) => k === keys[0] || k === keys[keys.length - 1]))
       out.push(`${w.word}'s dark letter is at an end`);
   }
@@ -87,6 +90,9 @@ export function problems(p: Panel, margin: number, budget = new Budget(4_000_000
   if (p.eggs?.length) {
     const want = Math.max(2, Math.floor(p.words.length / 2));
     if (p.eggs.length < want) out.push(`only ${p.eggs.length} eggs (want at least ${want})`);
+    // The first letters are highlighted, so an egg says something new only from 3 on.
+    for (const e of p.eggs)
+      if (placeIn(p, e) < 3) out.push(`an egg shows ${placeIn(p, e)} (want 3 or more)`);
   }
   // Portions (cuts): at least 8 on easy (5×5), 15 on medium (7×7), 21 on hard (9×9),
   // and at most 2 fences per square so no letter is boxed in.

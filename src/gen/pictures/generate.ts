@@ -14,7 +14,7 @@ import {
   setupSnowAndSwitches,
 } from './make';
 import { type Panel, type Run, clues, runIndexAt } from './model';
-import { countSolutions, logical, solve } from './solve';
+import { countSolutions, solve } from './solve';
 import { type PictureTwist, problems, without } from './verify';
 
 export interface Shape {
@@ -57,17 +57,9 @@ export const MESSAGES = [
 /**
  * Encode every letter of a word from `MESSAGES` (at most `maxLetters` distinct
  * letters) as a run length in `p`, so the message is all blanks: the player
- * unscrambles the clue letters into the word, which gives the numbers. Verifies
- * that replacing the letters with dark '?' clues leaves at least `margin`
- * answers while keeping 1 answer with the letter code.
+ * unscrambles the clue letters into the word, which gives the numbers.
  */
-function encodeLetters(
-  p: Panel,
-  maxLetters: number,
-  margin: number,
-  random: Rng,
-  budget: Budget,
-): Panel | null {
+function encodeLetters(p: Panel, maxLetters: number, random: Rng): Panel | null {
   const c = clues(p);
   const lengths = new Set<number>();
   for (const line of [...c.rows, ...c.cols]) {
@@ -93,22 +85,9 @@ function encodeLetters(
     });
     const letters = lettersArr.join('');
     const message = [...word].map((ch) => letterToDigit.get(ch) as string).join('');
-    const candidate: Panel = { ...p, letters, message };
-    const subBudget = new Budget(8_000, budget.deadline);
-    const ok = within(() => {
-      if (countSolutions(without(candidate, 'letters'), margin, {}, subBudget) < margin)
-        return false;
-      if (countSolutions(candidate, 2, {}, subBudget) !== 1) return false;
-      if (!onHasBoardTwist(candidate) && !logical(candidate)) return false;
-      return true;
-    });
-    if (ok) return candidate;
+    return { ...p, letters, message };
   }
   return null;
-}
-
-function onHasBoardTwist(p: Panel): boolean {
-  return Boolean(p.eggs?.length || p.portions?.length || p.frame);
 }
 
 /**
@@ -269,11 +248,10 @@ export function makePanel(
         p = { ...p, dark };
       }
 
-      // Verify unique solution before encoding letters (or after if letters is on)
-      if (!on.has('letters')) {
-        if (countSolutions(p, 2, {}, budget) !== 1) return why.no('not uniquely solvable');
-      } else {
-        const encoded = encodeLetters(p, shape.letters, shape.margin, random, budget);
+      // Verify unique solution before encoding letters, then assign letters to numbers on the board
+      if (countSolutions(p, 2, {}, budget) !== 1) return why.no('not uniquely solvable');
+      if (on.has('letters')) {
+        const encoded = encodeLetters(p, shape.letters, random);
         if (!encoded) return why.no('no letter encoding fits');
         p = encoded;
       }
@@ -289,7 +267,7 @@ export function makePanel(
         steps: steps.used,
       };
       for (const twist of on) {
-        if (twist === 'dark' || twist === 'colours') continue;
+        if (twist === 'dark' || twist === 'colours' || twist === 'letters') continue;
         stats[`without ${twist}`] = countSolutions(without(p, twist), shape.margin, {}, budget);
       }
       return { panel: p, seed, stats };

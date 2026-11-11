@@ -4,33 +4,36 @@
   "tier": "medium",
   "panels": [
     {
-      "seed": 52,
-      "stats": { "plain": 4, "without snow": 4, "steps": 19 },
+      "seed": 1,
+      "stats": { "plain": 4, "without snow": 4, "steps": 1 },
       "panel": {
         "name": "Webs, letters and snow: medium 1",
-        "rows": ["...1...", "2.243.E", ".......", "2..1..4", ".......", ".......", "O..O..O"],
-        "message": "L3V4",
-        "frame": { "top": 0, "left": 0, "bottom": 6, "right": 6, "axis": "v" }
+        "rows": ["T..E..T", ".......", ".......", ".......", "R.RER.A", "..A.E..", "E.A.A.E"],
+        "frame": { "top": 0, "left": 0, "bottom": 6, "right": 6, "axis": "v" },
+        "letters": " TEAR    ",
+        "message": "25342"
       }
     },
     {
-      "seed": 121,
-      "stats": { "plain": 3, "without snow": 3, "steps": 10 },
+      "seed": 45,
+      "stats": { "plain": 4, "without snow": 4, "steps": 1 },
       "panel": {
         "name": "Webs, letters and snow: medium 2",
-        "rows": ["O5.5.EO", "...4...", ".......", "...E...", ".4.6.2.", ".......", "...2..."],
-        "message": "L1V3",
-        "frame": { "top": 0, "left": 0, "bottom": 6, "right": 6, "axis": "v" }
+        "rows": ["TH..G.G", ".N.I...", ".......", "....I.N", ".......", ".G.T...", "IH..G.H"],
+        "frame": { "top": 0, "left": 0, "bottom": 6, "right": 6, "axis": "h" },
+        "letters": "TIGHN    ",
+        "message": "52341"
       }
     },
     {
-      "seed": 154,
-      "stats": { "plain": 3, "without snow": 3, "steps": 121 },
+      "seed": 48,
+      "stats": { "plain": 4, "without snow": 4, "steps": 1 },
       "panel": {
         "name": "Webs, letters and snow: medium 3",
-        "rows": ["1I.N.N.", ".......", ".N...4N", ".....N.", ".3...5N", ".......", "14.4.3."],
-        "message": "BEM32E",
-        "frame": { "top": 0, "left": 0, "bottom": 6, "right": 6, "axis": "h" }
+        "rows": ["......O", "...G...", "G..LG..", "W..W..3", "3..WO..", "...O...", "......O"],
+        "frame": { "top": 0, "left": 0, "bottom": 6, "right": 6, "axis": "h" },
+        "letters": "OG W L   ",
+        "message": "2614"
       }
     }
   ]

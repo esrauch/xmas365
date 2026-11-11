@@ -4,39 +4,57 @@
   "tier": "medium",
   "panels": [
     {
-      "seed": 10,
-      "stats": { "plain": 1, "steps": 325 },
+      "seed": 1,
+      "stats": { "plain": 1, "steps": 268 },
       "panel": {
         "name": "Carving, dark and letters: medium 1",
         "rows": [
+          "? . Y . E . .",
           ". . . . . . .",
-          ". . A . . ? .",
-          ". . . . . . 6",
-          ". 6 . . . . .",
-          ". . Y A . Y .",
-          ". M . . . Y .",
-          ". . . . . . ?"
+          ". N . . . . O",
+          ". . . . . . .",
+          ". . H . . . .",
+          "? . . E . O .",
+          ". . . . N . ."
         ],
-        "sizeLetters": " Y M A   ",
-        "message": "264"
+        "sizeLetters": " Y N EOH ",
+        "message": "87462"
       }
     },
     {
-      "seed": 26,
-      "stats": { "plain": 1, "steps": 2254 },
+      "seed": 3,
+      "stats": { "plain": 1, "steps": 41 },
       "panel": {
         "name": "Carving, dark and letters: medium 2",
         "rows": [
-          ". ? . . . Y 2",
-          ". . . . 8 . .",
-          ". . Y . . . .",
+          "4 . 2 . I . .",
+          ". E . . . . 2",
+          ". . . ? . D .",
+          ". . . 2 . . .",
+          "C . E . ? . R",
           ". . . . . . .",
-          "A . . . M . ?",
-          ". . . 3 . . .",
-          "3 . . . . . ."
+          "I . . . D . ."
         ],
-        "sizeLetters": "   Y M A ",
-        "message": "486"
+        "sizeLetters": " CIRED   ",
+        "message": "23654"
+      }
+    },
+    {
+      "seed": 4,
+      "stats": { "plain": 1, "steps": 16 },
+      "panel": {
+        "name": "Carving, dark and letters: medium 3",
+        "rows": [
+          ". 8 . . . . .",
+          "? . . . R . .",
+          ". . . . . Y .",
+          "G . . . . . .",
+          ". . A . V . Y",
+          "7 . . . . . .",
+          ". ? . . . A ."
+        ],
+        "sizeLetters": " AGRYV   ",
+        "message": "34265"
       }
     }
   ]

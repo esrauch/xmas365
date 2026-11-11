@@ -4,36 +4,39 @@
   "tier": "medium",
   "panels": [
     {
-      "seed": 28,
-      "stats": { "plain": 4, "without cuts": 4, "steps": 10 },
+      "seed": 30,
+      "stats": { "plain": 3, "without cuts": 3, "steps": 3 },
       "panel": {
         "name": "Webs, letters and cuts: medium 1",
-        "rows": ["......1", "1......", "V...V..", ".......", "...27.3", "4.L1V.L", "1......"],
-        "message": "3O4E",
-        "walls": [
-          [5, 3, "v"],
-          [4, 3, "h"]
-        ]
+        "rows": ["......P", "L..P..S", "..E...L", "S.S.P..", ".......", "L......", "L.L...P"],
+        "walls": [[2, 2, "h"]],
+        "letters": "EPLS     ",
+        "message": "42133"
       }
     },
     {
-      "seed": 95,
-      "stats": { "plain": 4, "without cuts": 4, "steps": 28 },
-      "panel": {
-        "name": "Webs, letters and cuts: medium 2",
-        "rows": ["2...A..", ".A....A", "R5..3..", "R3.....", "....R.2", ".......", "3...3.."],
-        "message": "HE14T",
-        "walls": [[2, 0, "h"]]
-      }
-    },
-    {
-      "seed": 96,
+      "seed": 169,
       "stats": { "plain": 3, "without cuts": 3, "steps": 4 },
       "panel": {
+        "name": "Webs, letters and cuts: medium 2",
+        "rows": ["I...I..", "......I", "T...T.T", ".......", "....T.G", "....H.I", "N.N..I."],
+        "walls": [[4, 4, "h"]],
+        "letters": "HINTG    ",
+        "message": "32514"
+      }
+    },
+    {
+      "seed": 289,
+      "stats": { "plain": 4, "without cuts": 4, "steps": 3 },
+      "panel": {
         "name": "Webs, letters and cuts: medium 3",
-        "rows": ["4...3.H", ".......", "..H....", "4U434.2", ".......", ".H..H..", "...1..."],
-        "message": "15G",
-        "walls": [[0, 5, "v"]]
+        "rows": [".EO..VE", ".....E.", ".......", ".EL..O.", ".......", "EO...L.", ".E...L."],
+        "walls": [
+          [3, 1, "v"],
+          [5, 1, "h"]
+        ],
+        "letters": " ELOV    ",
+        "message": "3452"
       }
     }
   ]

@@ -4,47 +4,66 @@
   "tier": "medium",
   "panels": [
     {
-      "seed": 3,
-      "stats": { "plain": 4, "without cuts": 4, "steps": 275 },
+      "seed": 6,
+      "stats": { "plain": 4, "without cuts": 4, "steps": 23 },
       "panel": {
         "name": "Carving, letters and cuts: medium 1",
         "rows": [
-          "H . 2 . . . .",
-          ". 2 . . . . 8",
-          ". . . G . . .",
-          ". . . . . . .",
-          ". G . U . . 3",
-          "2 . . . G . .",
-          ". 3 . 2 . 2 ."
+          ". . S . . P .",
+          ". E . . . . .",
+          ". . . . C . .",
+          ". E . . . . 6",
+          "E . I . . S .",
+          ". . . 8 . . .",
+          ". S . . . . ."
         ],
-        "sizeLetters": "  UH G   ",
-        "message": "436",
+        "sizeLetters": " SPE I C ",
+        "message": "23684",
         "walls": [
-          [4, 4, "h"],
-          [0, 1, "h"]
+          [4, 5, "v"],
+          [5, 0, "v"]
         ]
       }
     },
     {
-      "seed": 12,
-      "stats": { "plain": 3, "without cuts": 3, "steps": 121 },
+      "seed": 15,
+      "stats": { "plain": 6, "without cuts": 6, "steps": 15 },
       "panel": {
         "name": "Carving, letters and cuts: medium 2",
         "rows": [
-          ". 6 . . . . .",
-          ". . . . . 2 K",
-          ". 8 . . . . .",
-          "A . . . . . K",
-          ". . A . 6 2 A",
-          ". A . S . K .",
-          "3 . . . . . ."
+          ". T . . . . .",
+          ". . S . T . .",
+          "E . . . . . S",
+          ". . F . . . .",
+          ". F . . . . 3",
+          "F . F T . A .",
+          ". S . . . . F"
         ],
-        "sizeLetters": " KAS     ",
-        "message": "TH3N24",
+        "sizeLetters": " FSEAT   ",
+        "message": "24536",
         "walls": [
-          [5, 1, "h"],
-          [4, 1, "v"]
+          [4, 3, "v"],
+          [4, 0, "h"]
         ]
+      }
+    },
+    {
+      "seed": 18,
+      "stats": { "plain": 4, "without cuts": 4, "steps": 15 },
+      "panel": {
+        "name": "Carving, letters and cuts: medium 3",
+        "rows": [
+          "E . . . . . H",
+          ". . . E . . .",
+          ". . 3 . . N .",
+          "O . . . H . Y",
+          ". . . . . . .",
+          ". . H . H . .",
+          "2 . . 3 2 . 2"
+        ],
+        "sizeLetters": " H YNE O ",
+        "message": "28564",
+        "walls": [[4, 2, "v"]]
       }
     }
   ]

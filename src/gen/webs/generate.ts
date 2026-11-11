@@ -16,7 +16,7 @@ import { type Rng, rng, shuffle } from '../core/rng';
 import { type Made, Rejections, type Spec, type Tier, trySeeds } from '../core/spec';
 import { colourWeb, makeMirroredWeb, makeWeb, wholeBoard } from './make';
 import { type Panel, type Wall, type Web, parse, wallsBetween } from './model';
-import { distances, strokes, totals } from './rules';
+import { distances, strokes } from './rules';
 import { solve } from './solve';
 import { type WebTwist, problems, reach } from './verify';
 
@@ -45,7 +45,7 @@ export const SHAPES: Record<Tier, Shape> = {
     doubles: 0.35,
     margin: 2,
     dark: 2,
-    letters: 2,
+    letters: 4,
   },
   medium: {
     width: 7,
@@ -55,7 +55,7 @@ export const SHAPES: Record<Tier, Shape> = {
     doubles: 0.35,
     margin: 3,
     dark: 3,
-    letters: 2,
+    letters: 5,
   },
   hard: {
     width: 9,
@@ -65,27 +65,28 @@ export const SHAPES: Record<Tier, Shape> = {
     doubles: 0.35,
     margin: 3,
     dark: 5,
-    letters: 3,
+    letters: 5,
   },
 };
 
-/** Words and phrases for the letters' messages (Valentine's in the spider's room); each letter of a word coded everywhere it appears. */
+/** 4–5 letter words for the letters' messages (Valentine's in the spider's room); every unique letter of the word is assigned to a number on the board. */
 export const MESSAGES = [
   'LOVE',
-  'BOO',
-  'HUG',
   'KISS',
   'SWEET',
   'HEART',
   'CANDY',
   'TREAT',
-  'WEB',
   'MOON',
-  'BE MINE',
-  'I DARE YOU',
-  'LOVE YOU',
-  'MY SWEET',
   'TRICK',
+  'NIGHT',
+  'GHOST',
+  'MAGIC',
+  'CHARM',
+  'SPELL',
+  'GLOW',
+  'DARK',
+  'FANG',
 ];
 
 const ANSWER_LIST = 300;
@@ -132,33 +133,28 @@ function darken(
   return done ? q : null;
 }
 
-/** Write `count` of the web's counts as letters, from a message word; the message's blanks are those counts. */
-function encode(p: Panel, threads: number[], count: number, random: Rng): Panel | null {
-  const web = parse(p);
-  const t = totals(web, threads);
+/** Pick a word and assign each of its unique letters to a distinct visible number on the board. */
+function encode(p: Panel, maxCount: number, random: Rng): Panel | null {
   const shown = [
-    ...new Set(web.knots.flatMap((k, i) => (k.clue.kind === 'count' ? [t[i] ?? 0] : []))),
+    ...new Set(
+      p.rows.flatMap((row) => [...row].flatMap((ch) => (/[1-9]/.test(ch) ? [Number(ch)] : []))),
+    ),
   ];
   for (const word of shuffle(random, MESSAGES)) {
-    const letters = shuffle(random, [...new Set([...word].filter((ch) => /[A-Z]/.test(ch)))]).slice(
-      0,
-      count,
-    );
-    const values = shuffle(random, shown).slice(0, count);
-    if (letters.length < count || values.length < count) continue;
+    const letters = [...new Set([...word].filter((ch) => /[A-Z]/.test(ch)))];
+    if (letters.length > maxCount || letters.length > shown.length) continue;
+    const values = shuffle(random, shown).slice(0, letters.length);
     const code = new Map(values.map((v, i) => [v, letters[i] as string]));
-    // Each coded count: some of its knots (at least one) show the letter.
-    const rows = p.rows.map((row) => [...row]);
-    for (const [k, knot] of web.knots.entries()) {
-      const letter = code.get(t[k] ?? -1);
-      if (letter && knot.clue.kind === 'count' && random() < 0.7)
-        (rows[knot.r] as string[])[knot.c] = letter;
-    }
-    const used = new Set(rows.flat().filter((ch) => /[A-Z]/.test(ch)));
-    if (used.size !== count) continue;
+    const rows = p.rows.map((row) =>
+      [...row].map((ch) => (/[1-9]/.test(ch) ? (code.get(Number(ch)) ?? ch) : ch)).join(''),
+    );
+    const used = new Set(rows.join('').match(/[A-Z]/g) ?? []);
+    if (used.size !== letters.length) continue;
     const byLetter = new Map([...code].map(([v, l]) => [l, String(v)]));
     const message = [...word].map((ch) => byLetter.get(ch) ?? ch).join('');
-    return { ...p, rows: rows.map((r) => r.join('')), message };
+    if (/[^0-9 ]/.test(message)) continue;
+    const letterStr = Array.from({ length: 9 }, (_, i) => code.get(i + 1) ?? ' ').join('');
+    return { ...p, rows, letters: letterStr, message };
   }
   return null;
 }
@@ -215,13 +211,8 @@ export function makePanel(
       const coloured = parse(made.panel);
       const adding = (['colours', 'eggs', 'cuts', 'snow'] as const).filter((t) => on.has(t));
 
-      // 1. Hide clues.
+      // 1. Hide clues (dark).
       let p: Panel = { name: 'generated', rows: made.panel.rows };
-      if (on.has('letters')) {
-        const q = encode(p, remap(grown, made.threads, parse(p)), shape.letters, random);
-        if (!q) return why.no('no message fits');
-        p = q;
-      }
       if (on.has('dark')) {
         const q = darken(p, shape.dark, random, budget, !adding.length);
         if (!q) return why.no('nothing to darken');
@@ -233,6 +224,11 @@ export function makePanel(
       // 2. Nothing to add: one answer already, or try again.
       if (!adding.length) {
         if (solve(web, 2, {}, budget).length !== 1) return why.no('not one answer');
+        if (on.has('letters')) {
+          const q = encode(p, shape.letters, random);
+          if (!q) return why.no('no message fits');
+          p = q;
+        }
         return finish(p, shape.margin, { plain: 1 });
       }
 
@@ -329,7 +325,7 @@ export function makePanel(
       if (!chosen) return why.no(failed);
 
       // 4. The panel, checked again from scratch.
-      const out: Panel = { ...p };
+      let out: Panel = { ...p };
       if (on.has('colours') && made.panel.colours) out.colours = made.panel.colours;
       const snow = chosen.find((c) => c.clue.twist === 'snow');
       if (snow?.clue.twist === 'snow') out.frame = snow.clue.frame;
@@ -348,6 +344,11 @@ export function makePanel(
           const [r, c, side] = w.split(',');
           return [Number(r), Number(c), side === 'v' ? 'v' : 'h'] as Wall;
         });
+      if (on.has('letters')) {
+        const q = encode(out, shape.letters, random);
+        if (!q) return why.no('no message fits');
+        out = q;
+      }
       return finish(out, shape.margin, {
         plain: answers.length,
         ...Object.fromEntries([...m].map(([t, n]) => [`without ${t}`, n])),

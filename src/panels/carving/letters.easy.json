@@ -5,32 +5,32 @@
   "panels": [
     {
       "seed": 1,
-      "stats": { "plain": 1, "steps": 20 },
+      "stats": { "plain": 1, "steps": 8 },
       "panel": {
         "name": "Carving, letters: easy 1",
-        "rows": ["6 . . Y .", ". . . . .", "6 . Y 3 .", ". . . . .", ". . Y . M"],
-        "sizeLetters": " Y M     ",
-        "message": "2A4"
+        "rows": ["T . . W .", ". . . . .", "T . . E .", ". . W . .", ". . W . S"],
+        "sizeLetters": " WES T   ",
+        "message": "42336"
       }
     },
     {
-      "seed": 4,
-      "stats": { "plain": 1, "steps": 67 },
+      "seed": 6,
+      "stats": { "plain": 1, "steps": 9 },
       "panel": {
         "name": "Carving, letters: easy 2",
-        "rows": [". . N . .", ". 2 2 . .", ". . 4 . 2", "R . . 2 2", ". . N . ."],
-        "sizeLetters": "  N R    ",
-        "message": "CO53"
+        "rows": ["O . . . R", ". . . . .", ". . 2 . R", ". C . N .", ". . C . R"],
+        "sizeLetters": " RNC O   ",
+        "message": "4623"
       }
     },
     {
       "seed": 8,
-      "stats": { "plain": 1, "steps": 50 },
+      "stats": { "plain": 1, "steps": 8 },
       "panel": {
         "name": "Carving, letters: easy 3",
-        "rows": ["A . . . .", ". . . . .", "E . . . 6", ". . 6 E E", "E . E . ."],
-        "sizeLetters": " EA      ",
-        "message": "TR23T"
+        "rows": ["R . . . .", ". . . . .", "E . . . A", ". . A . .", "E E . . T"],
+        "sizeLetters": " ERT A   ",
+        "message": "43264"
       }
     }
   ]

@@ -6,7 +6,9 @@
  * - eggs: an egg's number is its square's place in its word;
  * - portions: no word crosses a portion's edge;
  * - bows: a word shows at most one colour, and two words bowed with one colour
- *   never touch.
+ *   never touch;
+ * - starts (every panel): each word's first letter is highlighted, so a word
+ *   starts on a highlighted square and never runs through another.
  * It lists each word's options (the squares it could cover, and what that
  * says about the code), then lays every word down, filling the grid.
  */
@@ -25,6 +27,8 @@ export interface Without {
   noBows?: boolean;
   noSnow?: boolean;
   noWalls?: boolean;
+  /** Leave out the highlighted first letters (to measure what they do). */
+  noStarts?: boolean;
 }
 
 /** One way a word could lie: its squares (sorted keys), and the code letters it needs. */
@@ -43,6 +47,8 @@ interface Look {
   frame: Frame | undefined;
   /** Fences, as the two squares' keys joined ('r,c|r,c', sorted). */
   walls: Set<string>;
+  /** The highlighted first letters (null: not shown). */
+  starts: Set<string> | null;
 }
 
 function look(p: Panel, rules: Without): Look {
@@ -69,6 +75,7 @@ function look(p: Panel, rules: Without): Look {
     ),
     frame: rules.noSnow ? undefined : p.frame,
     walls: rules.noWalls ? new Set() : wallSet(p.walls),
+    starts: rules.noStarts ? null : new Set(p.words.flatMap((w) => (w.cells[0] ? [key(w.cells[0])] : []))),
   };
 }
 
@@ -90,6 +97,8 @@ export function options(
     const n = seen.number.get(k);
     // A coded square shows a number (any letter, settled by the code); a dark one, anything.
     if (n === undefined && !seen.wild.has(k) && letterAt(p, s) !== word[i]) return;
+    // Starts: the first letter on a highlighted square, and no other letter on one.
+    if (seen.starts && seen.starts.has(k) !== (i === 0)) return;
     const egg = seen.egg.get(k);
     if (egg !== undefined && egg !== i + 1) return;
     if (path.length && seen.portion(k) !== seen.portion(key(path[0] as Spot))) return;

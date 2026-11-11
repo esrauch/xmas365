@@ -4,63 +4,66 @@
   "tier": "hard",
   "panels": [
     {
-      "seed": 9,
-      "stats": { "plain": 3, "without snow": 3, "steps": 16 },
+      "seed": 7,
+      "stats": { "plain": 34, "without snow": 34, "steps": 3 },
       "panel": {
         "name": "Webs, letters and snow: hard 1",
         "rows": [
-          "4215...6E",
+          "T...WWE.T",
           ".........",
-          ".......B.",
-          "E..W...E.",
-          ".......EB",
-          "B..E...B.",
-          ".......1.",
+          "........1",
+          "S...W.S.W",
+          "..T...S..",
+          "E...T.E.E",
+          "........T",
           ".........",
-          "B1B4...43"
+          "W...EWW.1"
         ],
-        "message": "432",
-        "frame": { "top": 0, "left": 0, "bottom": 8, "right": 8, "axis": "h" }
+        "frame": { "top": 0, "left": 0, "bottom": 8, "right": 8, "axis": "h" },
+        "letters": " TWES    ",
+        "message": "53442"
       }
     },
     {
-      "seed": 31,
-      "stats": { "plain": 4, "without snow": 4, "steps": 10 },
+      "seed": 18,
+      "stats": { "plain": 6, "without snow": 6, "steps": 1 },
       "panel": {
         "name": "Webs, letters and snow: hard 2",
         "rows": [
-          ".B.....4.",
-          "..W.E.2..",
-          "1.......1",
+          "S..S.S..S",
+          ".1.S.5.1.",
           ".........",
-          "24.....E3",
-          "..W.E.4..",
-          "..B.E.4..",
+          "..SG.TH..",
           ".........",
-          ".4..4..3."
+          "...SH5...",
+          "..1...O..",
+          "....1....",
+          "O..S.H..S"
         ],
-        "message": "263",
-        "frame": { "top": 0, "left": 0, "bottom": 8, "right": 8, "axis": "v" }
+        "frame": { "top": 0, "left": 0, "bottom": 8, "right": 8, "axis": "v" },
+        "letters": " OSH GT  ",
+        "message": "64237"
       }
     },
     {
-      "seed": 50,
-      "stats": { "plain": 9, "without snow": 9, "steps": 43 },
+      "seed": 29,
+      "stats": { "plain": 4, "without snow": 4, "steps": 1 },
       "panel": {
         "name": "Webs, letters and snow: hard 3",
         "rows": [
-          "W.......W",
-          ".W..T..W.",
-          "....2....",
-          "2.......W",
-          "37..S..TS",
+          "..A.I.A..",
+          "C.M4GI4.C",
           ".........",
-          "2...1...W",
-          ".4.....3.",
-          "3.......W"
+          ".A4A.CMC.",
+          ".........",
+          "4...M...4",
+          ".........",
+          ".........",
+          "I.......C"
         ],
-        "message": "53EE4",
-        "frame": { "top": 0, "left": 0, "bottom": 8, "right": 8, "axis": "v" }
+        "frame": { "top": 0, "left": 0, "bottom": 8, "right": 8, "axis": "v" },
+        "letters": "ACI MG   ",
+        "message": "51632"
       }
     }
   ]

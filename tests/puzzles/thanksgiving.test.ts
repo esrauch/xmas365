@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type Panel, countSolutions, parse, problems } from '../../src/gen/carving';
+import { type Panel, countSolutions, fillMessage, parse, problems } from '../../src/gen/carving';
 import {
   CANDYCORN,
   FEAST,
@@ -62,5 +62,9 @@ describe('Thanksgiving carving run', () => {
         .cells.flat()
         .filter((c) => c.n === 4),
     ).toHaveLength(2);
+  });
+
+  it('each letter message spells a real word', () => {
+    expect(LOCKET.map(fillMessage)).toEqual(['SWEET', 'CORN', 'HEART']);
   });
 });

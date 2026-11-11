@@ -4,33 +4,36 @@
   "tier": "easy",
   "panels": [
     {
-      "seed": 56,
-      "stats": { "plain": 2, "without cuts": 2, "steps": 4 },
+      "seed": 89,
+      "stats": { "plain": 2, "without cuts": 2, "steps": 1 },
       "panel": {
         "name": "Webs, letters and cuts: easy 1",
-        "rows": ["1.T.3", ".....", "3...R", "....1", "T...."],
-        "message": "24ICK",
-        "walls": [[0, 0, "h"]]
+        "rows": ["N..NN", ".....", ".....", "O...3", "N...M"],
+        "walls": [[3, 4, "h"]],
+        "letters": "MN O     ",
+        "message": "1442"
+      }
+    },
+    {
+      "seed": 108,
+      "stats": { "plain": 2, "without cuts": 2, "steps": 1 },
+      "panel": {
+        "name": "Webs, letters and cuts: easy 2",
+        "rows": [".S...", ".....", "PE..S", ".....", "P..SL"],
+        "walls": [[4, 3, "v"]],
+        "letters": "LSP E    ",
+        "message": "23511"
       }
     },
     {
       "seed": 121,
-      "stats": { "plain": 2, "without cuts": 2, "steps": 4 },
-      "panel": {
-        "name": "Webs, letters and cuts: easy 2",
-        "rows": ["2.6.E", "....E", ".....", "....O", "..E.O"],
-        "message": "L2V4",
-        "walls": [[3, 4, "h"]]
-      }
-    },
-    {
-      "seed": 348,
-      "stats": { "plain": 2, "without cuts": 2, "steps": 4 },
+      "stats": { "plain": 2, "without cuts": 2, "steps": 1 },
       "panel": {
         "name": "Webs, letters and cuts: easy 3",
-        "rows": [".2.EA", ".2.A.", ".....", ".....", "A3..."],
-        "message": "TR52T",
-        "walls": [[0, 1, "h"]]
+        "rows": ["O.3.3", ".....", ".....", "NM..3", ".O..."],
+        "walls": [[3, 0, "v"]],
+        "letters": "NO M     ",
+        "message": "4221"
       }
     }
   ]

@@ -24,7 +24,7 @@ export const CARVING_TWISTS: readonly TwistMeta[] = [
     key: 'letters',
     icon: '💌',
     label: 'Love-Letter',
-    rule: 'Same letter = same rectangle area; different letters = different areas, filling the message blanks.',
+    rule: 'Same letter = same rectangle area; different letters = different areas. The message blanks spell a word: unscramble it to learn the areas.',
   },
   {
     key: 'colours',
@@ -72,12 +72,12 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     twists: ['letters'],
     tip: '💌 Love Letters: Same letter = same area; different letters = different areas.',
     explain:
-      'Letters replace some area numbers. Rectangles with the same letter must have the same area, and different letters must have different areas to decode the message above the board.',
+      'Letters replace some area numbers. The numbered message blanks above the board spell a word: unscramble the letters into it to learn each letter’s area.',
     panel: {
       name: 'Coded Menu',
-      rows: ['P . .', '. P .', 'E . 1'],
-      sizeLetters: ' EP      ',
-      message: '3I2',
+      rows: ['K . .', '. K .', 'S . I'],
+      sizeLetters: 'ISK      ',
+      message: '3122',
     },
   },
   {
@@ -139,12 +139,12 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     twists: ['dark', 'letters'],
     tip: '🎃 Spooky + 💌 Love Letters: Any-area ? clues meet coded letter areas.',
     explain:
-      'Every Y rectangle has the same area and M has a different area, while the ? rectangle can take any area at all.',
+      'Unscramble C, O, and K into the message to learn their areas, while the ? rectangle can take any area at all.',
     panel: {
       name: 'Secret Recipe',
-      rows: ['U . . ? .', '. . 2 . .', '2 . . . .', '. . . G .', '2 . U . 2'],
-      sizeLetters: '   U G   ',
-      message: 'H46',
+      rows: ['K . . ? .', '. . O . .', '2 . . . .', '. . . C .', '2 . K . O'],
+      sizeLetters: ' O K C   ',
+      message: '6224',
     },
   },
   {
@@ -203,12 +203,12 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     twists: ['letters', 'colours'],
     tip: '💌 Love Letters + 🎆 Red, White & Blue: Coded areas and non-touching colors.',
     explain:
-      'Match equal letters to equal areas and separate same-colored portions to decode FEAST.',
+      'Unscramble the clue letters into SWEET to learn their areas and separate same-colored portions.',
     panel: {
       name: 'Ribboned Notes',
-      rows: ['4 . . . A', '. E . . .', 'A . . 6 .', '. . . . A', 'A . . 4 .'],
-      sizeLetters: ' AE      ',
-      message: 'F32ST',
+      rows: ['W . . . E', '. T . . .', 'E . . S .', '. . . . E', 'E . . 4 .'],
+      sizeLetters: ' ETW S   ',
+      message: '64223',
       colours: ['...b.', '.....', 'r....', '..r..', '...b.'],
     },
   },
@@ -218,12 +218,12 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     twists: ['letters', 'cuts'],
     tip: '💌 Love Letters + 🥧 Portions: Letter areas stopped by a fence.',
     explain:
-      'The fences block crossing rectangles so the F and A portions lock into unique areas for FEAST.',
+      'Unscramble the letters into KISS to learn their areas while respecting the fence boundaries.',
     panel: {
       name: 'Carved Initials',
-      rows: ['. . A . .', '. 4 . . 3', '2 . F . .', '. 2 . F .', '2 . . . 2'],
-      sizeLetters: '  FA     ',
-      message: '3E4ST',
+      rows: ['. . K . .', '. 4 . . S', 'I . S . .', '. 2 . S .', '2 . . . 2'],
+      sizeLetters: ' ISK     ',
+      message: '4233',
       walls: [
         [1, 3, 'h'],
         [1, 1, 'v'],
@@ -238,12 +238,12 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     twists: ['letters', 'snow'],
     tip: '💌 Love Letters + ❄️ Snowflakes: Coded areas with mirrored frame cuts.',
     explain:
-      'Reflected cuts inside the frosty frame determine the areas of A and E to spell FEAST.',
+      'Unscramble the letters into TREAT to learn their areas while mirroring cuts inside the frosty frame.',
     panel: {
       name: 'Winter Postcard',
-      rows: ['. . . 2 .', '6 . . . .', '. . . 2 .', '2 . A . E', '. A . . .'],
-      sizeLetters: '   AE    ',
-      message: 'F54ST',
+      rows: ['. . . T .', 'R . . . .', '. . . 2 .', '2 . A . E', '. A . . .'],
+      sizeLetters: ' T AER   ',
+      message: '26542',
       frame: { top: 0, left: 1, bottom: 3, right: 4, axis: 'h' },
     },
   },
@@ -253,12 +253,12 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     twists: ['letters', 'basket'],
     tip: '💌 Love Letters + 🥚 Easter Baskets: Coded areas and fair shares of 🥚 and 🥕.',
     explain:
-      'Every rectangle needs one 🥚 and one 🥕 while the S and A rectangles take consistent areas to spell THANKS.',
+      'Every rectangle needs one 🥚 and one 🥕 while C, O, and K take the areas from unscrambling COOK.',
     panel: {
       name: 'Sweet Parcel',
-      rows: ['🥚 . . 🥕 🥕', '🥕 A 🥕 🥕 .', '🥚 . 🥚 🥚 🥚', '. . S . .', 'S 🥚 🥕 . .'],
-      sizeLetters: '  S  A   ',
-      message: 'TH6NK3',
+      rows: ['. . . K 🥕', '. 🥚 🥕 . 🥚', '🥕 . . 🥚 .', '🥚 . 🥕 . 🥚', '🥕 🥚 O 🥕 C'],
+      sizeLetters: '  OC K   ',
+      message: '4336',
     },
   },
   {
@@ -348,20 +348,20 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     twists: [...CARVING_TWIST_ORDER],
     tip: '🎃 + 💌 + 🎆 + 🥧 + ❄️ + 🥚: All six holiday twists on one 6×6 table!',
     explain:
-      'Every portion collects one 🥚 and one 🥕, respects the fences, separates matching colors, mirrors cuts inside the frosty frame, and decodes P, E, and ?.',
+      'Every portion collects one 🥚 and one 🥕, respects the fences, separates matching colors, mirrors cuts inside the frosty frame, and decodes COOK and ?.',
     panel: {
       name: 'The Grand Carving',
       rows: [
         '🥚 . . 🥚 🥚 🥚',
-        '. 🥕 P . 🥕 .',
+        '. 🥕 C . 🥕 .',
         '🥕 🥚 🥚 🥕 ? 🥕',
-        '. . . E . 🥕',
+        '. . . O . 🥕',
         '🥕 . 🥕 . . 🥚',
-        '🥚 . . . 🥚 🥕',
+        '🥚 . . K 🥚 🥕',
       ],
       colours: ['b..rbr', '......', '......', '......', 'r.....', '...b..'],
-      sizeLetters: '    EP   ',
-      message: '6I5',
+      sizeLetters: '  K OC   ',
+      message: '6553',
       walls: [
         [0, 2, 'v'],
         [1, 2, 'h'],

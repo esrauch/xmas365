@@ -40,7 +40,7 @@ export interface Shape {
 
 /** A tier is a board size; the twists make it easier or harder as they fall. */
 export const SHAPES: Record<Tier, Shape> = {
-  easy: { width: 5, height: 5, minArea: 2, maxArea: 6, margin: 2, dark: 1, letters: 2, dishes: 2 },
+  easy: { width: 5, height: 5, minArea: 2, maxArea: 6, margin: 2, dark: 1, letters: 4, dishes: 2 },
   medium: {
     width: 7,
     height: 7,
@@ -48,26 +48,30 @@ export const SHAPES: Record<Tier, Shape> = {
     maxArea: 8,
     margin: 3,
     dark: 2,
-    letters: 3,
+    letters: 5,
     dishes: 3,
   },
-  hard: { width: 9, height: 9, minArea: 2, maxArea: 9, margin: 3, dark: 3, letters: 3, dishes: 3 },
+  hard: { width: 9, height: 9, minArea: 2, maxArea: 9, margin: 3, dark: 3, letters: 5, dishes: 3 },
 };
 
 /** Words for the letters' messages (Valentine's at the Thanksgiving table). */
 export const MESSAGES = [
-  'PIE',
   'CORN',
   'FEAST',
-  'YAM',
   'GRAVY',
-  'THANKS',
   'LOVE',
-  'HUG',
   'SWEET',
   'HEART',
   'TREAT',
   'KISS',
+  'WARM',
+  'BAKE',
+  'ROAST',
+  'CIDER',
+  'SPICE',
+  'MAPLE',
+  'HONEY',
+  'COOK',
 ];
 /** Easter baskets: every portion gets one of each (egg, carrot, chocolate), as the board shows them. */
 const BASKET = ['🥚', '🥕', '🍫'];
@@ -84,19 +88,29 @@ type CarveClue =
   | { twist: 'cuts'; wall: Wall }
   | { twist: 'snow'; frame: Frame };
 
-/** Write some sizes as letters from a message word (sizes 1–9); the message's digits are those sizes. */
+/**
+ * Encode every unique letter of a word from `MESSAGES` (at most `maxLetters`
+ * distinct letters) as a size on the board, so the message is all numbered
+ * blanks: the player unscrambles the word first and then solves the board.
+ */
 function encode(
   cells: Cell[][],
-  count: number,
+  maxLetters: number,
   random: Rng,
 ): { sizeLetters: string; message: string } | null {
   const sizes = [
     ...new Set(cells.flat().flatMap((x) => (x.n !== undefined && x.n <= 9 ? [x.n] : []))),
   ];
-  for (const word of shuffle(random, MESSAGES)) {
-    const letters = shuffle(random, [...new Set(word)]).slice(0, count);
-    const values = shuffle(random, sizes).slice(0, count);
-    if (letters.length < count || values.length < count) continue;
+  if (sizes.length < 3) return null;
+  const most = Math.min(maxLetters, sizes.length);
+  const words = shuffle(
+    random,
+    MESSAGES.filter((w) => new Set(w).size <= most && new Set(w).size >= Math.min(3, most)),
+  ).sort((a, b) => new Set(b).size - new Set(a).size);
+  for (const word of words) {
+    const letters = [...new Set(word)];
+    const values = shuffle(random, sizes).slice(0, letters.length);
+    if (values.length < letters.length) continue;
     const code = new Map(values.map((v, i) => [v, letters[i] as string]));
     // Plan first, change the cells only once the word works: every letter shows on
     // at least one portion (one letter alone is just a hidden given).
@@ -110,14 +124,14 @@ function encode(
         if (i === 0 || random() < 0.75) plan.set(cell, letter);
       });
     }
-    if (new Set(plan.values()).size < count) continue;
+    if (new Set(plan.values()).size < letters.length) continue;
     for (const [cell, letter] of plan) {
       delete cell.n;
       cell.letter = letter;
     }
     const sizeLetters = Array.from({ length: 9 }, (_, i) => code.get(i + 1) ?? ' ').join('');
     const byLetter = new Map([...code].map(([v, l]) => [l, String(v)]));
-    return { sizeLetters, message: [...word].map((ch) => byLetter.get(ch) ?? ch).join('') };
+    return { sizeLetters, message: [...word].map((ch) => byLetter.get(ch) as string).join('') };
   }
   return null;
 }
@@ -181,12 +195,8 @@ export function makePanel(
       }
       const adding = (['colours', 'cuts', 'snow'] as const).filter((t) => on.has(t));
 
-      // 1. Hide clues.
+      // 1. Hide clues (without letters: letters are encoded after the puzzle is generated).
       let letters: { sizeLetters: string; message: string } | null = null;
-      if (on.has('letters')) {
-        letters = encode(cells, shape.letters, random);
-        if (!letters) return why.no('no message fits');
-      }
       const panelOf = (): Panel => ({
         name: 'generated',
         rows: rowsOf(cells),
@@ -220,7 +230,20 @@ export function makePanel(
       // Easter baskets: take sizes away (while one answer stays, or about half if other twists will settle it).
       if (on.has('basket')) {
         let removed = 0;
+        const maxRemove = on.has('letters') ? Math.ceil(rects.length / 2) : rects.length;
+        const freq = new Map<number, number>();
         for (const [r, c] of sized) {
+          const n = at(r, c).n;
+          if (n !== undefined) freq.set(n, (freq.get(n) ?? 0) + 1);
+        }
+        const order = on.has('letters')
+          ? [...sized].sort(
+              ([r1, c1], [r2, c2]) =>
+                (freq.get(at(r2, c2).n ?? 0) ?? 0) - (freq.get(at(r1, c1).n ?? 0) ?? 0),
+            )
+          : sized;
+        for (const [r, c] of order) {
+          if (removed >= maxRemove) break;
           const cell = at(r, c);
           if (cell.n === undefined) continue;
           const n = cell.n;
@@ -229,6 +252,7 @@ export function makePanel(
             cell.n = n;
             continue;
           }
+          freq.set(n, (freq.get(n) ?? 1) - 1);
           removed++;
         }
       }
@@ -237,7 +261,11 @@ export function makePanel(
       // 2. Nothing to add: one answer already, or try again.
       if (!adding.length) {
         if (!unique()) return why.no('not one answer');
-        return finish(p, { plain: 1 });
+        if (on.has('letters')) {
+          letters = encode(cells, shape.letters, random);
+          if (!letters) return why.no('no message fits');
+        }
+        return finish(panelOf(), { plain: 1 });
       }
 
       // 3. List the answers once; choose the adding twists' clues against them.
@@ -355,8 +383,12 @@ export function makePanel(
         break;
       }
       if (!chosen) return why.no(failed);
-      // 4. The panel, checked again from scratch.
-      const out: Panel = { ...p };
+      // 4. Encode letters if requested, then check the panel from scratch.
+      if (on.has('letters')) {
+        letters = encode(cells, shape.letters, random);
+        if (!letters) return why.no('no message fits');
+      }
+      const out: Panel = { ...panelOf() };
       if (marks.size)
         out.colours = Array.from({ length: H }, (_, r) =>
           Array.from({ length: W }, (_, c) => marks.get(`${r},${c}`) ?? '.').join(''),

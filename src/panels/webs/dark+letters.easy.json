@@ -4,30 +4,33 @@
   "tier": "easy",
   "panels": [
     {
-      "seed": 27,
-      "stats": { "plain": 1, "steps": 22 },
+      "seed": 1,
+      "stats": { "plain": 1, "steps": 4 },
       "panel": {
         "name": "Webs, dark and letters: easy 1",
-        "rows": ["G.?..", ".....", "?...U", "....1", "U.G.."],
-        "message": "H32"
+        "rows": [".I?..", ".....", "....?", "S.K.K", "....S"],
+        "letters": "SIK      ",
+        "message": "3211"
       }
     },
     {
-      "seed": 42,
-      "stats": { "plain": 1, "steps": 10 },
+      "seed": 4,
+      "stats": { "plain": 1, "steps": 4 },
       "panel": {
         "name": "Webs, dark and letters: easy 2",
-        "rows": ["O.4..", ".....", ".....", "?.4..", ".E?.O"],
-        "message": "L2V1"
+        "rows": ["N?...", "NM...", "....O", ".....", ".M..M"],
+        "letters": "ONM      ",
+        "message": "3112"
       }
     },
     {
-      "seed": 104,
-      "stats": { "plain": 1, "steps": 13 },
+      "seed": 7,
+      "stats": { "plain": 1, "steps": 6 },
       "panel": {
         "name": "Webs, dark and letters: easy 3",
-        "rows": ["?....", "T...T", ".....", "?....", ".1.TE"],
-        "message": "H4AR3"
+        "rows": ["S...K", "..?.K", ".....", "S...I", "....?"],
+        "letters": " KSI     ",
+        "message": "2433"
       }
     }
   ]

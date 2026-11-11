@@ -94,7 +94,7 @@ export function solve(
         }
       });
       // What each knot needs, where it's known: its number, or its letter's value once a knot of that letter is settled.
-      const letterVal = new Map<string, number>();
+      const letterVal = new Map<string, number>(web.letterCounts);
       for (const [k, knot] of web.knots.entries()) {
         if (knot.clue.kind !== 'letter' || freeCount[k] !== 0) continue;
         const v = letterVal.get(knot.clue.letter);

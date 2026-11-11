@@ -4,30 +4,33 @@
   "tier": "easy",
   "panels": [
     {
-      "seed": 27,
-      "stats": { "plain": 1, "steps": 10 },
+      "seed": 1,
+      "stats": { "plain": 1, "steps": 1 },
       "panel": {
         "name": "Webs, letters: easy 1",
-        "rows": ["G.1..", ".....", "4...U", "....1", "U.G.."],
-        "message": "H32"
+        "rows": [".OM..", ".....", "....N", "N.M.M", "....N"],
+        "letters": "NOM      ",
+        "message": "3221"
       }
     },
     {
-      "seed": 42,
-      "stats": { "plain": 1, "steps": 4 },
+      "seed": 3,
+      "stats": { "plain": 1, "steps": 1 },
       "panel": {
         "name": "Webs, letters: easy 2",
-        "rows": ["O.4..", ".....", ".....", "1.4..", ".E4.O"],
-        "message": "L2V1"
+        "rows": [".N..O", "....O", "N....", "M...O", "N...."],
+        "letters": "NOM      ",
+        "message": "3221"
       }
     },
     {
-      "seed": 44,
+      "seed": 4,
       "stats": { "plain": 1, "steps": 4 },
       "panel": {
         "name": "Webs, letters: easy 3",
-        "rows": ["2....", "4...E", "....2", "..A..", "E.E.."],
-        "message": "TR31T"
+        "rows": ["MM...", "MN...", "....O", ".....", ".N..N"],
+        "letters": "OMN      ",
+        "message": "2113"
       }
     }
   ]

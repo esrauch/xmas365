@@ -71,12 +71,14 @@ export function covers(b: Board, rects: Rect[]): boolean {
   return seen.size === b.height * b.width;
 }
 
-/** The size each letter stands for, if consistent (same letter same size, different letters different sizes). */
+/** The size each letter stands for, if consistent with the word's numbers (and distinct). */
 export function letterSizes(b: Board, rects: Rect[]): Map<string, number> | null {
   const sizes = new Map<string, number>();
   for (const x of rects) {
     const letter = cellsOf(b, x).find((cell) => cell.letter)?.letter;
     if (!letter) continue;
+    const want = b.letterSize.get(letter);
+    if (want !== undefined && want !== x.h * x.w) return null;
     const had = sizes.get(letter);
     if (had !== undefined && had !== x.h * x.w) return null;
     sizes.set(letter, x.h * x.w);

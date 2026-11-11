@@ -4,43 +4,63 @@
   "tier": "hard",
   "panels": [
     {
-      "seed": 2,
-      "stats": { "plain": 1, "steps": 11295 },
+      "seed": 3,
+      "stats": { "plain": 1, "steps": 20 },
       "panel": {
         "name": "Carving, dark and letters: hard 1",
         "rows": [
-          ". . ? ? . 6 . . Y",
+          "4 . . R . A . . .",
+          ". . . . 7 . . . .",
+          ". . . . . T . . .",
           ". . . . . . . . .",
-          "8 . . . . . . Y .",
-          ". . . . . . . . .",
-          "2 3 M . 2 . . . .",
-          ". . . . . . . 2 .",
-          "M . . 6 M Y . 2 .",
-          ". . . . . . A . .",
-          ". 2 4 . . . 5 . ?"
+          "R . . 2 . . . H .",
+          ". . . . . . . . H",
+          ". . 2 . . . . . .",
+          ". 3 . ? . . . . ?",
+          "E . ? . 2 . . T ."
         ],
-        "sizeLetters": "  M Y  A ",
-        "message": "583"
+        "sizeLetters": "  E AH RT",
+        "message": "63589"
       }
     },
     {
-      "seed": 16,
-      "stats": { "plain": 1, "steps": 134842 },
+      "seed": 17,
+      "stats": { "plain": 1, "steps": 917 },
       "panel": {
         "name": "Carving, dark and letters: hard 2",
         "rows": [
-          ". . . S . . . . .",
-          ". ? . ? . I . ? .",
+          "3 . E . D . . . R",
+          ". . . . . . . ? .",
           ". . . . . . . . .",
-          ". . . . 8 I 6 . .",
-          ". . . . . . . . .",
-          "6 . I I . . . . S",
-          ". . S . . S 3 . .",
-          ". . . . . 3 . 6 .",
-          ". . K . . . . . I"
+          ". . . . ? . . . ?",
+          ". . R . . . . . .",
+          ". . . C . C . . R",
+          ". I . . . . 8 . .",
+          ". . . . C . . 3 R",
+          ". I . . . 2 . . R"
         ],
-        "sizeLetters": " I SK    ",
-        "message": "5244"
+        "sizeLetters": " R C D IE",
+        "message": "48692"
+      }
+    },
+    {
+      "seed": 19,
+      "stats": { "plain": 1, "steps": 63 },
+      "panel": {
+        "name": "Carving, dark and letters: hard 3",
+        "rows": [
+          "6 . . . . T . . ?",
+          ". . T . . . . . .",
+          ". . . . . . . . .",
+          "8 . . . 8 . F . .",
+          ". . . . . . . . .",
+          ". . . S . T . . .",
+          ". . A . . . . 9 .",
+          "? . . . ? . . . T",
+          ". . . T . . . E ."
+        ],
+        "sizeLetters": " T FAES  ",
+        "message": "46572"
       }
     }
   ]

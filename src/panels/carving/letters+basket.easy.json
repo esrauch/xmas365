@@ -4,23 +4,33 @@
   "tier": "easy",
   "panels": [
     {
-      "seed": 2790,
-      "stats": { "plain": 1, "steps": 45 },
+      "seed": 46,
+      "stats": { "plain": 1, "steps": 12 },
       "panel": {
         "name": "Carving, letters and basket: easy 1",
-        "rows": ["🥚 . . . .", ". 🥕 🥕 🥚 .", "N . . 🥚 A", "🥕 🥚 . 🥕 🥕", ". A 🥕 🥚 🥚"],
-        "sizeLetters": "  A N    ",
-        "message": "TH35KS"
+        "rows": [". . . K 🥕", ". 🥚 🥕 . 🥚", "🥕 . . 🥚 .", "🥚 . 🥕 . 🥚", "🥕 🥚 O 🥕 C"],
+        "sizeLetters": "  OC K   ",
+        "message": "4336"
       }
     },
     {
-      "seed": 3526,
-      "stats": { "plain": 1, "steps": 52 },
+      "seed": 77,
+      "stats": { "plain": 1, "steps": 9 },
       "panel": {
         "name": "Carving, letters and basket: easy 2",
-        "rows": ["🥕 🥚 🥚 🥚 .", ". . . 🥕 .", "🥕 🥕 🥕 N 🥚", ". 🥚 🥚 . S", "🥚 N 🥕 . 🥕"],
-        "sizeLetters": "  N S    ",
-        "message": "THA3K5"
+        "rows": [". . S 🥕 .", ". 🥚 🥕 . 🥚", ". 🥕 🥚 🥕 🥚", "🥚 🥕 K . .", ". I 🥕 . 🥚"],
+        "sizeLetters": "  K IS   ",
+        "message": "3566"
+      }
+    },
+    {
+      "seed": 106,
+      "stats": { "plain": 1, "steps": 34 },
+      "panel": {
+        "name": "Carving, letters and basket: easy 3",
+        "rows": ["🥕 🥚 . C 🥚", "🥚 . . 🥕 .", "🥕 . 🥚 K 🥕", "🥕 🥚 . . .", ". . 🥕 O 🥚"],
+        "sizeLetters": "  OC K   ",
+        "message": "4336"
       }
     }
   ]

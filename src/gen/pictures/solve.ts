@@ -202,11 +202,15 @@ export function pictures(
   twists: Twists = {},
   budgetObj?: Budget,
 ): number[][][] {
-  const c = clues(p);
+  const rawClues = clues(p);
+  const checkLetters = !twists.noLetters && Boolean(p.letters);
+  const c =
+    checkLetters && p.letters
+      ? withLetters(rawClues, (l) => (p.letters?.indexOf(l) ?? -1) + 1)
+      : rawClues;
   const H = c.rows.length;
   const W = c.cols.length;
   const frame = !twists.noSnow ? p.frame : undefined;
-  const checkLetters = !twists.noLetters && Boolean(p.letters);
   const grid: number[][] = Array.from({ length: H }, () => new Array<number>(W).fill(-1));
 
   // Line logic first: every square it settles narrows each row's arrangements before the search.

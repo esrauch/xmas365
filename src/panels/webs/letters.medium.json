@@ -4,30 +4,33 @@
   "tier": "medium",
   "panels": [
     {
-      "seed": 4,
-      "stats": { "plain": 1, "steps": 10 },
+      "seed": 2,
+      "stats": { "plain": 1, "steps": 1 },
       "panel": {
         "name": "Webs, letters: medium 1",
-        "rows": ["..H....", ".U5....", "U......", "4.7...H", "...H1..", ".......", "1.23..1"],
-        "message": "21G"
+        "rows": ["K4K...S", ".......", "...I.K4", ".I.....", "..4.K..", "..S...S", "......I"],
+        "letters": "IKS      ",
+        "message": "2133"
       }
     },
     {
-      "seed": 37,
-      "stats": { "plain": 1, "steps": 13 },
+      "seed": 7,
+      "stats": { "plain": 1, "steps": 3 },
       "panel": {
         "name": "Webs, letters: medium 2",
-        "rows": ["2..5..C", ".......", ".T.3...", "...1..3", "..3...3", "....T.C", "C.4...."],
-        "message": "1RI2K"
+        "rows": ["T...T..", "....T..", ".....TW", "E...6.W", ".......", "..T....", "T.S.S.E"],
+        "letters": " TEWS    ",
+        "message": "54332"
       }
     },
     {
-      "seed": 48,
-      "stats": { "plain": 1, "steps": 13 },
+      "seed": 8,
+      "stats": { "plain": 1, "steps": 1 },
       "panel": {
         "name": "Webs, letters: medium 3",
-        "rows": ["...I...", "K..5.4K", ".....2.", "1......", ".......", "I..6.K.", ".K.6.K."],
-        "message": "21SS"
+        "rows": ["NN..T..", "G...H..", "H......", ".......", "I...I.N", ".T..H..", "T.....T"],
+        "letters": " TNHGI   ",
+        "message": "36542"
       }
     }
   ]

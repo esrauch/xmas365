@@ -44,6 +44,8 @@ export interface Panel {
   diagonal?: boolean;
   /** The web is one unbranched string from the plug (first) to the star (second). */
   ends?: [Spot, Spot];
+  /** The letter for each thread count (index n - 1 is the letter for count n, ' ' for none). */
+  letters?: string;
   /** A message with numbered blanks: blank n takes the letter whose knots have n threads. */
   message?: string;
   /** The spider's home knot, and numbered eggs: [row, column, threads from home]. */
@@ -129,6 +131,8 @@ export interface Web {
   frame?: Frame;
   segmentLinks: Map<string, number[]>;
   framePairs: [string, string][];
+  /** The thread count each letter stands for (from `panel.letters`). */
+  letterCounts: Map<string, number>;
 }
 
 export function parse(panel: Panel): Web {
@@ -201,6 +205,11 @@ export function parse(panel: Panel): Web {
     walls,
     segmentLinks: new Map(),
     framePairs: [],
+    letterCounts: new Map(
+      [...(panel.letters ?? '')].flatMap((ch, i) =>
+        /[A-Z]/.test(ch) ? [[ch, i + 1] as const] : [],
+      ),
+    ),
   };
   if (panel.ends) web.ends = [knotAt(panel.ends[0]), knotAt(panel.ends[1])];
   if (panel.home) web.home = knotAt(panel.home);

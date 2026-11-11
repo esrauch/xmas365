@@ -5,7 +5,7 @@
  */
 import { Budget } from '../core/budget';
 import { area, offAxis } from '../core/mirror';
-import { type Panel, parse } from './model';
+import { type Panel, fillMessage, parse } from './model';
 import { cutsOf } from './rules';
 import { countSolutions, solve } from './solve';
 
@@ -60,7 +60,7 @@ export function problems(p: Panel, margin: number, budget = new Budget(3_000_000
   const answers = solve(b, 2, {}, budget);
   if (answers.length !== 1) out.push(`${answers.length} answers, not 1`);
   for (const twist of twistsOf(p)) {
-    if (twist === 'dark' || twist === 'basket') continue; // hiding clues, or the board itself
+    if (twist === 'dark' || twist === 'basket' || twist === 'letters') continue; // hiding/coding clues, or the board itself
     const m = countSolutions(parse(without(p, twist)), margin, {}, budget);
     if (m < margin) out.push(`without ${twist}, ${m} answers (want ${margin})`);
   }
@@ -77,12 +77,21 @@ export function problems(p: Panel, margin: number, budget = new Budget(3_000_000
     if ((f.axis === 'v' ? w : h) % 2)
       out.push('the mirror line runs through squares, not between them');
   }
-  // Letters: at least two different letters (different sizes), or a letter is just a hidden given.
+  // Letters: at least two different letters (different sizes), and the message is all blanks that fill in cleanly.
   const coded = new Set((p.sizeLetters ?? '').replace(/ /g, ''));
   const shown = new Set(
     p.rows.flatMap((row) => row.trim().split(/\s+/)).filter((t) => coded.has(t)),
   );
   if (shown.size === 1) out.push('only one letter');
+  if (shown.size > 0 || p.message) {
+    const filled = fillMessage(p);
+    if (!filled || filled.includes('_') || /[0-9]/.test(filled))
+      out.push('message blanks do not fill in cleanly');
+    if (/[^0-9 ]/.test(p.message ?? '')) out.push('message has letters that are not coded');
+    for (const ch of new Set(filled.replace(/ /g, ''))) {
+      if (!shown.has(ch)) out.push(`letter ${ch} is not on the board`);
+    }
+  }
   // Red, white and blue: marks in at least two colours (one colour alone isn't the flag).
   const tones = new Set((p.colours ?? []).join('').replace(/\./g, ''));
   if (p.colours && tones.size < 2) out.push('the marks use only one colour');

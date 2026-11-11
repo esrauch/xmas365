@@ -128,7 +128,7 @@ export function problems(p: Panel, margin: number, budget = new Budget(2_000_000
   }
 
   for (const twist of on) {
-    if (twist === 'dark') continue; // hiding clues: checked structurally below
+    if (twist === 'dark' || twist === 'letters') continue; // hiding clues or unscrambled word: checked structurally below
     if (twist === 'colours') {
       const indep = countIndependentColours(p, margin, budget);
       if (indep < margin) out.push(`colours independent count ${indep} (want at least ${margin})`);

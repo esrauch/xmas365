@@ -156,10 +156,10 @@ puzzles** = **132 puzzles** (`Stage 1 · Twist Reminders` [6] + `Stage 2 · Doub
 
 ### Spiderweb (Halloween)
 
-- **Love Letters (Box of Chocolates, ✅; generator ⚙️):** some knots show a letter
-  instead of a number; same letter, same count. Message blank *n* is the
-  letter whose knots have *n* threads (1OV2 → LOVE). Guess the word, learn
-  the counts.
+- **Love Letters (Box of Chocolates, ✅; generator ⚙️):** every unique letter of a
+  4–5 letter word is assigned to a thread count on the board, so the message is
+  all numbered blanks: unscramble the word first to learn the numbers, then
+  solve the web.
 - **Snowflakes (generator ⚙️):** the whole board; the joins mirror across
   the icy line, singles and doubles don't. Ghost threads show missing
   mirror joins.
@@ -181,10 +181,10 @@ All six columns are in the generator (⚙️), at every tier, in any mix (three
 clue-adding twists at once only on easy so far). Playtested 2026-11-03:
 Spooky and Portions (cuts) are good; the rest were adjusted as below.
 
-- **Love Letters (⚙️):** some sizes are letters; the message shows
-  a digit *n* as the letter for size *n*, other letters as they are (2A4 →
-  YAM). Two letters on easy, three from medium up (each a different size).
-  Size letters avoid T, P and C (the dishes).
+- **Love Letters (⚙️):** every unique letter of a 4–5 letter word (CORN, FEAST,
+  SWEET, HEART, ...) is assigned to a portion size on the board, so the message
+  is all numbered blanks: unscramble the word first to learn the numbers, then
+  solve the carving.
 - **Snowflakes (⚙️):** inside a frame, the cuts mirror; portions crossing
   the frame's edge carry on differently outside. The mirror line runs
   *between* squares (a line through a square's middle made no sense), so

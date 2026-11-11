@@ -75,11 +75,12 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
       twists: ['letters'],
       tip: '💌 Love Letters: Equal letters share a count; different letters take different counts.',
       explain:
-        'Knots marked with the same letter must have the same thread count, and different letters must have different counts. Solving them fills the numbered blanks in the message above!',
+        'Unscramble the letters on the knots into MOON to learn their thread counts and fill the numbered blanks in the message above!',
       panel: {
         name: 'Secret Initials',
-        rows: ['G.1..', '.....', '4...U', '....1', 'U.G..'],
-        message: 'H32',
+        rows: ['O.N..', '.....', 'M...3', '....1', '3.O..'],
+        letters: 'NO M     ',
+        message: '4221',
       },
     },
     {
@@ -144,11 +145,12 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
       twists: ['dark', 'letters'],
       tip: '🎃 Spooky + 💌 Love Letters: Dark (?) knots are free; letter knots share counts.',
       explain:
-        'Combine dark (?) knots that accept any count with coded letter knots (O and V) that must share consistent, distinct counts.',
+        'Combine dark (?) knots that accept any count with coded letter knots (L, O, V, and E) that unscramble into LOVE.',
       panel: {
         name: 'Midnight Valentine',
-        rows: ['....1..', 'O...V.2', '..1..?.', '....4..', '4.?....', '....O..', '2.4..O.'],
-        message: 'L26E',
+        rows: ['....L..', 'O...V.2', '..1..?.', '....E..', '4.?....', '....O..', '2.4..O.'],
+        letters: 'LO E V   ',
+        message: '1264',
       },
     },
     // 14: dark + colours
@@ -215,12 +217,13 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
       twists: ['letters', 'colours'],
       tip: '💌 Love Letters + 🎆 Red, White & Blue: Letter knots obey both color and count rules.',
       explain:
-        'Red and blue knots never link to their own color, helping determine the shared thread counts for letters K and I.',
+        'Red and blue knots never link to their own color while L, O, V, and E unscramble into LOVE.',
       panel: {
         name: 'Painted Postcard',
-        rows: ['...4..3', '.......', 'I.IK.I.', '.......', '......2', '3..6...', '..13.I2'],
-        message: '61SS',
-        colours: ['...r..b', '.......', 'r.rb.r.', '.......', '......r', 'b..r...', '..rb.rb'],
+        rows: ['......V', 'L..V..E', '..O...L', 'E.E.V..', '.......', 'L......', 'L.L...V'],
+        letters: 'OVLE     ',
+        message: '3124',
+        colours: ['......r', 'b..r..b', '..b...r', 'r.b.r..', '.......', 'b......', '..r...b'],
       },
     },
     // 19: letters + eggs
@@ -230,11 +233,12 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
       twists: ['letters', 'eggs'],
       tip: '💌 Love Letters + 🥚 Egg Hunt: Match letter counts while keeping egg hops exact.',
       explain:
-        'All W knots must take the same thread count, and the egg knot must be reached in 3 hops from the 🕷 home knot.',
+        'Unscramble S, W, E, and T into SWEET to learn their counts while reaching the egg knot in 3 hops from the 🕷 home knot.',
       panel: {
         name: 'Parcel Delivery',
-        rows: ['3...3..', '..W.3..', '.......', '.......', '5.4S4.4', '......W', 'W.2.1..'],
-        message: '12EET',
+        rows: ['E...3..', '..W.3..', '.......', '.......', 'T.4S4.4', '......W', 'W.2.1..'],
+        letters: 'SWE T    ',
+        message: '12335',
         home: [1, 2],
         eggs: [[4, 3, 3]],
       },
@@ -246,11 +250,12 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
       twists: ['letters', 'cuts'],
       tip: '💌 Love Letters + 🥧 Portions: Fence bars block links and fix the letter values.',
       explain:
-        'The fence bar blocks a vertical connection, fixing the thread counts for R and E and unlocking the coded word.',
+        'Unscramble T, R, E, and A into TREAT and route around the fence bar blocking a vertical connection.',
       panel: {
         name: 'Sealed Envelope',
-        rows: ['.1...ER', '.4..3.1', '.......', '....1..', '.4...4.', 'R......', '4E...R.'],
-        message: 'T23AT',
+        rows: ['.T...ER', '.A..3.1', '.......', '....1..', '.4...4.', 'R......', '4E...R.'],
+        letters: 'TREA     ',
+        message: '12341',
         walls: [[5, 1, 'h']],
       },
     },
@@ -261,11 +266,12 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
       twists: ['letters', 'snow'],
       tip: '💌 Love Letters + ❄️ Snowflakes: Mirrored joins and equal letters solve together.',
       explain:
-        'Symmetry across the vertical snowflake line pairs with the equal-count rule on E and B to spin the web.',
+        'Symmetry across the vertical snowflake line pairs with unscrambling M, O, and N into MOON to spin the web.',
       panel: {
         name: 'Frosted Note',
-        rows: ['E..E..2', '.......', '.2...2.', '3.....2', '.3.B.E.', '.......', '2..E..3'],
-        message: 'W45',
+        rows: ['O..O..2', '.......', '.2...2.', 'N.....2', '.3.M.O.', '.......', '2..O..3'],
+        letters: '  NOM    ',
+        message: '5443',
         frame: { top: 0, left: 0, bottom: 6, right: 6, axis: 'v' },
       },
     },
@@ -373,11 +379,12 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
       twists: ['dark', 'letters', 'colours', 'eggs', 'cuts', 'snow'],
       tip: '🎃💌🎆🥚🥧❄️ All 6 Twists: Every holiday clause rule is active at once!',
       explain:
-        'The final Clause I boss web! Balance dark (?) knots, coded W/B letters, red/blue colors, the 5-hop egg from 🕷, the fence bar, and horizontal snowflake symmetry all at once.',
+        'The final Clause I boss web! Balance dark (?) knots, coded K/I/S letters, red/blue colors, the 5-hop egg from 🕷, the fence bar, and horizontal snowflake symmetry all at once.',
       panel: {
         name: 'The Grand Cobweb',
-        rows: ['?.....2', '.......', '4....3W', 'W......', '5....3B', '.......', 'W.....2'],
-        message: '3E2',
+        rows: ['?.....2', '.......', 'K....3S', 'S......', '5....3I', '.......', 'S.....2'],
+        letters: ' ISK     ',
+        message: '4233',
         colours: ['r.....b', '.......', 'b.....r', 'r......', 'b....rb', '.......', 'r......'],
         frame: { top: 0, left: 0, bottom: 6, right: 6, axis: 'h' },
         home: [0, 0],

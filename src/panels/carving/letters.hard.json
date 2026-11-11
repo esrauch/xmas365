@@ -4,63 +4,63 @@
   "tier": "hard",
   "panels": [
     {
-      "seed": 2,
-      "stats": { "plain": 1, "steps": 304 },
+      "seed": 3,
+      "stats": { "plain": 1, "steps": 18 },
       "panel": {
         "name": "Carving, letters: hard 1",
         "rows": [
-          ". . 2 2 . 6 . . Y",
+          "4 . . R . A . . .",
+          ". . . . 7 . . . .",
+          ". . . . . T . . .",
           ". . . . . . . . .",
-          "8 . . . . . . Y .",
-          ". . . . . . . . .",
-          "2 3 M . 2 . . . .",
-          ". . . . . . . 2 .",
-          "M . . 6 M Y . 2 .",
-          ". . . . . . A . .",
-          ". 2 4 . . . 5 . 3"
+          "R . . 2 . . . H .",
+          ". . . . . . . . H",
+          ". . 2 . . . . . .",
+          ". E . E . . . . 2",
+          "E . 2 . 2 . . 9 ."
         ],
-        "sizeLetters": "  M Y  A ",
-        "message": "583"
+        "sizeLetters": "  E AH RT",
+        "message": "63589"
       }
     },
     {
-      "seed": 16,
-      "stats": { "plain": 1, "steps": 1802 },
+      "seed": 17,
+      "stats": { "plain": 1, "steps": 42 },
       "panel": {
         "name": "Carving, letters: hard 2",
         "rows": [
-          ". . . S . . . . .",
-          ". 6 . 6 . I . 6 .",
+          "3 . E . D . . . R",
+          ". . . . . . . D .",
           ". . . . . . . . .",
-          ". . . . 8 I 6 . .",
-          ". . . . . . . . .",
-          "6 . I I . . . . S",
-          ". . S . . S 3 . .",
-          ". . . . . 3 . 6 .",
-          ". . K . . . . . I"
+          ". . . . C . . . R",
+          ". . R . . . . . .",
+          ". . . C . C . . R",
+          ". I . . . . I . .",
+          ". . . . C . . 3 R",
+          ". I . . . 2 . . R"
         ],
-        "sizeLetters": " I SK    ",
-        "message": "5244"
+        "sizeLetters": " R C D IE",
+        "message": "48692"
       }
     },
     {
       "seed": 19,
-      "stats": { "plain": 1, "steps": 4681 },
+      "stats": { "plain": 1, "steps": 17 },
       "panel": {
         "name": "Carving, letters: hard 3",
         "rows": [
-          ". . 3 S . . . . .",
-          ". F . . . . . E S",
-          ". . . 4 6 3 . . .",
+          "E . . . . 2 . . 8",
+          ". . T . . . . . .",
           ". . . . . . . . .",
-          ". . 5 . . 2 . . .",
-          ". . . . . . 6 . .",
-          ". . . . . . 2 . 3",
-          ". 6 S . . 3 . . .",
-          ". . . . 5 . 2 . 2"
+          "8 . . . 8 . 4 . .",
+          ". . . . . . . . .",
+          ". . . S . T . . .",
+          ". . A . . . . 9 .",
+          "6 . . . F . . . T",
+          ". . . 2 . . . E ."
         ],
-        "sizeLetters": "   S   FE",
-        "message": "89A4T"
+        "sizeLetters": " T FAES  ",
+        "message": "46572"
       }
     }
   ]

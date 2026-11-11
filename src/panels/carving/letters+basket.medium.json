@@ -4,39 +4,57 @@
   "tier": "medium",
   "panels": [
     {
-      "seed": 10316,
-      "stats": { "plain": 1, "steps": 77 },
+      "seed": 36,
+      "stats": { "plain": 1, "steps": 12 },
       "panel": {
         "name": "Carving, letters and basket: medium 1",
         "rows": [
-          "🍫 🍫 . 🥕 🥚 . .",
-          "🥕 🥕 🍫 🥚 . . E",
-          "🥚 🥚 🥕 🍫 🥕 A 🥕",
-          "4 🍫 . . . 🥚 .",
-          ". 🥕 🍫 🥚 🥚 . .",
-          "🥚 . . . . 🥕 🍫",
-          "🍫 🥕 . T 🍫 . 🥚"
+          "T 🥚 S 🥚 . 🥚 .",
+          ". . 🥕 🍫 🍫 🥕 🥕",
+          "🥚 . . 🥕 🥚 . .",
+          ". 🍫 . . . W 🍫",
+          "🍫 . . 🍫 🍫 . 🥚",
+          "🥕 🥕 . 🥚 🥕 . .",
+          ". . . 🥚 🍫 E 🥕"
         ],
-        "sizeLetters": "     AET ",
-        "message": "8R768"
+        "sizeLetters": "   S ETW ",
+        "message": "48667"
       }
     },
     {
-      "seed": 17524,
-      "stats": { "plain": 1, "steps": 38 },
+      "seed": 115,
+      "stats": { "plain": 1, "steps": 18 },
       "panel": {
         "name": "Carving, letters and basket: medium 2",
         "rows": [
-          "🍫 . A 🥕 🥚 . 🍫",
-          ". 🍫 K 🥕 . 🍫 .",
-          "🥚 . . . 🥚 . .",
-          "🍫 🥕 🥚 🥚 🥕 . 🥚",
-          "🥚 . 🍫 🍫 S 🥕 .",
-          ". 4 🥕 . 🍫 . .",
-          "🥕 🥚 🍫 🥕 . 🥚 🥕"
+          "🥚 . 🍫 . 🥕 R .",
+          ". . 🥕 . 🍫 🍫 .",
+          ". 🍫 🍫 🥚 . 🥚 .",
+          "🍫 🥚 🥕 . 🥕 M .",
+          "🥚 . 🍫 🥚 🥚 . 🥕",
+          "🥕 🥕 A . 🥕 🥚 🍫",
+          ". 🥚 . 🥕 🍫 W ."
         ],
-        "sizeLetters": "    AS K ",
-        "message": "TH5N86"
+        "sizeLetters": "    AWRM ",
+        "message": "6578"
+      }
+    },
+    {
+      "seed": 155,
+      "stats": { "plain": 1, "steps": 10 },
+      "panel": {
+        "name": "Carving, letters and basket: medium 3",
+        "rows": [
+          ". . 🥚 🥕 🥚 . 🥚",
+          "🍫 . T . 🍫 . .",
+          ". 🥚 🥚 . E 🥕 .",
+          "🍫 . 🥕 . . 🥚 🥕",
+          "🥕 . 🍫 . 🥕 🍫 .",
+          "🥕 . 🍫 W . 🍫 S",
+          ". 🥚 . . 🥚 🥕 🍫"
+        ],
+        "sizeLetters": "    EWST ",
+        "message": "76558"
       }
     }
   ]

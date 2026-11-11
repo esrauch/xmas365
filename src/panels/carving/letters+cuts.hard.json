@@ -4,50 +4,71 @@
   "tier": "hard",
   "panels": [
     {
-      "seed": 5,
-      "stats": { "plain": 3, "without cuts": 3, "steps": 546 },
+      "seed": 2,
+      "stats": { "plain": 3, "without cuts": 3, "steps": 17 },
       "panel": {
         "name": "Carving, letters and cuts: hard 1",
         "rows": [
-          ". K . . . 6 . . .",
-          ". . . . H 4 K 5 6",
-          ". . 6 4 . . . . .",
-          "4 . . . . . . . .",
-          "5 . . . . . . . .",
-          ". S . . 4 H . . .",
-          ". . . . . . S 6 .",
-          ". S . 4 . . . . .",
-          ". . . . . . K . ."
+          ". G . . . . . . .",
+          "R . . . 6 . 4 . 7",
+          ". . . . . . . . .",
+          "Y . . . V . . Y .",
+          ". . . . . R . . .",
+          ". . . . . . . . .",
+          ". 6 . . . A . . .",
+          ". . 8 . . . . . .",
+          ". R . 9 . . 4 . R"
         ],
-        "sizeLetters": " SH K    ",
-        "message": "T3AN52",
+        "sizeLetters": " RG VY  A",
+        "message": "32956",
         "walls": [
-          [3, 3, "h"],
-          [5, 3, "v"]
+          [1, 0, "h"],
+          [6, 0, "v"]
         ]
       }
     },
     {
-      "seed": 44,
-      "stats": { "plain": 4, "without cuts": 4, "steps": 360 },
+      "seed": 4,
+      "stats": { "plain": 3, "without cuts": 3, "steps": 45 },
       "panel": {
         "name": "Carving, letters and cuts: hard 2",
         "rows": [
-          ". E . . . . . . R",
-          ". E . . . . . . .",
-          ". . . 9 . . . . .",
-          "6 . . . . 3 . 9 .",
-          ". . . R . . . 4 .",
-          ". . 2 . . . 9 . .",
-          "2 . . . . . . . .",
-          ". . . 2 . . 2 . .",
-          "4 . R . 2 2 . . A"
+          ". . R . . A . . 3",
+          "4 . . R . . . . .",
+          ". Y . . . . . . .",
+          ". . . 7 . . . . 3",
+          ". . . . . . . . .",
+          ". . . . . . . . .",
+          "5 . A . 8 . V . R",
+          ". . . . . . . G .",
+          ". Y R . . A . . R"
         ],
-        "sizeLetters": "  R EA   ",
-        "message": "H563T",
+        "sizeLetters": " R Y AVG ",
+        "message": "82674",
+        "walls": [[4, 1, "h"]]
+      }
+    },
+    {
+      "seed": 8,
+      "stats": { "plain": 4, "without cuts": 4, "steps": 18 },
+      "panel": {
+        "name": "Carving, letters and cuts: hard 3",
+        "rows": [
+          "D . . . C . E . D",
+          ". . . . . . . . .",
+          ". . . 6 . . . . .",
+          ". R . . . . . . I",
+          "4 . . 6 . R . . .",
+          ". . 4 . . . . . .",
+          ". . . . . 9 . I .",
+          "C . 4 . . . . . .",
+          ". C . . . . D . ."
+        ],
+        "sizeLetters": " DC R EI ",
+        "message": "38275",
         "walls": [
-          [8, 5, "v"],
-          [7, 3, "h"]
+          [0, 3, "v"],
+          [4, 8, "h"]
         ]
       }
     }

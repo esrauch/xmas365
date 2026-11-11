@@ -186,33 +186,33 @@ export const STOCKING: Panel[] = [
 
 export const LOCKET: Panel[] = [
   {
-    name: 'Sweet yam',
-    rows: ['6 . . Y .', '. . . . .', '6 . Y 3 .', '. . . . .', '. . Y . M'],
-    sizeLetters: ' Y M     ',
-    message: '2A4',
+    name: 'Sweet treat',
+    rows: ['S . . W .', '. . . . .', '6 . W E .', '. . . . .', '. . 2 . T'],
+    sizeLetters: ' WET S   ',
+    message: '62334',
     tip: '💌 Love-Letter: Same letter = same rectangle area; different letters = different areas.',
   },
   {
     name: 'Golden corn',
-    rows: ['. . N . .', '. 2 2 . .', '. . 4 . 2', 'R . . 2 2', '. . N . .'],
-    sizeLetters: '  N R    ',
-    message: 'CO53',
-    tip: '💌 Love-Letter: Match both N portions to one area and R to another to decode the word.',
+    rows: ['. . N . .', '. O 2 . .', '. . C . 2', 'R . . 2 O', '. . N . .'],
+    sizeLetters: ' ONCR    ',
+    message: '4253',
+    tip: '💌 Love-Letter: The numbered blanks spell a word: unscramble the clue letters into it to learn each letter’s area.',
   },
   {
     name: 'The Heart Locket',
     rows: [
       '. . . . . A .',
-      '. . . . R 3 3',
-      'E . 5 . . . .',
+      '. . . . R T 3',
+      'E . H . . . .',
       'A . . . . . .',
       '. E . . E . .',
-      '. . A 3 . . .',
+      '. . A T . . .',
       '. . . . 3 . .',
     ],
-    sizeLetters: ' A   E R ',
-    message: 'T862T',
-    tip: '💌 Love-Letter: Carve the 7×7 platter so A, E, and R take consistent distinct areas.',
+    sizeLetters: ' AT HE R ',
+    message: '56283',
+    tip: '💌 Love-Letter: Unscramble the letters on the 7×7 platter into the message first, then carve the board knowing their areas.',
   },
 ];
 
@@ -324,7 +324,7 @@ export const locket = run({
   room: 'Thanksgiving',
   kind: 'relic',
   from: "Love-Letter Carving · Thanksgiving (Valentine's)",
-  rules: `${CONTROLS} (Twist: portions with the same letter must have the same area, and different letters must have different areas, filling the numbered blanks in the message.)`,
+  rules: `${CONTROLS} (Twist: portions with the same letter must have the same area, and different letters must have different areas. The message's numbered blanks spell a word with the letter for each area, so unscramble the letters to learn their areas.)`,
   panels: LOCKET,
   mountPanel,
 });

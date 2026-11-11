@@ -4,25 +4,40 @@
   "tier": "easy",
   "panels": [
     {
-      "seed": 6,
-      "stats": { "plain": 2, "without cuts": 2, "steps": 72 },
+      "seed": 2,
+      "stats": { "plain": 2, "without cuts": 2, "steps": 7 },
       "panel": {
         "name": "Carving, letters and cuts: easy 1",
-        "rows": [". . I . .", ". 4 . . 4", ". I I . .", "I . . E .", "I . I . I"],
-        "sizeLetters": " IE      ",
-        "message": "P23",
-        "walls": [[2, 1, "h"]]
+        "rows": [". . V . .", ". 6 . . E", ". . . O .", ". . . . .", ". 4 . L ."],
+        "sizeLetters": " VLE O   ",
+        "message": "3624",
+        "walls": [[1, 4, "h"]]
       }
     },
     {
-      "seed": 11,
-      "stats": { "plain": 2, "without cuts": 2, "steps": 35 },
+      "seed": 3,
+      "stats": { "plain": 2, "without cuts": 2, "steps": 7 },
       "panel": {
         "name": "Carving, letters and cuts: easy 2",
-        "rows": [". . V . .", ". 4 . . .", ". . . . .", "4 . V . .", ". A . . ."],
-        "sizeLetters": "    AV   ",
-        "message": "GR56Y",
-        "walls": [[1, 1, "h"]]
+        "rows": [". . . M .", ". . W . M", "W . . . .", ". . . R .", "A . . . ."],
+        "sizeLetters": " M RAW   ",
+        "message": "6542",
+        "walls": [[0, 3, "v"]]
+      }
+    },
+    {
+      "seed": 4,
+      "stats": { "plain": 6, "without cuts": 6, "steps": 9 },
+      "panel": {
+        "name": "Carving, letters and cuts: easy 3",
+        "rows": [". . 2 . C", ". N . N .", ". . . . .", "R . O . .", ". C . . N"],
+        "sizeLetters": " NC RO   ",
+        "message": "3652",
+        "walls": [
+          [3, 2, "h"],
+          [1, 2, "v"],
+          [0, 1, "v"]
+        ]
       }
     }
   ]

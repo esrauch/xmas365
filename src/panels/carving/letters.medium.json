@@ -4,57 +4,57 @@
   "tier": "medium",
   "panels": [
     {
-      "seed": 10,
-      "stats": { "plain": 1, "steps": 45 },
+      "seed": 1,
+      "stats": { "plain": 1, "steps": 26 },
       "panel": {
         "name": "Carving, letters: medium 1",
         "rows": [
+          "3 . Y . H . .",
           ". . . . . . .",
-          ". . A . . 8 .",
-          ". . . . . . 6",
-          ". 6 . . . . .",
-          ". . Y A . Y .",
-          ". M . . . Y .",
-          ". . . . . . 7"
+          ". E . . . . 7",
+          ". . . . . . .",
+          ". . O . . . .",
+          "Y . . H . N .",
+          ". . . . E . ."
         ],
-        "sizeLetters": " Y M A   ",
-        "message": "264"
+        "sizeLetters": " Y E HNO ",
+        "message": "68742"
       }
     },
     {
-      "seed": 26,
-      "stats": { "plain": 1, "steps": 302 },
+      "seed": 3,
+      "stats": { "plain": 1, "steps": 15 },
       "panel": {
         "name": "Carving, letters: medium 2",
         "rows": [
-          ". 6 . . . Y 2",
-          ". . . . 8 . .",
-          ". . Y . . . .",
+          "R . 2 . I . .",
+          ". E . . . . C",
+          ". . . I . 6 .",
+          ". . . C . . .",
+          "C . E . 2 . R",
           ". . . . . . .",
-          "A . . . M . 5",
-          ". . . 3 . . .",
-          "3 . . . . . ."
+          "I . . . D . ."
         ],
-        "sizeLetters": "   Y M A ",
-        "message": "486"
+        "sizeLetters": " CIRED   ",
+        "message": "23654"
       }
     },
     {
-      "seed": 31,
-      "stats": { "plain": 1, "steps": 109 },
+      "seed": 4,
+      "stats": { "plain": 1, "steps": 12 },
       "panel": {
         "name": "Carving, letters: medium 3",
         "rows": [
-          ". . . . . A .",
-          ". . . . R 3 3",
-          "E . 5 . . . .",
+          ". 8 . . . . .",
+          "R . . . Y . .",
+          ". . . . . 5 .",
           "A . . . . . .",
-          ". E . . E . .",
-          ". . A 3 . . .",
-          ". . . . 3 . ."
+          ". . R . V . G",
+          "7 . . . . . .",
+          ". G . . . R ."
         ],
-        "sizeLetters": " A   E R ",
-        "message": "T862T"
+        "sizeLetters": " RAYGV   ",
+        "message": "52364"
       }
     }
   ]

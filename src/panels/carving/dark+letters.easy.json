@@ -5,22 +5,32 @@
   "panels": [
     {
       "seed": 1,
-      "stats": { "plain": 1, "steps": 112 },
+      "stats": { "plain": 1, "steps": 17 },
       "panel": {
         "name": "Carving, dark and letters: easy 1",
-        "rows": ["? . . Y .", ". . . . .", "6 . Y 3 .", ". . . . .", ". . Y . M"],
-        "sizeLetters": " Y M     ",
-        "message": "2A4"
+        "rows": ["T . . W .", ". . . . .", "? . . E .", ". . W . .", ". . W . S"],
+        "sizeLetters": " WES T   ",
+        "message": "42336"
       }
     },
     {
-      "seed": 4,
-      "stats": { "plain": 1, "steps": 171 },
+      "seed": 6,
+      "stats": { "plain": 1, "steps": 11 },
       "panel": {
         "name": "Carving, dark and letters: easy 2",
-        "rows": [". . N . .", ". ? 2 . .", ". . 4 . 2", "R . . 2 2", ". . N . ."],
-        "sizeLetters": "  N R    ",
-        "message": "CO53"
+        "rows": ["K . . . I", ". . . . .", ". . I . 2", ". 4 . ? .", ". . S . I"],
+        "sizeLetters": " I S K   ",
+        "message": "6244"
+      }
+    },
+    {
+      "seed": 8,
+      "stats": { "plain": 1, "steps": 8 },
+      "panel": {
+        "name": "Carving, dark and letters: easy 3",
+        "rows": ["C . . . .", ". . . . .", "K . . . O", ". . O . .", "K K . . ?"],
+        "sizeLetters": " KC  O   ",
+        "message": "3662"
       }
     }
   ]

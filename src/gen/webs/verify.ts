@@ -6,7 +6,7 @@
 import { Budget } from '../core/budget';
 import { mirrorSquare, offAxis } from '../core/mirror';
 import { type Panel, type Web, parse } from './model';
-import { strokes } from './rules';
+import { fillMessage, letterValues, strokes } from './rules';
 import { countSolutions, solve } from './solve';
 
 export type WebTwist = 'dark' | 'letters' | 'colours' | 'eggs' | 'cuts' | 'snow';
@@ -50,6 +50,7 @@ export function without(p: Panel, twist: WebTwist): Panel {
   else if (twist === 'snow') delete q.frame;
   else if (twist === 'letters') {
     q.rows = p.rows.map((row) => row.replace(/[A-Z]/g, '?'));
+    delete q.letters;
     delete q.message;
   }
   return q;
@@ -78,13 +79,24 @@ export function problems(p: Panel, margin: number, budget = new Budget(2_000_000
   const n = countSolutions(web, 2, {}, budget);
   if (n !== 1) out.push(`${n} answers, not 1`);
   for (const twist of twistsOf(p)) {
-    if (twist === 'dark') continue; // hiding clues: nothing to take away
+    if (twist === 'dark' || twist === 'letters') continue; // hiding clues or unscrambled word: nothing to take away
     const m = countSolutions(parse(without(p, twist)), margin, {}, budget);
     if (m < margin) out.push(`without ${twist}, ${m} answers (want ${margin})`);
   }
-  // Letters: at least two different letters (different counts), or a letter is just a hidden given.
+  // Letters: every unique letter of the message appears on the board, and no letters are pre-revealed in message.
   const shown = new Set(p.rows.join('').match(/[A-Z]/g) ?? []);
   if (shown.size === 1) out.push('only one letter');
+  if (shown.size > 0) {
+    const [answer] = solve(web, 1, {}, budget);
+    const values = answer ? letterValues(web, answer) : null;
+    const filled = values && p.message ? fillMessage(p.message, values) : '';
+    if (!filled || filled.includes('_') || !/[A-Z]/.test(filled))
+      out.push('message blanks do not fill in cleanly');
+    if (/[^0-9 ]/.test(p.message ?? '')) out.push('message has uncoded letters');
+    for (const ch of filled) {
+      if (/[A-Z]/.test(ch) && !shown.has(ch)) out.push(`letter ${ch} is not on the board`);
+    }
+  }
   // Snowflakes (whole board on Webs): the knots sit in mirror image, the answer draws
   // enough off the axis, and the numbers mustn't simply mirror too (or one half solves the other).
   if (p.frame) {
@@ -98,7 +110,7 @@ export function problems(p: Panel, margin: number, budget = new Budget(2_000_000
       const [mr, mc] = mirrorSquare(f, k.r, k.c);
       const m = p.rows[mr]?.[mc] ?? '';
       const n = p.rows[k.r]?.[k.c] ?? '';
-      return (mr < k.r || (mr === k.r && mc < k.c)) && /[0-9]/.test(m) && /[0-9]/.test(n)
+      return (mr < k.r || (mr === k.r && mc < k.c)) && /[0-9A-Z]/.test(m) && /[0-9A-Z]/.test(n)
         ? [m !== n]
         : [];
     });
