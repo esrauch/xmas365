@@ -115,15 +115,10 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
   /** Squares in found words. */
   const foundCells = (): Set<string> =>
     new Set([...found].flatMap((i) => (panel.words[i]?.cells ?? []).map(key)));
-  /** Squares in the currently hinted word. */
-  const hintedCells = (): Set<string> =>
-    hintedWord !== null && !found.has(hintedWord)
-      ? new Set((panel.words[hintedWord]?.cells ?? []).map(key))
-      : new Set<string>();
-  /** Coded letters revealed (by a found word through one). */
+  /** Coded letters revealed (by a found word through one; a hint's outline reveals nothing). */
   const revealed = (): Set<string> => {
     const out = new Set<string>();
-    for (const k of [...foundCells(), ...hintedCells()]) {
+    for (const k of foundCells()) {
       const [r, c] = k.split(',').map(Number) as Spot;
       out.add(letterAt(panel, [r, c]));
     }
@@ -132,8 +127,7 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
   /** What a square shows: its letter, a blank in the dark, or its code number. */
   const shown = (s: Spot): string => {
     const letter = letterAt(panel, s);
-    const isFoundOrHinted = foundCells().has(key(s)) || hintedCells().has(key(s));
-    if (dark.has(key(key(s) ? s : s)) && !isFoundOrHinted) return '?';
+    if (dark.has(key(s)) && !foundCells().has(key(s))) return '?';
     const n = code.indexOf(letter);
     if (n >= 0 && !revealed().has(letter)) return String(n + 1);
     return letter;
