@@ -1,7 +1,7 @@
 /**
  * The clicky carving panel: drag from one square to another to carve the
- * rectangle between them (it replaces any portions it overlaps); tap a
- * portion to lift it off; tap an empty square for a one-square portion.
+ * rectangle between them (rejected if it would overlap an existing portion);
+ * tap a portion to lift it off; tap an empty square for a one-square portion.
  * The panel checks as you go: a portion glows green when it's right on its
  * own and shows red when it isn't (two numbers, the wrong size, a dish
  * missing, or touching a portion of its colour); a flag goes green
@@ -241,11 +241,10 @@ export function mountCarving(host: HTMLElement, panel: Panel, hooks: CarveHooks)
       }
     }
     const x = span(r, c, p[0], p[1]);
-    if (rects.some((y) => lockedRectKeys.has(rectKey(y)) && overlaps(x, y))) {
+    if (rects.some((y) => overlaps(x, y))) {
       blip(180, 50, 8);
       return render();
     }
-    rects = rects.filter((y) => !overlaps(x, y));
     rects.push(x);
     lastCarvedKey = rectKey(x);
     blip(problem(b, x) ? 200 : 600, 60, 8);
@@ -506,14 +505,16 @@ export function mountCarving(host: HTMLElement, panel: Panel, hooks: CarveHooks)
     }
     if (drag) {
       const x = span(drag.r, drag.c, drag.to[0], drag.to[1]);
+      const isTapPreview = drag.to[0] === drag.r && drag.to[1] === drag.c;
+      const blocked = !isTapPreview && rects.some((y) => overlaps(x, y));
       add('rect', {
         x: x.c * cell + 2,
         y: x.r * cell + 2,
         width: x.w * cell - 4,
         height: x.h * cell - 4,
         rx: 7,
-        fill: 'rgba(255, 207, 107, 0.25)',
-        stroke: '#e0a020',
+        fill: blocked ? 'rgba(217, 83, 79, 0.22)' : 'rgba(255, 207, 107, 0.25)',
+        stroke: blocked ? '#d9534f' : '#e0a020',
         'stroke-width': 3,
         'stroke-dasharray': '5 4',
       });
@@ -566,6 +567,8 @@ export function mountCarving(host: HTMLElement, panel: Panel, hooks: CarveHooks)
     );
     if (drag) {
       const x = span(drag.r, drag.c, drag.to[0], drag.to[1]);
+      const isTapPreview = drag.to[0] === drag.r && drag.to[1] === drag.c;
+      const blocked = !isTapPreview && rects.some((y) => overlaps(x, y));
       add(
         'text',
         {
@@ -574,7 +577,7 @@ export function mountCarving(host: HTMLElement, panel: Panel, hooks: CarveHooks)
           'text-anchor': 'end',
           'font-size': cell * 0.32,
           'font-weight': 800,
-          fill: '#b07800',
+          fill: blocked ? '#c23b33' : '#b07800',
           stroke: '#fffaf2',
           'stroke-width': 3.5,
           'stroke-linejoin': 'round',
