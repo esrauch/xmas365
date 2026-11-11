@@ -391,7 +391,7 @@ const CONTROLS =
 
 export const hutch = run({
   id: 'hutch',
-  title: 'The Hutch',
+  title: 'Hops',
   room: 'Easter',
   kind: 'intro',
   from: 'Hops · Easter, taught puzzle by puzzle',
@@ -402,7 +402,7 @@ export const hutch = run({
 
 export const eggtree = run({
   id: 'eggtree',
-  title: 'The Egg Tree',
+  title: 'Egg-Hunt Hops',
   room: 'Easter',
   kind: 'home',
   from: 'Egg-Hunt Hops · Easter (Easter)',
@@ -413,7 +413,7 @@ export const eggtree = run({
 
 export const flag = run({
   id: 'flag',
-  title: 'The Star-Spangled Flag',
+  title: 'Patriotic Hops',
   room: 'Easter',
   kind: 'relic',
   from: 'Patriotic Hops · Easter (Fourth of July)',
@@ -424,7 +424,7 @@ export const flag = run({
 
 export const cornucopia = run({
   id: 'cornucopia',
-  title: 'The Cornucopia',
+  title: 'Portioned Hops',
   room: 'Easter',
   kind: 'relic',
   from: 'Portioned Hops · Easter (Thanksgiving)',
@@ -435,7 +435,7 @@ export const cornucopia = run({
 
 export const rose = run({
   id: 'rose',
-  title: 'The Single Rose',
+  title: 'Love-Letter Hops',
   room: 'Easter',
   kind: 'relic',
   from: "Love-Letter Hops · Easter (Valentine's)",
@@ -446,7 +446,7 @@ export const rose = run({
 
 export const ghost = run({
   id: 'ghost',
-  title: 'The Bedsheet Ghost',
+  title: 'Spooky Hops',
   room: 'Easter',
   kind: 'relic',
   from: 'Spooky Hops · Easter (Halloween)',
@@ -457,7 +457,7 @@ export const ghost = run({
 
 export const gingerbread = run({
   id: 'gingerbread',
-  title: 'The Gingerbread Man',
+  title: 'Snowflake Hops',
   room: 'Easter',
   kind: 'relic',
   from: 'Snowflake Hops · Easter (Christmas)',

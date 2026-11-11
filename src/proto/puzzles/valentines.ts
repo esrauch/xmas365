@@ -1831,7 +1831,7 @@ const CONTROLS =
 
 export const lovenotes = run({
   id: 'lovenotes',
-  title: 'Love Notes',
+  title: 'Heartstrings',
   room: "Valentine's",
   kind: 'intro',
   from: "Heartstrings · Valentine's, taught puzzle by puzzle",
@@ -1842,7 +1842,7 @@ export const lovenotes = run({
 
 export const mailbox = run({
   id: 'mailbox',
-  title: 'The Valentine Mailbox',
+  title: 'Love-Letter Heartstrings',
   room: "Valentine's",
   kind: 'home',
   from: "Love-Letter Heartstrings · Valentine's (Valentine's)",
@@ -1853,7 +1853,7 @@ export const mailbox = run({
 
 export const jack = run({
   id: 'jack',
-  title: "The Jack-o'-Lantern",
+  title: 'Spooky Heartstrings',
   room: "Valentine's",
   kind: 'relic',
   from: "Spooky Heartstrings · Valentine's (Halloween)",
@@ -1864,7 +1864,7 @@ export const jack = run({
 
 export const basket = run({
   id: 'basket',
-  title: "The Bunny's Basket",
+  title: 'Egg-Hunt Heartstrings',
   room: "Valentine's",
   kind: 'relic',
   from: "Egg-Hunt Heartstrings · Valentine's (Easter)",
@@ -1875,7 +1875,7 @@ export const basket = run({
 
 export const watermelon = run({
   id: 'watermelon',
-  title: 'The Watermelon Slice',
+  title: 'Patriotic Heartstrings',
   room: "Valentine's",
   kind: 'relic',
   from: "Patriotic Heartstrings · Valentine's (Fourth of July)",
@@ -1886,7 +1886,7 @@ export const watermelon = run({
 
 export const wishbone = run({
   id: 'wishbone',
-  title: 'The Wishbone',
+  title: 'Portioned Heartstrings',
   room: "Valentine's",
   kind: 'relic',
   from: "Portioned Heartstrings · Valentine's (Thanksgiving)",
@@ -1897,7 +1897,7 @@ export const wishbone = run({
 
 export const candycane = run({
   id: 'candycane',
-  title: 'The Candy Cane',
+  title: 'Snowflake Heartstrings',
   room: "Valentine's",
   kind: 'relic',
   from: "Snowflake Heartstrings · Valentine's (Christmas)",

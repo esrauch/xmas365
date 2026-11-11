@@ -5,7 +5,7 @@ import * as lights from '../../src/gen/lights';
 import * as pictures from '../../src/gen/pictures';
 import * as webs from '../../src/gen/webs';
 import * as words from '../../src/gen/words';
-import { ROOM_SPECS, STRAY_ITEMS, twistLabelFor } from '../../src/game/state';
+import { ROOM_SPECS, STRAY_ITEMS, getRunIdentity, twistLabelFor } from '../../src/game/state';
 import { HOLIDAY_TERMS, getGenreTwistKey } from '../../src/proto/puzzles/clauses/types';
 
 /** Each genre's checks, for a panel of unknown shape (every room run uses its genre's Panel). */
@@ -60,6 +60,14 @@ describe('Relics (revamp-centerpieces.md)', () => {
       expect(checks?.problems(first, 1), relic.id).toEqual([]);
     }
   }, 120_000);
+
+  it('every room run is titled by its twist and genre (no names of its own)', () => {
+    for (const room of ROOM_SPECS) {
+      const runs = [room.warmup, room.homeTwist.proto, ...room.strays.map((s) => s.proto)];
+      for (const proto of runs) expect(proto.title).toBe(getRunIdentity(proto.id)?.themedName);
+      expect(room.homeTwist.title).toBe(room.homeTwist.proto.title);
+    }
+  });
 
   it("every relic's and home twist's label comes from the genre's own twist rule", () => {
     for (const relic of Object.values(STRAY_ITEMS)) {

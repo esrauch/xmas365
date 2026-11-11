@@ -276,7 +276,7 @@ const CONTROLS =
 
 export const breadboard = run({
   id: 'breadboard',
-  title: 'The Bread Board',
+  title: 'Carving',
   room: 'Thanksgiving',
   kind: 'intro',
   from: 'Carving · Thanksgiving, taught puzzle by puzzle',
@@ -287,7 +287,7 @@ export const breadboard = run({
 
 export const feast = run({
   id: 'feast',
-  title: 'The Feast',
+  title: 'Portioned Carving',
   room: 'Thanksgiving',
   kind: 'home',
   from: 'Portioned Carving · Thanksgiving (Thanksgiving)',
@@ -298,7 +298,7 @@ export const feast = run({
 
 export const hotdog = run({
   id: 'hotdog',
-  title: 'The Hot Dog',
+  title: 'Patriotic Carving',
   room: 'Thanksgiving',
   kind: 'relic',
   from: 'Patriotic Carving · Thanksgiving (Fourth of July)',
@@ -309,7 +309,7 @@ export const hotdog = run({
 
 export const stocking = run({
   id: 'stocking',
-  title: 'The Stocking',
+  title: 'Snowflake Carving',
   room: 'Thanksgiving',
   kind: 'relic',
   from: 'Snowflake Carving · Thanksgiving (Christmas)',
@@ -320,7 +320,7 @@ export const stocking = run({
 
 export const locket = run({
   id: 'locket',
-  title: 'The Heart Locket',
+  title: 'Love-Letter Carving',
   room: 'Thanksgiving',
   kind: 'relic',
   from: "Love-Letter Carving · Thanksgiving (Valentine's)",
@@ -331,7 +331,7 @@ export const locket = run({
 
 export const jellybeans = run({
   id: 'jellybeans',
-  title: 'The Jelly Bean Jar',
+  title: 'Egg-Hunt Carving',
   room: 'Thanksgiving',
   kind: 'relic',
   from: 'Egg-Hunt Carving · Thanksgiving (Easter)',
@@ -342,7 +342,7 @@ export const jellybeans = run({
 
 export const candycorn = run({
   id: 'candycorn',
-  title: 'The Candy Corn',
+  title: 'Spooky Carving',
   room: 'Thanksgiving',
   kind: 'relic',
   from: 'Spooky Carving · Thanksgiving (Halloween)',

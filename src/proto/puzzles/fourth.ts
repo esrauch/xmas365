@@ -213,7 +213,7 @@ const CONTROLS =
 
 export const sparklers = run({
   id: 'sparklers',
-  title: 'Sparklers',
+  title: 'Fireworks',
   room: 'Fourth of July',
   kind: 'intro',
   from: 'Fireworks · Fourth of July, taught puzzle by puzzle',
@@ -224,7 +224,7 @@ export const sparklers = run({
 
 export const finale = run({
   id: 'finale',
-  title: 'The Grand Finale',
+  title: 'Patriotic Fireworks',
   room: 'Fourth of July',
   kind: 'home',
   from: 'Patriotic Fireworks · Fourth of July (Fourth of July)',
@@ -235,7 +235,7 @@ export const finale = run({
 
 export const bow = run({
   id: 'bow',
-  title: "Cupid's Bow",
+  title: 'Love-Letter Fireworks',
   room: 'Fourth of July',
   kind: 'relic',
   from: "Love-Letter Fireworks · Fourth of July (Valentine's)",
@@ -246,7 +246,7 @@ export const bow = run({
 
 export const broom = run({
   id: 'broom',
-  title: "The Witch's Broom",
+  title: 'Spooky Fireworks',
   room: 'Fourth of July',
   kind: 'relic',
   from: 'Spooky Fireworks · Fourth of July (Halloween)',
@@ -257,7 +257,7 @@ export const broom = run({
 
 export const chocobunny = run({
   id: 'chocobunny',
-  title: 'The Chocolate Bunny',
+  title: 'Egg-Hunt Fireworks',
   room: 'Fourth of July',
   kind: 'relic',
   from: 'Egg-Hunt Fireworks · Fourth of July (Easter)',
@@ -268,7 +268,7 @@ export const chocobunny = run({
 
 export const harvestcorn = run({
   id: 'harvestcorn',
-  title: 'The Harvest Corn',
+  title: 'Portioned Fireworks',
   room: 'Fourth of July',
   kind: 'relic',
   from: 'Portioned Fireworks · Fourth of July (Thanksgiving)',
@@ -279,7 +279,7 @@ export const harvestcorn = run({
 
 export const snowglobe = run({
   id: 'snowglobe',
-  title: 'The Snow Globe',
+  title: 'Snowflake Fireworks',
   room: 'Fourth of July',
   kind: 'relic',
   from: 'Snowflake Fireworks · Fourth of July (Christmas)',

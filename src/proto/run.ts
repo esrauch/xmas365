@@ -288,7 +288,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
       );
       topRow.append(leftControls, rightControls);
 
-      // Compact puzzle title + Dual Display subtitle + ultra-short micro-rule pill
+      // Compact puzzle title + holidays subtitle (the run's title is its themed name) + micro-rule pill
       const defaultPillText = getCompactRulePill({ ...proto, mount: () => {} });
       const runIdentity = getRunIdentity(proto.id);
       const title = h('div', {
@@ -305,7 +305,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
                 lineHeight: '1.25',
               },
             },
-            runIdentity.dualLabel,
+            runIdentity.holidayFormula,
           )
         : null;
       const titleGroup = h(

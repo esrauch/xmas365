@@ -210,7 +210,7 @@ const CONTROLS =
 
 export const cobwebs = run({
   id: 'cobwebs',
-  title: 'The Porch Cobwebs',
+  title: 'Web',
   room: 'Halloween',
   kind: 'intro',
   from: 'Web · Halloween, taught puzzle by puzzle',
@@ -221,7 +221,7 @@ export const cobwebs = run({
 
 export const web = run({
   id: 'web',
-  title: "The Spider's Web",
+  title: 'Spooky Web',
   room: 'Halloween',
   kind: 'home',
   from: 'Spooky Web · Halloween (Halloween)',
@@ -232,7 +232,7 @@ export const web = run({
 
 export const chocolates = run({
   id: 'chocolates',
-  title: 'The Box of Chocolates',
+  title: 'Love-Letter Web',
   room: 'Halloween',
   kind: 'relic',
   from: "Love-Letter Web · Halloween (Valentine's)",
@@ -243,7 +243,7 @@ export const chocolates = run({
 
 export const starlights = run({
   id: 'starlights',
-  title: 'The Tree-Top Star',
+  title: 'Snowflake Web',
   room: 'Halloween',
   kind: 'relic',
   from: 'Snowflake Web · Halloween (Christmas)',
@@ -254,7 +254,7 @@ export const starlights = run({
 
 export const chick = run({
   id: 'chick',
-  title: 'The Marshmallow Chick',
+  title: 'Egg-Hunt Web',
   room: 'Halloween',
   kind: 'relic',
   from: 'Egg-Hunt Web · Halloween (Easter)',
@@ -265,7 +265,7 @@ export const chick = run({
 
 export const picnic = run({
   id: 'picnic',
-  title: 'The Picnic Basket',
+  title: 'Patriotic Web',
   room: 'Halloween',
   kind: 'relic',
   from: 'Patriotic Web · Halloween (Fourth of July)',
@@ -276,7 +276,7 @@ export const picnic = run({
 
 export const gravyboat = run({
   id: 'gravyboat',
-  title: 'The Gravy Boat',
+  title: 'Portioned Web',
   room: 'Halloween',
   kind: 'relic',
   from: 'Portioned Web · Halloween (Thanksgiving)',

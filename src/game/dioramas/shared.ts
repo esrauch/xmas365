@@ -2308,13 +2308,12 @@ export function buildHolidayAlcoveBay(
       if (strayUnlocked) {
         const camPos = bayToWorld(theta, st.lx * 0.45, 1.75, 3.8);
         const camLook = bayToWorld(theta, st.lx, 0.64, st.lz);
-        const shortStrayTitle = st.stray.title.replace(/^The\s+/i, '');
         hotspotsOut.push({
           id: `proto:${st.stray.proto.id}`,
           bay: room.id,
           label: strayDone
-            ? `✓ ${st.stray.icon} ${shortStrayTitle}`
-            : `${st.stray.icon} ${shortStrayTitle}`,
+            ? `✓ ${st.stray.icon} ${st.stray.proto.title}`
+            : `${st.stray.icon} ${st.stray.proto.title}`,
           sublabel: strayDone
             ? `✓ Freed → ${st.homeRoomSpec?.shortTitle ?? ''}`
             : `→ ${st.homeRoomSpec?.shortTitle ?? ''}`,

@@ -469,7 +469,7 @@ const FOURTH_HOME_RELICS = ['picnic', 'hotdog', 'icepop', 'watermelon', 'flag'] 
 
 const HALLOWEEN_HOME_TWIST: HomeTwistSpec = {
   id: 'web',
-  title: "The Spider's Web",
+  title: 'Spooky Web',
   icon: '🕸️',
   twistLabel: 'Halloween Spooky: dark knots (?) may take any thread count',
   requiredItems: HALLOWEEN_HOME_RELICS,
@@ -478,7 +478,7 @@ const HALLOWEEN_HOME_TWIST: HomeTwistSpec = {
 
 const THANKSGIVING_HOME_TWIST: HomeTwistSpec = {
   id: 'feast',
-  title: 'The Feast',
+  title: 'Portioned Carving',
   icon: '🦃',
   twistLabel: 'Thanksgiving Portioned: no rectangle may cross a thick fence line',
   requiredItems: THANKSGIVING_HOME_RELICS,
@@ -487,7 +487,7 @@ const THANKSGIVING_HOME_TWIST: HomeTwistSpec = {
 
 const CHRISTMAS_HOME_TWIST: HomeTwistSpec = {
   id: 'tree',
-  title: 'The Christmas Tree',
+  title: 'Snowflake Lights',
   icon: '🎄',
   twistLabel: 'Christmas Snowflake: wires inside the frosty frame mirror across the axis',
   requiredItems: CHRISTMAS_HOME_RELICS,
@@ -496,7 +496,7 @@ const CHRISTMAS_HOME_TWIST: HomeTwistSpec = {
 
 const VALENTINES_HOME_TWIST: HomeTwistSpec = {
   id: 'mailbox',
-  title: 'The Valentine Mailbox',
+  title: 'Love-Letter Heartstrings',
   icon: '📮',
   twistLabel: "Valentine's Love-Letter: numbered squares share coded letters",
   requiredItems: VALENTINES_HOME_RELICS,
@@ -505,7 +505,7 @@ const VALENTINES_HOME_TWIST: HomeTwistSpec = {
 
 const EASTER_HOME_TWIST: HomeTwistSpec = {
   id: 'eggtree',
-  title: 'The Egg Tree',
+  title: 'Egg-Hunt Hops',
   icon: '🌳',
   twistLabel: 'Easter Egg-Hunt: hop underground between matching burrows to reach the Golden Egg',
   requiredItems: EASTER_HOME_RELICS,
@@ -514,7 +514,7 @@ const EASTER_HOME_TWIST: HomeTwistSpec = {
 
 const FOURTH_HOME_TWIST: HomeTwistSpec = {
   id: 'finale',
-  title: 'The Grand Finale',
+  title: 'Patriotic Fireworks',
   icon: '🎆',
   twistLabel: 'Fourth of July Patriotic: red and blue runs can touch without a gap',
   requiredItems: FOURTH_HOME_RELICS,

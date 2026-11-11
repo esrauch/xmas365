@@ -251,7 +251,7 @@ const CONTROLS =
 
 export const fairylights = run({
   id: 'fairylights',
-  title: 'The Fairy Lights',
+  title: 'Lights',
   room: 'Christmas',
   kind: 'intro',
   from: 'Lights · Christmas, taught puzzle by puzzle',
@@ -262,7 +262,7 @@ export const fairylights = run({
 
 export const tree = run({
   id: 'tree',
-  title: 'The Christmas Tree',
+  title: 'Snowflake Lights',
   room: 'Christmas',
   kind: 'home',
   from: 'Snowflake Lights · Christmas (Christmas)',
@@ -273,7 +273,7 @@ export const tree = run({
 
 export const goldenegg = run({
   id: 'goldenegg',
-  title: 'The Golden Egg',
+  title: 'Egg-Hunt Lights',
   room: 'Christmas',
   kind: 'relic',
   from: 'Egg-Hunt Lights · Christmas (Easter)',
@@ -284,7 +284,7 @@ export const goldenegg = run({
 
 export const pumpkinpie = run({
   id: 'pumpkinpie',
-  title: 'The Pumpkin Pie',
+  title: 'Portioned Lights',
   room: 'Christmas',
   kind: 'relic',
   from: 'Portioned Lights · Christmas (Thanksgiving)',
@@ -295,7 +295,7 @@ export const pumpkinpie = run({
 
 export const loveletter = run({
   id: 'loveletter',
-  title: 'The Love Letter',
+  title: 'Love-Letter Lights',
   room: 'Christmas',
   kind: 'relic',
   from: "Love-Letter Lights · Christmas (Valentine's)",
@@ -306,7 +306,7 @@ export const loveletter = run({
 
 export const icepop = run({
   id: 'icepop',
-  title: 'The Ice Pop',
+  title: 'Patriotic Lights',
   room: 'Christmas',
   kind: 'relic',
   from: 'Patriotic Lights · Christmas (Fourth of July)',
@@ -317,7 +317,7 @@ export const icepop = run({
 
 export const cauldron = run({
   id: 'cauldron',
-  title: 'The Cauldron',
+  title: 'Spooky Lights',
   room: 'Christmas',
   kind: 'relic',
   from: 'Spooky Lights · Christmas (Halloween)',
