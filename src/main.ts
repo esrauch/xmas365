@@ -274,14 +274,14 @@ function positionLeapBubbleElement(bubbleWrap: HTMLElement): void {
 
 function isContractOverlayBeat(beatId: BeatId | null): boolean {
   if (!beatId) return false;
-  return beatId === 'C0' || beatId === 'C6.early' || /^C[1-5]\.torn$/.test(beatId);
+  return beatId === 'C0';
 }
 
 function clearContractOverlayBeats(): void {
   for (let i = gameState.beatQueue.length - 1; i >= 0; i--) {
     const b = gameState.beatQueue[i];
     if (!b) continue;
-    if (b === 'C0' || b === 'C6.early' || /^C[1-5]\.torn$/.test(b)) {
+    if (b === 'C0') {
       gameState.beatQueue.splice(i, 1);
       gameState.markMilestone(b);
     }
@@ -292,7 +292,7 @@ function clearContractOverlayBeats(): void {
  * Render the front beat from `gameState.beatQueue` into `storyBannerHost`
  * (or directly over Leap Day in `leapBubbleHost` when Leap Day speaks in Holiday Hall).
  * Per `SCRIPT.md`, beats never sit in front of an open puzzle panel, except contract
- * reaction beats (`C0`, `C1.torn`..`C5.torn`) which appear over the Merger Contract checklist.
+ * opening beat (`C0`), which appears over the Merger Contract checklist.
  */
 function renderActiveStoryBeat(): void {
   clearCagedPromptTimer();

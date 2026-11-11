@@ -4,7 +4,6 @@
  */
 import {
   type BeatId,
-  CLAUSE_EARLY_TORN_BEATS,
   MEMOS,
   MEMO_ORDER,
   type MemoId,
@@ -688,7 +687,7 @@ export interface SaveData {
   solvedPuzzles: string[];
   /** Restored Relic IDs on their home shelves (`chocolates`, `starlights`, etc.). */
   restoredRelics: StrayId[];
-  /** Seen story beat IDs (`P0`, `P1`, `T1`, `C1.torn`, etc.). */
+  /** Seen story beat IDs (`P0`, `P1`, `T1`, `C6.torn`, etc.). */
   milestones: string[];
   /** Story beats queued for the next return to Holiday Hall (`E1`..`E6`). */
   hallPendingBeats: BeatId[];
@@ -1010,7 +1009,9 @@ export class GameState {
     if (Array.isArray(obj.hallPendingBeats)) {
       for (const b of obj.hallPendingBeats) {
         // Mascots no longer thank you when freed: drop any old pending `<room>.freed` beat.
-        if (typeof b === 'string' && !b.endsWith('.freed')) this.hallPendingBeats.add(b as BeatId);
+        // Freed mascots and voided clauses no longer have dialogue: drop any old pending beat.
+        if (typeof b === 'string' && !/\.freed$|^C[1-5]\.torn$|^C6\.early$/.test(b))
+          this.hallPendingBeats.add(b as BeatId);
       }
     }
     if (obj.freePlayCounts && typeof obj.freePlayCounts === 'object') {
@@ -1263,16 +1264,7 @@ export class GameState {
         this.milestones.delete(ROOM_SCRIPT[warmupRoom.id].enterMemoId);
       }
       if (protoId === 'clause') {
-        for (const b of [
-          ...CLAUSE_EARLY_TORN_BEATS,
-          'C6.torn',
-          'Y1',
-          'Y2',
-          'Y4',
-          'Y5',
-          'Y6',
-          'Y7',
-        ]) {
+        for (const b of ['C6.torn', 'Y1', 'Y2', 'Y4', 'Y5', 'Y6', 'Y7']) {
           this.milestones.delete(b);
         }
       }
@@ -1352,8 +1344,8 @@ export class GameState {
   }
 
   /**
-   * Mark a Merger Contract clause (`0..5`) as voided during gameplay, queuing its `C<n>.torn` beat,
-   * and completing `'clause'` once all 6 clauses are voided.
+   * Mark a Merger Contract clause (`0..5`) as voided during gameplay (no dialogue), and complete
+   * `'clause'` once all 6 clauses are voided (which queues `C6.torn`).
    */
   markClauseVoided(clauseIdx: number, forceTrigger = false): boolean {
     const wasVoided = !forceTrigger && this.isClauseVoided(clauseIdx);
@@ -1364,10 +1356,6 @@ export class GameState {
         this.markRunSolved('clause');
       } else {
         this.recomputeDerived();
-        const earlyBeat = CLAUSE_EARLY_TORN_BEATS[clauseIdx];
-        if (earlyBeat) {
-          this.enqueueBeat(earlyBeat);
-        }
         this.save();
         this.notify();
       }
@@ -1384,8 +1372,6 @@ export class GameState {
   setClauseVoided(clauseIdx: number, voided: boolean): void {
     this.fillClausePanels(clauseIdx, voided);
     if (!voided) {
-      const earlyBeat = CLAUSE_EARLY_TORN_BEATS[clauseIdx];
-      if (earlyBeat) this.milestones.delete(earlyBeat);
       for (const b of ['C6.torn', 'Y1', 'Y2', 'Y4', 'Y5', 'Y6', 'Y7']) {
         this.milestones.delete(b);
       }

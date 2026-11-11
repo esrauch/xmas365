@@ -320,12 +320,6 @@ export type DialogueBeatId =
   | 'halloween.bonus.offer'
   | 'halloween.bonus.reward'
   | 'C0'
-  | 'C1.torn'
-  | 'C2.torn'
-  | 'C3.torn'
-  | 'C4.torn'
-  | 'C5.torn'
-  | 'C6.early'
   | 'C6.torn'
   | 'Y1'
   | 'Y2'
@@ -578,96 +572,6 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
         speaker: 'santa',
         stage: 'shoving the golden clipboard forward',
         text: 'February twenty-*what*?! Audit away, frog—six ironclad clauses, zero loopholes!',
-      },
-    ],
-  },
-  'C1.torn': {
-    id: 'C1.torn',
-    kind: 'dialogue',
-    lines: [
-      {
-        speaker: 'leapday',
-        text: 'Clause 1: Halloween Vertical — red-lined and voided! Keep your tinsel off the cobwebs.',
-      },
-      {
-        speaker: 'santa',
-        stage: 'clutching his clipboard',
-        text: 'Hey! Do not initial my margins in red ink! That Halloween vertical was Q4 accretive!',
-      },
-    ],
-  },
-  'C2.torn': {
-    id: 'C2.torn',
-    kind: 'dialogue',
-    lines: [
-      {
-        speaker: 'leapday',
-        text: 'Clause 2: Thanksgiving Vertical — carved right out of the merger. Gratitude needs no gift receipt.',
-      },
-      {
-        speaker: 'santa',
-        stage: 'sputtering into his beard',
-        text: 'My November runway! Give me back that red pen this instant!',
-      },
-    ],
-  },
-  'C3.torn': {
-    id: 'C3.torn',
-    kind: 'dialogue',
-    lines: [
-      {
-        speaker: 'leapday',
-        text: 'Clause 3: Core Flagship — rewired! December 25th stays on December 25th.',
-      },
-      {
-        speaker: 'santa',
-        stage: 'tugging at his green tie',
-        text: 'You unplugged my 365-day rollout! Do you have any idea what sleigh overtime costs?!',
-      },
-    ],
-  },
-  'C4.torn': {
-    id: 'C4.torn',
-    kind: 'dialogue',
-    lines: [
-      {
-        speaker: 'leapday',
-        text: "Clause 4: Valentine's Vertical — un-merged from CRM. Love letters aren't drip campaigns.",
-      },
-      {
-        speaker: 'santa',
-        stage: 'checking his falling stock ticker',
-        text: 'Our Q1 engagement metrics! Shredded! Have you no respect for corporate synergy?!',
-      },
-    ],
-  },
-  'C5.torn': {
-    id: 'C5.torn',
-    kind: 'dialogue',
-    lines: [
-      {
-        speaker: 'leapday',
-        text: 'Clause 5: Easter Vertical — hopped right off the balance sheet. Bunnies report to no sleigh.',
-      },
-      {
-        speaker: 'santa',
-        stage: 'shielding the remaining pages',
-        text: 'That was our entire spring pre-order pipeline! Stop tearing the parchment!',
-      },
-    ],
-  },
-  'C6.early': {
-    id: 'C6.early',
-    kind: 'dialogue',
-    lines: [
-      {
-        speaker: 'leapday',
-        text: 'Clause 6: July 4th & Definitions — red-lined. Wait... "Fiscal Year is strictly defined as 365 days"? Hold that thought.',
-      },
-      {
-        speaker: 'santa',
-        stage: 'trying to cover Sec 6.2 with his thumb',
-        text: 'Stop reading Sec 6.2! Nobody is supposed to read the fine print!',
       },
     ],
   },
@@ -993,16 +897,6 @@ export const CAKE_RELAY_LINES: readonly {
       text: 'And the finishing touch, darling: spin festive bunting between every candle!',
     },
   },
-] as const;
-
-/** Dialogue beats queued when a Merger Contract clause (`0..5`) is voided before the final clause. */
-export const CLAUSE_EARLY_TORN_BEATS: readonly DialogueBeatId[] = [
-  'C1.torn',
-  'C2.torn',
-  'C3.torn',
-  'C4.torn',
-  'C5.torn',
-  'C6.early',
 ] as const;
 
 /** Interpolate `{holiday}` placeholders in memo fields. */

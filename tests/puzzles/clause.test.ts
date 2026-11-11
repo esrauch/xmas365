@@ -73,20 +73,17 @@ describe('XMAS365™ Merger Contract Finale gauntlet (6 clauses × 22 puzzles = 
     expect(state.clauseSolvedPanelCount('webs')).toBe(21);
     expect(state.isClauseVoided(0)).toBe(false);
 
-    // Solving the 22nd panel voids Clause 1 and queues C1.torn
+    // Solving the 22nd panel voids Clause 1, with no dialogue
+    const queued = state.beatQueue.length;
     state.markClausePanelSolved('webs', 21);
     expect(state.clauseSolvedPanelCount('webs')).toBe(22);
     expect(state.isClauseVoided(0)).toBe(true);
     expect(state.voidedClauseCount()).toBe(1);
-    expect(state.beatQueue).toContain('C1.torn');
+    expect(state.beatQueue.length).toBe(queued);
 
-    // Voiding Clause 6 early queues C6.early (not C6.torn), so dismissing it never skips C6.torn
+    // Voiding Clause 6 before the others queues nothing either (C6.torn waits for all six)
     state.markClauseVoided(5);
-    expect(state.beatQueue).toContain('C6.early');
     expect(state.beatQueue).not.toContain('C6.torn');
-    state.dismissBeat('C6.early');
-    expect(state.milestones.has('C6.early')).toBe(true);
-    expect(state.milestones.has('C6.torn')).toBe(false);
 
     // Voiding the remaining clauses completes the Merger Contract ('clause') and queues C6.torn
     for (let c = 1; c < 5; c++) {

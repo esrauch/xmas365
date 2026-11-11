@@ -45,8 +45,8 @@ beat is written; expect rewrites after Playtest 1.
 - **Santa stands in Holiday Hall during the Merger Contract.** Once all 30
   relics are returned and all six mascots are free (`E6`), CEO Santa takes the
   podium in Holiday Hall personally with the Master Merger Contract. You
-  confront him at `C0`, red-line each of the 6 clauses (`22` puzzles each)
-  across the podium (`C1.torn`–`C5.torn`, `C6.early`), and spring the Sec 6.2
+  confront him at `C0`, red-line each of the 6 clauses (`22` puzzles each) in
+  silence (the per-clause exchanges were dropped on 2026-11-11), and spring the Sec 6.2
   Leap Year loophole (`C6.torn`) right in front of him. Then he's a humbled
   guest at the party, where the mascots vote to let him keep his twelve days
   of Christmas: **XMAS365™ becomes Xmas12**.
@@ -387,7 +387,7 @@ Contract, I'm auditing every clause."
 Audit away, frog—six ironclad clauses, zero loopholes!"
 
 ### `C1`..`C6`: the clauses
-*Each clause is a 22-puzzle gauntlet (`6 Twist Reminders + 15 Double Twists + 1 All 6 Twists` = 132 puzzles across the 6 clauses) of its puzzle Base. Voiding a clause triggers its `C1.torn`..`C5.torn` (or `C6.early`) exchange with Santa right across the podium.*
+*Each clause is a 22-puzzle gauntlet (`6 Twist Reminders + 15 Double Twists + 1 All 6 Twists` = 132 puzzles across the 6 clauses) of its puzzle Base. Voiding a clause plays no dialogue; voiding the last one springs the loophole (`C6.torn`).*
 
 | ID | Panel | Clause |
 |---|---|---|
@@ -397,25 +397,6 @@ Audit away, frog—six ironclad clauses, zero loopholes!"
 | `C4` | Words | **Clause 4: Valentine's Vertical.** Feb 14th is merged into CRM. Romance is replaced with quarterly e-newsletters. |
 | `C5` | Hops | **Clause 5: Easter Vertical.** Spring is restructured into Q2 Pre-Order Season. All bunnies report to Sleigh Ops. |
 | `C6` | Pictures | **Clause 6: July 4th & Definitions.** July 4th is Christmas in July. *Sec 6.2: "Fiscal Year" is strictly defined as 365 days.* |
-
-- **`C1.torn`:**
-  - **Leap Day:** "Clause 1: Halloween Vertical — red-lined and voided! Keep your tinsel off the cobwebs."
-  - **Santa** *(clutching his clipboard)*: "Hey! Do not initial my margins in red ink! That Halloween vertical was Q4 accretive!"
-- **`C2.torn`:**
-  - **Leap Day:** "Clause 2: Thanksgiving Vertical — carved right out of the merger. Gratitude needs no gift receipt."
-  - **Santa** *(sputtering into his beard)*: "My November runway! Give me back that red pen this instant!"
-- **`C3.torn`:**
-  - **Leap Day:** "Clause 3: Core Flagship — rewired! December 25th stays on December 25th."
-  - **Santa** *(tugging at his green tie)*: "You unplugged my 365-day rollout! Do you have any idea what sleigh overtime costs?!"
-- **`C4.torn`:**
-  - **Leap Day:** "Clause 4: Valentine's Vertical — un-merged from CRM. Love letters aren't drip campaigns."
-  - **Santa** *(checking his falling stock ticker)*: "Our Q1 engagement metrics! Shredded! Have you no respect for corporate synergy?!"
-- **`C5.torn`:**
-  - **Leap Day:** "Clause 5: Easter Vertical — hopped right off the balance sheet. Bunnies report to no sleigh."
-  - **Santa** *(shielding the remaining pages)*: "That was our entire spring pre-order pipeline! Stop tearing the parchment!"
-- **`C6.early`** *(if Clause 6 is voided before all 6 clauses are complete)*:
-  - **Leap Day:** "Clause 6: July 4th & Definitions — red-lined. Wait... 'Fiscal Year is strictly defined as 365 days'? Hold that thought."
-  - **Santa** *(trying to cover Sec 6.2 with his thumb)*: "Stop reading Sec 6.2! Nobody is supposed to read the fine print!"
 
 ### `C6.torn`: the loophole
 *All six clauses voided right at Santa's podium in Holiday Hall.*
