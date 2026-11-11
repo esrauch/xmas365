@@ -47,6 +47,10 @@ import {
 } from './settings';
 import { buildMemoSheet, renderFormattedText, showMemoOverlay } from './ui/memo';
 import { applyPaletteVars } from './ui/paletteVars';
+import buildInfo from 'virtual:build-info';
+
+/** When this page loaded (shown with the build in Settings). */
+const PAGE_LOADED_AT = new Date().toISOString();
 
 if (import.meta.env.DEV) installErrorOverlay();
 
@@ -2916,7 +2920,23 @@ function openSettingsModal(): void {
       h('div', { style: { display: 'flex', flexDirection: 'column', gap: '9px' } }, ...roomCards),
     );
 
-    bodyHost.replaceChildren(controlsSection, saveCard, devSection);
+    // Which code this page is running (to rule out a stale tab).
+    const time = (iso: string): string =>
+      new Date(iso).toLocaleString([], {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    const versionLine = h(
+      'div',
+      {
+        style: { fontSize: '11.5px', color: '#7a6f5d', textAlign: 'center', padding: '4px 0 2px' },
+      },
+      `Version ${buildInfo.commit}${buildInfo.dirty ? ' + uncommitted changes' : ''} · built ${time(buildInfo.builtAt)} · page loaded ${time(PAGE_LOADED_AT)}`,
+    );
+
+    bodyHost.replaceChildren(controlsSection, saveCard, devSection, versionLine);
   };
 
   const card = h(
