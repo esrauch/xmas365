@@ -301,28 +301,22 @@ export const MEMOS: Record<MemoId, MemoSpec> = {
 export type DialogueBeatId =
   | 'P0'
   | 'thanksgiving.caged'
-  | 'thanksgiving.freed'
   | 'thanksgiving.bonus.offer'
   | 'thanksgiving.bonus.reward'
   | 'T3'
   | 'fourth.caged'
-  | 'fourth.freed'
   | 'fourth.bonus.offer'
   | 'fourth.bonus.reward'
   | 'christmas.caged'
-  | 'christmas.freed'
   | 'christmas.bonus.offer'
   | 'christmas.bonus.reward'
   | 'easter.caged'
-  | 'easter.freed'
   | 'easter.bonus.offer'
   | 'easter.bonus.reward'
   | 'valentines.caged'
-  | 'valentines.freed'
   | 'valentines.bonus.offer'
   | 'valentines.bonus.reward'
   | 'halloween.caged'
-  | 'halloween.freed'
   | 'halloween.bonus.offer'
   | 'halloween.bonus.reward'
   | 'C0'
@@ -381,16 +375,6 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
       },
     ],
   },
-  'thanksgiving.freed': {
-    id: 'thanksgiving.freed',
-    kind: 'dialogue',
-    lines: [
-      {
-        speaker: 'turkey',
-        text: 'Uncaged at last! Much obliged, Feb... 28th, is it? / And for the record, that platter is 100% *tofurkey*.',
-      },
-    ],
-  },
   'thanksgiving.bonus.offer': {
     id: 'thanksgiving.bonus.offer',
     kind: 'dialogue',
@@ -431,16 +415,6 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
       },
     ],
   },
-  'fourth.freed': {
-    id: 'fourth.freed',
-    kind: 'dialogue',
-    lines: [
-      {
-        speaker: 'eaglet',
-        text: 'FREEDOM RINGS! And chirps! Thanks, uh... March 1st! / Close enough for government work, right?',
-      },
-    ],
-  },
   'fourth.bonus.offer': {
     id: 'fourth.bonus.offer',
     kind: 'dialogue',
@@ -468,16 +442,6 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
       {
         speaker: 'snowman',
         text: 'One day a year was *cool*. Three hundred and sixty-five is a meltdown. / Could you get me out of here?',
-      },
-    ],
-  },
-  'christmas.freed': {
-    id: 'christmas.freed',
-    kind: 'dialogue',
-    lines: [
-      {
-        speaker: 'snowman',
-        text: 'Thank you... Tuesday, was it? / Even Christmas was sick of Christmas. The elves are clocking out.',
       },
     ],
   },
@@ -511,16 +475,6 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
       },
     ],
   },
-  'easter.freed': {
-    id: 'easter.freed',
-    kind: 'dialogue',
-    lines: [
-      {
-        speaker: 'bunny',
-        text: 'Thanksthanksthanks, Leap Year! Leap Week? Leapfrog! / Gotta dash, antlers off, bye!',
-      },
-    ],
-  },
   'easter.bonus.offer': {
     id: 'easter.bonus.offer',
     kind: 'dialogue',
@@ -551,16 +505,6 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
       },
     ],
   },
-  'valentines.freed': {
-    id: 'valentines.freed',
-    kind: 'dialogue',
-    lines: [
-      {
-        speaker: 'bear',
-        text: 'Oh, thank you, sweet... Groundhog Day? / Take a free, 100% non-scalable hug on me!',
-      },
-    ],
-  },
   'valentines.bonus.offer': {
     id: 'valentines.bonus.offer',
     kind: 'dialogue',
@@ -588,16 +532,6 @@ export const DIALOGUE_BEATS: Record<DialogueBeatId, DialogueBeatSpec> = {
       {
         speaker: 'spider',
         text: 'Quarantined for *web design*? The sheer lack of taste! / Do pull some strings and let me out, darling.',
-      },
-    ],
-  },
-  'halloween.freed': {
-    id: 'halloween.freed',
-    kind: 'dialogue',
-    lines: [
-      {
-        speaker: 'spider',
-        text: "*Fang-tastic* work, darling... February 30th? / Well, whatever date you are, you're a total catch.",
       },
     ],
   },
@@ -886,7 +820,6 @@ export interface RoomScriptSpec {
   restoredTitle: string;
   enterMemoId: MemoId;
   cagedBeatId: DialogueBeatId;
-  freedBeatId: DialogueBeatId;
   bonusOfferBeatId: DialogueBeatId;
   bonusRewardBeatId: DialogueBeatId;
   deskReclaimedSign: string;
@@ -900,7 +833,6 @@ export const ROOM_SCRIPT: Record<RoomScriptId, RoomScriptSpec> = {
     restoredTitle: 'Thanksgiving Table',
     enterMemoId: 'thanksgiving.enter',
     cagedBeatId: 'thanksgiving.caged',
-    freedBeatId: 'thanksgiving.freed',
     bonusOfferBeatId: 'thanksgiving.bonus.offer',
     bonusRewardBeatId: 'thanksgiving.bonus.reward',
     deskReclaimedSign: 'Thanksgiving: de-merged & back on the calendar!',
@@ -912,7 +844,6 @@ export const ROOM_SCRIPT: Record<RoomScriptId, RoomScriptSpec> = {
     restoredTitle: 'Fourth of July Yard',
     enterMemoId: 'fourth.enter',
     cagedBeatId: 'fourth.caged',
-    freedBeatId: 'fourth.freed',
     bonusOfferBeatId: 'fourth.bonus.offer',
     bonusRewardBeatId: 'fourth.bonus.reward',
     deskReclaimedSign: 'Fourth of July: de-merged & back on the calendar!',
@@ -924,7 +855,6 @@ export const ROOM_SCRIPT: Record<RoomScriptId, RoomScriptSpec> = {
     restoredTitle: 'Christmas Hearth',
     enterMemoId: 'christmas.enter',
     cagedBeatId: 'christmas.caged',
-    freedBeatId: 'christmas.freed',
     bonusOfferBeatId: 'christmas.bonus.offer',
     bonusRewardBeatId: 'christmas.bonus.reward',
     deskReclaimedSign: 'Christmas: de-merged & back on the calendar!',
@@ -936,7 +866,6 @@ export const ROOM_SCRIPT: Record<RoomScriptId, RoomScriptSpec> = {
     restoredTitle: 'Easter Garden',
     enterMemoId: 'easter.enter',
     cagedBeatId: 'easter.caged',
-    freedBeatId: 'easter.freed',
     bonusOfferBeatId: 'easter.bonus.offer',
     bonusRewardBeatId: 'easter.bonus.reward',
     deskReclaimedSign: 'Easter: de-merged & back on the calendar!',
@@ -948,7 +877,6 @@ export const ROOM_SCRIPT: Record<RoomScriptId, RoomScriptSpec> = {
     restoredTitle: "Valentine's Parlor",
     enterMemoId: 'valentines.enter',
     cagedBeatId: 'valentines.caged',
-    freedBeatId: 'valentines.freed',
     bonusOfferBeatId: 'valentines.bonus.offer',
     bonusRewardBeatId: 'valentines.bonus.reward',
     deskReclaimedSign: "Valentine's Day: de-merged & back on the calendar!",
@@ -960,7 +888,6 @@ export const ROOM_SCRIPT: Record<RoomScriptId, RoomScriptSpec> = {
     restoredTitle: 'Halloween Porch',
     enterMemoId: 'halloween.enter',
     cagedBeatId: 'halloween.caged',
-    freedBeatId: 'halloween.freed',
     bonusOfferBeatId: 'halloween.bonus.offer',
     bonusRewardBeatId: 'halloween.bonus.reward',
     deskReclaimedSign: 'Halloween: de-merged & back on the calendar!',

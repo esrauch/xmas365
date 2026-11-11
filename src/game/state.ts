@@ -1009,7 +1009,8 @@ export class GameState {
     }
     if (Array.isArray(obj.hallPendingBeats)) {
       for (const b of obj.hallPendingBeats) {
-        if (typeof b === 'string') this.hallPendingBeats.add(b as BeatId);
+        // Mascots no longer thank you when freed: drop any old pending `<room>.freed` beat.
+        if (typeof b === 'string' && !b.endsWith('.freed')) this.hallPendingBeats.add(b as BeatId);
       }
     }
     if (obj.freePlayCounts && typeof obj.freePlayCounts === 'object') {
@@ -1427,7 +1428,6 @@ export class GameState {
         if (this.completedRoomCount() === 1) {
           this.firstRevertedHoliday = homeRoom.shortTitle;
         }
-        this.enqueueBeat(ROOM_SCRIPT[homeRoom.id].freedBeatId);
       }
 
       this.save();
@@ -1455,9 +1455,6 @@ export class GameState {
       if (this.placedItems.size === 0) {
         this.milestones.delete('T3');
       }
-      if (homeRoom && !this.isRoomComplete(homeRoom)) {
-        this.milestones.delete(ROOM_SCRIPT[homeRoom.id].freedBeatId);
-      }
       const maxEsc = Math.floor(this.placedItems.size / 5);
       for (let k = maxEsc + 1; k <= ROOM_SPECS.length; k++) {
         const escId = `E${k}` as MemoId;
@@ -1484,7 +1481,6 @@ export class GameState {
       }
     }
     if (!placed) {
-      this.milestones.delete(ROOM_SCRIPT[room.id].freedBeatId);
       const maxEsc = Math.floor(this.placedItems.size / 5);
       for (let k = maxEsc + 1; k <= ROOM_SPECS.length; k++) {
         const escId = `E${k}` as MemoId;

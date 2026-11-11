@@ -100,8 +100,8 @@ Merger Contract.
   you at the podium in Holiday Hall ("Who on earth are *you*?!").
 - **The six mascots**, each locked in a 5-padlock cage above the 5 Relic
   Shelves at the top of its room, freed when all 5 of its Relics come home,
-  with a short thank-you before hopping off to the Freed Mascots' Corner in
-  Holiday Hall; all six celebrate at your party.
+  then hopping off (no dialogue) to the Freed Mascots' Corner in Holiday
+  Hall; all six celebrate at your party.
 
 | Holiday | Mascot (decided 2026-11-07) | What makes it read |
 |---|---|---|
@@ -135,8 +135,7 @@ shape.
   the first Relic, and every 5 Relics returned: `E1` at 5, `E2` at 10, `E3` at
   15, `E4` at 20, `E5` at 25, `E6` at 30) and they're pinned up in the hall to
   reread. Santa writes candidly to his staff, so you're overhearing the
-  villain's plan, not being lectured. Leap Day reacts in a line; a freed
-  mascot says thank-you. Puzzles themselves stay clean (rules only): the story
+  villain's plan, not being lectured. Puzzles themselves stay clean (rules only): the story
   never sits between the player and a puzzle.
 - **The memos escalate, never undo.** They change as relics are returned and
   cages un-padlocked: smug press releases, then confused reports of restocked
@@ -166,7 +165,7 @@ shape.
      dim outline of its missing Relic and a small badge for the Room where it
      is stranded, so you always know where to look. Each returned Relic goes
      onto its shelf and **opens one padlock** on the cage. The **fifth Relic**
-     opens the cage: the Mascot thanks you (`<room>.freed`), hops off to the
+     opens the cage: the Mascot hops off (no dialogue) to the
      **Freed Mascots' Corner** in Holiday Hall, the room bursts into full
      colour and music, and the room's lamp lights above its door in Holiday
      Hall.

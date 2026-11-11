@@ -1087,13 +1087,11 @@ function rebuildScene(): void {
         const room = ROOM_SPECS.find((r) => r.id === roomId);
         if (!room) return;
         blip(587, 55);
-        if (currentBay === 'hall' && gameState.isRoomComplete(room)) {
+        if (gameState.isRoomComplete(room)) {
           showHallMascotBark(roomId);
           return;
         }
-        const script = ROOM_SCRIPT[roomId];
-        const beatId = gameState.isRoomComplete(room) ? script.freedBeatId : script.cagedBeatId;
-        gameState.enqueueBeat(beatId, true);
+        gameState.enqueueBeat(ROOM_SCRIPT[roomId].cagedBeatId, true);
         renderActiveStoryBeat();
       },
       onPlaceItem: (itemId) => placeItemOnPedestal(itemId),
@@ -1113,10 +1111,6 @@ function rebuildScene(): void {
 function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
   if (isTransitioningBay && !opts?.instant) return;
   dismissActiveBarkBeat();
-  const activeBeat = gameState.currentBeat();
-  if (activeBeat && activeBeat.endsWith('.freed')) {
-    gameState.dismissBeat(activeBeat);
-  }
   closeModal();
 
   if (opts?.instant || bay === currentBay) {

@@ -134,8 +134,8 @@ By holiday, the five relics each mascot is waiting for:
   the **intro run**, as they do now after the warm-up.
 - **Escalation memos** come every 5 relics returned: E1 at 5, E2 at 10, … E6 at
   30 (all mascots free).
-- **A mascot's thank-you** (`<room>.freed`) plays when its fifth relic comes
-  home.
+- **No thank-you when a mascot is freed** (dropped 2026-11-11): the fifth
+  relic opens the cage and the mascot hops off to the hall in silence.
 - **Santa stands in the hall during the Contract.** The script is rewritten to
   match: he no longer "bursts in" at the loophole, and the "never imagines it's
   *someone*" thread goes.

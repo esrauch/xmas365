@@ -32,9 +32,11 @@ beat is written; expect rewrites after Playtest 1.
   reaction (`P2`) and the reaction to the first relic memo (`T2`) are dropped.
 - **Freeing a relic is silent** (after the first one triggers `T1`). Each
   room has one memo, found when you beat its intro run.
-- **The running gag:** every freed mascot thanks you when its fifth relic opens
-  its cage, then gets your name or date wrong, each one differently. At the
-  party they've all got it right.
+- **Freeing a mascot is silent too** (decided 2026-11-11): its cage opens and
+  it hops off to the Freed Mascots' Corner, with no dialogue. That dropped the
+  running gag's setup (each freed mascot got your name or date wrong), so the
+  party lines that pay it off ("Not the 28th!", "Not March 1st!", "not
+  Tuesday!") need rewriting.
 - **Christmas is a victim too.** Santa turns down complaints we never see
   (the elves' unionization drive, the reindeer's burnout), and the freed
   Snowman says it outright.
@@ -61,7 +63,7 @@ beat is written; expect rewrites after Playtest 1.
 |---|---|---|
 | **Memo** | XMAS365™ internal memo: To / From / Re / body, signed by Santa. Shown once, then pinned to the hall corkboard. | ≤ 65 words |
 | **Leap Day** | One dry line, usually a reaction to the memo just read. | ≤ 14 words |
-| **Mascot** | A caged plea, a thank-you, a Freed Mascots' Corner line, or a party line. A `/` starts a new line on screen. | ≤ 2 short lines |
+| **Mascot** | A caged plea, a Freed Mascots' Corner line, or a party line. A `/` starts a new line on screen. | ≤ 2 short lines |
 | **Santa** | Spoken, in person: at his podium during the Merger Contract and at the party. | ≤ 2 short lines |
 | **Sign** | Signage, a tag or a contract clause. | a few words |
 
@@ -158,9 +160,9 @@ more to free them."
 ## Act 2: the open house
 
 The six rooms, in the order the house usually opens. Each room has a memo
-(found when you beat its intro run) with its caged mascot's plea stuck to it, a
-thank-you when its fifth relic opens the cage and frees the mascot, and two
-bonus lines.
+(found when you beat its intro run) with its caged mascot's plea stuck to it,
+and two bonus lines. Freeing a mascot plays no dialogue: it just hops off to
+the Freed Mascots' Corner.
 
 ### Fourth of July
 
@@ -179,10 +181,6 @@ bonus lines.
 
 #### `fourth.caged`
 **The Eaglet:** "Give me liberty or give me a snack! / Mister? Ma'am? ...Frog?"
-
-#### `fourth.freed`
-**The Eaglet:** "FREEDOM RINGS! And chirps! Thanks, uh... March 1st! / Close
-enough for government work, right?"
 
 #### `fourth.bonus`
 - **Offer:** "Wanna launch the BIG-budget rockets? The really, really hard
@@ -209,10 +207,6 @@ enough for government work, right?"
 **The Snowman:** "One day a year was *cool*. Three hundred and sixty-five is a
 meltdown. / Could you get me out of here?"
 
-#### `christmas.freed`
-**The Snowman:** "Thank you... Tuesday, was it? / Even Christmas was sick of
-Christmas. The elves are clocking out."
-
 #### `christmas.bonus`
 - **Offer:** "A few strings of lights are still tangled, if you have the
   bandwidth."
@@ -221,10 +215,6 @@ Christmas. The elves are clocking out."
 ### Thanksgiving
 
 *Its entry beats are in Act 1.*
-
-#### `thanksgiving.freed`
-**The Turkey:** "Uncaged at last! Much obliged, Feb... 28th, is it? / And for
-the record, that platter is 100% *tofurkey*."
 
 #### `thanksgiving.bonus`
 - **Offer:** "Care to circle back for seconds? I've some high-*steaks*
@@ -251,10 +241,6 @@ the record, that platter is 100% *tofurkey*."
 **The Bunny:** "Hi-hello-quick-sync! They clipped *antlers* to my ears! / I'm
 *hopping* mad! Let's bounce!"
 
-#### `easter.freed`
-**The Bunny:** "Thanksthanksthanks, Leap Year! Leap Week? Leapfrog! / Gotta
-dash, antlers off, bye!"
-
 #### `easter.bonus`
 - **Offer:** "Ooh, want some stretch-goal hops? High-impact, super bouncy!"
 - **Reward:** "Nailed the landing! Party hat goes on the left ear. Or the
@@ -277,10 +263,6 @@ dash, antlers off, bye!"
 #### `valentines.caged`
 **The Teddy Bear:** "This hostile takeover is *un-bear-able*! / The mailbox is
 full of junk mail. Help me put the heart back in here?"
-
-#### `valentines.freed`
-**The Teddy Bear:** "Oh, thank you, sweet... Groundhog Day? / Take a free,
-100% non-scalable hug on me!"
 
 #### `valentines.bonus`
 - **Offer:** "I still have a few VIP love letters stuck in the mailroom. Lend
@@ -306,10 +288,6 @@ full of junk mail. Help me put the heart back in here?"
 #### `halloween.caged`
 **The Spider:** "Quarantined for *web design*? The sheer lack of taste! / Do
 pull some strings and let me out, darling."
-
-#### `halloween.freed`
-**The Spider:** "*Fang-tastic* work, darling... February 30th? / Well,
-whatever date you are, you're a total catch."
 
 #### `halloween.bonus`
 - **Offer:** "Care to test my high-complexity webs, darling? Very
