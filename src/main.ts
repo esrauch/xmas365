@@ -1348,31 +1348,72 @@ function showUnlockDialog(roomSpec: RoomSpec, kind: 'intro' | 'home'): void {
   (ui ?? document.body).append(overlay);
 }
 
-export function openVictoryCreditsModal(): void {
-  if (activeModal === 'proto') {
-    gameState.setActivePuzzle(null);
+const SHARE_URL = 'https://esrauch.github.io/xmas365/';
+
+export function buildProgressShareText(): string {
+  const act = gameState.act();
+  const lamps = gameState.completedRoomCount();
+  const placedRelics = gameState.placedItems.size;
+  const voidedClauses = gameState.voidedClauseCount();
+  const totalClubs = ALL_CLAUSES.length;
+  const totalSolved = gameState.totalSolvedPanelCount();
+  const totalPanels = gameState.totalGamePanelCount();
+
+  const roomStatusRow = ROOM_SPECS.map((r) => {
+    if (gameState.isRoomComplete(r)) return `${r.icon}✓`;
+    const started =
+      gameState.isRoomUnlocked(r) &&
+      (gameState.solvedRuns.has(r.warmup.id) || gameState.roomRestoredRelicCount(r) > 0);
+    return started ? `${r.icon}…` : `${r.icon}🔒`;
+  }).join(' ');
+
+  if (act === 4 || gameState.solvedRuns.has('clause')) {
+    return [
+      '🎩🎉 I saved the holidays from Santa in XMAS365™!',
+      '🎃🕸️ 🦃🥧 🎄💡 💌🧶 🐰🕳️ 🎆🎇',
+      `All 6 holidays restored & all ${totalClubs} Merger Contract clauses voided! (${totalSolved}/${totalPanels} puzzles)`,
+      SHARE_URL,
+    ].join('\n');
   }
-  activeModal = 'credits';
-  activeProtoId = null;
-  isCameraFocused = false;
-  hotspotLayer.style.display = 'none';
-  sideArrowsHost.style.display = 'none';
-  storyBannerHost.replaceChildren();
-  leapBubbleHost.replaceChildren();
-  hideMemoOverlay();
 
-  blip(523, 80);
-  window.setTimeout(() => blip(659, 80), 85);
-  window.setTimeout(() => blip(784, 90), 170);
-  window.setTimeout(() => blip(1047, 180), 260);
+  if (lamps >= 6 || voidedClauses > 0) {
+    return [
+      "🎩📜 I'm voiding Santa's Merger Contract in XMAS365™!",
+      roomStatusRow,
+      `${lamps}/6 holidays restored · ${voidedClauses}/${totalClubs} contract clauses voided (${totalSolved}/${totalPanels} puzzles)`,
+      SHARE_URL,
+    ].join('\n');
+  }
 
-  const shareUrl = 'https://esrauch.github.io/xmas365/';
-  const shareText = [
-    '🎩🎉 I saved the holidays from Santa in XMAS365™!',
-    '🎃🕸️ 🦃🥧 🎄💡 💌🧶 🐰🕳️ 🎆🎇',
-    'All 6 holidays restored & all 6 Merger Contract clauses voided!',
-    shareUrl,
+  if (lamps > 0 || placedRelics > 0) {
+    return [
+      "🎩🔑 I'm rescuing the holidays from Santa in XMAS365™!",
+      roomStatusRow,
+      `${lamps}/6 holidays restored · ${placedRelics}/30 relics returned · ${totalSolved} ${totalSolved === 1 ? 'puzzle' : 'puzzles'} solved`,
+      SHARE_URL,
+    ].join('\n');
+  }
+
+  if (totalSolved > 0) {
+    return [
+      "🎩🦃 I'm taking on Santa's holiday takeover in XMAS365™!",
+      roomStatusRow,
+      `${totalSolved} ${totalSolved === 1 ? 'puzzle' : 'puzzles'} solved in Holiday Hall`,
+      SHARE_URL,
+    ].join('\n');
+  }
+
+  return [
+    '🎩🎄 Can you save the holidays from Santa in XMAS365™?',
+    '🎃 🦃 🎄 💌 🐰 🎆',
+    'A holiday puzzle adventure by Em Rauch',
+    SHARE_URL,
   ].join('\n');
+}
+
+function buildShareCard(opts?: { marginBottom?: string; compact?: boolean }): HTMLElement {
+  const shareText = buildProgressShareText();
+  const isBeaten = gameState.act() === 4 || gameState.solvedRuns.has('clause');
 
   const shareTextarea = h('textarea', {
     readonly: 'readonly',
@@ -1382,10 +1423,10 @@ export function openVictoryCreditsModal(): void {
       width: '100%',
       boxSizing: 'border-box',
       fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
-      fontSize: '13px',
+      fontSize: opts?.compact ? '12.5px' : '13px',
       fontWeight: '700',
       lineHeight: '1.45',
-      padding: '10px 12px',
+      padding: '9px 11px',
       borderRadius: '10px',
       border: '2px solid #cbd5e0',
       background: '#fffdf9',
@@ -1463,6 +1504,120 @@ export function openVictoryCreditsModal(): void {
     }
   };
 
+  return h(
+    'div',
+    {
+      style: {
+        padding: '12px 14px',
+        borderRadius: '12px',
+        background: '#fffdf9',
+        border: opts?.compact ? '2px solid #d8cfc0' : '2px solid #1f2430',
+        boxShadow: opts?.compact ? 'none' : '0 3px 0 rgba(31, 36, 48, 0.16)',
+        marginBottom: opts?.marginBottom ?? '0',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+      },
+    },
+    h(
+      'div',
+      {
+        style: {
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '8px',
+          flexWrap: 'wrap',
+        },
+      },
+      h(
+        'span',
+        {
+          style: {
+            fontSize: '11px',
+            fontWeight: '900',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            color: opts?.compact ? '#4a5568' : '#1f2430',
+          },
+        },
+        isBeaten ? '📣 Share Your Victory' : '📣 Share Your Progress',
+      ),
+      shareStatus,
+    ),
+    shareTextarea,
+    h(
+      'div',
+      {
+        style: {
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          flexWrap: 'wrap',
+        },
+      },
+      h(
+        'button',
+        {
+          style: {
+            flex: '1 1 130px',
+            padding: '8px 14px',
+            borderRadius: '10px',
+            fontWeight: '900',
+            fontSize: '13px',
+            cursor: 'pointer',
+            background: '#2b6cb0',
+            color: '#fff',
+            border: '2px solid #1f2430',
+            boxShadow: '0 2px 0 #1f2430',
+          },
+          onclick: handleShareClick,
+        },
+        '📤 Share',
+      ),
+      h(
+        'button',
+        {
+          style: {
+            flex: '1 1 130px',
+            padding: '8px 14px',
+            borderRadius: '10px',
+            fontWeight: '900',
+            fontSize: '13px',
+            cursor: 'pointer',
+            background: '#fffaf0',
+            color: '#1f2430',
+            border: '2px solid #1f2430',
+            boxShadow: '0 2px 0 #1f2430',
+          },
+          onclick: () => copyShareText('✓ Copied to clipboard!'),
+        },
+        '📋 Copy Text',
+      ),
+    ),
+  );
+}
+
+export function openVictoryCreditsModal(): void {
+  if (activeModal === 'proto') {
+    gameState.setActivePuzzle(null);
+  }
+  activeModal = 'credits';
+  activeProtoId = null;
+  isCameraFocused = false;
+  hotspotLayer.style.display = 'none';
+  sideArrowsHost.style.display = 'none';
+  storyBannerHost.replaceChildren();
+  leapBubbleHost.replaceChildren();
+  hideMemoOverlay();
+
+  blip(523, 80);
+  window.setTimeout(() => blip(659, 80), 85);
+  window.setTimeout(() => blip(784, 90), 170);
+  window.setTimeout(() => blip(1047, 180), 260);
+
+  const isBeaten = gameState.act() === 4 || gameState.solvedRuns.has('clause');
+
   const creditsRows: readonly { role: string; value: string }[] = [
     { role: 'Game by', value: 'Em Rauch' },
     {
@@ -1528,12 +1683,12 @@ export function openVictoryCreditsModal(): void {
                 color: '#975a16',
               },
             },
-            'XMAS365™ · VICTORY & CREDITS',
+            isBeaten ? 'XMAS365™ · VICTORY & CREDITS' : 'XMAS365™ · CREDITS & SHARE',
           ),
           h(
             'h2',
             { style: { margin: '0', fontSize: '18px', lineHeight: '1.15' } },
-            'Day 366: Leap Day',
+            isBeaten ? 'Day 366: Leap Day' : 'Holiday Hall Credits',
           ),
         ),
       ),
@@ -1597,7 +1752,7 @@ export function openVictoryCreditsModal(): void {
               color: '#975a16',
             },
           },
-          '★ Holiday Hall Restored ★',
+          isBeaten ? '★ Holiday Hall Restored ★' : '★ A Holiday Puzzle Adventure ★',
         ),
         h(
           'div',
@@ -1621,7 +1776,9 @@ export function openVictoryCreditsModal(): void {
               color: '#744210',
             },
           },
-          'Holiday Hall is back on the twelve-month calendar — all six holidays restored, all mascots uncaged, and every clause of Santa’s Merger Contract voided.',
+          isBeaten
+            ? 'Holiday Hall is back on the twelve-month calendar — all six holidays restored, all mascots uncaged, and every clause of Santa’s Merger Contract voided.'
+            : 'Help Leap Day reclaim Holiday Hall from CEO Santa’s XMAS365™ corporate takeover — restore all six holidays, uncage their mascots, and void the Merger Contract.',
         ),
         h(
           'div',
@@ -1651,97 +1808,7 @@ export function openVictoryCreditsModal(): void {
       ),
 
       // 2. Share Screen Card (Inline text to copy + Share & Copy buttons)
-      h(
-        'div',
-        {
-          style: {
-            padding: '13px 14px',
-            borderRadius: '14px',
-            background: '#fffdf9',
-            border: '2px solid #1f2430',
-            boxShadow: '0 3px 0 rgba(31, 36, 48, 0.16)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '9px',
-          },
-        },
-        h(
-          'div',
-          {
-            style: {
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '8px',
-              flexWrap: 'wrap',
-            },
-          },
-          h(
-            'span',
-            {
-              style: {
-                fontSize: '12px',
-                fontWeight: '900',
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-                color: '#1f2430',
-              },
-            },
-            '📣 Share Your Victory',
-          ),
-          shareStatus,
-        ),
-        shareTextarea,
-        h(
-          'div',
-          {
-            style: {
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              flexWrap: 'wrap',
-            },
-          },
-          h(
-            'button',
-            {
-              style: {
-                flex: '1 1 130px',
-                padding: '9px 14px',
-                borderRadius: '10px',
-                fontWeight: '900',
-                fontSize: '13px',
-                cursor: 'pointer',
-                background: '#2b6cb0',
-                color: '#fff',
-                border: '2px solid #1f2430',
-                boxShadow: '0 2px 0 #1f2430',
-              },
-              onclick: handleShareClick,
-            },
-            '📤 Share',
-          ),
-          h(
-            'button',
-            {
-              style: {
-                flex: '1 1 130px',
-                padding: '9px 14px',
-                borderRadius: '10px',
-                fontWeight: '900',
-                fontSize: '13px',
-                cursor: 'pointer',
-                background: '#fffaf0',
-                color: '#1f2430',
-                border: '2px solid #1f2430',
-                boxShadow: '0 2px 0 #1f2430',
-              },
-              onclick: () => copyShareText('✓ Copied to clipboard!'),
-            },
-            '📋 Copy Text',
-          ),
-        ),
-      ),
+      buildShareCard(),
 
       h(
         'div',
@@ -3169,7 +3236,9 @@ function openSettingsModal(): void {
       h('div', { style: { display: 'flex', flexDirection: 'column', gap: '9px' } }, ...roomCards),
     );
 
-    bodyHost.replaceChildren(preferencesAndArchiveCard, saveCard, devSection);
+    const shareCard = buildShareCard({ marginBottom: '12px', compact: true });
+
+    bodyHost.replaceChildren(preferencesAndArchiveCard, shareCard, saveCard, devSection);
   };
 
   const card = h(
