@@ -28,10 +28,10 @@ Prototypes are deliberately unthemed: they test whether each puzzle is fun.
 
 | Room | Puzzle (`?p=`) | Kind | Status |
 |---|---|---|---|
-| Valentine's | Love Notes (`lovenotes`) | warm-up | **New direction, built:** 5 Strands panels (LOVE on a 2×2, up to a 6×6 with a spangram). Needs playing. |
+| Valentine's | Love Notes (`lovenotes`) | warm-up | **New direction, built:** 5 Strands panels (LOVE on a 2×2, up to a 6×6). Needs playing. |
 | Valentine's | Jack-o'-Lantern (`jack`) | stray | **Built:** 3 Strands panels with letters in the dark (Halloween). Needs playing. |
 | Valentine's | Bunny's Basket (`basket`) | stray | **Built:** 3 Strands panels with numbered eggs (a letter's place in its word; Easter). Needs playing. |
-| Valentine's | Valentine Mailbox (`mailbox`) | centrepiece | **Built:** 5 Strands panels with letters written as numbers (a codeword key fills in), 1 to 6 coded letters, ending on "Dear Valentine" (spangram BE MY VALENTINE). Needs playing. |
+| Valentine's | Valentine Mailbox (`mailbox`) | centrepiece | **Built:** 5 Strands panels with letters written as numbers (a codeword key fills in), 1 to 6 coded letters, ending on "Dear Valentine". Needs playing. |
 | Easter | The Hutch (`hutch`) | warm-up | **New direction, built (switched to Numbrix):** 5 panels (one step, a little run, every spot, numbered eggs, a first real hunt). Knight hops were too hard. Needs playing. |
 | Easter | Star-Spangled Flag (`flag`) | stray | **Built:** 3 panels with parade flags (a flag gives the number of the bunny's first visit to its row or column). Needs playing. |
 | Easter | Cornucopia (`cornucopia`) | stray | **Built:** 3 panels of courses (any connected shapes; finish each before the next). Needs playing. |

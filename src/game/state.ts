@@ -1779,9 +1779,7 @@ const COMPACT_RULE_PILLS: Record<string, string> = {
 export function getCompactRulePill(proto: Proto): string {
   const short = COMPACT_RULE_PILLS[proto.id];
   if (short) return short;
-  const m = proto.rules.match(
-    /\((Twist:[^)]+|Rules:[^)]+|Color:[^)]+|Burrows:[^)]+|A spangram[^)]+)\)/,
-  );
+  const m = proto.rules.match(/\((Twist:[^)]+|Rules:[^)]+|Color:[^)]+|Burrows:[^)]+)\)/);
   if (m?.[1]) return m[1];
   return proto.from;
 }

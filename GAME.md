@@ -539,8 +539,8 @@ belongs to exactly one themed word. **The rules:**
 - Drag through touching letters (diagonals too) to spell a theme word; let go
   to check it.
 - Every letter is in exactly one theme word, so the words fill the grid.
-- Bigger boards have a **spangram**: a theme word that runs from one side of
-  the board to the other (it names the theme).
+- Every word's first letter is ringed until the word is found, so you always
+  know where words start.
 
 Logic as well as vocabulary: the words fill the grid exactly, so leftover
 letters, corners and awkward clusters narrow down what's left. Each theme
@@ -548,8 +548,8 @@ word can be spelled only one way in its grid (checked when the panels are
 made), so a word you find is always the right one.
 
 **On a phone:** drag through letters; the word builds above the board as you
-go, and sliding back undoes a letter. A theme word locks in (blue, the
-spangram gold) with a chime; anything else shakes. The theme and how many
+go, and sliding back undoes a letter. A theme word locks in (blue) with a
+chime; anything else shakes. The theme and how many
 words are left are shown above the board. (Strands' hints for non-theme words
 can come in the UX pass.)
 
@@ -558,17 +558,17 @@ can come in the UX pass.)
 1. **One word:** a 2×2 that spells LOVE.
 2. **Two words:** a 3×3 of two words.
 3. **Three words:** a 4×4.
-4. **Side to side:** a 5×5 with its first spangram.
+4. **Long and winding:** a 5×5 with a long word winding across it.
 5. **A full note:** a 6×6.
 
 ### The Jack-o'-Lantern (stray from Halloween: the dark, 3 panels)
 
-Halloween's dark comes with it. **Twist: some letters are in the dark**,
+Halloween's dark comes with it. **Twist: some vowels are in the dark**,
 shown as blanks; they could be anything, and light up when a word through
 them is found. Themes mix the two holidays. **Puns go in the labels only; the words in
 the grid are always real words or phrases** (made-up pun words annoy the
 player): "Boo & you" (BOO, PUMPKIN, TREAT), "Bewitched" (BEWITCHED,
-CHARMED, POTION, HEX), "Ghoulfriend" (UNDYING LOVE, GHOSTED, BITTEN, SOULMATE). At most one dark letter per word, never its first or last
+CHARMED, POTION, HEX), "Ghoulfriend" (UNDYING LOVE, GHOSTED, BITTEN, SOULMATE). At most one dark letter per word, only a vowel, never its first or last
 letter; and reading each dark square as any letter (as the player must),
 every word still has only one path, so a word you've worked out can never be
 traced through the wrong dark square.
@@ -576,15 +576,14 @@ traced through the wrong dark square.
 ### The Bunny's Basket (stray from Easter: numbered eggs, 3 panels)
 
 Easter's numbered eggs come with it. **Twist: some letters carry an egg with
-their place in their word** (an egg marked 1 starts a word). Like the Jack,
+their place in their word** (always 3 or more: the ringed first letter is 1). Like the Jack,
 the words in the grid are real words that suit both Easter and Valentine's
 (puns only in the labels):
 
 1. **Some bunny** (3×5): SWEETS, DOVE, TULIP.
-2. **Spring fling** (5×5): LOVEBIRDS (spangram), BLOSSOM, RIBBON, BOW.
-3. **Sweet tooth** (5×6): JELLYBEANS (spangram), CHOCOLATE, TREATS, CANDY,
-   with an egg on every word's first letter (the earlier 6×6 Egg hunt was
-   too hard).
+2. **Spring fling** (5×5): LOVEBIRDS, BLOSSOM, RIBBON, BOW.
+3. **Sweet tooth** (5×6): JELLYBEANS, CHOCOLATE, TREATS, CANDY (the
+   earlier 6×6 Egg hunt was too hard).
 
 ### Centrepiece: the Valentine Mailbox (5 panels; unlocked by Cupid's Bow and the Box of Chocolates)
 
@@ -593,8 +592,7 @@ as panels. **Twist: some letters are written as numbers; the same number is
 always the same letter.** Finding a word through a number reveals that
 letter everywhere it appears, like a codeword, and a key fills in above the
 board. The run ramps from one coded letter to the last panel, a love letter
-mostly in code ("Sealed with a kiss"), and its spangram is the letter's
-message.
+mostly in code ("Sealed with a kiss").
 
 ## Halloween: the web run (designed 2026-11-02)
 

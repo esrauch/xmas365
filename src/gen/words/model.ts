@@ -1,9 +1,8 @@
 /**
  * Words (Valentine's): Strands (the New York Times' Strands), a grid of letters that is
  * entirely themed words. Drag through touching letters (diagonals too) to
- * spell one; every letter is in exactly one theme word, and bigger boards
- * have a spangram, a theme word that runs from one side to the other. Every
- * word's first letter is highlighted until it's found.
+ * spell one; every letter is in exactly one theme word, and every word's
+ * first letter is highlighted until it's found.
  *
  * The twists, each optional on a panel:
  * - red, white and blue (Fourth of July): words are coloured, only the bowed
@@ -43,10 +42,8 @@ export interface Panel {
   theme: string;
   /** The letters, row by row. */
   rows: string[];
-  /** The theme words and where they lie (the spangram first, if any). */
+  /** The theme words and where they lie. */
   words: Word[];
-  /** The first word is a spangram (runs from one side of the board to the other). */
-  spangram?: boolean;
   /** Squares whose letter is in the dark. */
   dark?: Spot[];
   /** Squares with a numbered egg (their place in their word). */
@@ -192,7 +189,6 @@ export function layOut(
   h: number,
   w: number,
   seed: number,
-  spangram = false,
   keep: Word[] = [],
   /** Search steps before giving up (default: more for bigger boards). */
   searchSteps?: number,
@@ -294,25 +290,7 @@ export function layOut(
   };
   for (const k of keep) lay(k.word, k.cells);
   const fresh = placed.length;
-  let ok: boolean;
-  if (spangram) {
-    // The spangram first: from the left side to the right (or top to bottom).
-    const word = words[0] as string;
-    const across = random() < 0.5 || w > h;
-    const starts: Spot[] = Array.from({ length: across ? h : w }, (_, i) =>
-      across ? [i, 0] : [0, i],
-    );
-    ok = shuffle(random, starts).some((start) =>
-      grow(word, [start], (path) => {
-        const last = path[path.length - 1] as Spot;
-        if (across ? last[1] !== w - 1 : last[0] !== h - 1) return false;
-        lay(word, [...path]);
-        if (fill(words.slice(1))) return true;
-        unlay([...path]);
-        return false;
-      }),
-    );
-  } else ok = fill(words);
+  const ok = fill(words);
   if (!ok) return null;
   const panel: Panel = {
     name: 'generated',
@@ -323,7 +301,6 @@ export function layOut(
   // Keep the words in the order given.
   const laid = placed.slice(fresh);
   panel.words = [...keep, ...words.map((x) => laid.find((p) => p.word === x) as Word)];
-  if (spangram) panel.spangram = true;
   return panel;
 }
 

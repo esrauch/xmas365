@@ -96,20 +96,6 @@ describe("Valentine's love-letter room (7 runs, 25 panels)", () => {
       });
   });
 
-  it('spangrams run from one side to the other', () => {
-    for (const p of all.filter((x) => x.spangram)) {
-      const cells = p.words[0]?.cells ?? [];
-      const rows = cells.map(([r]) => r);
-      const cols = cells.map(([, c]) => c);
-      const H = p.rows.length - 1;
-      const W = (p.rows[0]?.length ?? 1) - 1;
-      expect(
-        (cols.includes(0) && cols.includes(W)) || (rows.includes(0) && rows.includes(H)),
-        p.name,
-      ).toBe(true);
-    }
-  });
-
   it('dark squares, eggs, bows and codes are on the board', () => {
     for (const p of all) {
       for (const s of [...(p.dark ?? []), ...(p.eggs ?? []), ...(p.bows ?? [])])

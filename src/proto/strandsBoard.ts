@@ -1,9 +1,9 @@
 /**
  * The clicky Strands panel: drag through touching letters (diagonals too)
  * to spell a word; slide back to undo the last letter; let go to check it.
- * Each word's first letter is ringed (the spangram's in gold) until the word
+ * Each word's first letter is ringed until the word
  * is found, then the ring fades.
- * A theme word locks in (blue; the spangram gold) and chimes; anything else
+ * A theme word locks in (blue) and chimes; anything else
  * shakes. The word builds above the board as you drag. Dark letters show as
  * blanks, coded letters as their number, until a word through them is found
  * (a coded letter is then revealed everywhere, and in the key).
@@ -202,20 +202,16 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
     const HEART_TONES = ['#e91e63', '#ff5252', '#ffd54f', '#ff80ab'];
 
     panel.words.forEach((w, wIdx) => {
-      const isSpan = Boolean(panel.spangram && wIdx === 0);
       w.cells.forEach(([r, c], cIdx) => {
-        if (!isSpan && cIdx % 2 !== 0 && cIdx !== w.cells.length - 1) return;
+        if (cIdx % 2 !== 0 && cIdx !== w.cells.length - 1) return;
         const cx = c * cell + cell / 2;
         const cy = r * cell + cell / 2;
         const delay = wIdx * 55 + cIdx * 35;
         const el = document.createElementNS(NS, 'text');
-        el.textContent = isSpan && cIdx % 2 === 1 ? '✦' : '♥';
+        el.textContent = '♥';
         el.setAttribute('text-anchor', 'middle');
-        el.setAttribute('font-size', String(cell * (isSpan ? 0.34 : 0.28)));
-        el.setAttribute(
-          'fill',
-          isSpan ? '#f59f00' : (HEART_TONES[(wIdx + cIdx) % HEART_TONES.length] ?? '#e91e63'),
-        );
+        el.setAttribute('font-size', String(cell * 0.28));
+        el.setAttribute('fill', HEART_TONES[(wIdx + cIdx) % HEART_TONES.length] ?? '#e91e63');
         el.setAttribute('opacity', '0');
         layer.append(el);
         floats.push({
@@ -339,7 +335,8 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
         });
       }
     };
-    const colourOf = (i: number): string => (panel.spangram && i === 0 ? '#f5c542' : '#8ec5ff');
+    /** A found word's colour. */
+    const FOUND = '#8ec5ff';
     // Fair shares: thick edges between portions.
     if (panel.portions)
       for (let r = 0; r < H; r++)
@@ -434,7 +431,7 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
         'stroke-linecap': 'round',
       });
     }
-    for (const i of found) strand(panel.words[i]?.cells ?? [], colourOf(i));
+    for (const i of found) strand(panel.words[i]?.cells ?? [], FOUND);
     if (hintedWord !== null && !found.has(hintedWord)) {
       for (const [r, c] of panel.words[hintedWord]?.cells ?? []) {
         add('rect', {
@@ -477,7 +474,7 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
             cy: y,
             r: cell * 0.44,
             fill: 'none',
-            stroke: panel.spangram && startOf === 0 ? '#d4a017' : '#e0457b',
+            stroke: '#e0457b',
             'stroke-width': 3,
           });
           if (found.has(startOf))
@@ -489,7 +486,7 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
           r: cell * 0.36,
           fill:
             f !== undefined
-              ? colourOf(f)
+              ? FOUND
               : inPath.has(key(s))
                 ? '#c9b6e8'
                 : isDark
@@ -497,13 +494,7 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
                   : coded
                     ? '#fde7ef'
                     : tint(s),
-          stroke: coded
-            ? '#c2185b'
-            : isAllSolved && f === 0 && panel.spangram
-              ? '#b28704'
-              : panel.colours
-                ? ring(s)
-                : 'none',
+          stroke: coded ? '#c2185b' : panel.colours ? ring(s) : 'none',
           'stroke-width': 2,
         });
         const textEl = add(
@@ -569,9 +560,7 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
         .join(' · ')}`;
     // Once solved, the run's own message stands.
     if (found.size < panel.words.length)
-      hooks.status(
-        `${found.size} of ${panel.words.length} theme words${panel.spangram && !found.has(0) ? ' (one is a spangram, side to side, from the gold ring)' : ''}`,
-      );
+      hooks.status(`${found.size} of ${panel.words.length} theme words`);
     lastFoundWord = null;
   };
 
@@ -597,13 +586,9 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
       return;
     }
 
-    // 1st click: pick an unfound word (preferring non-spangram theme words first) and outline its squares
-    const order = panel.words.map((_, i) => i);
-    if (panel.spangram && order.length > 1) {
-      order.push(order.shift() as number);
-    }
-    const nextWord = order.find((i) => !found.has(i));
-    if (nextWord !== undefined) {
+    // 1st click: pick the first unfound word and outline its squares
+    const nextWord = panel.words.findIndex((_, i) => !found.has(i));
+    if (nextWord >= 0) {
       hintedWord = nextWord;
       blip(620, 70, 10);
       persist?.onChange({ found: [...found], hintedWord });

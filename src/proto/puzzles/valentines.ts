@@ -106,9 +106,9 @@ export const LOVENOTES: StoryPanel[] = [
     ],
   },
   {
-    name: 'Side to side',
+    name: 'Long and winding',
     theme: 'Be mine',
-    tip: '💌 A spangram runs all the way from one side of the board to the opposite side; its first letter has a gold ring',
+    tip: '💌 Long words wind right across the board: let the theme suggest them, then trace from the ring',
     rows: ['VACSS', 'LENAI', 'RTIRK', 'OESND', 'SHUGE'],
     words: [
       {
@@ -162,7 +162,6 @@ export const LOVENOTES: StoryPanel[] = [
         ],
       },
     ],
-    spangram: true,
   },
   {
     name: "Cupid's kit",
@@ -1779,7 +1778,7 @@ export const lovenotes = run({
   room: "Valentine's",
   kind: 'intro',
   from: "Heartstrings · Valentine's, taught puzzle by puzzle",
-  rules: `${CONTROLS} (A spangram, on bigger boards, runs from one side of the board to the other.)`,
+  rules: CONTROLS,
   panels: LOVENOTES,
   mountPanel,
 });
