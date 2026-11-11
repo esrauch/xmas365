@@ -414,6 +414,8 @@ export function mountCarving(host: HTMLElement, panel: Panel, hooks: CarveHooks)
         'stroke-width': 1,
       });
     const clashing = new Set(colourClashes(b, rects).flat());
+    // Red, white and blue: a plain portion is white (green elsewhere), with the same green border.
+    const patriotic = b.cells.some((row) => row.some((cl) => cl.colour));
     rects.forEach((x, i) => {
       const bad = problem(b, x) !== null || clashing.has(i);
       const colour = colourOf(b, x);
@@ -423,7 +425,15 @@ export function mountCarving(host: HTMLElement, panel: Panel, hooks: CarveHooks)
         width: x.w * cell - 6,
         height: x.h * cell - 6,
         rx: 7,
-        fill: done ? '#ffe7a0' : colour ? `url(#stripes-${colour})` : bad ? '#f3e1dc' : '#e2f2dc',
+        fill: done
+          ? '#ffe7a0'
+          : colour
+            ? `url(#stripes-${colour})`
+            : bad
+              ? '#f3e1dc'
+              : patriotic
+                ? '#ffffff'
+                : '#e2f2dc',
         stroke: done ? '#d4a017' : bad ? '#d9534f' : '#4caf50',
         'stroke-width': 3,
         'stroke-dasharray': bad && !done ? '6 4' : '',
@@ -526,7 +536,8 @@ export function mountCarving(host: HTMLElement, panel: Panel, hooks: CarveHooks)
               'text-anchor': 'middle',
               'font-size': cell * 0.4,
               'font-weight': 700,
-              fill: cl.letter ? '#c2185b' : '#8a7f72',
+              // On a red or blue mark, white like a number (crimson would vanish on red).
+              fill: cl.colour ? '#fff' : cl.letter ? '#c2185b' : '#8a7f72',
             },
             cl.letter ?? '?',
           );
