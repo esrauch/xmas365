@@ -136,7 +136,7 @@ export const BROOM: StoryPanel[] = [
 export const CHOCOBUNNY: StoryPanel[] = [
   {
     name: 'A chick',
-    tip: '🥚 A square with a numbered egg is filled and is that exact nth filled square from the left in its row',
+    tip: '🥚 An egg on a row clue marks which run in that row covers the egg square in the grid',
     rows: ['.##..', '#.#..', '###.#', '.####', '.###.'],
     eggs: [
       [1, 2, 2],
@@ -145,7 +145,7 @@ export const CHOCOBUNNY: StoryPanel[] = [
   },
   {
     name: 'A carrot',
-    tip: '🥚 Count filled squares from the left edge of the row so each egg lands on its number',
+    tip: '🥚 Each egg square in the grid is filled as part of the row clue number marked with an egg',
     rows: ['#.#..', '.#...', '#.##.', '..###', '...##'],
     eggs: [
       [0, 2, 2],
@@ -154,7 +154,7 @@ export const CHOCOBUNNY: StoryPanel[] = [
   },
   {
     name: 'The chocolate bunny',
-    tip: '🥚 An egg counts filled squares from the left of its row: a 3 means two filled squares come before it',
+    tip: '🥚 Match each egg square in the grid to the egg-marked run clue in its row',
     rows: ['.#...#.', '.#...#.', '..###..', '.#.#.#.', '..#.#..', '.#####.', '##...##'],
     eggs: [
       [0, 5, 2],
@@ -262,7 +262,7 @@ export const chocobunny = run({
   room: 'Fourth of July',
   kind: 'relic',
   from: 'Egg-Hunt Fireworks · Fourth of July (Easter)',
-  rules: `${CONTROLS} (Twist: a numbered egg sits on a filled square that is that exact nth filled square in its row counting from the left.)`,
+  rules: `${CONTROLS} (Twist: an egg on a row clue marks which run in that row covers the egg square in the grid.)`,
   panels: CHOCOBUNNY,
   mountPanel,
 });

@@ -15,8 +15,8 @@
  * - letters (Valentine's): some run lengths are written as letters (same
  *   letter = same length, different letters = different lengths), and a
  *   message's numbered blanks fill in from them;
- * - eggs (Easter): [row, col, n] marks a filled square that is the nth filled
- *   square in its row counting from the left;
+ * - eggs (Easter): [row, col, n] marks a filled square covered by the
+ *   corresponding egg-marked run clue in its row;
  * - portions (Thanksgiving): contiguous outlined portions ('A', 'B', ...),
  *   each holding the exact same number of filled squares;
  * - snow (Christmas): inside a frosty frame (with its mirror line between
@@ -37,7 +37,7 @@ export interface Panel {
   letters?: string;
   /** A message with numbered blanks (blank n is the letter for n). */
   message?: string;
-  /** Numbered eggs: [row, column, n]: that square is filled, the nth filled square of its row counting from the left. */
+  /** Eggs: [row, column, n]: that square is filled as part of the corresponding egg-marked run in its row. */
   eggs?: [number, number, number][];
   /** Fair shares: portions, a letter per square; each holds the same number of filled squares. */
   portions?: string[];
@@ -71,6 +71,19 @@ export function runsOf(line: number[]): Run[] {
     else out.push({ n: 1, colour: v });
   });
   return out;
+}
+
+/** Which run (0-based index in `runsOf(line)`) covers square `col`, or -1 if `line[col]` is not filled. */
+export function runIndexAt(line: number[], col: number): number {
+  if ((line[col] ?? 0) <= 0) return -1;
+  let idx = -1;
+  let prev = 0;
+  for (let c = 0; c <= col; c++) {
+    const cur = Math.max(line[c] ?? 0, 0);
+    if (cur > 0 && cur !== prev) idx++;
+    prev = cur;
+  }
+  return idx;
 }
 
 export interface Clues {

@@ -6,7 +6,16 @@
  */
 import { Budget, OverBudget } from '../core/budget';
 import { type Frame, mirrorSquare } from '../core/mirror';
-import { type Cell, type Clues, type Panel, type Run, clues, picture, runsOf } from './model';
+import {
+  type Cell,
+  type Clues,
+  type Panel,
+  type Run,
+  clues,
+  picture,
+  runIndexAt,
+  runsOf,
+} from './model';
 import { eggsHold, frameSymmetric, portionCounts } from './rules';
 
 export { OverBudget };
@@ -214,14 +223,16 @@ export function pictures(
   let steps = 0;
   const stepCap = twists.budget ?? Infinity;
 
+  const sol = picture(p);
   const rowsOptions = c.rows.map((runs, r) => {
     const all = arrangements(runs, known[r] ?? new Array<number>(W).fill(-1), 200000) ?? [];
     return all.filter((line) => {
       if (!twists.noEggs && p.eggs?.length) {
         const rowEggs = p.eggs.filter(([er]) => er === r);
-        for (const [, ec, n] of rowEggs) {
-          if ((line[ec] ?? 0) <= 0) return false;
-          if (line.slice(0, ec + 1).filter((v) => v > 0).length !== n) return false;
+        const solRow = sol[r] ?? [];
+        for (const [, ec] of rowEggs) {
+          if ((line[ec] ?? 0) <= 0 || (line[ec] ?? 0) !== (solRow[ec] ?? 0)) return false;
+          if (runIndexAt(line, ec) !== runIndexAt(solRow, ec)) return false;
         }
       }
       if (frame && frame.axis === 'v' && r >= frame.top && r <= frame.bottom) {

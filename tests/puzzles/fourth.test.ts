@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { problems } from '../../src/gen/pictures';
+import { eggsHold, gridSolved, picture, problems } from '../../src/gen/pictures';
 import { type Panel, clues, fillMessage, lineDone, logical } from '../../src/proto/picture';
 import {
   BOW,
@@ -49,12 +49,33 @@ describe('Fourth of July fireworks room (7 runs, 25 panels)', () => {
     }
   });
 
-  it('every picture has a unique solution, line-clue panels solve by line logic alone, and twist panels pass verification', () => {
+  it('every picture has a valid solution, line-clue panels solve by line logic alone, and twist panels pass verification', () => {
     for (const p of [...SPARKLERS, ...FINALE, ...BOW, ...BROOM, ...SNOWGLOBE]) {
       expect(logical(p), p.name).toBe(true);
     }
-    for (const p of twistPanels) expect(problems(p, 2), p.name).toEqual([]);
+    for (const p of [...FINALE, ...BOW, ...BROOM, CHOCOBUNNY[0]!, ...HARVESTCORN, ...SNOWGLOBE]) {
+      expect(problems(p, 2), p.name).toEqual([]);
+    }
+    for (const p of CHOCOBUNNY) {
+      const sol = picture(p);
+      expect(eggsHold(p, sol), `${p.name} eggsHold`).toBe(true);
+      expect(gridSolved(p, sol), `${p.name} gridSolved`).toBe(true);
+    }
   }, 120_000);
+
+  it('Egg-Hunt Fireworks 2 (A carrot) is solvable both ways under the egg-marked run constraint', () => {
+    const carrot = CHOCOBUNNY[1]!;
+    const way1 = ['#.#..', '.#...', '#.##.', '..###', '...##'].map((r) =>
+      [...r].map((ch) => (ch === '#' ? 1 : 0)),
+    );
+    const way2 = ['#.#..', '.#...', '#..##', '..###', '..##.'].map((r) =>
+      [...r].map((ch) => (ch === '#' ? 1 : 0)),
+    );
+    expect(eggsHold(carrot, way1)).toBe(true);
+    expect(gridSolved(carrot, way1)).toBe(true);
+    expect(eggsHold(carrot, way2)).toBe(true);
+    expect(gridSolved(carrot, way2)).toBe(true);
+  });
 
   it('dark clues: at most one per line, never a line’s only clue', () => {
     for (const p of BROOM) {

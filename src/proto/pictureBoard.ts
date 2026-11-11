@@ -8,7 +8,7 @@
  * - colours (red and blue paints in the bar, different colours can touch);
  * - dark ('?' clues of any length);
  * - letters (letter clues and message blank tiles above the board);
- * - eggs (glow green when they are the nth filled square in their row, red when over);
+ * - eggs (glow green when covered by their row's egg-marked run clue, red when impossible);
  * - portions (live share counts per portion, green when fair, red when over);
  * - snowflakes (frosty frame, mirror line with ❄, and ghost mirror squares).
  * Solved, the picture glows and chimes (and a message's blanks fill in).
@@ -18,14 +18,17 @@ import { blip, getBoardPersistence, h } from './kit';
 import {
   type Panel,
   type Run,
+  arrangements,
   clues,
   eggsHold,
   fillMessage,
   frameSymmetric,
+  gridSolved,
   lineDone,
   matches,
   picture,
   portionCounts,
+  runIndexAt,
 } from './picture';
 
 const NS = 'http://www.w3.org/2000/svg';
@@ -456,7 +459,7 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
   const release = (): void => {
     if (!drag) return;
     drag = null;
-    if (matches(panel, grid)) {
+    if (gridSolved(panel, grid)) {
       done = true;
       [660, 880, 1100, 1320].forEach((f, k) => setTimeout(() => blip(f, 150), k * 110));
       navigator.vibrate?.([20, 40, 20]);
@@ -517,19 +520,34 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
     // Map each egg [r, cc, n] to which run index k in c.rows[r] covers (r, cc),
     // and compute its live fill/stroke colours.
     const sol = picture(panel);
-    const eggStyle = (
-      r: number,
-      cc: number,
-      n: number,
-    ): { fill: string; stroke: string; right: boolean } => {
+    const eggStyle = (r: number, cc: number): { fill: string; stroke: string; right: boolean } => {
       const row = grid[r] ?? [];
       const atCell = row[cc] ?? 0;
-      const filledToHere = row.slice(0, cc + 1).filter((v) => v > 0).length;
-      const right = atCell > 0 && filledToHere === n;
+      const runs = c.rows[r] ?? [];
+      const wantRun = runIndexAt(sol[r] ?? [], cc);
+      const targetRun = runs[wantRun];
+      const known = row.map((v) => (v === CROSS ? 0 : v > 0 ? v : -1));
+      const validArrs = (arrangements(runs, known) ?? []).filter(
+        (arr) => runIndexAt(arr, cc) === wantRun,
+      );
+      let segLen = 0;
+      if (atCell > 0) {
+        let segStart = cc;
+        while (segStart > 0 && row[segStart - 1] === atCell) segStart--;
+        let segEnd = cc;
+        while (segEnd + 1 < W && row[segEnd + 1] === atCell) segEnd++;
+        segLen = segEnd - segStart + 1;
+      }
       const wrong =
         atCell === CROSS ||
-        filledToHere > n ||
-        (atCell > 0 && row.slice(0, cc).every((v) => v !== 0) && filledToHere !== n);
+        (row.some((v) => v !== 0) && validArrs.length === 0) ||
+        (atCell > 0 &&
+          (atCell !== (targetRun?.colour ?? 1) ||
+            (!targetRun?.hidden && segLen > (targetRun?.n ?? 0))));
+      const right =
+        !wrong &&
+        atCell > 0 &&
+        (targetRun?.hidden ? runIndexAt(row, cc) === wantRun : segLen === (targetRun?.n ?? 0));
       const fill = done ? '#ffd54f' : wrong ? '#ff8a80' : right ? '#a5d6a7' : '#fff6dc';
       const stroke = done ? '#b28704' : wrong ? '#c62828' : right ? '#2e7d32' : '#c9a227';
       return { fill, stroke, right };
@@ -537,14 +555,7 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
     const clueEgg = new Map<string, [number, number, number]>();
     for (const egg of panel.eggs ?? []) {
       const [r, cc] = egg;
-      const solRow = sol[r] ?? [];
-      let runIdx = -1;
-      let prev = 0;
-      for (let col = 0; col <= cc; col++) {
-        const cur = solRow[col] ?? 0;
-        if (cur > 0 && cur !== prev) runIdx++;
-        prev = cur > 0 ? cur : 0;
-      }
+      const runIdx = runIndexAt(sol[r] ?? [], cc);
       if (runIdx >= 0) clueEgg.set(`${r},${runIdx}`, egg);
     }
 
@@ -561,7 +572,7 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
         const cy = clueH + r * cell + cell / 2;
         const egg = clueEgg.get(`${r},${k}`);
         if (egg) {
-          const { fill, stroke } = eggStyle(egg[0], egg[1], egg[2]);
+          const { fill, stroke } = eggStyle(egg[0], egg[1]);
           add('ellipse', {
             cx,
             cy,
@@ -783,10 +794,10 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
         }
 
     // Eggs inside the grid: just an unnumbered egg icon in the square.
-    for (const [r, cc, n] of panel.eggs ?? []) {
+    for (const [r, cc] of panel.eggs ?? []) {
       const x = clueW + cc * cell + cell / 2;
       const y = clueH + r * cell + cell / 2;
-      const { fill, stroke } = eggStyle(r, cc, n);
+      const { fill, stroke } = eggStyle(r, cc);
       add('ellipse', {
         cx: x,
         cy: y,
@@ -874,7 +885,7 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
       (grid[r] as number[])[cc] = truth > 0 ? truth : CROSS;
       lockedCells.add(`${r},${cc}`);
       blip(640, 70, 10);
-      if (matches(panel, grid)) {
+      if (gridSolved(panel, grid)) {
         done = true;
         [660, 880, 1100, 1320].forEach((f, k) => setTimeout(() => blip(f, 150), k * 110));
         navigator.vibrate?.([20, 40, 20]);
@@ -926,6 +937,19 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
   drawPortionBar();
   drawBar();
   render();
+  if (!done && gridSolved(panel, grid)) {
+    done = true;
+    drawNote();
+    drawPortionBar();
+    render();
+    setTimeout(() => {
+      if (!svg.isConnected) return;
+      [660, 880, 1100, 1320].forEach((f, k) => setTimeout(() => blip(f, 150), k * 110));
+      navigator.vibrate?.([20, 40, 20]);
+      launchBoardFireworks();
+      hooks.solved();
+    }, 300);
+  }
   return () => ({
     done,
     grid: grid.map((row) =>

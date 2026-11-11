@@ -42,7 +42,7 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
       key: 'eggs',
       icon: '🥚',
       label: 'Egg-Hunt',
-      rule: 'A square with a numbered egg is filled and is that exact nth filled square from the left in its row.',
+      rule: 'An egg on a row clue marks which run in that row covers the egg square in the grid.',
     },
     {
       key: 'portions',
@@ -106,9 +106,9 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
       name: 'Nest of Sparks',
       section: 'intro',
       twists: ['eggs'],
-      tip: '🥚 Egg Hunt: Egg n is filled and is the nth filled square from the left in its row.',
+      tip: '🥚 Egg Hunt: An egg on a row clue marks which run in that row covers the egg square.',
       explain:
-        'In Fireworks, a square marked with a numbered egg must be filled, and its number tells you how many filled squares appear up to and including that square from the left of its row.',
+        'In Fireworks, a square marked with an egg must be filled as part of the corresponding run in its row whose clue number has an egg icon.',
       panel: {
         name: 'Nest of Sparks',
         rows: ['#..#', '.##.', '#.#.', '.###'],
@@ -185,9 +185,9 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
       name: 'Moonlit Nest',
       section: 'duo',
       twists: ['dark', 'eggs'],
-      tip: '🎃 Spooky + 🥚 Egg Hunt: Use row egg counts to pin down ? runs.',
+      tip: '🎃 Spooky + 🥚 Egg Hunt: Use the egg-marked row runs to pin down ? clues.',
       explain:
-        'Numbered eggs lock filled squares and cumulative row counts from the left, resolving the lengths of hidden ? clues.',
+        'Each egg square belongs to the egg-marked run clue in its row, helping resolve the lengths of hidden ? clues.',
       panel: {
         name: 'Moonlit Nest',
         rows: ['.#...', '#.#..', '...#.', '.#..#', '..##.'],
@@ -255,9 +255,9 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
       name: 'Painted Ribbon',
       section: 'duo',
       twists: ['letters', 'eggs'],
-      tip: '💌 Love Letters + 🥚 Egg Hunt: Egg positions help decode the letter lengths.',
+      tip: '💌 Love Letters + 🥚 Egg Hunt: Egg-marked runs help decode the letter lengths.',
       explain:
-        'Use the numbered eggs in each row together with the letter clues so every coded run length and egg count agrees.',
+        'Use the egg squares and their matching egg-marked row clues together with the letter clues so every coded run length agrees.',
       panel: {
         name: 'Painted Ribbon',
         rows: ['.#...', '.#...', '###..', '##.#.', '##..#'],
@@ -303,9 +303,9 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
       name: 'Festive Basket',
       section: 'duo',
       twists: ['colours', 'eggs'],
-      tip: '🎆 Red, White & Blue + 🥚 Egg Hunt: Eggs count both Red and Blue filled squares.',
+      tip: '🎆 Red, White & Blue + 🥚 Egg Hunt: Each egg square belongs to its row’s egg-marked colored run.',
       explain:
-        'An egg’s number counts all filled squares (whether Red or Blue) from the left of its row, and its own square must be filled with one of the two colors.',
+        'An egg square in the grid must be filled with the color and run of the egg-marked clue in its row, while Red and Blue runs can touch directly.',
       panel: {
         name: 'Festive Basket',
         rows: ['.R.B.', '....B', '..R..', '.BRRB', 'RRBB.'],
@@ -348,9 +348,9 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
       name: 'Harvest Clutch',
       section: 'duo',
       twists: ['eggs', 'portions'],
-      tip: '🥚 Egg Hunt + 🥧 Portions: Row egg counts and equal region shares.',
+      tip: '🥚 Egg Hunt + 🥧 Portions: Match egg-marked row runs and equal region shares.',
       explain:
-        'Combine the left-to-right egg counts in their rows with equal filled-square totals across the outlined portions.',
+        'Cover each egg square with its row’s egg-marked run while balancing filled-square totals equally across the outlined portions.',
       panel: {
         name: 'Harvest Clutch',
         rows: ['##.#.', '....#', '#....', '.#.##', '..##.'],
@@ -365,9 +365,9 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
       name: 'Frosted Clutch',
       section: 'duo',
       twists: ['eggs', 'snow'],
-      tip: '🥚 Egg Hunt + ❄️ Snowflakes: Mirror inside the frame and match row egg counts.',
+      tip: '🥚 Egg Hunt + ❄️ Snowflakes: Mirror inside the frame and cover each egg square with its marked run.',
       explain:
-        'Reflect filled squares across the frosty frame’s axis while honoring each numbered egg’s exact filled count from the left of its row.',
+        'Reflect filled squares across the frosty frame’s axis while covering each egg square with the egg-marked run clue in its row.',
       panel: {
         name: 'Frosted Clutch',
         rows: ['.##..#', '....#.', '#..#..', '.##...', '.#..#.', '#.#..#'],
@@ -400,7 +400,7 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
       twists: ['dark', 'letters', 'colours', 'eggs', 'portions', 'snow'],
       tip: '🎃💌🎆🥚🥧❄️ All 6 Twists: Every holiday clause fires at once!',
       explain:
-        'The Clause VI Boss! ? clues, coded letter lengths, touching Red & Blue runs, numbered row eggs, equal-share portions, and the frosty mirror frame all combine in one grand display.',
+        'The Clause VI Boss! ? clues, coded letter lengths, touching Red & Blue runs, egg-marked row runs, equal-share portions, and the frosty mirror frame all combine in one grand display.',
       panel: {
         name: 'The Grand Merger Finale',
         rows: ['.RR..B', '....R.', 'B..B.R', '.BB...', '.R..B.', 'BR...B'],
