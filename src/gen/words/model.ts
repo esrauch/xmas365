@@ -2,7 +2,8 @@
  * Words (Valentine's): Strands (the New York Times' Strands), a grid of letters that is
  * entirely themed words. Drag through touching letters (diagonals too) to
  * spell one; every letter is in exactly one theme word, and bigger boards
- * have a spangram, a theme word that runs from one side to the other.
+ * have a spangram, a theme word that runs from one side to the other. Every
+ * word's first letter is highlighted until it's found.
  *
  * The twists, each optional on a panel:
  * - red, white and blue (Fourth of July): words are coloured, only the bowed
@@ -14,9 +15,10 @@
  *   each holding the same number of words);
  * - snowflakes (Christmas): inside a frame, words come in mirror pairs: each
  *   word's squares mirror another word's, its letters in a different order;
- * - the dark (Halloween): some letters are hidden until a word through them
+ * - the dark (Halloween): some vowels are hidden until a word through them
  *   is found;
- * - numbered eggs (Easter): some letters carry their place in their word;
+ * - numbered eggs (Easter): some letters carry their place in their word
+ *   (3 or more: the first letter is highlighted already);
  * - letters for numbers (Valentine's own): some letters are written as
  *   numbers, the same number always the same letter, revealed everywhere
  *   when a word through one is found.
@@ -92,6 +94,9 @@ export function stepBlocked(walls: Set<string>, a: Spot, b: Spot): boolean {
 
 /** The letter at a square. */
 export const letterAt = (p: Panel, [r, c]: Spot): string => p.rows[r]?.[c] ?? '';
+
+/** Vowels (the only letters the dark may hide). */
+export const isVowel = (ch: string): boolean => 'AEIOU'.includes(ch.toUpperCase()) && ch !== '';
 
 /** The word a dragged path finds (its index), if it spells a theme word over that word's own squares. */
 export function find(p: Panel, path: Spot[]): number {

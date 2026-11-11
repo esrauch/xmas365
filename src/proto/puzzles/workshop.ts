@@ -313,7 +313,7 @@ const WORDS: Workshop = {
   title: 'Heartstrings Workshop',
   from: 'Heartstrings, generated in the browser, with any mix of twists',
   rules:
-    'Pick a difficulty and any twists, then Generate. Drag through touching letters (diagonals too) to find the theme words; every letter is in one.',
+    'Pick a difficulty and any twists, then Generate. Drag through touching letters (diagonals too) to find the theme words. Every word starts on a ringed letter, and every letter is in one.',
   twists: [
     { id: 'dark', label: 'Spooky (Halloween): a few letters hidden' },
     { id: 'letters', label: "Love-Letter (Valentine's): some letters written as numbers" },

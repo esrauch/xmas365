@@ -75,7 +75,9 @@ function look(p: Panel, rules: Without): Look {
     ),
     frame: rules.noSnow ? undefined : p.frame,
     walls: rules.noWalls ? new Set() : wallSet(p.walls),
-    starts: rules.noStarts ? null : new Set(p.words.flatMap((w) => (w.cells[0] ? [key(w.cells[0])] : []))),
+    starts: rules.noStarts
+      ? null
+      : new Set(p.words.flatMap((w) => (w.cells[0] ? [key(w.cells[0])] : []))),
   };
 }
 

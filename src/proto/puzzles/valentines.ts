@@ -20,7 +20,7 @@ export const LOVENOTES: StoryPanel[] = [
   {
     name: 'One word',
     theme: 'Four letters',
-    tip: '💌 Drag through touching letters (diagonals too) to trace the theme word',
+    tip: '💌 Start on the ringed letter and drag through touching letters (diagonals too) to trace the theme word',
     rows: ['LV', 'OE'],
     words: [
       {
@@ -37,7 +37,7 @@ export const LOVENOTES: StoryPanel[] = [
   {
     name: 'Two words',
     theme: 'Red for love',
-    tip: '💌 Every letter on the board belongs to exactly one theme word',
+    tip: '💌 Every word starts on a ringed letter, and every letter belongs to exactly one theme word',
     rows: ['TRA', 'EHE', 'SOR'],
     words: [
       {
@@ -108,7 +108,7 @@ export const LOVENOTES: StoryPanel[] = [
   {
     name: 'Side to side',
     theme: 'Be mine',
-    tip: '💌 A spangram runs all the way from one side of the board to the opposite side',
+    tip: '💌 A spangram runs all the way from one side of the board to the opposite side; its first letter has a gold ring',
     rows: ['VACSS', 'LENAI', 'RTIRK', 'OESND', 'SHUGE'],
     words: [
       {
@@ -659,7 +659,7 @@ export const JACK: StoryPanel[] = [
   {
     name: 'Candle in the dark',
     theme: 'Garden of love',
-    tip: '🎃 A ? tile hides its letter in the dark until you trace a valid word through it',
+    tip: '🎃 A ? tile hides a vowel in the dark until you trace a word through it',
     rows: ['LTUSG', 'ONALA', 'DBETR', 'OUMWO', 'UQEAD'],
     words: [
       {
@@ -716,7 +716,7 @@ export const JACK: StoryPanel[] = [
   {
     name: 'Ghostly crushes',
     theme: 'Ghostly crushes',
-    tip: '🎃 Dark letters are never a word’s first or last letter — use the visible ends to guide you',
+    tip: '🎃 Only vowels go dark, never at a word’s ends: read the consonants around a ? to guess the word',
     rows: ['SPCAN', 'ELMED', 'LKRIL', 'CTVAS', 'IRNET'],
     words: [
       {
@@ -874,7 +874,7 @@ export const JACK: StoryPanel[] = [
     dark: [
       [4, 0],
       [0, 2],
-      [6, 0],
+      [0, 6],
     ],
   },
 ];
@@ -883,7 +883,7 @@ export const BASKET: StoryPanel[] = [
   {
     name: 'Painted eggs',
     theme: 'Spring fling',
-    tip: '🥚 A numbered egg on a letter gives its exact 1-based place in its word',
+    tip: '🥚 A numbered egg gives its letter’s place in its word: 3 or more, since the ringed first letter is 1',
     rows: ['PDDLE', 'USGRA', 'SNWOI', 'AIBNH', 'RGPPO'],
     words: [
       {
@@ -940,7 +940,7 @@ export const BASKET: StoryPanel[] = [
   {
     name: 'Moonlit hunt',
     theme: 'Spring fling',
-    tip: '🥚 Count steps from the start of a word so every egg lands on its number',
+    tip: '🥚 Count steps from a word’s ringed first letter so every egg lands on its number',
     rows: ['SHRBR', 'OEEZE', 'WSLIE', 'UYDFA', 'NNOFD'],
     words: [
       {
@@ -1771,7 +1771,7 @@ const mountPanel: Parameters<typeof run<StoryPanel>>[0]['mountPanel'] = (host, p
   mountStrands(host, panel, { solved: () => hooks.solved(), status: hooks.status });
 
 const CONTROLS =
-  'Drag through touching letters (diagonals too) to spell a word; slide back to undo a letter; let go to check it. Every letter is in exactly one theme word. The puzzles teach the rules; open a puzzle number to jump about.';
+  'Drag through touching letters (diagonals too) to spell a word; slide back to undo a letter; let go to check it. Every word starts on a ringed letter (the ring fades once it’s found), and every letter is in exactly one theme word. The puzzles teach the rules; open a puzzle number to jump about.';
 
 export const lovenotes = run({
   id: 'lovenotes',
@@ -1801,7 +1801,7 @@ export const jack = run({
   room: "Valentine's",
   kind: 'relic',
   from: "Spooky Heartstrings · Valentine's (Halloween)",
-  rules: `${CONTROLS} (Twist: some letters are in the dark, shown as ?; they light up when a word through them is found.)`,
+  rules: `${CONTROLS} (Twist: some vowels are in the dark, shown as ?, never at a word's ends; they light up when a word through them is found.)`,
   panels: JACK,
   mountPanel,
 });
@@ -1812,7 +1812,7 @@ export const basket = run({
   room: "Valentine's",
   kind: 'relic',
   from: "Egg-Hunt Heartstrings · Valentine's (Easter)",
-  rules: `${CONTROLS} (Twist: an egg on a letter gives its place in its word; an egg marked 1 starts a word.)`,
+  rules: `${CONTROLS} (Twist: an egg on a letter gives its place in its word, always 3 or more: the ringed first letter is 1.)`,
   panels: BASKET,
   mountPanel,
 });

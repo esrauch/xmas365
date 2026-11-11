@@ -18,7 +18,7 @@ describe('generated words panels', () => {
   it('there are some', () => expect(files.length).toBeGreaterThan(0));
 
   it.each(files)(
-    '%s: each panel has one answer, the tier size, its twists, and every twist does work',
+    '%s: each panel has one answer, the tier size, its twists, and twists sit on a sound board',
     (file) => {
       const pinned = JSON.parse(readFileSync(join(dir, file), 'utf8')) as Pinned;
       const { margin, width, height } = SHAPES[pinned.tier];

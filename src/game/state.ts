@@ -1748,11 +1748,11 @@ const COMPACT_RULE_PILLS: Record<string, string> = {
   icepop: '🎆 Same-color bulbs cannot connect directly',
   cauldron: '🎃 Dark tiles hide their wire shape until lit',
   // Valentine's (Heartstrings)
-  lovenotes: '💌 Drag through letters to find theme words',
+  lovenotes: '💌 Start on a ring, drag to spell theme words',
   mailbox: '💌 Numbered tiles share coded letters',
-  jack: '🎃 ? hides letters until found',
-  basket: '🥚 Egg number = letter’s place in word',
-  watermelon: '🎆 Red and blue tiles alternate along words',
+  jack: '🎃 ? hides a vowel until found',
+  basket: '🥚 Egg = letter’s place in word (3+)',
+  watermelon: '🎆 Same-colour words never touch',
   wishbone: '🦃 Words cannot cross a thick fence line',
   candycane: '❄️ Word paths mirror across the icy line',
   // Easter (Hops)

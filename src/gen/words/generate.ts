@@ -23,7 +23,7 @@ import {
   trySeeds,
 } from '../core/spec';
 import { fillBoard } from './make';
-import { type Panel, type Spot, type Word, key, layOut } from './model';
+import { type Panel, type Spot, type Word, isVowel, key, layOut, letterAt } from './model';
 
 type Wall = [number, number, 'v' | 'h'];
 import { answers, edge, framedOptions, options } from './solve';
@@ -506,7 +506,9 @@ export function makePanel(
       let before = load(p);
       for (const w of shuffle(random, p.words)) {
         if (dark.length >= shape.dark) break;
-        for (const s of shuffle(random, w.cells.slice(1, -1))) {
+        // Only vowels go dark: the consonants left read as the word's skeleton.
+        const inner = w.cells.slice(1, -1).filter((s) => isVowel(letterAt(p, s)));
+        for (const s of shuffle(random, inner)) {
           const next = { ...p, dark: [...dark, s] };
           const after = load(next);
           if (after > before) continue;
@@ -632,7 +634,8 @@ export function makePanel(
         if (options({ ...p, eggs }, w.word, {}, budget).length <= 1) continue;
         let bestSpot: Spot | null = null;
         let bestCount = options({ ...p, eggs }, w.word, {}, budget).length;
-        for (const s of shuffle(random, w.cells)) {
+        // From the 3rd letter on: the 1st is highlighted already.
+        for (const s of shuffle(random, w.cells.slice(2))) {
           const cnt = options({ ...p, eggs: [...eggs, s] }, w.word, {}, budget).length;
           if (cnt < bestCount) {
             bestCount = cnt;
@@ -651,7 +654,7 @@ export function makePanel(
       )) {
         if (eggs.length >= targetEggs) break;
         const w = p.words[wi] as Word;
-        const pool = w.cells.length > 1 ? w.cells.slice(1) : w.cells;
+        const pool = w.cells.slice(2);
         const chosen = shuffle(random, pool)[0];
         if (chosen) {
           eggs.push(chosen);

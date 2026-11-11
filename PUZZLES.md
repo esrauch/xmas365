@@ -230,10 +230,12 @@ All six columns are in the generator (⚙️), generating in seconds across easy
 
 All six columns are in the generator (⚙️). Words come from theme banks
 (`src/gen/words/themes.ts`, real words only), picked to fill the board
-exactly; every word must be traceable only one way as the player sees the
-board, so a found word is always the right one. A twist "does work" when,
-without it, some words could be traced more than one way (1 on easy, 2
-above): whole-board answers hardly ever differ in Strands. Boards are
+exactly. Every word's first letter is highlighted (the ring fades once the
+word is found), and the board must be sound as the player sees it, twists
+included: one answer, and every word traceable only one way, so a found word
+is always the right one. Unlike the other genres, twists needn't do work here:
+a board may lean on its twists or be sound without them (decided 2026-11-10).
+The dark hides only vowels, and eggs show 3 or more. Boards are
 filled straight from the theme's bank, choosing words as they go (a pocket
 of four squares takes a four-letter word), with dead ends caught as each
 word grows (a sealed-off pocket must fit some unused words; a lone square

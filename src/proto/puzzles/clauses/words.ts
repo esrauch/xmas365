@@ -22,7 +22,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       key: 'dark',
       icon: '🎃',
       label: 'Spooky',
-      rule: 'A ? tile hides its letter in the dark until you trace a valid word through it.',
+      rule: 'A ? tile hides a vowel in the dark until you trace a word through it.',
     },
     {
       key: 'letters',
@@ -40,7 +40,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       key: 'eggs',
       icon: '🥚',
       label: 'Egg-Hunt',
-      rule: 'A numbered egg tile must be that exact 1-based letter position in its word.',
+      rule: 'A numbered egg gives its letter’s place in its word: 3 or more, since the ringed first letter is 1.',
     },
     {
       key: 'cuts',
@@ -60,9 +60,9 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       name: 'Intro 1: Spooky',
       section: 'intro',
       twists: ['dark'],
-      tip: '🎃 ? tiles hide their letter in the dark',
+      tip: '🎃 ? tiles hide a vowel in the dark',
       explain:
-        '🎃 Spooky in Heartstrings: A ? tile hides its letter in the dark—use the surrounding letters and theme to trace a valid word right through it!',
+        '🎃 Spooky in Heartstrings: A ? tile hides a vowel in the dark—read the consonants around it and the theme to trace a word right through it!',
       panel: {
         name: 'Candlelight Note',
         theme: 'Table for two',
@@ -197,9 +197,9 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       name: 'Intro 4: Egg Hunt',
       section: 'intro',
       twists: ['eggs'],
-      tip: '🥚 Numbered egg = that exact 1-based letter position in its word',
+      tip: '🥚 Numbered egg = its letter’s place in its word (3 or more)',
       explain:
-        '🥚 Egg Hunt in Heartstrings: A numbered egg tile must be visited at that exact 1-based letter index when tracing its word.',
+        '🥚 Egg Hunt in Heartstrings: A numbered egg gives its letter’s place in its word. It’s always 3 or more: the ringed first letter is 1.',
       panel: {
         name: 'Numbered Eggs',
         theme: 'Sweet treats',
@@ -317,7 +317,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['dark', 'letters'],
       tip: '🎃 Spooky + 💌 Love Letters',
       explain:
-        '🎃 Spooky (A ? tile hides its letter in the dark until you trace a valid word through it.) combined with 💌 Love Letters (Numbered tiles (1, 2, …) stand for coded letters; every matching number hides the same letter.)',
+        '🎃 Spooky (A ? tile hides a vowel in the dark until you trace a word through it.) combined with 💌 Love Letters (Numbered tiles (1, 2, …) stand for coded letters; every matching number hides the same letter.)',
       panel: {
         name: 'Spooky + Love Letters',
         theme: 'Sweet treats',
@@ -370,7 +370,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
           },
         ],
         dark: [
-          [0, 1],
+          [0, 2],
           [1, 4],
         ],
         code: 'CA',
@@ -382,7 +382,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['dark', 'colours'],
       tip: '🎃 Spooky + 🎆 Red, White & Blue',
       explain:
-        '🎃 Spooky (A ? tile hides its letter in the dark until you trace a valid word through it.) combined with 🎆 Red, White & Blue (Bowed tiles reveal their word’s Red or Blue color; two words of the same color can never touch orthogonally.)',
+        '🎃 Spooky (A ? tile hides a vowel in the dark until you trace a word through it.) combined with 🎆 Red, White & Blue (Bowed tiles reveal their word’s Red or Blue color; two words of the same color can never touch orthogonally.)',
       panel: {
         name: 'Spooky + Red, White & Blue',
         theme: 'Mistletoe kisses',
@@ -443,8 +443,8 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
           [4, 4],
         ],
         dark: [
-          [4, 4],
-          [0, 1],
+          [2, 0],
+          [4, 0],
         ],
       },
     },
@@ -454,7 +454,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['dark', 'eggs'],
       tip: '🎃 Spooky + 🥚 Egg Hunt',
       explain:
-        '🎃 Spooky (A ? tile hides its letter in the dark until you trace a valid word through it.) combined with 🥚 Egg Hunt (A numbered egg tile must be that exact 1-based letter position in its word.)',
+        '🎃 Spooky (A ? tile hides a vowel in the dark until you trace a word through it.) combined with 🥚 Egg Hunt (A numbered egg gives its letter’s place in its word: 3 or more, since the ringed first letter is 1.)',
       panel: {
         name: 'Spooky + Egg Hunt',
         theme: 'Mistletoe kisses',
@@ -507,12 +507,12 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
           },
         ],
         dark: [
-          [3, 0],
-          [0, 3],
+          [4, 1],
+          [1, 2],
         ],
         eggs: [
           [3, 3],
-          [1, 4],
+          [1, 2],
         ],
       },
     },
@@ -522,7 +522,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['dark', 'cuts'],
       tip: '🎃 Spooky + 🥧 Portions',
       explain:
-        '🎃 Spooky (A ? tile hides its letter in the dark until you trace a valid word through it.) combined with 🥧 Portions (A word path cannot step across a thick fence bar or diagonally through a fenced corner.)',
+        '🎃 Spooky (A ? tile hides a vowel in the dark until you trace a word through it.) combined with 🥧 Portions (A word path cannot step across a thick fence bar or diagonally through a fenced corner.)',
       panel: {
         name: 'Spooky + Portions',
         theme: 'Sweet treats',
@@ -580,7 +580,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
           },
         ],
         dark: [
-          [0, 1],
+          [1, 0],
           [1, 4],
         ],
         walls: [
@@ -601,7 +601,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['dark', 'snow'],
       tip: '🎃 Spooky + ❄️ Snowflakes',
       explain:
-        '🎃 Spooky (A ? tile hides its letter in the dark until you trace a valid word through it.) combined with ❄️ Snowflakes (Inside the frosty frame, words come in mirror-footprint pairs across the icy line.)',
+        '🎃 Spooky (A ? tile hides a vowel in the dark until you trace a word through it.) combined with ❄️ Snowflakes (Inside the frosty frame, words come in mirror-footprint pairs across the icy line.)',
       panel: {
         name: 'Spooky + Snowflakes',
         theme: 'Garden of love',
@@ -657,7 +657,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
         },
         dark: [
           [4, 0],
-          [3, 3],
+          [3, 2],
         ],
       },
     },
@@ -734,7 +734,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['letters', 'eggs'],
       tip: '💌 Love Letters + 🥚 Egg Hunt',
       explain:
-        '💌 Love Letters (Numbered tiles (1, 2, …) stand for coded letters; every matching number hides the same letter.) combined with 🥚 Egg Hunt (A numbered egg tile must be that exact 1-based letter position in its word.)',
+        '💌 Love Letters (Numbered tiles (1, 2, …) stand for coded letters; every matching number hides the same letter.) combined with 🥚 Egg Hunt (A numbered egg gives its letter’s place in its word: 3 or more, since the ringed first letter is 1.)',
       panel: {
         name: 'Love Letters + Egg Hunt',
         theme: 'Love letters',
@@ -943,7 +943,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['colours', 'eggs'],
       tip: '🎆 Red, White & Blue + 🥚 Egg Hunt',
       explain:
-        '🎆 Red, White & Blue (Bowed tiles reveal their word’s Red or Blue color; two words of the same color can never touch orthogonally.) combined with 🥚 Egg Hunt (A numbered egg tile must be that exact 1-based letter position in its word.)',
+        '🎆 Red, White & Blue (Bowed tiles reveal their word’s Red or Blue color; two words of the same color can never touch orthogonally.) combined with 🥚 Egg Hunt (A numbered egg gives its letter’s place in its word: 3 or more, since the ringed first letter is 1.)',
       panel: {
         name: 'Red, White & Blue + Egg Hunt',
         theme: 'Table for two',
@@ -1004,7 +1004,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
         ],
         eggs: [
           [3, 1],
-          [2, 0],
+          [1, 1],
         ],
       },
     },
@@ -1165,7 +1165,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['eggs', 'cuts'],
       tip: '🥚 Egg Hunt + 🥧 Portions',
       explain:
-        '🥚 Egg Hunt (A numbered egg tile must be that exact 1-based letter position in its word.) combined with 🥧 Portions (A word path cannot step across a thick fence bar or diagonally through a fenced corner.)',
+        '🥚 Egg Hunt (A numbered egg gives its letter’s place in its word: 3 or more, since the ringed first letter is 1.) combined with 🥧 Portions (A word path cannot step across a thick fence bar or diagonally through a fenced corner.)',
       panel: {
         name: 'Egg Hunt + Portions',
         theme: 'Love notes',
@@ -1218,8 +1218,8 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
           },
         ],
         eggs: [
-          [2, 1],
-          [2, 2],
+          [2, 0],
+          [3, 2],
         ],
         walls: [
           [0, 1, 'v'],
@@ -1239,7 +1239,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['eggs', 'snow'],
       tip: '🥚 Egg Hunt + ❄️ Snowflakes',
       explain:
-        '🥚 Egg Hunt (A numbered egg tile must be that exact 1-based letter position in its word.) combined with ❄️ Snowflakes (Inside the frosty frame, words come in mirror-footprint pairs across the icy line.)',
+        '🥚 Egg Hunt (A numbered egg gives its letter’s place in its word: 3 or more, since the ringed first letter is 1.) combined with ❄️ Snowflakes (Inside the frosty frame, words come in mirror-footprint pairs across the icy line.)',
       panel: {
         name: 'Egg Hunt + Snowflakes',
         theme: 'Date night',
@@ -1294,7 +1294,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
           axis: 'v',
         },
         eggs: [
-          [2, 1],
+          [0, 1],
           [1, 3],
         ],
       },
@@ -1382,7 +1382,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['dark', 'letters', 'colours', 'eggs', 'cuts', 'snow'],
       tip: '🎃 Spooky · 💌 Love-Letter · 🎆 Patriotic · 🥚 Egg-Hunt · 🥧 Portioned · ❄️ Snowflake',
       explain:
-        'Final Clause IV Boss: All 6 holiday twists active at once—dark ? tiles, numbered cipher tiles, Red/Blue bows, numbered egg positions, fence cuts, and frosty mirror-footprint pairs!',
+        'Final Clause IV Boss: All 6 holiday twists active at once—dark ? vowels, numbered cipher tiles, Red/Blue bows, numbered egg positions, fence cuts, and frosty mirror-footprint pairs!',
       panel: {
         name: 'Clause IV Finale: Full Heartstrings',
         theme: 'Love notes',
@@ -1441,7 +1441,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
           right: 3,
           axis: 'v',
         },
-        dark: [[3, 2]],
+        dark: [[2, 3]],
         code: 'KS',
         colours: ['bbrr', 'bbrr', 'rrww', 'rrww', 'bbbb'],
         bows: [
@@ -1450,7 +1450,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
         ],
         eggs: [
           [3, 2],
-          [1, 2],
+          [0, 3],
         ],
         walls: [
           [0, 1, 'v'],

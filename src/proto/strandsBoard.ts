@@ -1,6 +1,8 @@
 /**
  * The clicky Strands panel: drag through touching letters (diagonals too)
  * to spell a word; slide back to undo the last letter; let go to check it.
+ * Each word's first letter is ringed (the spangram's in gold) until the word
+ * is found, then the ring fades.
  * A theme word locks in (blue; the spangram gold) and chimes; anything else
  * shakes. The word builds above the board as you drag. Dark letters show as
  * blanks, coded letters as their number, until a word through them is found
@@ -34,6 +36,10 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
   const W = Wd * cell;
   const Hpx = H * cell;
   const found = new Set<number>();
+  /** Each word's first square (highlighted until the word is found) → the word. */
+  const starts = new Map(
+    panel.words.flatMap((w, i) => (w.cells[0] ? [[key(w.cells[0]), i] as const] : [])),
+  );
   const dark = new Set((panel.dark ?? []).map(key));
   const eggs = new Set((panel.eggs ?? []).map(key));
   const walls = wallSet(panel.walls);
@@ -463,6 +469,20 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
         const text = shown(s);
         const isDark = text === '?';
         const coded = /[0-9]/.test(text);
+        // A word's first letter is ringed until the word is found, then the ring fades.
+        const startOf = starts.get(key(s));
+        if (startOf !== undefined && (!found.has(startOf) || startOf === lastFoundWord)) {
+          const ringEl = add('circle', {
+            cx: x,
+            cy: y,
+            r: cell * 0.44,
+            fill: 'none',
+            stroke: panel.spangram && startOf === 0 ? '#d4a017' : '#e0457b',
+            'stroke-width': 3,
+          });
+          if (found.has(startOf))
+            ringEl.setAttribute('style', 'animation: puzz-start-fade 0.6s ease-out both;');
+        }
         const circEl = add('circle', {
           cx: x,
           cy: y,
@@ -550,7 +570,7 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
     // Once solved, the run's own message stands.
     if (found.size < panel.words.length)
       hooks.status(
-        `${found.size} of ${panel.words.length} theme words${panel.spangram && !found.has(0) ? ' (one is a spangram, side to side)' : ''}`,
+        `${found.size} of ${panel.words.length} theme words${panel.spangram && !found.has(0) ? ' (one is a spangram, side to side, from the gold ring)' : ''}`,
       );
     lastFoundWord = null;
   };
@@ -560,6 +580,7 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
     // 2nd click on the currently hinted word: auto-trace and lock it in
     if (hintedWord !== null && !found.has(hintedWord)) {
       found.add(hintedWord);
+      lastFoundWord = hintedWord;
       hintedWord = null;
       path = [];
       blip(880, 120, 15);

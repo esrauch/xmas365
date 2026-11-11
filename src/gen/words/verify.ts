@@ -1,9 +1,10 @@
 /**
  * The checks every generated Words panel must pass, shared by the generator
- * and the tests: the words fill the grid, every word can be traced only one
- * way (as the player sees the board, so a found word is always the right
- * one), each clue-adding twist does work by a margin, and nothing feels
- * pointless.
+ * and the tests: the words fill the grid, and every word can be traced only one
+ * way (as the player sees the board, with each word's first letter highlighted,
+ * so a found word is always the right one). Unlike the other genres, a twist
+ * needn't do work here: a board may lean on its twists or be sound without
+ * them (`margin` is kept for the shared signature).
  */
 import { Budget } from '../core/budget';
 import { type Panel, isVowel, key, letterAt, placeIn, wellFormed } from './model';
@@ -31,14 +32,6 @@ export function twistsOf(p: Panel): WordTwist[] {
   return on;
 }
 
-/** The rule that leaves one clue-adding twist out. */
-const leaveOut: Partial<Record<WordTwist, Without>> = {
-  eggs: { noEggs: true },
-  colours: { noBows: true },
-  cuts: { noWalls: true },
-  snow: { noSnow: true },
-};
-
 /**
  * Does every word have exactly one way to lie, as the player traces it? Coded
  * letters count as known here (the key fills in as words are found); the
@@ -49,25 +42,15 @@ export function eachWordOnce(p: Panel, rules: Without = {}, budget = new Budget(
 }
 
 /** Problems with a panel (empty when it's good). */
-export function problems(p: Panel, margin: number, budget = new Budget(4_000_000)): string[] {
+export function problems(p: Panel, _margin: number, budget = new Budget(4_000_000)): string[] {
   const out: string[] = [];
   if (!wellFormed(p)) out.push("the words don't fill the grid");
   const found = answers(p, 2, {}, budget);
   if (found.length !== 1 || found[0]?.join('|') !== truthOf(p).join('|'))
     out.push(`${found.length} answers, not just the true one`);
   if (!eachWordOnce(p, {}, budget)) out.push('a word can be traced more than one way');
-  // Each clue-adding twist does work: without it, at least `margin` words could be
-  // traced more than one way. (Whole-board answers hardly ever differ in Words:
-  // the work a twist does is settling which way a word lies.)
-  for (const twist of twistsOf(p)) {
-    const rules = leaveOut[twist];
-    if (!rules) continue; // the dark and the code hide clues: nothing to take away
-    const loose = framedOptions(p, { ...rules, noCode: true }, budget).filter(
-      (o) => o.length > 1,
-    ).length;
-    if (loose < margin)
-      out.push(`without ${twist}, ${loose} words lie more than one way (want ${margin})`);
-  }
+  // Twists needn't do work in Words: a board may lean on its twists or be sound
+  // without them (PUZZLE_DESIGN.md, 1.2).
   // The dark: at most one per word, only on a vowel, never its first or last letter.
   for (const w of p.words) {
     const keys = w.cells.map(key);

@@ -644,6 +644,16 @@ body {
   }
 }
 
+/* A Heartstrings word's first-letter ring, fading once the word is found. */
+@keyframes puzz-start-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 @keyframes puzz-clue-met {
   0% {
     transform: scale(1);
