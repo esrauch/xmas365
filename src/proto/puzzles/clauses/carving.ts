@@ -218,12 +218,12 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     twists: ['letters', 'cuts'],
     tip: '💌 Love Letters + 🥧 Portions: Letter areas stopped by a fence.',
     explain:
-      'Unscramble the letters into KISS to learn their areas while respecting the fence boundaries.',
+      'Unscramble the letters into PIE to learn their areas while respecting the fence boundaries.',
     panel: {
       name: 'Carved Initials',
-      rows: ['. . K . .', '. 4 . . S', 'I . S . .', '. 2 . S .', '2 . . . 2'],
-      sizeLetters: ' ISK     ',
-      message: '4233',
+      rows: ['. . P . .', '. 4 . . E', 'I . E . .', '. 2 . E .', '2 . . . 2'],
+      sizeLetters: ' IEP     ',
+      message: '423',
       walls: [
         [1, 3, 'h'],
         [1, 1, 'v'],
@@ -253,11 +253,11 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     twists: ['letters', 'basket'],
     tip: '💌 Love Letters + 🥚 Easter Baskets: Coded areas and fair shares of 🥚 and 🥕.',
     explain:
-      'Every rectangle needs one 🥚 and one 🥕 while C, O, and K take the areas from unscrambling COOK.',
+      'Every rectangle needs one 🥚 and one 🥕 while F, O, and D take the areas from unscrambling FOOD.',
     panel: {
       name: 'Sweet Parcel',
-      rows: ['. . . K 🥕', '. 🥚 🥕 . 🥚', '🥕 . . 🥚 .', '🥚 . 🥕 . 🥚', '🥕 🥚 O 🥕 C'],
-      sizeLetters: '  OC K   ',
+      rows: ['. . . D 🥕', '. 🥚 🥕 . 🥚', '🥕 . . 🥚 .', '🥚 . 🥕 . 🥚', '🥕 🥚 O 🥕 F'],
+      sizeLetters: '  OF D   ',
       message: '4336',
     },
   },
@@ -348,19 +348,19 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     twists: [...CARVING_TWIST_ORDER],
     tip: '🎃 + 💌 + 🎆 + 🥧 + ❄️ + 🥚: All six holiday twists on one 6×6 table!',
     explain:
-      'Every portion collects one 🥚 and one 🥕, respects the fences, separates matching colors, mirrors cuts inside the frosty frame, and decodes COOK and ?.',
+      'Every portion collects one 🥚 and one 🥕, respects the fences, separates matching colors, mirrors cuts inside the frosty frame, and decodes FEED and ?.',
     panel: {
       name: 'The Grand Carving',
       rows: [
         '🥚 . . 🥚 🥚 🥚',
-        '. 🥕 C . 🥕 .',
+        '. 🥕 F . 🥕 .',
         '🥕 🥚 🥚 🥕 ? 🥕',
-        '. . . O . 🥕',
+        '. . . E . 🥕',
         '🥕 . 🥕 . . 🥚',
-        '🥚 . . K 🥚 🥕',
+        '🥚 . . D 🥚 🥕',
       ],
       colours: ['b..rbr', '......', '......', '......', 'r.....', '...b..'],
-      sizeLetters: '  K OC   ',
+      sizeLetters: '  D EF   ',
       message: '6553',
       walls: [
         [0, 2, 'v'],
