@@ -93,22 +93,22 @@ Trade and Star in the Shadows (in git history at d0d65b3).
 How it's built, for the other rooms to follow:
 - `src/proto/hashi.ts`: Hashi rules and twists, a solver with propagation
   (counts answers in milliseconds), and a random web generator.
-- `src/proto/hashiBoard.ts`: the clicky panel (drag between knots, refusals
+- `src/proto/websBoard.ts`: the clicky panel (drag between knots, refusals
   flash, pieces coloured when split, chime and buzz when solved).
 - `src/proto/run.ts`: a room's run of panels (strip, ticks, Next); any genre
   can use it.
 - Thanksgiving follows the same pattern: `src/proto/shikaku.ts` (rules,
-  twists, exact-cover solver, carving generator), `src/proto/shikakuBoard.ts`
+  twists, exact-cover solver, carving generator), `src/proto/carvingBoard.ts`
   (drag a rectangle, tap to lift), `src/proto/puzzles/thanksgiving.ts`.
   Round one's Hot Dog Platter, Stuffed Stocking (weighings) and Feast are
   in git history at 4d830bc; the Platter lives on as fair shares.
-- Christmas: `src/proto/net.ts` (rules, twists, solver checked against brute
-  force, tree/egg/pie/wreath shapes, generator), `src/proto/netBoard.ts`
+- Christmas: `src/proto/lights.ts` (rules, twists, solver checked against brute
+  force, tree/egg/pie/wreath shapes, generator), `src/proto/lightsBoard.ts`
   (tap to turn, long-press to pin), `src/proto/puzzles/christmas.ts`. Round
   one's Golden Egg Ornament (queens), Pie in a Tin and Christmas Tree are in
   git history at 4d830bc.
 - Valentine's: `src/proto/strands.ts` (rules, checks, a generator that lays
-  words out to fill the grid without crossing), `src/proto/strandsBoard.ts`
+  words out to fill the grid without crossing), `src/proto/wordsBoard.ts`
   (drag through letters), `src/proto/puzzles/valentines.ts`. Word lists are
   hand-written; tests check every word has exactly one spelling. Round one's
   Jack-o'-Lantern, Secret Admirers and Mailbox are in git history at 4d830bc.

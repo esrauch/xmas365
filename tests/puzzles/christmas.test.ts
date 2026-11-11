@@ -9,7 +9,7 @@ import {
   solved,
   startGrid,
   turn,
-} from '../../src/proto/net';
+} from '../../src/proto/lights';
 import {
   CAULDRON,
   EGG,

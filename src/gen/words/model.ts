@@ -1,5 +1,5 @@
 /**
- * Words (Valentine's): Strands (the New York Times' Strands), a grid of letters that is
+ * Words (Valentine's): Heartstrings, a grid of letters that is
  * entirely themed words. Drag through touching letters (diagonals too) to
  * spell one; every letter is in exactly one theme word, and every word's
  * first letter is highlighted until it's found.

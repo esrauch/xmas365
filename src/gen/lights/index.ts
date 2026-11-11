@@ -1,5 +1,5 @@
 /**
- * Christmas lights (Net) puzzle generator: models, rules, solver, verification,
+ * Christmas lights puzzle generator: models, rules, solver, verification,
  * and multi-twist generation.
  */
 export * from './model';

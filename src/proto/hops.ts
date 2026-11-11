@@ -1,5 +1,5 @@
 /**
- * Bunny hops (Easter): Numbrix (Hidato with plain steps).
+ * Bunny hops (Easter).
  * Re-exported from the generator in src/gen/hops/.
  */
 export * from '../gen/hops';

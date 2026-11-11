@@ -1,5 +1,5 @@
 /**
- * Rules and verification for Bunny hops (Numbrix) and its twists.
+ * Rules and verification for Bunny hops and its twists.
  */
 import { segment, symmetricIn } from '../core/mirror';
 import { type Board, type Spot, splitRoutes } from './model';

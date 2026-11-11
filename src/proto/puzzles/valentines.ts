@@ -1,6 +1,6 @@
 /**
  * Valentine's: the love-letter room (revamp-centerpieces.md).
- * Heartstrings (Strands) panels in seven runs:
+ * Heartstrings panels in seven runs:
  * - Intro: Love Notes (`lovenotes`, 5 panels, <=7x7)
  * - Home twist: The Valentine Mailbox (`mailbox`, 5 panels, <=7x7, `letters` cipher)
  * - 5 Relic runs (3 panels each, <=7x7):
@@ -12,7 +12,7 @@
  */
 import { type Panel } from '../../gen/words';
 import { run } from '../run';
-import { mountStrands } from '../strandsBoard';
+import { mountWords } from '../wordsBoard';
 
 type StoryPanel = Panel & { tip?: string };
 
@@ -1767,7 +1767,7 @@ export const CANDYCANE: StoryPanel[] = [
 ];
 
 const mountPanel: Parameters<typeof run<StoryPanel>>[0]['mountPanel'] = (host, panel, hooks) =>
-  mountStrands(host, panel, { solved: () => hooks.solved(), status: hooks.status });
+  mountWords(host, panel, { solved: () => hooks.solved(), status: hooks.status });
 
 const CONTROLS =
   'Drag through touching letters (diagonals too) to spell a word; slide back to undo a letter; let go to check it. Every word starts on a ringed letter (the ring fades once it’s found), and every letter is in exactly one theme word. The puzzles teach the rules; open a puzzle number to jump about.';

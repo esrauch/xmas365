@@ -1,5 +1,5 @@
 /**
- * Net (Lights) generator: plain panels, or any mix of holiday twists, at a tier.
+ * Lights generator: plain panels, or any mix of holiday twists, at a tier.
  */
 import { Budget, within } from '../core/budget';
 import { rng } from '../core/rng';

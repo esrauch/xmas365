@@ -30,7 +30,7 @@ import {
   spell,
   startGrid,
   turn,
-} from './net';
+} from './lights';
 
 const NS = 'http://www.w3.org/2000/svg';
 const WIRE: Record<string, string> = {

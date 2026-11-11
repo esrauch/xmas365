@@ -1,5 +1,5 @@
 /**
- * Generating picture-grid (nonogram) panels: the plain puzzle, or any mix of
+ * Generating picture-grid (Fireworks) panels: the plain puzzle, or any mix of
  * the six holiday twists, at easy (5×5), medium (7×7), and hard (9×9).
  */
 import { Budget, within } from '../core/budget';

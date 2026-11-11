@@ -1,5 +1,5 @@
 /**
- * Net (Lights) solver: fast depth-first search with loop prevention, component tracking,
+ * Lights solver: fast depth-first search with loop prevention, component tracking,
  * budget capping, and early pruning for all holiday twists.
  */
 import { Budget } from '../core/budget';

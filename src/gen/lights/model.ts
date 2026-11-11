@@ -1,5 +1,5 @@
 /**
- * Net (Simon Tatham's Net) and Christmas lights: the panel model and parsing.
+ * Christmas lights: the panel model and parsing.
  *
  * Every square on the board holds a piece of the light string; turn the
  * pieces so the power reaches every square from the plug, with no loose

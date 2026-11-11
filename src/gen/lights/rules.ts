@@ -1,5 +1,5 @@
 /**
- * Net (Lights) rules: power spreading, loose ends, loop detection, and holiday twist verification.
+ * Lights rules: power spreading, loose ends, loop detection, and holiday twist verification.
  */
 import { type Frame, mirrorSquare, segment } from '../core/mirror';
 import { type Board, DIRS, E, OPP, S, STEP, type Spot, key, mirrorMask, turn } from './model';

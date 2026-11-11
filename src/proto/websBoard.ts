@@ -919,7 +919,7 @@ export function mountWeb(host: HTMLElement, panel: Panel, hooks: BoardHooks): ()
     cachedSol ??= solve(web, 1)[0] ?? null;
     if (!cachedSol) return;
 
-    // 1. If any bridge has too many strands or shouldn't exist, fix/remove one wrong bridge
+    // 1. If any bridge has too many threads or shouldn't exist, fix/remove one wrong bridge
     const wrongIdx = threads.findIndex((t, i) => t > (cachedSol?.[i] ?? 0));
     if (wrongIdx !== -1) {
       const link = web.links[wrongIdx];

@@ -1,5 +1,5 @@
 /**
- * Verification for Net (Lights) panels: uniqueness, margin validation for twists,
+ * Verification for Lights panels: uniqueness, margin validation for twists,
  * and aesthetic rules.
  */
 import { Budget } from '../core/budget';

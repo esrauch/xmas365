@@ -1,5 +1,5 @@
 /**
- * Bunny hops (Easter): Numbrix (Hidato with plain steps). The Easter Bunny hops
+ * Bunny hops (Easter). The Easter Bunny hops
  * to a neighbouring spot (up, down, left or right) and lands on every lawn spot
  * of the board exactly once; some eggs are already numbered with their place in
  * the order. Rocks (part of the base game) are squares the bunny can't hop onto:

@@ -1,5 +1,5 @@
 /**
- * Net (Lights) board generation: spanning trees, snowflake-framed trees,
+ * Lights board generation: spanning trees, snowflake-framed trees,
  * and holiday twist synthesizers.
  */
 import { Budget } from '../core/budget';

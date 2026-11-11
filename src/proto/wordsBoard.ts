@@ -1,5 +1,5 @@
 /**
- * The clicky Strands panel: drag through touching letters (diagonals too)
+ * The clicky Heartstrings panel: drag through touching letters (diagonals too)
  * to spell a word; slide back to undo the last letter; let go to check it.
  * Each word's first letter is ringed until the word
  * is found, then the ring fades.
@@ -23,12 +23,12 @@ import {
 
 const NS = 'http://www.w3.org/2000/svg';
 
-export interface StrandsHooks {
+export interface WordsHooks {
   solved(): void;
   status(text: string): void;
 }
 
-export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHooks): () => unknown {
+export function mountWords(host: HTMLElement, panel: Panel, hooks: WordsHooks): () => unknown {
   const H = panel.rows.length;
   const Wd = panel.rows[0]?.length ?? 0;
   const avail = Math.min(host.clientWidth || 360, 480);
@@ -175,7 +175,7 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
     blip(600 + path.length * 40, 20);
     render();
   });
-  const launchStrandsCelebration = (): void => {
+  const launchWordsCelebration = (): void => {
     if (typeof requestAnimationFrame !== 'function') return;
     const layer = document.createElementNS(NS, 'g');
     layer.setAttribute('style', 'pointer-events: none');
@@ -268,7 +268,7 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
         navigator.vibrate?.([20, 40, 20]);
         path = [];
         render();
-        launchStrandsCelebration();
+        launchWordsCelebration();
         hooks.solved();
         return;
       }
@@ -571,7 +571,7 @@ export function mountStrands(host: HTMLElement, panel: Panel, hooks: StrandsHook
         [660, 880, 1100, 1320].forEach((f, k) => setTimeout(() => blip(f, 150), k * 110));
         navigator.vibrate?.([20, 40, 20]);
         render();
-        launchStrandsCelebration();
+        launchWordsCelebration();
         hooks.solved();
         return;
       }

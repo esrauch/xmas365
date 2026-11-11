@@ -1,5 +1,5 @@
 /**
- * Thanksgiving: the carving run (`revamp-centerpieces.md`). Shikaku panels in
+ * Thanksgiving: the carving run (`revamp-centerpieces.md`). Carving panels in
  * seven runs: the intro run on the bread board, the Feast home-twist run
  * (`cuts`: fences no portion may cross), and the five relic runs (Hot Dog,
  * Stocking, Heart Locket, Jelly Bean Jar, and Candy Corn). Every panel is
@@ -7,7 +7,7 @@
  */
 import { type Panel } from '../../gen/carving';
 import { run } from '../run';
-import { mountCarving } from '../shikakuBoard';
+import { mountCarving } from '../carvingBoard';
 
 export const WARMUP: Panel[] = [
   {

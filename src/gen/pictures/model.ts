@@ -1,5 +1,5 @@
 /**
- * Picture grids (Fourth of July): Nonograms. The panel format, and the row and
+ * Picture grids (Fourth of July): Fireworks. The panel format, and the row and
  * column run clues it parses into.
  *
  * The base rules: the numbers at the end of each row and column give the runs

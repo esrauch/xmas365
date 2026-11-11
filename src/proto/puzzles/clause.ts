@@ -15,14 +15,14 @@ import type { Panel as LightPanel } from '../../gen/lights';
 import type { Panel as PicPanel } from '../../gen/pictures';
 import type { Panel as WebPanel } from '../../gen/webs';
 import type { Panel as WordPanel } from '../../gen/words';
-import { mountWeb } from '../hashiBoard';
+import { mountWeb } from '../websBoard';
 import { mountHops } from '../hopsBoard';
 import { type Proto, h, panelSignature, setBoardPersistence } from '../kit';
-import { mountLights } from '../netBoard';
+import { mountLights } from '../lightsBoard';
 import { mountPicture } from '../pictureBoard';
 import type { PanelHooks } from '../run';
-import { mountCarving } from '../shikakuBoard';
-import { mountStrands } from '../strandsBoard';
+import { mountCarving } from '../carvingBoard';
+import { mountWords } from '../wordsBoard';
 import {
   ALL_CLAUSES,
   CLAUSE_PANEL_COUNT,
@@ -83,7 +83,7 @@ function mountClauseBoard(
   if (genre === 'webs') mountWeb(slot, panel as WebPanel, boardHooks);
   else if (genre === 'carving') mountCarving(slot, panel as CarvePanel, boardHooks);
   else if (genre === 'lights') mountLights(slot, panel as LightPanel, boardHooks);
-  else if (genre === 'words') mountStrands(slot, panel as WordPanel, boardHooks);
+  else if (genre === 'words') mountWords(slot, panel as WordPanel, boardHooks);
   else if (genre === 'hops') mountHops(slot, panel as HopPanel, boardHooks);
   else mountPicture(slot, panel as PicPanel, boardHooks);
 }

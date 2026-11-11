@@ -1,6 +1,6 @@
 /**
  * Easter: the bunny-hop room (revamp-centerpieces.md).
- * Bunny Hops (Numbrix) panels in seven runs:
+ * Bunny Hops panels in seven runs:
  * - Intro: The Hutch (`hutch`, 5 panels, <=4x4)
  * - Home twist: The Egg Tree (`eggtree`, 5 panels, <=6x6, `burrows`)
  * - 5 Relic runs (3 panels each, 4x4 / 5x5 / 6x6):

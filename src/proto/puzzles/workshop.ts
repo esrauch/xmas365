@@ -12,13 +12,13 @@ import { type Panel as LightPanel, twistsOf as lightTwists } from '../../gen/lig
 import { type Panel as PicturePanel, twistsOf as pictureTwists } from '../../gen/pictures';
 import { type Panel as WebPanel, twistsOf as webTwists } from '../../gen/webs';
 import { type Panel as WordPanel, twistsOf as wordTwists } from '../../gen/words';
-import { mountWeb } from '../hashiBoard';
+import { mountWeb } from '../websBoard';
 import { mountHops } from '../hopsBoard';
 import { type Proto, h } from '../kit';
-import { mountLights } from '../netBoard';
+import { mountLights } from '../lightsBoard';
 import { mountPicture } from '../pictureBoard';
-import { mountCarving } from '../shikakuBoard';
-import { mountStrands } from '../strandsBoard';
+import { mountCarving } from '../carvingBoard';
+import { mountWords } from '../wordsBoard';
 import { formatPuzzleIdentity } from './clauses/types';
 
 interface Workshop {
@@ -330,7 +330,7 @@ const WORDS: Workshop = {
   ],
   twistsOf: (p) => wordTwists(p as WordPanel),
   mount: (host, p, hooks) =>
-    mountStrands(host, { ...(p as WordPanel), name: 'Workshop Heartstrings' }, hooks),
+    mountWords(host, { ...(p as WordPanel), name: 'Workshop Heartstrings' }, hooks),
 };
 
 export const webWorkshop = workshop('webworkshop', WEBS);

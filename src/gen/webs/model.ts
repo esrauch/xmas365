@@ -1,6 +1,5 @@
 /**
- * Webs (Halloween): Hashi (Nikoli's Hashiwokakero, Tatham's Bridges). The
- * panel format, and the web it parses into: knots, the links that could hold
+ * Webs (Halloween): the panel format, and the web it parses into: knots, the links that could hold
  * threads between them, which links cross, and the twists' clues.
  *
  * The base rules: a knot's number is how many threads leave it; threads run

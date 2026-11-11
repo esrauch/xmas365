@@ -1,5 +1,5 @@
 /**
- * A fast, budgeted solver for Bunny hops (Numbrix) and its twists.
+ * A fast, budgeted solver for Bunny hops and its twists.
  */
 import { Budget } from '../core/budget';
 import { inside, mirrorKey, mirrorSquare, segment } from '../core/mirror';

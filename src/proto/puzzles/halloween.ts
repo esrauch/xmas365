@@ -1,12 +1,12 @@
 /**
- * Halloween: the web run (`revamp-centerpieces.md`). Hashi panels in seven
+ * Halloween: the web run (`revamp-centerpieces.md`). Web panels in seven
  * runs: the intro run on the porch cobwebs, the Spider's Web home-twist run
  * (dark `?` knots), and the five relic runs (Box of Chocolates, Tree-Top Star,
  * Marshmallow Chick, Picnic Basket, and Gravy Boat). Every panel is ≤ 7×7 and
  * has a unique solution (`tests/puzzles/halloween.test.ts`).
  */
 import { type Panel, fillMessage, letterValues, parse, solve } from '../../gen/webs';
-import { mountWeb } from '../hashiBoard';
+import { mountWeb } from '../websBoard';
 import { run } from '../run';
 
 export const WARMUP: Panel[] = [

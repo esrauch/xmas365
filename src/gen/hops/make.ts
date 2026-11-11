@@ -1,5 +1,5 @@
 /**
- * Solution-first generation of Bunny hops (Numbrix) boards, routes, and twists.
+ * Solution-first generation of Bunny hops boards, routes, and twists.
  */
 import { Budget } from '../core/budget';
 import { type Frame, area, frames, mirrorSquare, offAxis, symmetricIn } from '../core/mirror';

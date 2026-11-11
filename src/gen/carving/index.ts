@@ -1,4 +1,4 @@
-/** Carving (Thanksgiving): Shikaku, its twists, solver and generator. */
+/** Carving (Thanksgiving): the rectangle puzzle, its twists, solver and generator. */
 export * from './model';
 export * from './rules';
 export * from './solve';

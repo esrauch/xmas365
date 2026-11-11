@@ -1,5 +1,5 @@
 /**
- * Net (Simon Tatham's Net) and Christmas lights.
+ * Christmas lights.
  * Re-exported from the generator in src/gen/lights/.
  */
 export * from '../gen/lights';

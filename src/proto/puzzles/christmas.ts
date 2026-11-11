@@ -1,11 +1,11 @@
 /**
- * Christmas: the lights run (`revamp-centerpieces.md`). Net panels in seven
+ * Christmas: the lights run (`revamp-centerpieces.md`). Lights panels in seven
  * runs: the intro run on the fairy lights, the Christmas Tree home-twist run
  * (`snow`: mirrored frosty frame), and the five relic runs (Golden Egg,
  * Pumpkin Pie, Love Letter, Ice Pop, and Cauldron). Every panel is ≤ 6×6 and
  * has a unique solution (`tests/puzzles/christmas.test.ts`).
  */
-import { type LightsPanel, mountLights } from '../netBoard';
+import { type LightsPanel, mountLights } from '../lightsBoard';
 import { run } from '../run';
 
 export const WARMUP: LightsPanel[] = [

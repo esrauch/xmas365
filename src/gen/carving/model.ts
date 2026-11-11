@@ -1,6 +1,5 @@
 /**
- * Carving (Thanksgiving): Shikaku (Nikoli; Tatham's Rectangles). The panel
- * format, and the board it parses into.
+ * Carving (Thanksgiving): the panel format, and the board it parses into.
  *
  * The base rules: divide the grid into rectangles (portions); each holds
  * exactly one number, and the number is its size. The twists, each optional:

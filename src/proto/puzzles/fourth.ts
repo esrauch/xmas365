@@ -1,6 +1,6 @@
 /**
  * Fourth of July: the fireworks room (revamp-centerpieces.md).
- * Fireworks (Picture-grid / Nonogram) panels in seven runs, each a set of
+ * Fireworks (picture grid) panels in seven runs, each a set of
  * recognizable pictures:
  * - Intro (`sparklers`, 5 panels, <=7x7): line, sparkle, cone, rocket, burst
  * - Home twist (`finale`, 5 panels, <=7x7, `colours`): building to the flag
