@@ -105,10 +105,10 @@ export const BROOM: StoryPanel[] = [
   {
     name: 'The pumpkin',
     tip: '🎃 A ? clue in a row or column stands for a filled run of any length (1 or more)',
-    rows: ['...#.', '.#.##', '.###.', '#####', '..#..'],
+    rows: ['#####', '.###.', '#.###', '.###.', '.###.'],
     dark: [
+      ['row', 2, 1],
       ['col', 4, 1],
-      ['row', 1, 1],
     ],
   },
   {

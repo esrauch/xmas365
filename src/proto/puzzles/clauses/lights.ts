@@ -79,10 +79,10 @@ const PANELS: readonly ClausePanelItem<LightPanel>[] = [
       'A ? tile hides its wire shape in the dark and turns blind; orient the visible surrounding tiles first so their wire ends reveal how each ? tile must connect.',
     panel: {
       name: 'Shadow Bulbs',
-      rows: ['6a8', '7ac', '129'],
-      plug: [2, 1],
+      rows: ['2eac4', '47815', '7baa9', '7c42c', '13ba9'],
+      plug: [4, 2],
       dark: [
-        [0, 0],
+        [3, 4],
         [2, 2],
       ],
     },

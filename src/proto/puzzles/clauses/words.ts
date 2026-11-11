@@ -65,30 +65,45 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
         '🎃 Spooky in Heartstrings: A ? tile hides its letter in the dark—use the surrounding letters and theme to trace a valid word right through it!',
       panel: {
         name: 'Candlelight Note',
-        theme: 'Red for love',
-        rows: ['TRA', 'EHE', 'SOR'],
+        theme: 'Table for two',
+        rows: ['ENNA', 'IHTP', 'DRMK', 'AWNI'],
         words: [
           {
-            word: 'HEART',
+            word: 'DINE',
             cells: [
-              [1, 1],
-              [1, 2],
-              [0, 2],
+              [2, 0],
+              [1, 0],
               [0, 1],
               [0, 0],
             ],
           },
           {
-            word: 'ROSE',
+            word: 'NAPKIN',
             cells: [
-              [2, 2],
+              [0, 2],
+              [0, 3],
+              [1, 3],
+              [2, 3],
+              [3, 3],
+              [3, 2],
+            ],
+          },
+          {
+            word: 'WARMTH',
+            cells: [
+              [3, 1],
+              [3, 0],
               [2, 1],
-              [2, 0],
-              [1, 0],
+              [2, 2],
+              [1, 2],
+              [1, 1],
             ],
           },
         ],
-        dark: [[0, 1]],
+        dark: [
+          [3, 0],
+          [1, 0],
+        ],
       },
     },
     {

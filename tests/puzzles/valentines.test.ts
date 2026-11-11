@@ -118,6 +118,20 @@ describe("Valentine's love-letter room (7 runs, 25 panels)", () => {
     }
   });
 
+  it('uses no duplicate words across all 25 story panels in the 7 runs', () => {
+    const seen = new Map<string, string>();
+    for (const r of allRuns) {
+      (r.panels ?? []).forEach((panel, idx) => {
+        const p = panel as Panel;
+        for (const w of p.words) {
+          const prev = seen.get(w.word);
+          expect(prev, `${r.id}[${idx}] repeats word "${w.word}" from ${prev}`).toBeUndefined();
+          seen.set(w.word, `${r.id}[${idx}]`);
+        }
+      });
+    }
+  });
+
   it('a word counts by any path through its own squares that spells it', () => {
     const p: Panel = {
       name: 'mummy',

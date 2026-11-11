@@ -132,12 +132,12 @@ export const HOTDOG: Panel[] = [
 export const STOCKING: Panel[] = [
   {
     name: 'A frosty window',
-    rows: ['. . 2 . .', '. 6 . . 4', '. . . 6 .', '. . . . .', '. 4 . 3 .'],
+    rows: ['. . . 3 .', '6 . . . 2', '. . . . .', '. 2 . . 3', '2 . 5 2 .'],
     frame: {
       top: 1,
-      left: 0,
+      left: 1,
       bottom: 4,
-      right: 2,
+      right: 3,
       axis: 'h',
     },
     tip: '❄️ Snowflake: Inside the frosty frame, cuts between portions mirror across the icy line.',
@@ -165,20 +165,20 @@ export const STOCKING: Panel[] = [
   {
     name: 'A full stocking',
     rows: [
-      '4 . 2 . . . .',
-      '. 2 . . . . 8',
-      '. . . 6 . . .',
-      '. . . . . . .',
-      '. 6 . 3 . . 3',
-      '2 . . . 6 . .',
-      '. 3 . 2 . 2 .',
+      '. . 4 . 7 . .',
+      '. 6 . . . . .',
+      '. . 2 . . . .',
+      '. . . 2 . . 8',
+      '. . 6 . . 4 .',
+      '8 . . . . . .',
+      '. . . . . . 2',
     ],
     frame: {
-      top: 1,
-      left: 1,
-      bottom: 3,
-      right: 4,
-      axis: 'v',
+      top: 2,
+      left: 2,
+      bottom: 5,
+      right: 6,
+      axis: 'h',
     },
     tip: '❄️ Snowflake: Mirror the cuts inside the frosty frame to pack the 7×7 stocking.',
   },
@@ -245,12 +245,12 @@ export const JELLYBEANS: Panel[] = [
 export const CANDYCORN: Panel[] = [
   {
     name: 'Hidden portion',
-    rows: ['6 . . 2 .', '. . . . .', '? . 2 3 .', '. . . . .', '. . 2 . 4'],
+    rows: ['. . 2 . 3', '4 . . 3 .', '. ? . . .', '. . 3 . .', '. . 2 . 2'],
     tip: '🎃 Spooky: A ? clue stands for a rectangle of any area.',
   },
   {
     name: 'Shadow platter',
-    rows: ['. . 3 . .', '. 2 2 . .', '. . ? . 2', '5 . . 2 2', '. . 3 . .'],
+    rows: ['. 3 . . .', '3 . . . 3', '. 6 . . .', '2 . . . ?', '2 . 4 . .'],
     tip: '🎃 Spooky: Carve the numbered rectangles first to see what space the ? portion must fill.',
   },
   {

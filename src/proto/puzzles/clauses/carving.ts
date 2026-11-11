@@ -142,9 +142,9 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
       'Every Y rectangle has the same area and M has a different area, while the ? rectangle can take any area at all.',
     panel: {
       name: 'Secret Recipe',
-      rows: ['? . . Y .', '. . . . .', '6 . . 3 .', '. . Y . .', '. . Y . M'],
-      sizeLetters: ' Y M     ',
-      message: '2A4',
+      rows: ['U . . ? .', '. . 2 . .', '2 . . . .', '. . . G .', '2 . U . 2'],
+      sizeLetters: '   U G   ',
+      message: 'H46',
     },
   },
   {
@@ -156,8 +156,8 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
       'Work out the ? portion’s footprint while making sure no two red or two blue portions share an edge.',
     panel: {
       name: 'Twilight Pennants',
-      rows: ['. . 2 . .', '. ? . . 4', '. . . 6 .', '. . . . .', '. 4 . 3 .'],
-      colours: ['..rb.', 'b....', '.....', '.....', '.r.b.'],
+      rows: ['. 4 . 2 .', '. . . . 2', '. . 5 . .', '. ? . . .', '3 . . 6 .'],
+      colours: ['r...b', '...r.', '...b.', '.....', 'b....'],
     },
   },
   {
@@ -203,13 +203,13 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     twists: ['letters', 'colours'],
     tip: '💌 Love Letters + 🎆 Red, White & Blue: Coded areas and non-touching colors.',
     explain:
-      'Match equal letters to equal areas and separate same-colored portions to decode THANKS.',
+      'Match equal letters to equal areas and separate same-colored portions to decode FEAST.',
     panel: {
       name: 'Ribboned Notes',
-      rows: ['. . 2 . .', '. S . . T', '. . . S .', '. . . . .', '. T . 3 .'],
-      sizeLetters: '   T S   ',
-      message: '4HANK6',
-      colours: ['..r..', '...b.', '.....', '.....', '.b.r.'],
+      rows: ['4 . . . A', '. E . . .', 'A . . 6 .', '. . . . A', 'A . . 4 .'],
+      sizeLetters: ' AE      ',
+      message: 'F32ST',
+      colours: ['...b.', '.....', 'r....', '..r..', '...b.'],
     },
   },
   {
@@ -218,13 +218,18 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     twists: ['letters', 'cuts'],
     tip: '💌 Love Letters + 🥧 Portions: Letter areas stopped by a fence.',
     explain:
-      'The vertical fence blocks one orientation so the R and C portions lock into unique areas for CORN.',
+      'The fences block crossing rectangles so the F and A portions lock into unique areas for FEAST.',
     panel: {
       name: 'Carved Initials',
-      rows: ['. . . R .', '. . 6 . R', '6 . . . .', '. . . 4 .', 'C . . . .'],
-      sizeLetters: ' R  C    ',
-      message: '5O2N',
-      walls: [[1, 3, 'v']],
+      rows: ['. . A . .', '. 4 . . 3', '2 . F . .', '. 2 . F .', '2 . . . 2'],
+      sizeLetters: '  FA     ',
+      message: '3E4ST',
+      walls: [
+        [1, 3, 'h'],
+        [1, 1, 'v'],
+        [2, 1, 'h'],
+        [3, 0, 'h'],
+      ],
     },
   },
   {

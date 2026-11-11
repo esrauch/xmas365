@@ -64,7 +64,7 @@ export const SPIDER: Panel[] = [
   },
   {
     name: "The Spider's Web",
-    rows: ['..?....', '.15....', '1......', '?.7...2', '...?1..', '.......', '1.23..1'],
+    rows: ['21...1.', '?.4....', '......?', '2......', '..4..53', '.......', '?...4.2'],
     tip: '🎃 Spooky: Spin the full 7×7 rafters web around the hidden ? knots.',
   },
 ];
@@ -186,8 +186,8 @@ export const GRAVYBOAT: Panel[] = [
   },
   {
     name: 'Ladle barrier',
-    rows: ['24...', '.....', '.4.1.', '.....', '.3.31'],
-    walls: [[2, 3, 'h']],
+    rows: ['2....', '5...2', '....2', '....3', '2...2'],
+    walls: [[1, 4, 'h']],
     tip: '🥧 Portioned: Route threads around the wooden fence bar to connect the web.',
   },
   {

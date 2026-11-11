@@ -66,7 +66,7 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
         'A dark knot (?) hides its number in the shadows and can take any thread count (1 or more) needed to satisfy its neighbors and connect the web.',
       panel: {
         name: 'Candle in the Dark',
-        rows: ['...1.', '.....', '.....', '?3.3.', '.?.32'],
+        rows: ['?..1.', '....2', '...43', '.....', '3..4.'],
       },
     },
     {
@@ -91,8 +91,8 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
         'Red knots cannot connect to red knots, and blue knots cannot connect to blue knots. White (plain) knots can connect to any color.',
       panel: {
         name: 'Party Bulbs',
-        rows: ['3.3.2', '.....', '4...1', '.....', '3.2..'],
-        colours: ['r.b.r', '.....', 'b...b', '.....', '..r..'],
+        rows: ['3...2', '....2', '4...4', '.....', '1...2'],
+        colours: ['b...r', '....b', 'r....', '.....', 'b...b'],
       },
     },
     {
@@ -104,9 +104,9 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
         'The number on an egg badge tells you the exact fewest knot-to-knot thread hops needed to reach that knot from the spider home (🕷). Direct shortcuts that arrive too soon must be avoided!',
       panel: {
         name: 'Three Hops Home',
-        rows: ['24...', '.....', '.4.1.', '.....', '.3.31'],
-        home: [2, 3],
-        eggs: [[4, 4, 4]],
+        rows: ['....2', '.....', '2...5', '3...4', '4...4'],
+        home: [4, 0],
+        eggs: [[2, 0, 4]],
       },
     },
     {
@@ -118,8 +118,8 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
         'Thick wooden fence bars between squares block straight sightlines—no thread is allowed to cross a bar.',
       panel: {
         name: 'Fence Post',
-        rows: ['2...3', '2...3', '.....', '.....', '3..32'],
-        walls: [[0, 0, 'h']],
+        rows: ['13.1.', '.....', '.....', '.....', '24.21'],
+        walls: [[0, 0, 'v']],
       },
     },
     {
@@ -144,11 +144,11 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
       twists: ['dark', 'letters'],
       tip: '🎃 Spooky + 💌 Love Letters: Dark (?) knots are free; letter knots share counts.',
       explain:
-        'Combine dark (?) knots that accept any count with coded letter knots (L and V) that must share consistent, distinct counts.',
+        'Combine dark (?) knots that accept any count with coded letter knots (O and V) that must share consistent, distinct counts.',
       panel: {
         name: 'Midnight Valentine',
-        rows: ['?L2...3', '.......', '...V.2L', '.V.....', '..L.?..', '..3...?', '......V'],
-        message: '4O1E',
+        rows: ['....1..', 'O...V.2', '..1..?.', '....4..', '4.?....', '....O..', '2.4..O.'],
+        message: 'L26E',
       },
     },
     // 14: dark + colours

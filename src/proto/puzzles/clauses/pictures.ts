@@ -155,13 +155,13 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
         'Combine ? mystery runs with coded letter runs: same letters must share the same run length, while ? clues can take any length that fits.',
       panel: {
         name: 'Midnight Billet',
-        rows: ['####.', '..###', '####.', '###..', '.#...'],
+        rows: ['.####', '.####', '.###.', '#####', '##.##'],
         dark: [
-          ['col', 1, 1],
-          ['col', 0, 0],
+          ['col', 4, 1],
+          ['row', 4, 0],
         ],
-        letters: 'ABNG',
-        message: '2134',
+        letters: '  IFZ',
+        message: '4355',
       },
     },
     {
@@ -173,11 +173,11 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
         'A colored ? clue tells you whether the run is Red or Blue while hiding how long it is; remember that Red and Blue runs can touch without a gap.',
       panel: {
         name: 'Phantom Flare',
-        rows: ['RRRR.', '..RRB', 'RRRB.', 'RRB..', '.B...'],
+        rows: ['RRRR.', 'RRRRB', 'RRRBB', '..BB.', 'R.B..'],
         palette: 'RB',
         dark: [
-          ['col', 1, 1],
           ['col', 0, 0],
+          ['row', 1, 1],
         ],
       },
     },
@@ -210,11 +210,11 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
         'Every outlined portion holds the exact same number of filled squares, giving you the extra count needed to resolve the ? clues.',
       panel: {
         name: 'Twilight Banquet',
-        rows: ['...#.', '.#..#', '.##..', '#####', '..##.'],
-        portions: ['AAAAB', 'AAABB', 'AAABB', 'ABABB', 'BBBBB'],
+        rows: ['####.', '###..', '##.#.', '##..#', '.#...'],
+        portions: ['AAAAB', 'ABBAB', 'ABAAB', 'BBBBB', 'BBBBB'],
         dark: [
-          ['col', 4, 1],
-          ['col', 3, 1],
+          ['row', 3, 0],
+          ['row', 2, 0],
         ],
       },
     },
@@ -227,11 +227,12 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
         'Mirroring squares across the frosty frame’s axis locks in cells that disambiguate the hidden ? run clues.',
       panel: {
         name: 'Ghost Flurry',
-        rows: ['####.', '....#', '#..#.', '.##..', '..#..'],
-        frame: { top: 0, bottom: 3, left: 0, right: 3, axis: 'v' },
+        rows: ['...#.##', '......#', '..##..#', '#....##', '.#..#.#', '..###.#', '.######'],
+        frame: { top: 1, bottom: 4, left: 0, right: 5, axis: 'v' },
         dark: [
-          ['col', 3, 0],
-          ['row', 2, 0],
+          ['row', 3, 0],
+          ['row', 2, 1],
+          ['col', 2, 0],
         ],
       },
     },
@@ -259,13 +260,13 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
         'Use the numbered eggs in each row together with the letter clues so every coded run length and egg count agrees.',
       panel: {
         name: 'Painted Ribbon',
-        rows: ['#..#.', '##..#', '##...', '.##..', '.###.'],
+        rows: ['.#...', '.#...', '###..', '##.#.', '##..#'],
         eggs: [
-          [0, 3, 2],
-          [1, 1, 2],
+          [3, 3, 3],
+          [4, 4, 3],
         ],
-        letters: 'ELVO',
-        message: '2431',
+        letters: 'MB  O',
+        message: '2551',
       },
     },
     {
@@ -324,9 +325,9 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
         'Every outlined portion must hold the same total number of filled squares (Red plus Blue combined), while different-colored runs can touch directly.',
       panel: {
         name: 'Bicentennial Pie',
-        rows: ['RRR.R', '.R...', 'BB.B.', '....B', '.B...'],
+        rows: ['B..B.', 'B...B', 'BBB..', 'B.R..', 'BRRRR'],
         palette: 'RB',
-        portions: ['AAAAB', 'ABAAB', 'ABAAB', 'ABBBB', 'BBBBB'],
+        portions: ['AAAAB', 'AAABB', 'AABBB', 'ABBBB', 'ABBBB'],
       },
     },
     {
