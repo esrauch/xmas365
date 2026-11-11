@@ -29,7 +29,7 @@ export const THEME_WORDS: Record<number, readonly string[]> = {
     (w) => w.length === 3,
   ),
   4: ['STAR', 'GLOW', 'WARM', 'GOLD', 'SNOW', 'PINE', 'YULE', 'GIFT', 'COZY', 'NOEL'],
-  5: ['LIGHT', 'SHINE', 'SPARK', 'FROST', 'ANGEL', 'FLAME', 'CHIME', 'CROWN', 'TWIGY'],
+  5: ['LIGHT', 'SHINE', 'SPARK', 'FROST', 'ANGEL', 'FLAME', 'CHIME', 'CROWN', 'CAROL'],
 };
 const WORDS_3 = ['JOY', 'SUN', 'ICY', 'FIR', 'ELM', 'BOW', 'RED', 'LIT', 'RAY', 'WAX'];
 

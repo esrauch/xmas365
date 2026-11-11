@@ -261,6 +261,9 @@ export function mountWords(host: HTMLElement, panel: Panel, hooks: WordsHooks): 
     const i = find(panel, path);
     if (i >= 0 && !found.has(i)) {
       found.add(i);
+      if (hintedWord === i) {
+        hintedWord = null;
+      }
       lastFoundWord = i;
       blip(880, 120, 15);
       if (found.size === panel.words.length) {
@@ -284,8 +287,13 @@ export function mountWords(host: HTMLElement, panel: Panel, hooks: WordsHooks): 
     path = [];
     render();
   };
+  const cancelDrag = (): void => {
+    if (!path.length) return;
+    path = [];
+    render();
+  };
   svg.addEventListener('pointerup', release);
-  svg.addEventListener('pointercancel', release);
+  svg.addEventListener('pointercancel', cancelDrag);
 
   /** Colours: a letter's tint (plain letters white), and a ring in its colour (red, white and blue; red and green in older panels). */
   const TINTS: Record<string, string> = { r: '#fde0dd', g: '#dff3df', b: '#dde6fb' };

@@ -90,6 +90,15 @@ export function buildMemoSheet(memo: MemoSpec, holiday: string): HTMLElement {
   );
 }
 
+let activeKeyCleanup: (() => void) | null = null;
+
+export function clearMemoOverlayKeyListener(): void {
+  if (activeKeyCleanup) {
+    activeKeyCleanup();
+    activeKeyCleanup = null;
+  }
+}
+
 /**
  * A new memo, filling the screen until it's put away. Enter, Space or Escape
  * also put it away. Returns the overlay (already in `host`).
@@ -101,18 +110,19 @@ export function showMemoOverlay(
   buttonLabel: string,
   onDone: () => void,
 ): HTMLElement {
+  clearMemoOverlayKeyListener();
   let done = false;
   const finish = (): void => {
     if (done) return;
     done = true;
-    window.removeEventListener('keydown', onKey);
+    clearMemoOverlayKeyListener();
     overlay.remove();
     onDone();
   };
   const onKey = (e: KeyboardEvent): void => {
     // Taken down some other way (a puzzle opened over it): just stop listening.
     if (!overlay.isConnected) {
-      window.removeEventListener('keydown', onKey);
+      clearMemoOverlayKeyListener();
       return;
     }
     if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
@@ -132,6 +142,7 @@ export function showMemoOverlay(
     ),
   );
   window.addEventListener('keydown', onKey);
+  activeKeyCleanup = () => window.removeEventListener('keydown', onKey);
   host.replaceChildren(overlay);
   return overlay;
 }

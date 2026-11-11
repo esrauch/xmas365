@@ -301,7 +301,7 @@ export function mountHops(host: HTMLElement, panel: Panel, hooks: HopsHooks): ()
   });
 
   svg.addEventListener('pointermove', (e) => {
-    if (!active) return;
+    if (done || !active) return;
     const j = spotAt(e, true);
     const route = routes[active];
     const last = route[route.length - 1];
@@ -326,7 +326,7 @@ export function mountHops(host: HTMLElement, panel: Panel, hooks: HopsHooks): ()
   });
 
   const release = (): void => {
-    if (!active) return;
+    if (done || !active) return;
     const cur = active;
     active = null;
     const route = routes[cur];
@@ -337,8 +337,15 @@ export function mountHops(host: HTMLElement, panel: Panel, hooks: HopsHooks): ()
     }
     settle();
   };
+  const cancelDrag = (): void => {
+    if (!active) return;
+    active = null;
+    moved = false;
+    wasBunny = false;
+    settle();
+  };
   svg.addEventListener('pointerup', release);
-  svg.addEventListener('pointercancel', release);
+  svg.addEventListener('pointercancel', cancelDrag);
 
   const launchHopsCelebration = (): void => {
     if (typeof requestAnimationFrame !== 'function') return;
@@ -756,11 +763,22 @@ export function mountHops(host: HTMLElement, panel: Panel, hooks: HopsHooks): ()
 
       if (g !== undefined || letter !== undefined) {
         const gold = panel.golden && key(panel.golden) === key(s);
+        const hintedBunny = hintOwner.get(i);
         const eggTone: 'r' | 'b' =
-          hintOwner.get(i) ?? (b.twoBunnies && b.colour[i] === secTone ? 'b' : 'r');
+          hintedBunny ??
+          (b.twoBunnies && (b.colour[i] === secTone || (b.colour[i] === 'w' && owner(i) === 'b'))
+            ? 'b'
+            : 'r');
         const myRoute = routes[eggTone];
-        const byMe = !b.twoBunnies || owner(i) === eggTone;
-        const late = g !== undefined && n === undefined && myRoute.length >= g;
+        const byMe =
+          !b.twoBunnies ||
+          (hintedBunny ? owner(i) === hintedBunny : b.colour[i] === 'w' || owner(i) === eggTone);
+        const late =
+          g !== undefined &&
+          n === undefined &&
+          (hintedBunny === undefined && b.colour[i] === 'w' && b.twoBunnies
+            ? routes.r.length >= g && routes.b.length >= g
+            : myRoute.length >= g);
         const wrong =
           (g !== undefined && n !== undefined && (!byMe || n !== g)) ||
           (letter !== undefined && n !== undefined && (owner(i) !== 'r' || !blankSteps.has(n)));
@@ -918,9 +936,9 @@ export function mountHops(host: HTMLElement, panel: Panel, hooks: HopsHooks): ()
       b.given.set(spot, stepNum);
       hintOwner.set(spot, bunny);
       if (b.dark[spot]) b.dark[spot] = false;
-      emitState();
+      lastHoppedSpot = spot;
       blip(660, 70, 10);
-      flashSpots([spot]);
+      settle();
     };
 
     // 1. Check if either bunny's current route has diverged from the solution

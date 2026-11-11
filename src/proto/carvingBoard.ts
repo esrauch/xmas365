@@ -214,7 +214,7 @@ export function mountCarving(host: HTMLElement, panel: Panel, hooks: CarveHooks)
     render();
   });
   svg.addEventListener('pointermove', (e) => {
-    if (!drag) return;
+    if (done || !drag) return;
     const p = at(e);
     if (p && (p[0] !== drag.to[0] || p[1] !== drag.to[1])) {
       drag.to = p;
@@ -223,7 +223,7 @@ export function mountCarving(host: HTMLElement, panel: Panel, hooks: CarveHooks)
     }
   });
   svg.addEventListener('pointerup', (e) => {
-    if (!drag) return;
+    if (done || !drag) return;
     const p = at(e) ?? drag.to;
     const { r, c } = drag;
     drag = null;
@@ -350,6 +350,8 @@ export function mountCarving(host: HTMLElement, panel: Panel, hooks: CarveHooks)
   const settle = (): void => {
     if (solved(b, rects)) {
       done = true;
+      inspect = null;
+      clearTimeout(inspectTimer);
       [660, 880, 1100].forEach((f, i) => setTimeout(() => blip(f, 160), i * 110));
       navigator.vibrate?.([20, 40, 20]);
       render();
@@ -813,7 +815,8 @@ export function mountCarving(host: HTMLElement, panel: Panel, hooks: CarveHooks)
     // 1. If any carved rectangle doesn't match the solution, remove one wrong rectangle
     const wrongIdx = rects.findIndex((x) => !solSet.has(rectKey(x)));
     if (wrongIdx !== -1) {
-      rects.splice(wrongIdx, 1);
+      const removed = rects.splice(wrongIdx, 1)[0];
+      if (removed) lockedRectKeys.delete(rectKey(removed));
       blip(260, 60, 10);
       settle();
       return;
@@ -823,9 +826,17 @@ export function mountCarving(host: HTMLElement, panel: Panel, hooks: CarveHooks)
     const currentSet = new Set(rects.map(rectKey));
     const missing = cachedSol.find((s) => !currentSet.has(rectKey(s)));
     if (missing) {
-      rects = rects.filter((y) => !overlaps(missing, y));
+      rects = rects.filter((y) => {
+        if (overlaps(missing, y)) {
+          lockedRectKeys.delete(rectKey(y));
+          return false;
+        }
+        return true;
+      });
       rects.push({ ...missing });
-      lockedRectKeys.add(rectKey(missing));
+      const mKey = rectKey(missing);
+      lockedRectKeys.add(mKey);
+      lastCarvedKey = mKey;
       blip(640, 70, 10);
       settle();
     }

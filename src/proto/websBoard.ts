@@ -259,18 +259,23 @@ export function mountWeb(host: HTMLElement, panel: Panel, hooks: BoardHooks): ()
     const k = knotAt(x, y);
     if (k >= 0) {
       drag = { from: k, x, y };
-      svg.setPointerCapture(e.pointerId);
+      try {
+        svg.setPointerCapture(e.pointerId);
+      } catch {
+        // Synthetic pointer: no capture needed
+      }
       return;
     }
     const i = linkAt(x, y);
     if (i >= 0) {
+      picked = null;
       threads[i] = 0;
       blip(260, 50, 8);
       settle();
     }
   });
   svg.addEventListener('pointermove', (e) => {
-    if (!drag) return;
+    if (done || !drag) return;
     const [x, y] = at(e);
     const [cx, cy] = centre(web.knots[drag.from] as Knot);
     if (!rubber) {
@@ -289,7 +294,7 @@ export function mountWeb(host: HTMLElement, panel: Panel, hooks: BoardHooks): ()
     rubber.setAttribute('y2', String(y));
   });
   const end = (e: PointerEvent): void => {
-    if (!drag) return;
+    if (done || !drag) return;
     const [x, y] = at(e);
     const from = drag.from;
     drag = null;
@@ -922,9 +927,9 @@ export function mountWeb(host: HTMLElement, panel: Panel, hooks: BoardHooks): ()
     // 1. If any bridge has too many threads or shouldn't exist, fix/remove one wrong bridge
     const wrongIdx = threads.findIndex((t, i) => t > (cachedSol?.[i] ?? 0));
     if (wrongIdx !== -1) {
-      const link = web.links[wrongIdx];
       threads[wrongIdx] = cachedSol[wrongIdx] ?? 0;
-      if (link) flash([`k${link.a}`, `k${link.b}`]);
+      picked = null;
+      blip(640, 70, 10);
       settle();
       return;
     }
@@ -932,10 +937,9 @@ export function mountWeb(host: HTMLElement, panel: Panel, hooks: BoardHooks): ()
     // 2. Otherwise add 1 missing strand from the solution
     const missingIdx = threads.findIndex((t, i) => t < (cachedSol?.[i] ?? 0));
     if (missingIdx !== -1) {
-      const link = web.links[missingIdx];
       threads[missingIdx] = (threads[missingIdx] ?? 0) + 1;
+      picked = null;
       blip(640, 70, 10);
-      if (link) flash([`k${link.a}`, `k${link.b}`]);
       settle();
     }
   };

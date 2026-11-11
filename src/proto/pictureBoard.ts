@@ -25,7 +25,6 @@ import {
   frameSymmetric,
   gridSolved,
   lineDone,
-  matches,
   picture,
   portionCounts,
   runIndexAt,
@@ -101,7 +100,8 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
         }
         cand.push(candRow);
       }
-      if (valid && !matches(panel, cand)) {
+      if (valid && !gridSolved(panel, cand)) {
+        const sol = picture(panel);
         for (let r = 0; r < H; r++) {
           for (let cc = 0; cc < W; cc++) {
             (grid[r] as number[])[cc] = cand[r]?.[cc] ?? 0;
@@ -117,8 +117,20 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
           for (const k of init.locked) {
             if (typeof k === 'string') {
               const [r, cc] = k.split(',').map(Number);
-              if (r !== undefined && cc !== undefined && r >= 0 && r < H && cc >= 0 && cc < W) {
-                lockedCells.add(k);
+              if (
+                r !== undefined &&
+                cc !== undefined &&
+                Number.isInteger(r) &&
+                Number.isInteger(cc) &&
+                r >= 0 &&
+                r < H &&
+                cc >= 0 &&
+                cc < W
+              ) {
+                const want = (sol[r]?.[cc] ?? 0) > 0 ? (sol[r]?.[cc] ?? 0) : CROSS;
+                if (grid[r]?.[cc] === want) {
+                  lockedCells.add(`${r},${cc}`);
+                }
               }
             }
           }
@@ -267,6 +279,10 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
     const p = at(e);
     if (!p) return;
     const [r, cc] = p;
+    if (lockedCells.has(`${r},${cc}`)) {
+      blip(180, 70, 20);
+      return;
+    }
     const now = grid[r]?.[cc] ?? 0;
     // One colour: fill → cross → clear. Colours: the chosen paint, or clear if it's already that.
     const value =
@@ -282,7 +298,7 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
     render();
   });
   svg.addEventListener('pointermove', (e) => {
-    if (!drag) return;
+    if (done || !drag) return;
     const p = at(e);
     if (!p) return;
     const [r, cc] = p;
@@ -457,7 +473,7 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
   };
 
   const release = (): void => {
-    if (!drag) return;
+    if (done || !drag) return;
     drag = null;
     if (gridSolved(panel, grid)) {
       done = true;
@@ -522,11 +538,14 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
     const sol = picture(panel);
     const eggStyle = (r: number, cc: number): { fill: string; stroke: string; right: boolean } => {
       const row = grid[r] ?? [];
-      const atCell = row[cc] ?? 0;
+      const atCell = effective(r, cc);
       const runs = c.rows[r] ?? [];
       const wantRun = runIndexAt(sol[r] ?? [], cc);
       const targetRun = runs[wantRun];
-      const known = row.map((v) => (v === CROSS ? 0 : v > 0 ? v : -1));
+      const known = row.map((_, cIdx) => {
+        const v = effective(r, cIdx);
+        return v === CROSS ? 0 : v > 0 ? v : -1;
+      });
       const validArrs = (arrangements(runs, known) ?? []).filter(
         (arr) => runIndexAt(arr, cc) === wantRun,
       );

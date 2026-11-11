@@ -662,6 +662,10 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
           autoAdvanceTimer = 0;
         }
         stopAdvanceBar();
+        if (activeFreePlayTier !== null) {
+          freePlayToken++;
+          cancelGenerating();
+        }
         activeFreePlayTier = null;
         currentFreePlayPanel = null;
         strip.style.display = 'flex';
@@ -743,6 +747,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         mountPanel(nextPane, panel, {
           solved: (text) => {
             panelSolved = true;
+            const wasAllSolved = panels.every((_, k) => done.has(`${proto.id}:${k}`));
             gameState.markPanelSolved(proto.id, i);
             const allSolved = panels.every((_, k) => done.has(`${proto.id}:${k}`));
             const nextUnsolvedAfter = panels.findIndex(
@@ -750,18 +755,9 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
             );
             const anyUnsolved = panels.findIndex((_, k) => !done.has(`${proto.id}:${k}`));
             const nextUnsolved = nextUnsolvedAfter !== -1 ? nextUnsolvedAfter : anyUnsolved;
-            renderStrip(i, i, allSolved);
-            if (allSolved || i === panels.length - 1) {
-              if (allSolved || nextUnsolved === -1) {
-                gameState.setActivePuzzle(null);
-              } else {
-                const nextPanel = panels[nextUnsolved] as P;
-                gameState.setActivePuzzle({
-                  protoId: proto.id,
-                  panelIdx: nextUnsolved,
-                  panelSig: panelSignature(nextPanel),
-                });
-              }
+            renderStrip(i, i, allSolved && (!wasAllSolved || i === panels.length - 1));
+            if (allSolved && (!wasAllSolved || i === panels.length - 1)) {
+              gameState.setActivePuzzle(null);
               message.className = '';
               message.textContent = '';
               next.style.visibility = 'hidden';
@@ -771,12 +767,12 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
               ctx.solved();
             } else {
               const nextIdx =
-                nextUnsolvedAfter !== -1 ? nextUnsolvedAfter : Math.min(i + 1, panels.length - 1);
-              if (nextUnsolved !== -1) {
-                const nextPanel = panels[nextUnsolved] as P;
+                nextUnsolved !== -1 ? nextUnsolved : Math.min(i + 1, panels.length - 1);
+              const nextPanel = panels[nextIdx] as P | undefined;
+              if (nextPanel) {
                 gameState.setActivePuzzle({
                   protoId: proto.id,
-                  panelIdx: nextUnsolved,
+                  panelIdx: nextIdx,
                   panelSig: panelSignature(nextPanel),
                 });
               } else {

@@ -1248,6 +1248,25 @@ export class GameState {
     this.notify();
   }
 
+  private removeBeat(beatId: string): void {
+    this.milestones.delete(beatId);
+    this.hallPendingBeats.delete(beatId as BeatId);
+    for (let i = this.beatQueue.length - 1; i >= 0; i--) {
+      if (this.beatQueue[i] === beatId) {
+        this.beatQueue.splice(i, 1);
+      }
+    }
+  }
+
+  private syncFirstRevertedHoliday(): void {
+    const completed = ROOM_SPECS.filter((r) => this.isRoomComplete(r));
+    if (completed.length === 0) {
+      this.firstRevertedHoliday = 'Thanksgiving';
+    } else if (!completed.some((r) => r.shortTitle === this.firstRevertedHoliday)) {
+      this.firstRevertedHoliday = completed[0]?.shortTitle ?? 'Thanksgiving';
+    }
+  }
+
   /**
    * Toggle a run's solved state directly (used by Settings toggles and dev tools).
    * Updates all panels of the run and syncs derived state/memos without queuing modal popups.
@@ -1261,11 +1280,22 @@ export class GameState {
     } else {
       const warmupRoom = ROOM_SPECS.find((r) => r.warmup.id === protoId);
       if (warmupRoom) {
-        this.milestones.delete(ROOM_SCRIPT[warmupRoom.id].enterMemoId);
+        this.removeBeat(ROOM_SCRIPT[warmupRoom.id].enterMemoId);
+      }
+      const strayEntry = Object.values(STRAY_ITEMS).find((s) => s.proto.id === protoId);
+      if (strayEntry && this.placedItems.delete(strayEntry.id)) {
+        if (this.placedItems.size === 0) {
+          this.removeBeat('T3');
+        }
+        const maxEsc = Math.floor(this.placedItems.size / 5);
+        for (let k = maxEsc + 1; k <= ROOM_SPECS.length; k++) {
+          this.removeBeat(`E${k}`);
+        }
+        this.syncFirstRevertedHoliday();
       }
       if (protoId === 'clause') {
         for (const b of ['C6.torn', 'Y1', 'Y2', 'Y4', 'Y5', 'Y6', 'Y7']) {
-          this.milestones.delete(b);
+          this.removeBeat(b);
         }
       }
     }
@@ -1275,7 +1305,7 @@ export class GameState {
         this.solvedRuns.has(s.proto.id),
       );
       if (!anyStraySolved) {
-        this.milestones.delete('T1');
+        this.removeBeat('T1');
       }
       this.recomputeDerived();
     }
@@ -1383,7 +1413,7 @@ export class GameState {
     }
     if (!voided) {
       for (const b of ['C6.torn', 'Y1', 'Y2', 'Y4', 'Y5', 'Y6', 'Y7']) {
-        this.milestones.delete(b);
+        this.removeBeat(b);
       }
     }
     this.recomputeDerived();
@@ -1449,14 +1479,13 @@ export class GameState {
     }
     if (this.placedItems.delete(itemId)) {
       if (this.placedItems.size === 0) {
-        this.milestones.delete('T3');
+        this.removeBeat('T3');
       }
       const maxEsc = Math.floor(this.placedItems.size / 5);
       for (let k = maxEsc + 1; k <= ROOM_SPECS.length; k++) {
-        const escId = `E${k}` as MemoId;
-        this.milestones.delete(escId);
-        this.hallPendingBeats.delete(escId);
+        this.removeBeat(`E${k}`);
       }
+      this.syncFirstRevertedHoliday();
       this.recomputeDerived();
       this.save();
       this.notify();
@@ -1477,12 +1506,14 @@ export class GameState {
       }
     }
     if (!placed) {
+      if (this.placedItems.size === 0) {
+        this.removeBeat('T3');
+      }
       const maxEsc = Math.floor(this.placedItems.size / 5);
       for (let k = maxEsc + 1; k <= ROOM_SPECS.length; k++) {
-        const escId = `E${k}` as MemoId;
-        this.milestones.delete(escId);
-        this.hallPendingBeats.delete(escId);
+        this.removeBeat(`E${k}`);
       }
+      this.syncFirstRevertedHoliday();
     } else if (this.completedRoomCount() === 1) {
       this.firstRevertedHoliday = room.shortTitle;
     }

@@ -32,6 +32,7 @@ import {
 } from './game/diorama';
 import { type BuiltIntroCinematic, buildIntroCinematic } from './game/introCinematic';
 import { FINALE_PROTO, ROOM_SPECS, type RoomSpec, STRAY_ITEMS, gameState } from './game/state';
+import { cancelGenerating } from './gen/client';
 import { type Proto, blip, h } from './proto/kit';
 import { PROTOS } from './proto/puzzles';
 import { ALL_CLAUSES, CLAUSE_PANEL_COUNT } from './proto/puzzles/clauses';
@@ -45,7 +46,12 @@ import {
   setShowIntroOnLoadEnabled,
   setSoundEnabled,
 } from './settings';
-import { buildMemoSheet, renderFormattedText, showMemoOverlay } from './ui/memo';
+import {
+  buildMemoSheet,
+  clearMemoOverlayKeyListener,
+  renderFormattedText,
+  showMemoOverlay,
+} from './ui/memo';
 import { applyPaletteVars } from './ui/paletteVars';
 import buildInfo from 'virtual:build-info';
 
@@ -67,9 +73,17 @@ const view = new View(canvas, { fov: 40, outline: params.get('outline') !== '0' 
 // Scene state: all 7 bays live in one Holiday Hall diorama
 let currentBay: BayId = 'hall';
 let activeDiorama: BuiltDiorama | null = null;
-let activeModal: 'none' | 'proto' | 'corkboard' | 'settings' | 'credits' = 'none';
+let activeModal: 'none' | 'proto' | 'corkboard' | 'settings' | 'credits' | 'unlock' = 'none';
 let activeProtoId: string | null = null;
 let activeProtoWasSolvedOnOpen = false;
+let bayTransitionTimers: number[] = [];
+
+function clearBayTransitionTimers(): void {
+  for (const id of bayTransitionTimers) {
+    window.clearTimeout(id);
+  }
+  bayTransitionTimers = [];
+}
 
 // Circular camera rotation around Holiday Hall + focus targets
 let camAngleTarget = getBayAngle('hall');
@@ -253,6 +267,7 @@ function clearCagedPromptTimer(): void {
 
 function hideMemoOverlay(): void {
   shownMemoBeatId = null;
+  clearMemoOverlayKeyListener();
   memoHost.replaceChildren();
 }
 
@@ -1003,6 +1018,15 @@ function layoutStableHotspots(): void {
 
 let introActive = false;
 let isTransitioningBay = false;
+/** The intro's `onEnterBay` (which queues the opening memo) waits here if a modal was open. */
+let pendingEnterBay = false;
+
+/** Run a postponed `onEnterBay`, once nothing covers the hall. */
+function flushPendingEnterBay(): void {
+  if (!pendingEnterBay || activeModal !== 'none' || isTransitioningBay) return;
+  pendingEnterBay = false;
+  gameState.onEnterBay(currentBay);
+}
 
 function syncBayUIAndHotspots(): void {
   layoutStableHotspots();
@@ -1010,6 +1034,7 @@ function syncBayUIAndHotspots(): void {
     hotspotLayer.classList.add('settled');
   }
   if (!introActive) {
+    pendingEnterBay = false;
     gameState.onEnterBay(currentBay);
     renderTopBar();
     renderSideArrows();
@@ -1118,6 +1143,11 @@ function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
   closeModal();
 
   if (opts?.instant || bay === currentBay) {
+    clearBayTransitionTimers();
+    isTransitioningBay = false;
+    activeDiorama?.setDoorHop(null, 0);
+    fadeOverlay.style.opacity = '0';
+    fadeOverlay.style.pointerEvents = 'none';
     currentBay = bay;
     camAngleTarget = getBayAngle(bay);
     camAngleCurrent = camAngleTarget;
@@ -1139,12 +1169,13 @@ function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
       return;
     }
 
+    clearBayTransitionTimers();
     isTransitioningBay = true;
     hotspotLayer.classList.remove('settled');
     leapBubbleHost.replaceChildren();
     storyBannerHost.replaceChildren();
     blip(440, 50);
-    window.setTimeout(() => blip(587, 65), 320);
+    bayTransitionTimers.push(window.setTimeout(() => blip(587, 65), 320));
 
     const hopDurationMs = 860;
     const hopStart = performance.now();
@@ -1157,34 +1188,41 @@ function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
     };
     requestAnimationFrame(tickHop);
 
-    window.setTimeout(() => {
-      fadeOverlay.style.pointerEvents = 'auto';
-      fadeOverlay.style.opacity = '1';
-    }, 660);
-
-    window.setTimeout(() => {
-      currentBay = bay;
-      camAngleTarget = getBayAngle(bay);
-      camAngleCurrent = camAngleTarget;
-      activeDiorama?.setDoorHop(null, 0);
-      if (unlockItem) {
-        blip(659, 90);
-        gameState.placeItem(unlockItem.id);
-        rebuildScene();
-      } else {
-        syncBayUIAndHotspots();
-      }
-      hotspotLayer.classList.add('settled');
-      fadeOverlay.style.opacity = '0';
-      fadeOverlay.style.pointerEvents = 'none';
+    bayTransitionTimers.push(
       window.setTimeout(() => {
-        isTransitioningBay = false;
-      }, 220);
-    }, 900);
+        fadeOverlay.style.pointerEvents = 'auto';
+        fadeOverlay.style.opacity = '1';
+      }, 660),
+    );
+
+    bayTransitionTimers.push(
+      window.setTimeout(() => {
+        currentBay = bay;
+        camAngleTarget = getBayAngle(bay);
+        camAngleCurrent = camAngleTarget;
+        activeDiorama?.setDoorHop(null, 0);
+        if (unlockItem) {
+          blip(659, 90);
+          gameState.placeItem(unlockItem.id);
+          rebuildScene();
+        } else {
+          syncBayUIAndHotspots();
+        }
+        hotspotLayer.classList.add('settled');
+        fadeOverlay.style.opacity = '0';
+        fadeOverlay.style.pointerEvents = 'none';
+        bayTransitionTimers.push(
+          window.setTimeout(() => {
+            isTransitioningBay = false;
+          }, 220),
+        );
+      }, 900),
+    );
     return;
   }
 
   // Returning to Holiday Hall (or switching bays): fade to black, snap camera, fade in
+  clearBayTransitionTimers();
   isTransitioningBay = true;
   hotspotLayer.classList.remove('settled');
   leapBubbleHost.replaceChildren();
@@ -1193,24 +1231,29 @@ function switchBay(bay: BayId, opts?: { instant?: boolean }): void {
   fadeOverlay.style.pointerEvents = 'auto';
   fadeOverlay.style.opacity = '1';
 
-  window.setTimeout(() => {
-    currentBay = bay;
-    camAngleTarget = getBayAngle(bay);
-    camAngleCurrent = camAngleTarget;
-    syncBayUIAndHotspots();
-    hotspotLayer.classList.add('settled');
-    fadeOverlay.style.opacity = '0';
-    fadeOverlay.style.pointerEvents = 'none';
+  bayTransitionTimers.push(
     window.setTimeout(() => {
-      isTransitioningBay = false;
-    }, 220);
-  }, 220);
+      currentBay = bay;
+      camAngleTarget = getBayAngle(bay);
+      camAngleCurrent = camAngleTarget;
+      syncBayUIAndHotspots();
+      hotspotLayer.classList.add('settled');
+      fadeOverlay.style.opacity = '0';
+      fadeOverlay.style.pointerEvents = 'none';
+      bayTransitionTimers.push(
+        window.setTimeout(() => {
+          isTransitioningBay = false;
+        }, 220),
+      );
+    }, 220),
+  );
 }
 
 function closeModal(): void {
   if (activeModal === 'proto') {
     gameState.setActivePuzzle(null);
   }
+  cancelGenerating();
   activeModal = 'none';
   activeProtoId = null;
   activeProtoWasSolvedOnOpen = false;
@@ -1219,6 +1262,7 @@ function closeModal(): void {
   hotspotLayer.style.display = '';
   sideArrowsHost.style.display = '';
   syncRenderLoop();
+  flushPendingEnterBay();
   renderActiveStoryBeat();
 }
 
@@ -1232,6 +1276,16 @@ const ROOM_TINTS: Record<string, string> = {
 };
 
 function showUnlockDialog(roomSpec: RoomSpec, kind: 'intro' | 'home'): void {
+  activeModal = 'unlock';
+  activeProtoId = null;
+  activeProtoWasSolvedOnOpen = false;
+  isCameraFocused = false;
+  hotspotLayer.style.display = 'none';
+  sideArrowsHost.style.display = 'none';
+  storyBannerHost.replaceChildren();
+  leapBubbleHost.replaceChildren();
+  hideMemoOverlay();
+
   const isWarmup = kind === 'intro';
   const sizeText =
     roomSpec.id === 'easter'
@@ -1251,7 +1305,7 @@ function showUnlockDialog(roomSpec: RoomSpec, kind: 'intro' | 'home'): void {
     {
       class: 'puzz-modal-backdrop',
       style: { zIndex: '55' },
-      onclick: () => overlay.remove(),
+      onclick: () => closeModal(),
     },
     h(
       'div',
@@ -1338,14 +1392,15 @@ function showUnlockDialog(roomSpec: RoomSpec, kind: 'intro' | 'home'): void {
               border: '2px solid #1f2430',
               boxShadow: '0 2px 0 #1f2430',
             },
-            onclick: () => overlay.remove(),
+            onclick: () => closeModal(),
           },
           'Awesome! ✓',
         ),
       ),
     ),
   );
-  (ui ?? document.body).append(overlay);
+  modalHost.replaceChildren(overlay);
+  syncRenderLoop();
 }
 
 const SHARE_URL = 'https://esrauch.github.io/xmas365/';
@@ -1602,6 +1657,7 @@ export function openVictoryCreditsModal(): void {
   if (activeModal === 'proto') {
     gameState.setActivePuzzle(null);
   }
+  clearCagedPromptTimer();
   activeModal = 'credits';
   activeProtoId = null;
   isCameraFocused = false;
@@ -1911,7 +1967,8 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
         }
         if (!wasAlreadySolved && roomSpec && (proto.kind === 'intro' || proto.kind === 'home')) {
           wasAlreadySolved = true;
-          closeModal();
+          gameState.setActivePuzzle(null);
+          cancelGenerating();
           rebuildScene();
           showUnlockDialog(roomSpec, proto.kind);
           return;
@@ -2009,7 +2066,7 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
         );
       },
       status: () => {
-        // Status is rendered inside the puzzle run footer
+        doneBanner.replaceChildren();
       },
     });
   };
@@ -2363,6 +2420,14 @@ function openSettingsModal(): void {
   const bodyHost = h('div', { class: 'puzz-modal-body' });
 
   const syncSceneBehindModal = (): void => {
+    if (currentBay !== 'hall') {
+      const curRoom = ROOM_SPECS.find((r) => r.id === currentBay);
+      if (curRoom && !gameState.isRoomUnlocked(curRoom)) {
+        currentBay = 'hall';
+        camAngleTarget = getBayAngle('hall');
+        camAngleCurrent = camAngleTarget;
+      }
+    }
     rebuildScene();
     hotspotLayer.style.display = 'none';
     sideArrowsHost.style.display = 'none';
@@ -2727,6 +2792,11 @@ function openSettingsModal(): void {
                 confirmReset = false;
                 saveFeedback = { ok: true, text: 'All progress reset to New Game.' };
                 gameState.resetAll();
+                if (currentBay !== 'hall') {
+                  currentBay = 'hall';
+                  camAngleTarget = getBayAngle('hall');
+                  camAngleCurrent = camAngleTarget;
+                }
                 blip(330, 90);
                 syncSceneBehindModal();
                 renderSettingsContent();
@@ -2790,6 +2860,7 @@ function openSettingsModal(): void {
                   onclick: () => {
                     const res = gameState.importSaveJson(saveTextarea.value);
                     if (res.ok) {
+                      gameState.setActivePuzzle(null);
                       saveFeedback = { ok: true, text: 'Save state restored and applied!' };
                       blip(660, 70);
                       syncSceneBehindModal();
@@ -3570,7 +3641,8 @@ function finishIntro(): void {
       syncRenderLoop();
       // Wait ~0.5s for Holiday Hall & Leap Day on the rug to register before opening P1
       window.setTimeout(() => {
-        gameState.onEnterBay(currentBay);
+        pendingEnterBay = true;
+        flushPendingEnterBay();
         renderTopBar();
         renderCarryTray();
         renderActiveStoryBeat();
@@ -4004,6 +4076,10 @@ new MutationObserver(() => {
     isCameraFocused = false;
     hotspotLayer.style.display = '';
     sideArrowsHost.style.display = '';
+    if (pendingEnterBay) {
+      flushPendingEnterBay();
+      renderActiveStoryBeat();
+    }
   }
   syncRenderLoop();
 }).observe(modalHost, { childList: true });

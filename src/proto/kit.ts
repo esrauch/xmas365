@@ -130,6 +130,9 @@ export function blip(freq: number, ms = 60, buzz = 0): void {
   if (!isSoundEnabled()) return;
   try {
     audio ??= new AudioContext();
+    if (audio.state === 'suspended') {
+      void audio.resume().catch(() => {});
+    }
     const o = audio.createOscillator();
     const g = audio.createGain();
     o.frequency.value = freq;

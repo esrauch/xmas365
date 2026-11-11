@@ -200,8 +200,16 @@ export function spell(b: Board, grid: number[][]): string {
   const { dist } = light(b, grid);
   return b.blanks
     .map((n) => {
-      const hit = b.letters.find(([r, c]) => dist.get(key(r, c)) === n);
-      return hit ? hit[2] : '_';
+      const hitsAtN = b.letters.filter(([r, c]) => dist.get(key(r, c)) === n);
+      if (hitsAtN.length === 0) return '_';
+      const ch = hitsAtN[0]?.[2];
+      if (!ch || hitsAtN.some((h) => h[2] !== ch)) return '_';
+      const sameLetterOtherDist = b.letters.some(([r, c, l]) => {
+        if (l !== ch) return false;
+        const d = dist.get(key(r, c));
+        return d !== undefined && d !== n;
+      });
+      return sameLetterOtherDist ? '_' : ch;
     })
     .join('');
 }

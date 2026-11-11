@@ -131,6 +131,12 @@ export function mountLights(
                 (grid[r]?.[c] ?? -1) === (b.solution[r]?.[c] ?? -2)
               ) {
                 lockedTiles.add(k);
+                if (b.frame && inFrame(b.frame, r, c)) {
+                  const [mr, mc] = mirrorSquare(b.frame, r, c);
+                  if (b.inside(mr, mc) && (grid[mr]?.[mc] ?? -1) === (b.solution[mr]?.[mc] ?? -2)) {
+                    lockedTiles.add(key(mr, mc));
+                  }
+                }
               }
             }
           }
@@ -207,7 +213,7 @@ export function mountLights(
     lastTurnedKey = key(r, c);
     if (b.frame && inFrame(b.frame, r, c)) {
       const [mr, mc] = mirrorSquare(b.frame, r, c);
-      if (b.inside(mr, mc) && (mr !== r || mc !== c)) {
+      if (b.inside(mr, mc) && (mr !== r || mc !== c) && !lockedTiles.has(key(mr, mc))) {
         (grid[mr] as number[])[mc] = mirrorMask(next, b.frame.axis);
       }
     }
@@ -637,17 +643,23 @@ export function mountLights(
       );
     }
     const letterDistCounts = new Map<number, Set<string>>();
+    const letterToDists = new Map<string, Set<number>>();
     for (const [r, c, ch] of b.letters) {
       const d = dist.get(key(r, c));
       if (d !== undefined) {
         const set = letterDistCounts.get(d) ?? new Set<string>();
         set.add(ch);
         letterDistCounts.set(d, set);
+        const dSet = letterToDists.get(ch) ?? new Set<number>();
+        dSet.add(d);
+        letterToDists.set(ch, dSet);
       }
     }
     for (const [r, c, ch] of b.letters) {
       const reached = dist.get(key(r, c));
-      const conflict = reached !== undefined && (letterDistCounts.get(reached)?.size ?? 0) > 1;
+      const conflict =
+        reached !== undefined &&
+        ((letterDistCounts.get(reached)?.size ?? 0) > 1 || (letterToDists.get(ch)?.size ?? 0) > 1);
       const fill = done
         ? '#ffd54f'
         : reached === undefined
@@ -744,10 +756,11 @@ export function mountLights(
     const eggWrong = b.eggs.some(([r, c, n]) => dist.has(key(r, c)) && dist.get(key(r, c)) !== n);
     const letterWrong =
       b.letters.some(
-        ([r, c]) =>
+        ([r, c, ch]) =>
           dist.has(key(r, c)) &&
           (!blankSet.has(dist.get(key(r, c)) ?? -1) ||
-            (letterDistCounts.get(dist.get(key(r, c)) ?? -1)?.size ?? 0) > 1),
+            (letterDistCounts.get(dist.get(key(r, c)) ?? -1)?.size ?? 0) > 1 ||
+            (letterToDists.get(ch)?.size ?? 0) > 1),
       ) ||
       (b.blanks.length > 0 && spell(b, grid).includes('_'));
     hooks.status(
