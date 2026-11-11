@@ -591,7 +591,13 @@ export function mountPicture(host: HTMLElement, panel: Panel, hooks: PictureHook
             'text-anchor': 'middle',
             'font-size': cell * 0.46,
             'font-weight': 700,
-            fill: egg ? (grey ? '#7a6f5d' : '#4a3a20') : tone(run, grey),
+            // On an egg, keep the run's red or blue (it's part of the clue); plain runs read dark on the egg.
+            fill:
+              egg && (grey || palette.length < 2)
+                ? grey
+                  ? '#7a6f5d'
+                  : '#4a3a20'
+                : tone(run, grey),
           },
           label(run),
         );
