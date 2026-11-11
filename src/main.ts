@@ -1676,7 +1676,8 @@ function openProtoModal(protoId: string, focusPos: THREE.Vector3, focusLook: THR
   hideMemoOverlay();
   hotspotLayer.style.display = 'none';
   sideArrowsHost.style.display = 'none';
-  isCameraFocused = true;
+  // Opening a puzzle leaves the camera where it is (no zoom in on the hotspot).
+  isCameraFocused = false;
   focusPosTarget.copy(focusPos);
   focusLookTarget.copy(focusLook);
 
