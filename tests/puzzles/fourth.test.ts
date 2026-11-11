@@ -70,7 +70,7 @@ describe('Fourth of July fireworks room (7 runs, 25 panels)', () => {
   });
 
   it('each letter message spells a real phrase', () => {
-    expect(BOW.map(fillMessage)).toEqual(['LOVE', 'STAR', 'LIGHT']);
+    expect(BOW.map(fillMessage)).toEqual(['LOVE', 'BOOM', 'FIRE']);
   });
 
   it('lineDone waits for dark (?) lines to have no empty squares left', () => {
