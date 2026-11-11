@@ -329,8 +329,13 @@ export function mountWords(host: HTMLElement, panel: Panel, hooks: WordsHooks): 
         });
       }
     };
-    /** A found word's colour. */
-    const FOUND = '#8ec5ff';
+    /** A found word's colour: its own red, white or blue on Patriotic boards, else blue. */
+    const FOUND: Record<string, string> = { r: '#f2a19c', b: '#9fbbf0', g: '#a8d8a8' };
+    const foundColour = (i: number): string => {
+      if (!panel.colours) return '#8ec5ff';
+      const [r, c] = panel.words[i]?.cells[0] ?? [0, 0];
+      return FOUND[panel.colours[r]?.[c] ?? ''] ?? '#ffffff';
+    };
     // Fair shares: thick edges between portions.
     if (panel.portions)
       for (let r = 0; r < H; r++)
@@ -425,7 +430,12 @@ export function mountWords(host: HTMLElement, panel: Panel, hooks: WordsHooks): 
         'stroke-linecap': 'round',
       });
     }
-    for (const i of found) strand(panel.words[i]?.cells ?? [], FOUND);
+    // A white word's strand is a light grey, so it still shows on the board.
+    for (const i of found)
+      strand(
+        panel.words[i]?.cells ?? [],
+        foundColour(i) === '#ffffff' ? '#e4ddd0' : foundColour(i),
+      );
     if (hintedWord !== null && !found.has(hintedWord)) {
       for (const [r, c] of panel.words[hintedWord]?.cells ?? []) {
         add('rect', {
@@ -480,7 +490,7 @@ export function mountWords(host: HTMLElement, panel: Panel, hooks: WordsHooks): 
           r: cell * 0.36,
           fill:
             f !== undefined
-              ? FOUND
+              ? foundColour(f)
               : inPath.has(key(s))
                 ? '#c9b6e8'
                 : isDark
