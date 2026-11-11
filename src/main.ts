@@ -1366,101 +1366,128 @@ export function openVictoryCreditsModal(): void {
   window.setTimeout(() => blip(784, 90), 170);
   window.setTimeout(() => blip(1047, 180), 260);
 
-  const y6Spec = {
-    title: 'DAY 366: LEAP DAY',
-    subtitle: 'An Xmas12 Production',
-    body: 'Holiday Hall is back on the twelve-month calendar.\n\nAll six holidays restored · All mascots uncaged · All contract clauses voided.\n\nHappy Birthday, Leap Day!',
+  const shareUrl = 'https://esrauch.github.io/xmas365/';
+  const shareText = [
+    '🎩🎉 I saved the holidays from Santa in XMAS365™!',
+    '🎃🕸️ 🦃🥧 🎄💡 💌🧶 🐰🕳️ 🎆🎇',
+    'All 6 holidays restored & all 6 Merger Contract clauses voided!',
+    shareUrl,
+  ].join('\n');
+
+  const shareTextarea = h('textarea', {
+    readonly: 'readonly',
+    rows: '4',
+    spellcheck: 'false',
+    style: {
+      width: '100%',
+      boxSizing: 'border-box',
+      fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+      fontSize: '13px',
+      fontWeight: '700',
+      lineHeight: '1.45',
+      padding: '10px 12px',
+      borderRadius: '10px',
+      border: '2px solid #cbd5e0',
+      background: '#fffdf9',
+      color: '#1f2430',
+      resize: 'none',
+      cursor: 'text',
+    },
+    onclick: () => {
+      shareTextarea.focus();
+      shareTextarea.select();
+    },
+  }) as HTMLTextAreaElement;
+  shareTextarea.value = shareText;
+
+  const shareStatus = h(
+    'span',
+    {
+      style: {
+        fontSize: '12px',
+        fontWeight: '800',
+        color: '#276749',
+        minHeight: '18px',
+      },
+    },
+    '',
+  );
+
+  const copyShareText = (feedbackMsg = '✓ Copied to clipboard!'): void => {
+    blip(660, 55);
+    shareTextarea.focus();
+    shareTextarea.select();
+    if (navigator.clipboard?.writeText) {
+      void navigator.clipboard.writeText(shareText).then(
+        () => {
+          shareStatus.textContent = feedbackMsg;
+        },
+        () => {
+          try {
+            document.execCommand('copy');
+            shareStatus.textContent = feedbackMsg;
+          } catch {
+            shareStatus.textContent = 'Select the text above to copy!';
+          }
+        },
+      );
+    } else {
+      try {
+        document.execCommand('copy');
+        shareStatus.textContent = feedbackMsg;
+      } catch {
+        shareStatus.textContent = 'Select the text above to copy!';
+      }
+    }
   };
 
-  const mascotRollCall: readonly { label: string; role: string; bg: string; border: string }[] = [
-    { label: '🎩 Leap Day', role: 'Day 366 · Every Year', bg: '#f0fff4', border: '#2f855a' },
-    { label: '🕷️ Halloween Spider', role: 'Halloween Porch', bg: '#faf5ff', border: '#805ad5' },
+  const handleShareClick = (): void => {
+    blip(587, 55);
+    if (typeof navigator.share === 'function') {
+      void navigator
+        .share({
+          title: 'XMAS365™',
+          text: shareText,
+        })
+        .then(
+          () => {
+            shareStatus.textContent = '✓ Shared!';
+          },
+          (err: unknown) => {
+            if (err instanceof Error && err.name === 'AbortError') return;
+            copyShareText('✓ Copied to clipboard!');
+          },
+        );
+    } else {
+      copyShareText('✓ Copied to clipboard!');
+    }
+  };
+
+  const creditsRows: readonly { role: string; value: string }[] = [
+    { role: 'Game by', value: 'Em Rauch' },
     {
-      label: '🦃 Thanksgiving Turkey',
-      role: 'Thanksgiving Table',
-      bg: '#fffaf0',
-      border: '#c05621',
+      role: 'Starring',
+      value:
+        '🎩 Leap Day · 🕷️ Spider · 🦃 Turkey · ⛄ Snowman · 🧸 Bear · 🐰 Bunny · 🦅 Eaglet · 🎅 Santa',
     },
-    { label: '⛄ Christmas Snowman', role: 'Christmas Hearth', bg: '#f0fff4', border: '#2f855a' },
-    { label: "🧸 Valentine's Bear", role: "Valentine's Parlor", bg: '#fff5f7', border: '#d53f8c' },
-    { label: '🐰 Easter Bunny', role: 'Easter Garden', bg: '#fefcbf', border: '#d69e2e' },
     {
-      label: '🦅 Fourth of July Eaglet',
-      role: 'Fourth of July Yard',
-      bg: '#ebf8ff',
-      border: '#2b6cb0',
-    },
-    {
-      label: '🎅 Humbled Santa',
-      role: 'Founder, Xmas12 (12 Days Only)',
-      bg: '#fff5f5',
-      border: '#c53030',
+      role: 'Six Holiday Verticals',
+      value: '🕸️ Web · 🥧 Carving · 💡 Lights · 🧶 Heartstrings · 🕳️ Hops · 🎇 Fireworks',
     },
   ];
-
-  const mascotPills = mascotRollCall.map((m) =>
-    h(
-      'div',
-      {
-        style: {
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '2px',
-          padding: '7px 10px',
-          borderRadius: '10px',
-          background: m.bg,
-          border: `2px solid ${m.border}`,
-          boxShadow: '0 2px 0 rgba(31, 36, 48, 0.16)',
-        },
-      },
-      h('span', { style: { fontWeight: '800', fontSize: '12.5px', color: '#1f2430' } }, m.label),
-      h('span', { style: { fontWeight: '700', fontSize: '10.5px', color: '#4a5568' } }, m.role),
-    ),
-  );
-
-  const genrePills = ROOM_SPECS.map((r) =>
-    h(
-      'div',
-      {
-        style: {
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '6px',
-          padding: '6px 10px',
-          borderRadius: '9px',
-          background: '#fffdf9',
-          border: `1.5px solid ${r.accent}`,
-          fontSize: '12px',
-          fontWeight: '700',
-          color: '#1f2430',
-        },
-      },
-      h('span', {}, `${r.icon} ${r.title}`),
-      h(
-        'span',
-        {
-          style: {
-            fontSize: '11px',
-            fontWeight: '800',
-            color: r.accent,
-          },
-        },
-        `★ ${r.genreLabel}`,
-      ),
-    ),
-  );
 
   const finishCredits = (): void => {
     blip(587, 65);
     closeModal();
   };
 
+  const hasPendingFinalMemo = gameState.beatQueue.includes('Y7');
+
   const card = h(
     'div',
     {
       class: 'puzz-modal-card',
-      style: { maxWidth: '560px' },
+      style: { maxWidth: '520px' },
       onclick: (e: MouseEvent) => e.stopPropagation(),
     },
     h(
@@ -1501,9 +1528,13 @@ export function openVictoryCreditsModal(): void {
                 color: '#975a16',
               },
             },
-            y6Spec.subtitle,
+            'XMAS365™ · VICTORY & CREDITS',
           ),
-          h('h2', { style: { margin: '0', fontSize: '18px', lineHeight: '1.15' } }, y6Spec.title),
+          h(
+            'h2',
+            { style: { margin: '0', fontSize: '18px', lineHeight: '1.15' } },
+            'Day 366: Leap Day',
+          ),
         ),
       ),
       h(
@@ -1538,96 +1569,183 @@ export function openVictoryCreditsModal(): void {
           gap: '14px',
         },
       },
+      // 1. Real Credits Banner ("Game by Em Rauch")
       h(
         'div',
         {
           style: {
-            padding: '12px 14px',
-            borderRadius: '12px',
+            padding: '16px 16px',
+            borderRadius: '14px',
             background: 'linear-gradient(180deg, #fefcbf 0%, #fffaf0 100%)',
-            border: '2px solid #d69e2e',
-            color: '#744210',
+            border: '2.5px solid #d69e2e',
+            boxShadow: '0 3px 0 rgba(116, 66, 16, 0.2)',
+            color: '#1f2430',
             textAlign: 'center',
             display: 'flex',
             flexDirection: 'column',
-            gap: '6px',
+            gap: '8px',
           },
         },
-        ...y6Spec.body.split('\n\n').map((para, idx) =>
+        h(
+          'div',
+          {
+            style: {
+              fontSize: '11px',
+              fontWeight: '900',
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              color: '#975a16',
+            },
+          },
+          '★ Holiday Hall Restored ★',
+        ),
+        h(
+          'div',
+          {
+            style: {
+              fontSize: '22px',
+              fontWeight: '900',
+              lineHeight: '1.2',
+              color: '#1f2430',
+            },
+          },
+          'Game by Em Rauch',
+        ),
+        h(
+          'div',
+          {
+            style: {
+              fontSize: '13px',
+              fontWeight: '700',
+              lineHeight: '1.4',
+              color: '#744210',
+            },
+          },
+          'Holiday Hall is back on the twelve-month calendar — all six holidays restored, all mascots uncaged, and every clause of Santa’s Merger Contract voided.',
+        ),
+        h(
+          'div',
+          {
+            style: {
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '5px',
+              marginTop: '4px',
+              paddingTop: '10px',
+              borderTop: '1.5px dashed rgba(183, 121, 31, 0.45)',
+              fontSize: '12px',
+              color: '#4a5568',
+            },
+          },
+          ...creditsRows
+            .slice(1)
+            .map((row) =>
+              h(
+                'div',
+                { style: { lineHeight: '1.35' } },
+                h('strong', { style: { color: '#1f2430' } }, `${row.role}: `),
+                h('span', { style: { fontWeight: '600' } }, row.value),
+              ),
+            ),
+        ),
+      ),
+
+      // 2. Share Screen Card (Inline text to copy + Share & Copy buttons)
+      h(
+        'div',
+        {
+          style: {
+            padding: '13px 14px',
+            borderRadius: '14px',
+            background: '#fffdf9',
+            border: '2px solid #1f2430',
+            boxShadow: '0 3px 0 rgba(31, 36, 48, 0.16)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '9px',
+          },
+        },
+        h(
+          'div',
+          {
+            style: {
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '8px',
+              flexWrap: 'wrap',
+            },
+          },
           h(
-            'div',
+            'span',
             {
               style: {
-                fontSize: idx === 2 ? '15px' : '13px',
-                fontWeight: idx === 2 ? '900' : '700',
-                lineHeight: '1.4',
+                fontSize: '12px',
+                fontWeight: '900',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                color: '#1f2430',
               },
             },
-            para,
+            '📣 Share Your Victory',
+          ),
+          shareStatus,
+        ),
+        shareTextarea,
+        h(
+          'div',
+          {
+            style: {
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              flexWrap: 'wrap',
+            },
+          },
+          h(
+            'button',
+            {
+              style: {
+                flex: '1 1 130px',
+                padding: '9px 14px',
+                borderRadius: '10px',
+                fontWeight: '900',
+                fontSize: '13px',
+                cursor: 'pointer',
+                background: '#2b6cb0',
+                color: '#fff',
+                border: '2px solid #1f2430',
+                boxShadow: '0 2px 0 #1f2430',
+              },
+              onclick: handleShareClick,
+            },
+            '📤 Share',
+          ),
+          h(
+            'button',
+            {
+              style: {
+                flex: '1 1 130px',
+                padding: '9px 14px',
+                borderRadius: '10px',
+                fontWeight: '900',
+                fontSize: '13px',
+                cursor: 'pointer',
+                background: '#fffaf0',
+                color: '#1f2430',
+                border: '2px solid #1f2430',
+                boxShadow: '0 2px 0 #1f2430',
+              },
+              onclick: () => copyShareText('✓ Copied to clipboard!'),
+            },
+            '📋 Copy Text',
           ),
         ),
       ),
+
       h(
         'div',
-        {},
-        h(
-          'div',
-          {
-            style: {
-              fontSize: '11px',
-              fontWeight: '900',
-              textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              color: '#4a5568',
-              marginBottom: '6px',
-            },
-          },
-          '🎉 Starring the Holiday Hall Cast',
-        ),
-        h(
-          'div',
-          {
-            style: {
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(175px, 1fr))',
-              gap: '7px',
-            },
-          },
-          ...mascotPills,
-        ),
-      ),
-      h(
-        'div',
-        {},
-        h(
-          'div',
-          {
-            style: {
-              fontSize: '11px',
-              fontWeight: '900',
-              textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              color: '#4a5568',
-              marginBottom: '6px',
-            },
-          },
-          '★ Six Restored Holiday Verticals',
-        ),
-        h(
-          'div',
-          {
-            style: {
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-              gap: '6px',
-            },
-          },
-          ...genrePills,
-        ),
-      ),
-      h(
-        'div',
-        { style: { display: 'flex', justifyContent: 'center', marginTop: '4px' } },
+        { style: { display: 'flex', justifyContent: 'center', marginTop: '2px' } },
         h(
           'button',
           {
@@ -1644,7 +1762,9 @@ export function openVictoryCreditsModal(): void {
             },
             onclick: finishCredits,
           },
-          '📌 Read Final Memo (Y7) & Enter Free Play ▸',
+          hasPendingFinalMemo
+            ? '📌 Read Final Memo (Y7) & Enter Free Play ▸'
+            : 'Done · Back to Holiday Hall ▸',
         ),
       ),
     ),
@@ -1656,6 +1776,7 @@ export function openVictoryCreditsModal(): void {
     'div',
     {
       class: 'puzz-modal-backdrop',
+      onclick: finishCredits,
     },
     card,
   );
@@ -2242,151 +2363,162 @@ function openSettingsModal(): void {
     const totalSolvedPanels = gameState.totalSolvedPanelCount();
     const totalPanels = gameState.totalGamePanelCount();
 
-    // 1. General Settings (Sound Toggle + FPS Counter Toggle + Reset Progress)
-    const controlsSection = h(
+    const sectionTitle = (label: string): HTMLElement =>
+      h(
+        'div',
+        {
+          style: {
+            fontSize: '11px',
+            fontWeight: '900',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            color: '#4a5568',
+            marginBottom: '6px',
+          },
+        },
+        label,
+      );
+
+    // -------------------------------------------------------------------------
+    // PLAYER SECTIONS (shown first)
+    // -------------------------------------------------------------------------
+
+    // 1. Audio & Story Archive / Credits
+    const preferencesAndArchiveCard = h(
       'div',
       {
         style: {
-          display: 'flex',
-          flexWrap: 'wrap',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
           gap: '10px',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '12px 14px',
-          borderRadius: '12px',
-          background: '#fffdf9',
-          border: '2px solid #d8cfc0',
           marginBottom: '12px',
         },
       },
+      // Audio Card
       h(
         'div',
-        { style: { display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' } },
-        h(
-          'button',
-          {
-            style: {
-              padding: '8px 14px',
-              borderRadius: '10px',
-              fontWeight: '800',
-              fontSize: '13px',
-              cursor: 'pointer',
-              background: soundOn ? '#2f855a' : '#4a5568',
-              color: '#fff',
-              border: '2px solid #1f2430',
-              boxShadow: '0 2px 0 #1f2430',
-            },
-            onclick: () => {
-              const next = !isSoundEnabled();
-              setSoundEnabled(next);
-              if (next) blip(660, 70);
-              renderSettingsContent();
-            },
-          },
-          soundOn ? '🔊 Sound: ON' : '🔇 Sound: OFF',
-        ),
-        h(
-          'button',
-          {
-            style: {
-              padding: '8px 14px',
-              borderRadius: '10px',
-              fontWeight: '800',
-              fontSize: '13px',
-              cursor: 'pointer',
-              background: fpsOn ? '#2b6cb0' : '#4a5568',
-              color: '#fff',
-              border: '2px solid #1f2430',
-              boxShadow: '0 2px 0 #1f2430',
-            },
-            onclick: () => {
-              const next = !isFpsEnabled();
-              setFpsEnabled(next);
-              fpsBadge.style.display = next ? 'block' : 'none';
-              blip(523, 55);
-              renderSettingsContent();
-            },
-          },
-          fpsOn ? '⏱️ FPS Counter: ON' : '⏱️ FPS Counter: OFF',
-        ),
-        h(
-          'button',
-          {
-            style: {
-              padding: '8px 14px',
-              borderRadius: '10px',
-              fontWeight: '800',
-              fontSize: '13px',
-              cursor: 'pointer',
-              background: '#fffaf0',
-              color: '#744210',
-              border: '2px solid #d69e2e',
-              boxShadow: '0 2px 0 #b7791f',
-            },
-            onclick: () => {
-              closeModal();
-              openCorkboardModal();
-            },
-          },
-          `📄 Unlocked Memos (${gameState.pinnedMemos.size}/${MEMO_ORDER.length})`,
-        ),
-        h(
-          'button',
-          {
-            style: {
-              padding: '8px 14px',
-              borderRadius: '10px',
-              fontWeight: '800',
-              fontSize: '13px',
-              cursor: 'pointer',
-              background: introOn ? '#2b6cb0' : '#4a5568',
-              color: '#fff',
-              border: '2px solid #1f2430',
-              boxShadow: '0 2px 0 #1f2430',
-            },
-            onclick: () => {
-              const next = !isShowIntroOnLoadEnabled();
-              setShowIntroOnLoadEnabled(next);
-              blip(523, 55);
-              renderSettingsContent();
-            },
-          },
-          introOn ? '🎬 Show Intro on Load: ON' : '🎬 Show Intro on Load: OFF',
-        ),
-      ),
-      h(
-        'button',
         {
           style: {
-            padding: '8px 14px',
-            borderRadius: '10px',
-            fontWeight: '800',
-            fontSize: '13px',
-            cursor: 'pointer',
-            background: confirmReset ? '#c53030' : '#fff5f5',
-            color: confirmReset ? '#fff' : '#c53030',
-            border: '2px solid #c53030',
-            boxShadow: '0 2px 0 #742a2a',
-          },
-          onclick: () => {
-            if (!confirmReset) {
-              confirmReset = true;
-              renderSettingsContent();
-              return;
-            }
-            confirmReset = false;
-            saveFeedback = { ok: true, text: 'All progress reset to New Game.' };
-            gameState.resetAll();
-            blip(330, 90);
-            syncSceneBehindModal();
-            renderSettingsContent();
+            padding: '12px 14px',
+            borderRadius: '12px',
+            background: '#fffdf9',
+            border: '2px solid #d8cfc0',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            gap: '8px',
           },
         },
-        confirmReset ? '⚠️ Tap Again to Confirm Reset' : '🗑️ Reset All Progress',
+        sectionTitle('🔊 Audio'),
+        h(
+          'div',
+          {
+            style: {
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '10px',
+            },
+          },
+          h(
+            'span',
+            { style: { fontSize: '13px', fontWeight: '700', color: '#1f2430' } },
+            'Sound Effects & Chimes',
+          ),
+          h(
+            'button',
+            {
+              style: {
+                padding: '7px 14px',
+                borderRadius: '10px',
+                fontWeight: '800',
+                fontSize: '13px',
+                cursor: 'pointer',
+                background: soundOn ? '#2f855a' : '#4a5568',
+                color: '#fff',
+                border: '2px solid #1f2430',
+                boxShadow: '0 2px 0 #1f2430',
+                flexShrink: '0',
+              },
+              onclick: () => {
+                const next = !isSoundEnabled();
+                setSoundEnabled(next);
+                if (next) blip(660, 70);
+                renderSettingsContent();
+              },
+            },
+            soundOn ? '🔊 Sound: ON' : '🔇 Sound: OFF',
+          ),
+        ),
+      ),
+      // Archive & Credits Card
+      h(
+        'div',
+        {
+          style: {
+            padding: '12px 14px',
+            borderRadius: '12px',
+            background: '#fffdf9',
+            border: '2px solid #d8cfc0',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            gap: '8px',
+          },
+        },
+        sectionTitle('📖 Archive & Credits'),
+        h(
+          'div',
+          { style: { display: 'flex', flexWrap: 'wrap', gap: '8px' } },
+          h(
+            'button',
+            {
+              style: {
+                flex: '1 1 140px',
+                padding: '8px 12px',
+                borderRadius: '10px',
+                fontWeight: '800',
+                fontSize: '12.5px',
+                cursor: 'pointer',
+                background: '#fffaf0',
+                color: '#744210',
+                border: '2px solid #d69e2e',
+                boxShadow: '0 2px 0 #b7791f',
+              },
+              onclick: () => {
+                closeModal();
+                openCorkboardModal();
+              },
+            },
+            `📄 Memos (${gameState.pinnedMemos.size}/${MEMO_ORDER.length})`,
+          ),
+          h(
+            'button',
+            {
+              style: {
+                flex: '1 1 130px',
+                padding: '8px 12px',
+                borderRadius: '10px',
+                fontWeight: '800',
+                fontSize: '12.5px',
+                cursor: 'pointer',
+                background: '#fefcbf',
+                color: '#744210',
+                border: '2px solid #d69e2e',
+                boxShadow: '0 2px 0 #b7791f',
+              },
+              onclick: () => {
+                closeModal();
+                openVictoryCreditsModal();
+              },
+            },
+            '🎂 Credits & Share',
+          ),
+        ),
       ),
     );
 
-    // 2. Save State (`puzz.save`) Backup & Restore Card
+    // 2. Progress & Save Data (Backup, Restore, Reset)
     const saveTextarea = h('textarea', {
       rows: '6',
       spellcheck: 'false',
@@ -2410,14 +2542,14 @@ function openSettingsModal(): void {
       'div',
       {
         style: {
-          padding: '11px 14px',
+          padding: '12px 14px',
           borderRadius: '12px',
           background: '#fffdf9',
           border: '2px solid #d8cfc0',
-          marginBottom: '12px',
+          marginBottom: '16px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '8px',
+          gap: '10px',
         },
       },
       h(
@@ -2434,28 +2566,16 @@ function openSettingsModal(): void {
         h(
           'div',
           { style: { display: 'flex', flexDirection: 'column', gap: '2px' } },
-          h(
-            'span',
-            {
-              style: {
-                fontSize: '11px',
-                fontWeight: '800',
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-                color: '#4a5568',
-              },
-            },
-            '💾 Save State (puzz.save)',
-          ),
+          sectionTitle('💾 Progress & Save Data'),
           h(
             'span',
             { style: { fontSize: '13px', fontWeight: '800', color: '#1f2430' } },
-            `Act ${act} · ★ ${lamps}/6 Rooms · 📜 ${voidedClauses}/${ALL_CLAUSES.length} Clauses · ✓ ${totalSolvedPanels}/${totalPanels} Puzzles`,
+            `★ ${lamps}/6 Rooms Restored · 📜 ${voidedClauses}/${ALL_CLAUSES.length} Clauses Voided · ✓ ${totalSolvedPanels}/${totalPanels} Puzzles`,
           ),
         ),
         h(
           'div',
-          { style: { display: 'flex', flexWrap: 'wrap', gap: '6px' } },
+          { style: { display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' } },
           h(
             'button',
             {
@@ -2474,7 +2594,7 @@ function openSettingsModal(): void {
                 if (navigator.clipboard?.writeText) {
                   void navigator.clipboard.writeText(json).then(
                     () => {
-                      saveFeedback = { ok: true, text: 'Copied save JSON to clipboard!' };
+                      saveFeedback = { ok: true, text: 'Copied save data to clipboard!' };
                       blip(660, 55);
                       renderSettingsContent();
                     },
@@ -2482,19 +2602,19 @@ function openSettingsModal(): void {
                       showSaveEditor = true;
                       saveFeedback = {
                         ok: true,
-                        text: 'Select and copy your save JSON below.',
+                        text: 'Select and copy your save data below.',
                       };
                       renderSettingsContent();
                     },
                   );
                 } else {
                   showSaveEditor = true;
-                  saveFeedback = { ok: true, text: 'Select and copy your save JSON below.' };
+                  saveFeedback = { ok: true, text: 'Select and copy your save data below.' };
                   renderSettingsContent();
                 }
               },
             },
-            '📋 Copy Save JSON',
+            '📋 Copy Save',
           ),
           h(
             'button',
@@ -2516,7 +2636,36 @@ function openSettingsModal(): void {
                 renderSettingsContent();
               },
             },
-            showSaveEditor ? '▾ Hide JSON Editor' : '📥 Restore / Edit Save JSON',
+            showSaveEditor ? '▾ Hide Restore' : '📥 Restore Save',
+          ),
+          h(
+            'button',
+            {
+              style: {
+                padding: '6px 12px',
+                borderRadius: '8px',
+                fontWeight: '800',
+                fontSize: '12px',
+                cursor: 'pointer',
+                background: confirmReset ? '#c53030' : '#fff5f5',
+                color: confirmReset ? '#fff' : '#c53030',
+                border: '1.5px solid #c53030',
+              },
+              onclick: () => {
+                if (!confirmReset) {
+                  confirmReset = true;
+                  renderSettingsContent();
+                  return;
+                }
+                confirmReset = false;
+                saveFeedback = { ok: true, text: 'All progress reset to New Game.' };
+                gameState.resetAll();
+                blip(330, 90);
+                syncSceneBehindModal();
+                renderSettingsContent();
+              },
+            },
+            confirmReset ? '⚠️ Tap Again to Confirm Reset' : '🗑️ Reset Progress',
           ),
         ),
       ),
@@ -2591,7 +2740,9 @@ function openSettingsModal(): void {
         : null,
     );
 
-    // 3. Progression & State Toggles: Quick Presets + Global Flags + 6 Contract Clauses + 6 Holiday Rooms
+    // -------------------------------------------------------------------------
+    // DEVELOPER SETTINGS SECTION (below player settings)
+    // -------------------------------------------------------------------------
     const presetBtn = (label: string, onClick: () => void): HTMLElement =>
       h(
         'button',
@@ -2617,6 +2768,93 @@ function openSettingsModal(): void {
         label,
       );
 
+    // Which code this page is running (to rule out a stale tab).
+    const time = (iso: string): string =>
+      new Date(iso).toLocaleString([], {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+    const devDiagnosticsBar = h(
+      'div',
+      {
+        style: {
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '8px',
+          padding: '9px 11px',
+          borderRadius: '10px',
+          background: '#fffdf9',
+          border: '1.5px solid #d8cfc0',
+          marginBottom: '10px',
+        },
+      },
+      h(
+        'div',
+        { style: { display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' } },
+        h(
+          'button',
+          {
+            style: {
+              padding: '6px 11px',
+              borderRadius: '8px',
+              fontWeight: '800',
+              fontSize: '12px',
+              cursor: 'pointer',
+              background: fpsOn ? '#2b6cb0' : '#4a5568',
+              color: '#fff',
+              border: '1.5px solid #1f2430',
+            },
+            onclick: () => {
+              const next = !isFpsEnabled();
+              setFpsEnabled(next);
+              fpsBadge.style.display = next ? 'block' : 'none';
+              blip(523, 55);
+              renderSettingsContent();
+            },
+          },
+          fpsOn ? '⏱️ FPS Counter: ON' : '⏱️ FPS Counter: OFF',
+        ),
+        h(
+          'button',
+          {
+            style: {
+              padding: '6px 11px',
+              borderRadius: '8px',
+              fontWeight: '800',
+              fontSize: '12px',
+              cursor: 'pointer',
+              background: introOn ? '#2b6cb0' : '#4a5568',
+              color: '#fff',
+              border: '1.5px solid #1f2430',
+            },
+            onclick: () => {
+              const next = !isShowIntroOnLoadEnabled();
+              setShowIntroOnLoadEnabled(next);
+              blip(523, 55);
+              renderSettingsContent();
+            },
+          },
+          introOn ? '🎬 Show Intro on Load: ON' : '🎬 Show Intro on Load: OFF',
+        ),
+      ),
+      h(
+        'div',
+        {
+          style: {
+            fontSize: '11px',
+            fontWeight: '600',
+            color: '#6b7280',
+          },
+        },
+        `Version ${buildInfo.commit}${buildInfo.dirty ? ' + uncommitted changes' : ''} · built ${time(buildInfo.builtAt)} · loaded ${time(PAGE_LOADED_AT)}`,
+      ),
+    );
+
     const devHeader = h(
       'div',
       {
@@ -2637,18 +2875,18 @@ function openSettingsModal(): void {
           {
             style: {
               fontSize: '11px',
-              fontWeight: '800',
+              fontWeight: '900',
               textTransform: 'uppercase',
               letterSpacing: '0.06em',
               color: '#4a5568',
             },
           },
-          '🛠️ Progression & Save State Toggles',
+          '🛠️ Developer Settings',
         ),
         h(
           'div',
           { style: { fontSize: '14px', fontWeight: '800', color: '#1f2430' } },
-          `Toggle Rooms, Relics & Contract Clauses (Act ${act} · ★ ${lamps}/6 Lamps)`,
+          `Diagnostics & Progression Overrides (Act ${act} · ★ ${lamps}/6 Lamps)`,
         ),
       ),
       h(
@@ -2925,28 +3163,13 @@ function openSettingsModal(): void {
         },
       },
       devHeader,
+      devDiagnosticsBar,
       globalChecks,
       clauseCard,
       h('div', { style: { display: 'flex', flexDirection: 'column', gap: '9px' } }, ...roomCards),
     );
 
-    // Which code this page is running (to rule out a stale tab).
-    const time = (iso: string): string =>
-      new Date(iso).toLocaleString([], {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    const versionLine = h(
-      'div',
-      {
-        style: { fontSize: '11.5px', color: '#7a6f5d', textAlign: 'center', padding: '4px 0 2px' },
-      },
-      `Version ${buildInfo.commit}${buildInfo.dirty ? ' + uncommitted changes' : ''} · built ${time(buildInfo.builtAt)} · page loaded ${time(PAGE_LOADED_AT)}`,
-    );
-
-    bodyHost.replaceChildren(controlsSection, saveCard, devSection, versionLine);
+    bodyHost.replaceChildren(preferencesAndArchiveCard, saveCard, devSection);
   };
 
   const card = h(
