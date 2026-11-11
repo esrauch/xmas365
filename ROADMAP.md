@@ -208,7 +208,7 @@ and its dedicated Vitest suite (`tests/puzzles/clauses/<genre>.test.ts`).
     3. `letters` (💌 Love Letters: letter bulbs sit at step distances from the plug that spell the target word)
     4. `eggs` (🥚 Egg Hunt: power reaches each numbered egg in that exact number of wire-steps from its plug)
     5. `colours` (🎆 Red, White & Blue: two plugs, red and blue; each powers its own color while white pieces can join either without mixing)
-    6. `slices` (🥧 Portions: each pie slice gets exactly one wire from the center `*`, and no wire crosses a crust wall between slices)
+    6. `slices` (🥧 Portions: no wire crosses a crust wall between slices, so each is lit from the center `*`)
   - **Notes:** 12/15 duo panels generate directly via `genLights` at `easy`/`medium`;
     synthesize `letters+eggs`, `snow+colours`, and `snow+slices` (plus the 6 trivial
     intros and the `<= 7×7` `all6` lights panel) and verify with `lightProblems`.

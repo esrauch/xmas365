@@ -223,8 +223,9 @@ All six columns are in the generator (⚙️), generating in seconds across easy
   number of steps from the plug.
 - **Red, White and Blue (⚙️):** a red string and a blue string that never
   join, each powered from its own plug; white pieces can belong to either.
-- **Portions (Pumpkin Pie, ✅; ⚙️):** pie slices with one serving each; no wire crosses
-  a slice wall, and each slice gets exactly one wire from the middle.
+- **Portions (Pumpkin Pie, ✅; ⚙️):** pie slices round the middle; no wire crosses
+  a slice wall. The walls are placed so each slice gets exactly one wire from the
+  middle anyway, so that isn't a separate rule (checked in `verify.ts`).
 
 ### Heartstrings (Valentine's)
 

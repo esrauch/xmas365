@@ -5,7 +5,7 @@
 import { Budget } from '../core/budget';
 import { area, offAxis } from '../core/mirror';
 import { DIRS, type Panel, STEP, type Spot, key, parse } from './model';
-import { type Rules, piecesSymmetricIn, spell, wiresOf } from './rules';
+import { type Rules, piecesSymmetricIn, servings, spell, wiresOf } from './rules';
 import { countSolutions, solve } from './solve';
 
 export type LightTwist = 'snow' | 'dark' | 'letters' | 'eggs' | 'colours' | 'slices';
@@ -183,6 +183,9 @@ export function problems(p: Panel, margin: number, budget = new Budget(500_000))
         out.push(`slice ${s} does not reach the outer edge of the pie`);
       }
     }
+    // One serving per slice isn't a rule the player is told: the walls must make it so.
+    for (const [s, n] of servings(b, b.solution).feeds)
+      if (n !== 1) out.push(`slice ${s} gets ${n} wires from the middle, not 1`);
   }
 
   // The dark: at least 2 dark squares, never touching each other, never on a plug/egg/letter/cross.

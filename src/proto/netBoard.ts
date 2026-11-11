@@ -8,7 +8,7 @@
  * - letters (letter bulbs and message blank tiles above the board);
  * - numbered eggs (glow green when reached in their exact step count);
  * - red, white and blue (two strings from two plugs, white pieces take either);
- * - fair shares / slices (one serving wire from the middle per slice, no wires across slice walls).
+ * - slices (no wires across slice walls; the dotted edge is where each slice meets the middle).
  */
 import { inFrame, mirrorSquare } from '../gen/core/mirror';
 import { blip, getBoardPersistence, h } from './kit';
@@ -354,9 +354,7 @@ export function mountLights(
     const { dist, string, loose, loop } = light(b, grid);
     const shownNow = revealed();
     const sparks = new Set(loose.map(([r, c, d]) => `${key(r, c)}:${d}`));
-    const { feeds, walls } = b.servings
-      ? servings(b, grid)
-      : { feeds: new Map<string, number>(), walls: [] };
+    const { walls } = b.servings ? servings(b, grid) : { walls: [] };
     const crossing = new Set(walls.map(([r, c, d]) => `${key(r, c)}:${d}`));
     for (const [r, c, d] of walls) {
       const [dr, dc] = STEP[d] as Spot;
@@ -692,44 +690,6 @@ export function mountLights(
         '★',
       );
     }
-    // Each slice's servings so far, by its middle square: green at one, red over.
-    if (b.servings) {
-      const placed = new Set<string>();
-      for (let r = 0; r < b.height; r++)
-        for (let c = 0; c < b.width; c++) {
-          const s = b.slice(r, c);
-          if (s === undefined || s === '*' || placed.has(s)) continue;
-          placed.add(s);
-          const squares: Spot[] = [];
-          for (let rr = 0; rr < b.height; rr++)
-            for (let cc = 0; cc < b.width; cc++) if (b.slice(rr, cc) === s) squares.push([rr, cc]);
-          const [mr, mc] = squares[Math.floor(squares.length / 2)] as Spot;
-          const have = feeds.get(s) ?? 0;
-          const colour = have === 1 ? '#2f8a45' : have > 1 ? '#d9534f' : '#6b5f52';
-          add('rect', {
-            x: mc * cell + cell * 0.02,
-            y: mr * cell + cell * 0.02,
-            width: cell * 0.34,
-            height: cell * 0.3,
-            rx: 4,
-            fill: '#fff',
-            stroke: colour,
-            'stroke-width': 2,
-          });
-          add(
-            'text',
-            {
-              x: mc * cell + cell * 0.19,
-              y: mr * cell + cell * 0.25,
-              'text-anchor': 'middle',
-              'font-size': cell * 0.22,
-              'font-weight': 700,
-              fill: colour,
-            },
-            String(have),
-          );
-        }
-    }
     // Edge flags: green when the line has that many joins, red when it has more.
     if (flagged) {
       const along = joinsAlong(b, grid);
@@ -806,7 +766,7 @@ export function mountLights(
                     ? 'Everything’s lit, but the wires inside the frosty frame don’t mirror yet'
                     : walls.length
                       ? 'Everything’s lit, but a wire crosses between two slices'
-                      : 'Everything’s lit, but a slice gets more than one serving'
+                      : 'Everything’s lit, but something doesn’t match its clues yet'
           : `${dist.size} of ${total} lit`,
     );
   };

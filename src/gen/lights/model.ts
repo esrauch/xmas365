@@ -12,7 +12,8 @@
  * - numbered eggs (Easter): power reaches each egg in its step count from the plug;
  * - red, white and blue (Fourth of July): red string from red plug, blue string from blue plug,
  *   white pieces can belong to either;
- * - fair shares / slices (Thanksgiving): pie slices with one serving each, no wires crossing slice walls.
+ * - slices (Thanksgiving): pie slices around the middle, no wires crossing slice walls (the walls
+ *   leave each slice exactly one wire in from the middle).
  */
 import { type Frame, inFrame, mirrorSquare } from '../core/mirror';
 import { rng } from '../core/rng';

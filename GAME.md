@@ -848,12 +848,12 @@ reaches it on its number, and red when it arrives on the wrong one.
 
 The pie's been plugged into the lights, and Thanksgiving's fair shares come
 with it. The board's a round pie, cut in slices round the middle, where
-the plug is. **Twist: one serving per slice.** No wire may cross the solid
-wall between two slices (each slice's lights are their own little string),
-and every slice gets exactly one wire from the middle across its dashed
-edge. The rule is spelled out above the board; each slice shows its
-servings so far (green at one, red over), and a wire through a wall shows
-red.
+the plug is. **Twist: crust walls.** No wire may cross the solid wall
+between two slices (each slice's lights are their own little string), so
+each slice is lit from the middle across its dashed edge. The walls are
+placed so every slice gets exactly one wire in from the middle without the
+player being told (dropped as a separate rule on 2026-11-11: it never ruled
+anything out). A wire through a wall shows red.
 
 (First tried: "the same number of wires crosses into every slice". Far too
 hard: counting crossings isn't about the pieces, each crossing counts twice,

@@ -118,7 +118,7 @@ export const PIE: LightsPanel[] = [
     rows: ['.42c.', '6bab8', '3ac6c', '2afd1', '.291.'],
     plug: [2, 2],
     slices: ['.BBB.', 'BBBBB', 'BB*AA', 'AAAAA', '.AAA.'],
-    tip: '🥧 Portioned: Each pie slice gets one wire from *, and no wire crosses a crust wall.',
+    tip: '🥧 Portioned: No wire crosses a crust wall, so each pie slice is lit from *.',
   },
   {
     name: 'A bigger pie',
@@ -288,7 +288,7 @@ export const pumpkinpie = run({
   room: 'Christmas',
   kind: 'relic',
   from: 'Portioned Lights · Christmas (Thanksgiving)',
-  rules: `${CONTROLS} (Twist: each slice gets exactly one wire from the middle, across a dotted edge, and no wire may cross a thick crust line between two slices. Each slice shows how many wires it gets from the middle so far.)`,
+  rules: `${CONTROLS} (Twist: no wire may cross a thick crust line between two slices, so each slice is lit from the middle, across its dotted edge.)`,
   panels: PIE,
   mountPanel,
 });

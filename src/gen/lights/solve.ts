@@ -5,7 +5,7 @@
 import { Budget } from '../core/budget';
 import { inFrame, mirrorSquare } from '../core/mirror';
 import { type Board, DIRS, N, OPP, STEP, type Spot, W, key, mirrorMask } from './model';
-import { type Rules, options, servings, solved } from './rules';
+import { type Rules, options, solved } from './rules';
 
 /** Find up to `limit` answers (each the grid of pieces). */
 export function solve(
@@ -150,19 +150,6 @@ export function solve(
         if (open.has(root)) continue;
         if (!plugRoots.includes(root) || (plugIndex.length === 1 && n < cells.length)) {
           closedEarly = true;
-        }
-      }
-
-      if (!closedEarly && walls) {
-        const { feeds } = servings(
-          b,
-          grid.map((row) => row.map((x) => Math.max(x, 0))),
-        );
-        for (const v of feeds.values()) {
-          if (v > 1) {
-            closedEarly = true;
-            break;
-          }
         }
       }
 

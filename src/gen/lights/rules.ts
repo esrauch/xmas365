@@ -211,7 +211,7 @@ export interface Rules {
   noFlags?: boolean;
   /** Ignore eggs (to check they matter). */
   noEggs?: boolean;
-  /** Ignore servings / slices (to check they matter). */
+  /** Ignore the slices' crust walls (to check they matter). */
   noServings?: boolean;
   /** Ignore snowflakes (to check they matter). */
   noSnow?: boolean;
@@ -252,11 +252,8 @@ export function solved(b: Board, grid: number[][], rules: Rules = {}): boolean {
     if (b.colFlags.some((f, c) => f !== null && f !== cols[c])) return false;
   }
 
-  // Fair shares and slices
-  if (!rules.noServings && b.servings) {
-    const { feeds, walls } = servings(b, grid);
-    if (walls.length || [...feeds.values()].some((v) => v !== 1)) return false;
-  }
+  // Slices: no wire across a crust wall (each slice's one serving follows from the walls: verify.ts)
+  if (!rules.noServings && b.servings && servings(b, grid).walls.length) return false;
 
   // Snowflakes: inside the frame, every piece must be the exact mirror of its partner across the axis
   if (!rules.noSnow && b.frame && !piecesSymmetricIn(b.frame, grid)) return false;

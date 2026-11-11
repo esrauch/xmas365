@@ -48,7 +48,7 @@ export const LIGHT_TWISTS_META: readonly TwistMeta[] = [
     key: 'slices',
     icon: '🥧',
     label: 'Portioned',
-    rule: 'Each pie slice gets exactly one wire from the center *, and no wire may cross a crust wall between slices.',
+    rule: 'No wire may cross a crust wall between pie slices, so each slice is lit from the center *.',
   },
 ];
 
@@ -140,9 +140,9 @@ const PANELS: readonly ClausePanelItem<LightPanel>[] = [
     name: 'Fair Slices',
     section: 'intro',
     twists: ['slices'],
-    tip: '🥧 One wire from * into each slice; no crossing crust walls',
+    tip: '🥧 No wire crosses a crust wall; each slice is lit from *',
     explain:
-      'Each pie slice must receive exactly one wire from the center * across its dotted edge, and no wire may cross a thick crust line between two slices.',
+      'No wire may cross a thick crust line between two slices, so each pie slice is lit from the center * across its dotted edge.',
     panel: {
       name: 'Fair Slices',
       rows: ['6a8', '3c4', '2b9'],
@@ -235,7 +235,7 @@ const PANELS: readonly ClausePanelItem<LightPanel>[] = [
     name: 'Frosty Slice',
     section: 'duo',
     twists: ['snow', 'slices'],
-    tip: '❄️ Mirror inside frame · 🥧 One wire per slice from *',
+    tip: '❄️ Mirror inside frame · 🥧 No wire crosses a crust wall',
     explain:
       'Feed each pie slice with a single wire from * while respecting both the crust boundary on the right and the frosty mirror frame at the bottom.',
     panel: {
@@ -316,7 +316,7 @@ const PANELS: readonly ClausePanelItem<LightPanel>[] = [
     name: 'Shadow Wedge',
     section: 'duo',
     twists: ['dark', 'slices'],
-    tip: '🎃 ? tiles turn blind · 🥧 One wire per slice from *',
+    tip: '🎃 ? tiles turn blind · 🥧 No wire crosses a crust wall',
     explain:
       'Crust walls between slices block cross-slice wires, pinning down the neighbors of the two dark ? tiles.',
     panel: {
@@ -383,9 +383,9 @@ const PANELS: readonly ClausePanelItem<LightPanel>[] = [
     name: 'Baked Cipher',
     section: 'duo',
     twists: ['letters', 'slices'],
-    tip: '💌 Spell FIR at 6, 10, 9 · 🥧 One wire per slice from *',
+    tip: '💌 Spell FIR at 6, 10, 9 · 🥧 No wire crosses a crust wall',
     explain:
-      'Send exactly one wire into each pie slice from * and choose the internal branch order that places F, I, and R at distances 6, 10, and 9.',
+      'Keep every wire inside its pie slice and choose the internal branch order that places F, I, and R at distances 6, 10, and 9.',
     panel: {
       name: 'Baked Cipher',
       rows: ['6ac2c', '52bc5', '3e855', '6d6bd', '11381'],
@@ -423,7 +423,7 @@ const PANELS: readonly ClausePanelItem<LightPanel>[] = [
     name: 'Custard Egg',
     section: 'duo',
     twists: ['eggs', 'slices'],
-    tip: '🥚 Egg at step distance 9 · 🥧 One wire per slice from *',
+    tip: '🥚 Egg at step distance 9 · 🥧 No wire crosses a crust wall',
     explain:
       'Keep each pie slice fed by a single wire from * and orient the left slice’s inner loop so the egg is reached in 9 steps.',
     panel: {
@@ -439,7 +439,7 @@ const PANELS: readonly ClausePanelItem<LightPanel>[] = [
     name: 'Bicentennial Pie',
     section: 'duo',
     twists: ['colours', 'slices'],
-    tip: '🎆 Separate Red & Blue strings · 🥧 One wire per slice from *',
+    tip: '🎆 Separate Red & Blue strings · 🥧 No wire crosses a crust wall',
     explain:
       'Respect both the pie crust walls between slices and the color boundary between the Red and Blue plugs.',
     panel: {
