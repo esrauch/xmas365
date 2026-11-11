@@ -674,7 +674,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         const panel = panels[i] as P;
         renderStrip(i);
         helpBox.style.display = 'none';
-        title.textContent = `Puzzle ${i + 1}/${panels.length} · ${panel.name}`;
+        title.textContent = `Puzzle ${i + 1}/${panels.length}`;
         rulePill.textContent = panel.tip ?? defaultPillText;
         footer.style.display = 'flex';
         message.className = '';

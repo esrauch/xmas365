@@ -631,7 +631,7 @@ export const clause: Proto = {
             h(
               'button',
               {
-                title: `Puzzle ${idx + 1}: ${item.name} — ${idInfo.dualLabel} (${SECTION_META[item.section].badge})`,
+                title: `Puzzle ${idx + 1}: ${idInfo.dualLabel} (${SECTION_META[item.section].badge})`,
                 style: {
                   minWidth: '24px',
                   height: '22px',
@@ -741,7 +741,7 @@ export const clause: Proto = {
               {
                 style: { fontWeight: '800', fontSize: '14px', color: '#1f2430' },
               },
-              `Puzzle ${idx + 1}/${panels.length} · ${item.name}`,
+              `Puzzle ${idx + 1}/${panels.length} · ${identity.themedName}`,
             ),
             h(
               'span',
@@ -770,7 +770,7 @@ export const clause: Proto = {
                 lineHeight: '1.3',
               },
             },
-            identity.dualLabel,
+            identity.holidayFormula,
           ),
           isIntro
             ? h(
