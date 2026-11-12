@@ -1373,35 +1373,35 @@ export function buildPropMesh(id: string, accent: string): THREE.Group {
     case 'watermelon': {
       // Fourth of July relic in Valentine's: juicy crimson watermelon wedge with green rind & black seeds
       const wm = new THREE.Group();
-      wm.position.set(0, 0.08, 0);
+      wm.position.set(0, 0.04, 0);
       const rind = new THREE.Mesh(
         new THREE.CylinderGeometry(0.24, 0.24, 0.09, 18, 1, false, 0, Math.PI),
         mat('#2f855a'),
       );
-      rind.rotation.z = Math.PI / 2;
+      rind.rotation.z = -Math.PI / 2;
       rind.rotation.y = Math.PI / 2;
-      rind.position.set(0, 0.16, 0);
+      rind.position.set(0, 0.24, 0);
       const pith = new THREE.Mesh(
         new THREE.CylinderGeometry(0.215, 0.215, 0.095, 18, 1, false, 0, Math.PI),
         mat('#f0fff4'),
       );
-      pith.rotation.z = Math.PI / 2;
+      pith.rotation.z = -Math.PI / 2;
       pith.rotation.y = Math.PI / 2;
-      pith.position.set(0, 0.16, 0);
+      pith.position.set(0, 0.24, 0);
       const flesh = new THREE.Mesh(
         new THREE.CylinderGeometry(0.195, 0.195, 0.1, 18, 1, false, 0, Math.PI),
         mat('#e53e3e'),
       );
-      flesh.rotation.z = Math.PI / 2;
+      flesh.rotation.z = -Math.PI / 2;
       flesh.rotation.y = Math.PI / 2;
-      flesh.position.set(0, 0.16, 0);
+      flesh.position.set(0, 0.24, 0);
       wm.add(rind, pith, flesh);
       for (const [sx, sy] of [
-        [-0.08, 0.1],
-        [0, 0.08],
-        [0.08, 0.1],
-        [-0.04, 0.13],
-        [0.04, 0.13],
+        [-0.08, 0.17],
+        [0, 0.14],
+        [0.08, 0.17],
+        [-0.04, 0.2],
+        [0.04, 0.2],
       ] as const) {
         wm.add(sphere(0.016, '#1a202c', sx, sy, 0.052));
         wm.add(sphere(0.016, '#1a202c', sx, sy, -0.052));
@@ -2064,42 +2064,73 @@ export function buildHolidayAlcoveBay(
   });
 
   // TIER 3: FIVE RELIC TABLES ON THE FLOOR IN A STAGGERED 2-ROW ARC
-  const strayLayout: readonly { x: number; z: number; pillY: number }[] = [
-    { x: -1.16, z: 1.64, pillY: 0.42 },
-    { x: -0.64, z: 1.26, pillY: 0.84 },
-    { x: 0, z: 1.68, pillY: 0.42 },
-    { x: 0.64, z: 1.26, pillY: 0.84 },
-    { x: 1.16, z: 1.64, pillY: 0.42 },
+  // Back-row tables (idx 1, 3) use tall pedestals so their 3D relics sit high and clear above
+  // the front row, and every pillY sits on the pedestal front below its tabletop rim so buttons
+  // never cover the 3D relic models.
+  const strayLayout: readonly {
+    x: number;
+    z: number;
+    tableH: number;
+    pillY: number;
+    pillZOffset: number;
+  }[] = [
+    { x: -1.22, z: 1.82, tableH: 0.28, pillY: 0.15, pillZOffset: 0.2 },
+    { x: -0.7, z: 1.18, tableH: 1.0, pillY: 0.88, pillZOffset: 0.16 },
+    { x: 0, z: 1.88, tableH: 0.24, pillY: 0.01, pillZOffset: 0.22 },
+    { x: 0.7, z: 1.18, tableH: 1.0, pillY: 0.88, pillZOffset: 0.16 },
+    { x: 1.22, z: 1.82, tableH: 0.28, pillY: 0.15, pillZOffset: 0.2 },
   ];
   const strayEntries = room.strays.map((stray, idx) => {
-    const slot = strayLayout[idx] ?? { x: 0, z: 1.5, pillY: 0.48 };
+    const slot = strayLayout[idx] ?? {
+      x: 0,
+      z: 1.5,
+      tableH: 0.34,
+      pillY: 0.22,
+      pillZOffset: 0.18,
+    };
     const lx = slot.x;
     const lz = slot.z;
+    const tableH = slot.tableH;
     const pillY = slot.pillY;
+    const pillZOffset = slot.pillZOffset;
     const homeRoomSpec = ROOM_SPECS.find((r) => r.id === stray.homeRoom);
     const sg = new THREE.Group();
     sg.position.set(lx, 0, lz);
-    sg.scale.setScalar(0.8);
-    sg.add(cyl(0.34, 0.28, 0.36, '#6b4928', 0, 0.18, 0));
+    sg.scale.setScalar(0.88);
+    sg.add(cyl(0.32, 0.27, tableH, '#6b4928', 0, tableH / 2, 0));
 
     const rimMat = mat(homeRoomSpec?.accent ?? room.accent);
-    const rimMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.34, 0.06, 14), rimMat);
-    rimMesh.position.set(0, 0.38, 0);
+    const rimMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.33, 0.06, 14), rimMat);
+    rimMesh.position.set(0, tableH + 0.02, 0);
     rimMesh.castShadow = true;
     rimMesh.receiveShadow = true;
     sg.add(rimMesh);
 
+    // Bright cream velvet display pad on top of the pedestal so the 3D relic pops with high contrast
+    const padMesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.31, 0.31, 0.025, 14),
+      mat('#fffaf0'),
+    );
+    padMesh.position.set(0, tableH + 0.052, 0);
+    padMesh.receiveShadow = true;
+    sg.add(padMesh);
+
+    const propBaseY = tableH + 0.065;
     const prop = buildPropMesh(stray.id, room.accent);
-    prop.position.set(0, 0.42, 0);
+    prop.position.set(0, propBaseY, 0.02);
+    prop.scale.setScalar(1.18);
+    prop.rotation.x = 0.16;
     sg.add(prop);
-    floating.push({ mesh: prop, phase: idx * 1.4, baseY: 0.42 });
+    floating.push({ mesh: prop, phase: idx * 1.4, baseY: propBaseY });
 
     bay.add(sg);
     return {
       stray,
       lx,
       lz,
+      tableH,
       pillY,
+      pillZOffset,
       homeRoomSpec,
       sg,
       rimMat,
@@ -2157,7 +2188,8 @@ export function buildHolidayAlcoveBay(
       }
     }
 
-    // Old centerpiece prop stays as background decoration: drained while incomplete, full color when complete
+    // Old centerpiece prop stays as background decoration while the floor is empty, and yields the rug when the 5 relic tables appear
+    cpGroup.visible = !strayUnlocked;
     for (const entry of cpDecorativeMats) {
       if (complete) {
         entry.mat.color.copy(entry.baseColor);
@@ -2230,7 +2262,7 @@ export function buildHolidayAlcoveBay(
         status: homeTwistDone ? 'done' : homeTwistUnlocked ? 'ready' : 'locked',
         hero: !homeTwistDone,
         accent: room.accent,
-        worldPos: homeTwistDone ? bayToWorld(theta, -0.78, 0.02, 2.16) : centerHeroWorldPos,
+        worldPos: homeTwistDone ? bayToWorld(theta, -0.78, -0.14, 2.34) : centerHeroWorldPos,
         cameraPos: homeTwistFocusPos,
         cameraLook: homeTwistFocusLook,
         onClick: () => {
@@ -2307,7 +2339,7 @@ export function buildHolidayAlcoveBay(
 
       if (strayUnlocked) {
         const camPos = bayToWorld(theta, st.lx * 0.45, 1.75, 3.8);
-        const camLook = bayToWorld(theta, st.lx, 0.64, st.lz);
+        const camLook = bayToWorld(theta, st.lx, st.tableH + 0.28, st.lz);
         hotspotsOut.push({
           id: `proto:${st.stray.proto.id}`,
           bay: room.id,
@@ -2320,7 +2352,7 @@ export function buildHolidayAlcoveBay(
           icon: strayDone ? '✓' : st.stray.icon,
           status: strayDone ? 'done' : 'ready',
           accent: st.homeRoomSpec?.accent ?? room.accent,
-          worldPos: bayToWorld(theta, st.lx, st.pillY, st.lz + 0.06),
+          worldPos: bayToWorld(theta, st.lx, st.pillY, st.lz + st.pillZOffset),
           cameraPos: camPos,
           cameraLook: camLook,
           meshGroup: st.sg,
@@ -2394,7 +2426,7 @@ export function buildHolidayAlcoveBay(
           },
         ],
         accent: '#2f855a',
-        worldPos: bayToWorld(theta, 0.78, 0.02, 2.16),
+        worldPos: bayToWorld(theta, 0.78, -0.14, 2.34),
         cameraPos: warmupFocusPos,
         cameraLook: warmupFocusLook,
         onClick: () => callbacks.onOpenProto(room.warmup.id, warmupFocusPos, warmupFocusLook),

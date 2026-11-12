@@ -861,15 +861,16 @@ function buildHotspotDOM(hotspots: Hotspot3D[]): void {
       }
 
       const isDoorPill = hs.id.startsWith('door:');
+      const isStrayPill = hs.id.startsWith('proto:') && (hs.sublabel?.includes('→') ?? false);
       const el = h(
         'button',
         {
           class: `hotspot-pill ${hs.status}${hs.hero ? ' hero' : ''}`,
           style: {
             borderColor: hs.status === 'ready' || hs.status === 'door' ? hs.accent : undefined,
-            minWidth: isDoorPill ? '0' : undefined,
-            maxWidth: isDoorPill ? '112px' : undefined,
-            padding: isDoorPill ? '4px 6px' : undefined,
+            minWidth: isDoorPill || isStrayPill ? '0' : undefined,
+            maxWidth: isDoorPill ? '112px' : isStrayPill ? '144px' : undefined,
+            padding: isDoorPill ? '4px 6px' : isStrayPill ? '2px 5px' : undefined,
           },
           onclick: (e: MouseEvent) => {
             e.stopPropagation();
@@ -881,7 +882,14 @@ function buildHotspotDOM(hotspots: Hotspot3D[]): void {
           {
             style: {
               fontWeight: '800',
-              fontSize: hs.hero ? '15.5px' : isDoorPill ? '9.5px' : '10.5px',
+              fontSize: hs.hero
+                ? '15.5px'
+                : isDoorPill
+                  ? '9.5px'
+                  : isStrayPill
+                    ? '8.8px'
+                    : '10.5px',
+              whiteSpace: isStrayPill ? 'nowrap' : undefined,
             },
           },
           hs.label,
@@ -891,7 +899,7 @@ function buildHotspotDOM(hotspots: Hotspot3D[]): void {
               'span',
               {
                 style: {
-                  fontSize: hs.hero ? '12px' : isDoorPill ? '8.5px' : '9px',
+                  fontSize: hs.hero ? '12px' : isDoorPill ? '8.5px' : isStrayPill ? '8px' : '9px',
                   fontWeight: '700',
                   opacity: hs.hero ? '0.95' : '0.88',
                   color: hs.status === 'done' ? '#22543d' : hs.hero ? hs.accent : undefined,
@@ -945,7 +953,7 @@ function layoutStableHotspots(): void {
   stableCam.lookAt(bayToWorld(camAngleTarget, 0, 1.38, 0.75));
   stableCam.updateMatrixWorld();
 
-  const padX = currentBay === 'hall' ? Math.min(54, w * 0.14) : Math.min(58, w * 0.15);
+  const padX = currentBay === 'hall' ? Math.min(54, w * 0.14) : Math.min(68, w * 0.175);
   const topBarBottom =
     topBar.getBoundingClientRect().bottom - view.canvas.getBoundingClientRect().top;
   const minY = Math.max(88, topBarBottom > 0 ? topBarBottom + 22 : 88);
