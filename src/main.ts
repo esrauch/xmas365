@@ -58,6 +58,29 @@ import buildInfo from 'virtual:build-info';
 /** When this page loaded (shown with the build in Settings). */
 const PAGE_LOADED_AT = new Date().toISOString();
 
+/** Chrome's install prompt (not in the DOM types yet). */
+interface InstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+/** The browser's install prompt, kept for Settings' Add to Home Screen button (Chrome, Android). */
+let installPrompt: InstallPromptEvent | null = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  installPrompt = e as InstallPromptEvent;
+});
+window.addEventListener('appinstalled', () => {
+  installPrompt = null;
+});
+/** Running from the home screen already. */
+const isInstalled = (): boolean =>
+  window.matchMedia('(display-mode: standalone)').matches ||
+  (navigator as Navigator & { standalone?: boolean }).standalone === true;
+/** iPhone or iPad (iPads report as a Mac with touch). */
+const isIOS = (): boolean =>
+  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
 if (import.meta.env.DEV) installErrorOverlay();
 
 applyPaletteVars();
@@ -3317,7 +3340,74 @@ function openSettingsModal(): void {
 
     const shareCard = buildShareCard({ marginBottom: '12px', compact: true });
 
-    bodyHost.replaceChildren(preferencesAndArchiveCard, shareCard, saveCard, devSection);
+    // Add to Home Screen: the browser's prompt where there is one, otherwise how to do it by hand.
+    const installHelp = h('div', {
+      style: { fontSize: '12.5px', color: '#4a5568', lineHeight: '1.4', display: 'none' },
+    });
+    const installCard = h(
+      'div',
+      {
+        style: {
+          padding: '12px 14px',
+          borderRadius: '12px',
+          background: '#fffdf9',
+          border: '2px solid #d8cfc0',
+          marginBottom: '12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+        },
+      },
+      sectionTitle('📲 Add to Home Screen'),
+      isInstalled()
+        ? h(
+            'div',
+            { style: { fontSize: '12.5px', color: '#276749', fontWeight: '700' } },
+            '✓ You’re playing from your home screen.',
+          )
+        : h(
+            'button',
+            {
+              style: {
+                alignSelf: 'flex-start',
+                padding: '8px 14px',
+                borderRadius: '10px',
+                fontWeight: '800',
+                fontSize: '12.5px',
+                cursor: 'pointer',
+                background: '#ebf8ff',
+                color: '#2c5282',
+                border: '2px solid #4299e1',
+                boxShadow: '0 2px 0 #2b6cb0',
+              },
+              onclick: () => {
+                if (installPrompt) {
+                  const ask = installPrompt;
+                  installPrompt = null;
+                  void ask
+                    .prompt()
+                    .then(() => ask.userChoice)
+                    .then(() => renderSettingsContent());
+                  return;
+                }
+                installHelp.textContent = isIOS()
+                  ? 'In Safari, tap the Share button (the square with an arrow), then “Add to Home Screen”.'
+                  : 'Open your browser’s menu and choose “Install app” or “Add to Home screen”.';
+                installHelp.style.display = 'block';
+              },
+            },
+            '📲 Add to Home Screen',
+          ),
+      installHelp,
+    );
+
+    bodyHost.replaceChildren(
+      preferencesAndArchiveCard,
+      installCard,
+      shareCard,
+      saveCard,
+      devSection,
+    );
   };
 
   const card = h(
