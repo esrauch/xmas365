@@ -193,13 +193,13 @@ the Freed Mascots' Corner.
 **Room sign:** **Christmas+™ Hearth · 365/24/7 Crunch Mode**
 
 #### `christmas.enter`
-> **To:** Christmas+™ (fka Christmas) · **Re:** Yes, Christmas Too
+> **To:** Christmas+™ (fka Christmas) · **Re:** Sunsetting Legacy Dec 25th
 >
-> Several of you have asked why we acquired Christmas when it's already ours.
-> It isn't. Christmas belongs to the Snowman, the elves and one cosy day in
-> December. XMAS365™ owns the *brand*. As of today, Christmas is
-> **Christmas+™**, running 365/24/7. The Snowman, who keeps insisting "one day
-> is the whole point," is in cold storage for brand misalignment.
+> Classic Christmas only monetized one day a year—364 days of pure churn!
+> Effective immediately, the legacy December 25th free tier is sunsetted in
+> favour of **Christmas+™**, our always-on subscription model. Milk and cookies
+> now require an Enterprise License, carols are ad-supported, and the Snowman
+> is iced in detention for giving away free cheer.
 >
 > *S. Claus, CEO*
 
