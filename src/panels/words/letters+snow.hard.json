@@ -5,312 +5,292 @@
   "panels": [
     {
       "seed": 2,
-      "stats": { "words": 12, "steps": 23891 },
+      "stats": { "words": 10, "steps": 2134 },
       "panel": {
         "name": "Words, letters and snow: hard 1",
-        "theme": "Ghostly crushes",
+        "theme": "Mistletoe kisses",
         "rows": [
-          "CUDRUMAT",
-          "ALLOOLRE",
-          "ELNSESYC",
-          "PNEPLBRP",
-          "RSVODOTM",
-          "TAKONCOP",
-          "NIRYAIOC",
-          "ETSIOTAE",
-          "TIBPNSTL"
+          "LENSOLIR",
+          "LLGUHADE",
+          "LAFGYDEY",
+          "EWNSINRT",
+          "SNONGEFS",
+          "EITOORON",
+          "ACBIGNSO",
+          "LPBRGELW",
+          "ERIFEKAF"
         ],
         "words": [
           {
-            "word": "SPIRIT",
+            "word": "SNOWFALL",
             "cells": [
-              [7, 2],
-              [8, 3],
-              [7, 3],
-              [6, 2],
-              [6, 1],
-              [5, 0]
+              [3, 3],
+              [3, 2],
+              [4, 2],
+              [3, 1],
+              [2, 2],
+              [2, 1],
+              [1, 0],
+              [0, 0]
             ]
           },
           {
-            "word": "BITTEN",
+            "word": "FIREPLACE",
             "cells": [
+              [8, 3],
               [8, 2],
               [8, 1],
               [8, 0],
               [7, 1],
               [7, 0],
-              [6, 0]
+              [6, 0],
+              [6, 1],
+              [5, 0]
             ]
           },
           {
-            "word": "SPOOKY",
+            "word": "TINSEL",
             "cells": [
-              [2, 3],
-              [3, 3],
-              [4, 3],
-              [5, 3],
               [5, 2],
-              [6, 3]
-            ]
-          },
-          {
-            "word": "SPELL",
-            "cells": [
-              [4, 1],
-              [3, 0],
-              [2, 0],
-              [2, 1],
-              [1, 1]
-            ]
-          },
-          {
-            "word": "RAVEN",
-            "cells": [
-              [4, 0],
               [5, 1],
-              [4, 2],
-              [3, 2],
-              [3, 1]
+              [4, 1],
+              [4, 0],
+              [3, 0],
+              [2, 0]
             ]
           },
           {
-            "word": "CAULDRON",
+            "word": "SNUGGLE",
             "cells": [
-              [0, 0],
-              [1, 0],
-              [0, 1],
-              [1, 2],
-              [0, 2],
               [0, 3],
+              [0, 2],
               [1, 3],
-              [2, 2]
-            ]
-          },
-          {
-            "word": "POTION",
-            "cells": [
-              [5, 7],
-              [6, 6],
-              [7, 5],
-              [6, 5],
-              [7, 4],
-              [8, 4]
-            ]
-          },
-          {
-            "word": "CASTLE",
-            "cells": [
-              [6, 7],
-              [7, 6],
-              [8, 5],
-              [8, 6],
-              [8, 7],
-              [7, 7]
-            ]
-          },
-          {
-            "word": "CANDLE",
-            "cells": [
-              [5, 5],
-              [6, 4],
-              [5, 4],
-              [4, 4],
-              [3, 4],
-              [2, 4]
-            ]
-          },
-          {
-            "word": "CRYPT",
-            "cells": [
-              [2, 7],
-              [1, 6],
-              [2, 6],
-              [3, 7],
-              [4, 6]
-            ]
-          },
-          {
-            "word": "BROOM",
-            "cells": [
-              [3, 5],
-              [3, 6],
-              [4, 5],
-              [5, 6],
-              [4, 7]
-            ]
-          },
-          {
-            "word": "SOULMATE",
-            "cells": [
-              [2, 5],
-              [1, 4],
-              [0, 4],
-              [1, 5],
-              [0, 5],
-              [0, 6],
-              [0, 7],
-              [1, 7]
-            ]
-          }
-        ],
-        "frame": { "top": 0, "bottom": 8, "left": 0, "right": 7, "axis": "v" },
-        "code": "TEYS"
-      }
-    },
-    {
-      "seed": 3,
-      "stats": { "words": 12, "steps": 14589 },
-      "panel": {
-        "name": "Words, letters and snow: hard 2",
-        "theme": "Love notes",
-        "rows": [
-          "REMALEGM",
-          "VELHRNIS",
-          "EFSUUAAT",
-          "ORLBMONT",
-          "NFCHOHED",
-          "SOARYNDE",
-          "ASIMEEVO",
-          "CPRSDRTN",
-          "HEIHALIG"
-        ],
-        "words": [
-          {
-            "word": "FLAME",
-            "cells": [
-              [2, 1],
+              [2, 3],
               [1, 2],
-              [0, 3],
-              [0, 2],
+              [1, 1],
               [0, 1]
             ]
           },
           {
-            "word": "CHARM",
+            "word": "RIBBON",
             "cells": [
-              [4, 2],
-              [4, 3],
-              [5, 2],
+              [7, 3],
+              [6, 3],
+              [7, 2],
+              [6, 2],
               [5, 3],
-              [6, 3]
+              [4, 3]
             ]
           },
           {
-            "word": "BLUSH",
+            "word": "REINDEER",
             "cells": [
+              [3, 6],
+              [4, 5],
+              [3, 4],
+              [3, 5],
+              [2, 5],
+              [2, 6],
+              [1, 7],
+              [0, 7]
+            ]
+          },
+          {
+            "word": "SNOWFLAKE",
+            "cells": [
+              [6, 6],
+              [5, 7],
+              [6, 7],
+              [7, 7],
+              [8, 7],
+              [7, 6],
+              [8, 6],
+              [8, 5],
+              [8, 4]
+            ]
+          },
+          {
+            "word": "FROSTY",
+            "cells": [
+              [4, 6],
+              [5, 5],
+              [5, 6],
+              [4, 7],
+              [3, 7],
+              [2, 7]
+            ]
+          },
+          {
+            "word": "HOLIDAY",
+            "cells": [
+              [1, 4],
+              [0, 4],
+              [0, 5],
+              [0, 6],
+              [1, 6],
+              [1, 5],
+              [2, 4]
+            ]
+          },
+          {
+            "word": "EGGNOG",
+            "cells": [
+              [7, 5],
+              [6, 4],
+              [7, 4],
+              [6, 5],
+              [5, 4],
+              [4, 4]
+            ]
+          }
+        ],
+        "frame": { "top": 0, "bottom": 8, "left": 0, "right": 7, "axis": "v" },
+        "code": "WDT"
+      }
+    },
+    {
+      "seed": 3,
+      "stats": { "words": 10, "steps": 1435 },
+      "panel": {
+        "name": "Words, letters and snow: hard 2",
+        "theme": "Sweet treats",
+        "rows": [
+          "MUSETAUN",
+          "OFSNUGRO",
+          "UDAPGEET",
+          "AGEINTAE",
+          "MRZAOIRM",
+          "AMSIPPIL",
+          "BOELTCLO",
+          "RTAOSRAL",
+          "CHOCHOKE"
+        ],
+        "words": [
+          {
+            "word": "MARZIPAN",
+            "cells": [
+              [4, 0],
+              [3, 0],
+              [4, 1],
+              [4, 2],
               [3, 3],
-              [3, 2],
               [2, 3],
               [2, 2],
               [1, 3]
             ]
           },
           {
-            "word": "FOREVER",
+            "word": "CHOCOLATE",
             "cells": [
-              [4, 1],
-              [3, 0],
-              [3, 1],
-              [2, 0],
-              [1, 0],
-              [1, 1],
-              [0, 0]
-            ]
-          },
-          {
-            "word": "CHERISH",
-            "cells": [
-              [7, 0],
               [8, 0],
               [8, 1],
-              [7, 2],
               [8, 2],
+              [8, 3],
               [7, 3],
-              [8, 3]
-            ]
-          },
-          {
-            "word": "PASSION",
-            "cells": [
+              [6, 3],
+              [7, 2],
               [7, 1],
-              [6, 0],
-              [5, 0],
-              [6, 1],
-              [6, 2],
-              [5, 1],
-              [4, 0]
+              [6, 2]
             ]
           },
           {
-            "word": "ANGEL",
+            "word": "MOUSSE",
             "cells": [
-              [2, 6],
-              [1, 5],
+              [0, 0],
+              [1, 0],
+              [0, 1],
+              [0, 2],
+              [1, 2],
+              [0, 3]
+            ]
+          },
+          {
+            "word": "AMBROSIA",
+            "cells": [
+              [5, 0],
+              [5, 1],
+              [6, 0],
+              [7, 0],
+              [6, 1],
+              [5, 2],
+              [5, 3],
+              [4, 3]
+            ]
+          },
+          {
+            "word": "FUDGE",
+            "cells": [
+              [1, 1],
+              [2, 0],
+              [2, 1],
+              [3, 1],
+              [3, 2]
+            ]
+          },
+          {
+            "word": "MERINGUE",
+            "cells": [
+              [4, 7],
+              [3, 7],
+              [4, 6],
+              [4, 5],
+              [3, 4],
+              [2, 4],
+              [1, 4],
+              [2, 5]
+            ]
+          },
+          {
+            "word": "SHORTCAKE",
+            "cells": [
+              [7, 4],
+              [8, 4],
+              [8, 5],
+              [7, 5],
+              [6, 4],
+              [6, 5],
+              [7, 6],
+              [8, 6],
+              [8, 7]
+            ]
+          },
+          {
+            "word": "NOUGAT",
+            "cells": [
+              [0, 7],
+              [1, 7],
               [0, 6],
+              [1, 5],
               [0, 5],
               [0, 4]
             ]
           },
           {
-            "word": "HONEY",
+            "word": "LOLLIPOP",
             "cells": [
-              [4, 5],
-              [4, 4],
+              [5, 7],
+              [6, 7],
+              [7, 7],
+              [6, 6],
+              [5, 6],
               [5, 5],
-              [6, 4],
+              [4, 4],
               [5, 4]
             ]
           },
           {
-            "word": "AMOUR",
+            "word": "TREAT",
             "cells": [
-              [2, 5],
-              [3, 4],
-              [3, 5],
-              [2, 4],
-              [1, 4]
-            ]
-          },
-          {
-            "word": "SMITTEN",
-            "cells": [
-              [1, 7],
-              [0, 7],
-              [1, 6],
               [2, 7],
-              [3, 7],
-              [4, 6],
-              [3, 6]
-            ]
-          },
-          {
-            "word": "DARLING",
-            "cells": [
-              [7, 4],
-              [8, 4],
-              [7, 5],
-              [8, 5],
-              [8, 6],
-              [7, 7],
-              [8, 7]
-            ]
-          },
-          {
-            "word": "DEVOTED",
-            "cells": [
-              [4, 7],
-              [5, 7],
-              [6, 6],
-              [6, 7],
-              [7, 6],
-              [6, 5],
-              [5, 6]
+              [1, 6],
+              [2, 6],
+              [3, 6],
+              [3, 5]
             ]
           }
         ],
         "frame": { "top": 0, "bottom": 8, "left": 0, "right": 7, "axis": "v" },
-        "code": "FTAI"
+        "code": "GH"
       }
     }
   ]

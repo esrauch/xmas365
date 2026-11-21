@@ -79,7 +79,7 @@ export const CLAUSE_PICTURES: ClauseDef<PicturePanel> = {
       name: 'Secret Sparkler',
       section: 'intro',
       twists: ['letters'],
-      tip: '💌 Love Letters: Equal letters mean equal run lengths; distinct letters differ.',
+      tip: '💌 Love Letters: Clue letters spell a word in the numbered blanks—each number is its run length.',
       explain:
         'In Fireworks, letter clues replace run lengths: every matching letter has the exact same length, different letters have different lengths, and the numbered message blanks spell a word, so unscrambling the letters into it gives each length.',
       panel: {

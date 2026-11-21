@@ -81,6 +81,17 @@ describe("Valentine's love-letter room (7 runs, 25 panels)", () => {
       }
   });
 
+  it('at most one coded letter per word, and never on a ringed first letter in story panels', () => {
+    for (const p of all.filter((x) => x.code)) {
+      const codeSet = new Set([...(p.code ?? '')]);
+      for (const w of p.words) {
+        const coded = w.cells.filter((c) => codeSet.has(letterAt(p, c)));
+        expect(coded.length, `${p.name}: ${w.word}`).toBeLessThanOrEqual(1);
+        expect(codeSet.has(w.word[0] ?? ''), `${p.name}: ${w.word} first`).toBe(false);
+      }
+    }
+  });
+
   it('with dark squares read as any letter, each word still has only one path', () => {
     for (const p of all.filter((x) => x.dark))
       for (const w of p.words)

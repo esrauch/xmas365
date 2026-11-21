@@ -81,21 +81,21 @@ export const FINALE: StoryPanel[] = [
 export const BOW: StoryPanel[] = [
   {
     name: 'A heart',
-    tip: '💌 Letter clues stand for run lengths; same letter = same length, different letters = different lengths',
+    tip: '💌 Love-Letter: The numbered blanks spell a word from the clue letters—each letter’s number is its run length!',
     rows: ['.#.#.', '#####', '#####', '.###.', '..#..'],
     letters: 'O EVL',
     message: '5143',
   },
   {
     name: 'A love letter',
-    tip: '💌 The numbered blanks spell a word: unscramble the clue letters into it to learn each letter’s length',
+    tip: '💌 Love-Letter: Same letter = same run length, different letters = different lengths—unscramble the word to learn them.',
     rows: ['#######', '##...##', '#.#.#.#', '#..#..#', '#######'],
     letters: 'HC  R E',
     message: '21775',
   },
   {
     name: 'Heart on fire',
-    tip: '💌 Unscramble the letters into the message first, then solve the picture with the numbers it gives',
+    tip: '💌 Love-Letter: Unscramble the letters into the message word first, then solve the picture with the numbers it gives.',
     rows: ['......#', '.##.##.', '#######', '#######', '.#####.', '.####..', '#..#...'],
     letters: 'AZ EL B',
     message: '75124',

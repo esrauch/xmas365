@@ -62,8 +62,22 @@ export function problems(p: Panel, _margin: number, budget = new Budget(4_000_00
     if (dark.some((k) => k === keys[0] || k === keys[keys.length - 1]))
       out.push(`${w.word}'s dark letter is at an end`);
   }
-  // The code: at least two letters (one alone is just a hidden given).
-  if (p.code !== undefined && p.code.length < 2) out.push('only one coded letter');
+  // The code: at least two letters (one alone is just a hidden given), each appearing
+  // at least twice on the board, and at most one coded square in any word.
+  if (p.code !== undefined) {
+    if (p.code.length < 2) out.push('only one coded letter');
+    const codeSet = new Set([...p.code]);
+    if (codeSet.size !== p.code.length) out.push('duplicate letter in code');
+    const gridText = p.rows.join('');
+    for (const ch of codeSet) {
+      const total = [...gridText].filter((c) => c === ch).length;
+      if (total < 2) out.push(`coded letter ${ch} appears fewer than twice`);
+    }
+    for (const w of p.words) {
+      const codedInWord = w.cells.filter((s) => codeSet.has(letterAt(p, s))).length;
+      if (codedInWord > 1) out.push(`${w.word} has ${codedInWord} coded letters (max 1)`);
+    }
+  }
   // Red, white and blue: bows in at least two colours.
   if (p.bows) {
     const tones = new Set(p.bows.map(([r, c]) => p.colours?.[r]?.[c]));

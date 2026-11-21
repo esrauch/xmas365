@@ -234,7 +234,7 @@ export const CORNUCOPIA: StoryPanel[] = [
 export const ROSE: StoryPanel[] = [
   {
     name: 'Secret hop',
-    tip: '💌 Letter eggs must be visited on the hop numbers shown in the message blanks to spell a word',
+    tip: '💌 Love-Letter: The numbered blanks spell a word from the letter eggs—visit each letter on its blank’s hop number!',
     rows: ['####', '####', '####', '#.##'],
     rocks: [[3, 1]],
     given: [[2, 3, 1]],

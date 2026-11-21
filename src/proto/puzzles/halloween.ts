@@ -75,21 +75,21 @@ export const CHOCOLATES: Panel[] = [
     rows: ['OL..M', '.....', '.....', '.4.O.', 'O...N'],
     letters: ' ONML    ',
     message: '4223',
-    tip: '💌 Love-Letter: Same letter = same thread count; different letters = different counts.',
+    tip: '💌 Love-Letter: The numbered blanks spell a word from the knot letters—each letter’s number is its thread count!',
   },
   {
     name: 'Be mine',
     rows: ['..E....', 'T5R...A', '.E.....', '12A.A.5', '......2', '.......', '....2..'],
     letters: 'TE A   R ',
     message: '18241',
-    tip: '💌 Love-Letter: Equal letters take equal thread counts and fill the message blanks.',
+    tip: '💌 Love-Letter: Same letter = same thread count, different letters = different counts—unscramble the word to learn them.',
   },
   {
     name: 'Haunted heart',
     rows: ['...H...', 'T..N.AT', '.....T.', 'H......', '.......', 'H..U.T.', '.T.U.T.'],
     letters: 'HT ANU',
     message: '14652',
-    tip: '💌 Love-Letter: Unscramble the five letters into the message to decode the final chocolate note.',
+    tip: '💌 Love-Letter: Unscramble the five letters into the message word to decode the final chocolate note.',
   },
 ];
 

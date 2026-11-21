@@ -5,245 +5,26 @@
   "panels": [
     {
       "seed": 1,
-      "stats": { "words": 9, "steps": 5552 },
+      "stats": { "words": 8, "steps": 1112 },
       "panel": {
         "name": "Words, letters: medium 1",
-        "theme": "Cupid's kit",
-        "rows": ["GNTGOAR", "IETLDOR", "RGAQUIW", "TRCCLEV", "SHKRSOR", "EBALNAU", "RUMADSD"],
+        "theme": "Garden of love",
+        "rows": ["SRINGYS", "PTREVPO", "NDORCHI", "ABSEGAD", "LLEMOSR", "ULDOSDL", "EBEBLNA"],
         "words": [
           {
-            "word": "STRING",
-            "cells": [
-              [4, 0],
-              [3, 0],
-              [2, 0],
-              [1, 0],
-              [0, 1],
-              [0, 0]
-            ]
-          },
-          {
-            "word": "TARGET",
-            "cells": [
-              [1, 2],
-              [2, 2],
-              [3, 1],
-              [2, 1],
-              [1, 1],
-              [0, 2]
-            ]
-          },
-          {
-            "word": "GOLD",
-            "cells": [
-              [0, 3],
-              [0, 4],
-              [1, 3],
-              [1, 4]
-            ]
-          },
-          {
-            "word": "ARROW",
-            "cells": [
-              [0, 5],
-              [0, 6],
-              [1, 6],
-              [1, 5],
-              [2, 6]
-            ]
-          },
-          {
-            "word": "QUIVER",
-            "cells": [
-              [2, 3],
-              [2, 4],
-              [2, 5],
-              [3, 6],
-              [3, 5],
-              [4, 6]
-            ]
-          },
-          {
-            "word": "CHERUB",
-            "cells": [
-              [3, 2],
-              [4, 1],
-              [5, 0],
-              [6, 0],
-              [6, 1],
-              [5, 1]
-            ]
-          },
-          {
-            "word": "CLOUD",
-            "cells": [
-              [3, 3],
-              [3, 4],
-              [4, 5],
-              [5, 6],
-              [6, 6]
-            ]
-          },
-          {
-            "word": "MARK",
-            "cells": [
-              [6, 2],
-              [5, 2],
-              [4, 3],
-              [4, 2]
-            ]
-          },
-          {
-            "word": "SANDALS",
-            "cells": [
-              [6, 5],
-              [5, 5],
-              [5, 4],
-              [6, 4],
-              [6, 3],
-              [5, 3],
-              [4, 4]
-            ]
-          }
-        ],
-        "code": "CLE"
-      }
-    },
-    {
-      "seed": 2,
-      "stats": { "words": 8, "steps": 5319 },
-      "panel": {
-        "name": "Words, letters: medium 2",
-        "theme": "Ghostly crushes",
-        "rows": ["TRSHMIS", "IKANIKT", "CDCAPUP", "OSPOULM", "WDEOKYD", "HCMNIBR", "ARETTNO"],
-        "words": [
-          {
-            "word": "TRICK",
+            "word": "SPRING",
             "cells": [
               [0, 0],
-              [0, 1],
               [1, 0],
-              [2, 0],
-              [1, 1]
-            ]
-          },
-          {
-            "word": "SHADOW",
-            "cells": [
+              [0, 1],
               [0, 2],
               [0, 3],
-              [1, 2],
-              [2, 1],
-              [3, 0],
-              [4, 0]
+              [0, 4]
             ]
           },
           {
-            "word": "MIST",
+            "word": "POSY",
             "cells": [
-              [0, 4],
-              [0, 5],
-              [0, 6],
-              [1, 6]
-            ]
-          },
-          {
-            "word": "PUMPKIN",
-            "cells": [
-              [2, 4],
-              [2, 5],
-              [3, 6],
-              [2, 6],
-              [1, 5],
-              [1, 4],
-              [1, 3]
-            ]
-          },
-          {
-            "word": "CAULDRON",
-            "cells": [
-              [2, 2],
-              [2, 3],
-              [3, 4],
-              [3, 5],
-              [4, 6],
-              [5, 6],
-              [6, 6],
-              [6, 5]
-            ]
-          },
-          {
-            "word": "SPOOKY",
-            "cells": [
-              [3, 1],
-              [3, 2],
-              [3, 3],
-              [4, 3],
-              [4, 4],
-              [4, 5]
-            ]
-          },
-          {
-            "word": "CHARMED",
-            "cells": [
-              [5, 1],
-              [5, 0],
-              [6, 0],
-              [6, 1],
-              [5, 2],
-              [4, 2],
-              [4, 1]
-            ]
-          },
-          {
-            "word": "BITTEN",
-            "cells": [
-              [5, 5],
-              [5, 4],
-              [6, 4],
-              [6, 3],
-              [6, 2],
-              [5, 3]
-            ]
-          }
-        ],
-        "code": "AOM"
-      }
-    },
-    {
-      "seed": 3,
-      "stats": { "words": 9, "steps": 5667 },
-      "panel": {
-        "name": "Words, letters: medium 3",
-        "theme": "Love notes",
-        "rows": ["CHEEGRE", "ALNDAND", "RTNILRE", "MGYENOT", "CHTRKIH", "HSAHSTU", "ERIESRE"],
-        "words": [
-          {
-            "word": "CHARM",
-            "cells": [
-              [0, 0],
-              [0, 1],
-              [1, 0],
-              [2, 0],
-              [3, 0]
-            ]
-          },
-          {
-            "word": "GENTLE",
-            "cells": [
-              [0, 4],
-              [0, 3],
-              [1, 2],
-              [2, 1],
-              [1, 1],
-              [0, 2]
-            ]
-          },
-          {
-            "word": "TENDER",
-            "cells": [
-              [3, 6],
-              [2, 6],
               [1, 5],
               [1, 6],
               [0, 6],
@@ -251,20 +32,32 @@
             ]
           },
           {
-            "word": "DARLING",
+            "word": "VERDANT",
             "cells": [
-              [1, 3],
               [1, 4],
-              [2, 5],
-              [2, 4],
-              [2, 3],
-              [2, 2],
-              [3, 1]
+              [1, 3],
+              [1, 2],
+              [2, 1],
+              [3, 0],
+              [2, 0],
+              [1, 1]
             ]
           },
           {
-            "word": "CHERISH",
+            "word": "ORCHID",
             "cells": [
+              [2, 2],
+              [2, 3],
+              [2, 4],
+              [2, 5],
+              [2, 6],
+              [3, 6]
+            ]
+          },
+          {
+            "word": "BLUEBELL",
+            "cells": [
+              [3, 1],
               [4, 0],
               [5, 0],
               [6, 0],
@@ -275,45 +68,242 @@
             ]
           },
           {
-            "word": "KISS",
+            "word": "SEED",
             "cells": [
-              [4, 4],
-              [4, 5],
-              [5, 4],
-              [6, 4]
+              [3, 2],
+              [3, 3],
+              [4, 2],
+              [5, 2]
             ]
           },
           {
-            "word": "TRUE",
+            "word": "GARLAND",
             "cells": [
-              [5, 5],
-              [6, 5],
+              [3, 4],
+              [3, 5],
+              [4, 6],
               [5, 6],
-              [6, 6]
+              [6, 6],
+              [6, 5],
+              [5, 5]
+            ]
+          },
+          {
+            "word": "BLOSSOM",
+            "cells": [
+              [6, 3],
+              [6, 4],
+              [5, 3],
+              [5, 4],
+              [4, 5],
+              [4, 4],
+              [4, 3]
+            ]
+          }
+        ],
+        "code": "DP"
+      }
+    },
+    {
+      "seed": 2,
+      "stats": { "words": 8, "steps": 994 },
+      "panel": {
+        "name": "Words, letters: medium 2",
+        "theme": "Mistletoe kisses",
+        "rows": ["ORENAWI", "NMTOLHS", "AOCISTS", "CSBOVAC", "LELSDER", "EHNWRNF", "IGOETWI"],
+        "words": [
+          {
+            "word": "ORNAMENT",
+            "cells": [
+              [0, 0],
+              [0, 1],
+              [1, 0],
+              [2, 0],
+              [1, 1],
+              [0, 2],
+              [0, 3],
+              [1, 2]
+            ]
+          },
+          {
+            "word": "COCOA",
+            "cells": [
+              [3, 0],
+              [2, 1],
+              [2, 2],
+              [1, 3],
+              [0, 4]
+            ]
+          },
+          {
+            "word": "WISHLIST",
+            "cells": [
+              [0, 5],
+              [0, 6],
+              [1, 6],
+              [1, 5],
+              [1, 4],
+              [2, 3],
+              [2, 4],
+              [2, 5]
+            ]
+          },
+          {
+            "word": "SCARF",
+            "cells": [
+              [2, 6],
+              [3, 6],
+              [3, 5],
+              [4, 6],
+              [5, 6]
+            ]
+          },
+          {
+            "word": "SLEIGH",
+            "cells": [
+              [3, 1],
+              [4, 0],
+              [5, 0],
+              [6, 0],
+              [6, 1],
+              [5, 1]
+            ]
+          },
+          {
+            "word": "BELOVED",
+            "cells": [
+              [3, 2],
+              [4, 1],
+              [4, 2],
+              [3, 3],
+              [3, 4],
+              [4, 5],
+              [4, 4]
+            ]
+          },
+          {
+            "word": "SNOW",
+            "cells": [
+              [4, 3],
+              [5, 2],
+              [6, 2],
+              [5, 3]
+            ]
+          },
+          {
+            "word": "WINTER",
+            "cells": [
+              [6, 5],
+              [6, 6],
+              [5, 5],
+              [6, 4],
+              [6, 3],
+              [5, 4]
+            ]
+          }
+        ],
+        "code": "HR"
+      }
+    },
+    {
+      "seed": 3,
+      "stats": { "words": 8, "steps": 1327 },
+      "panel": {
+        "name": "Words, letters: medium 3",
+        "theme": "Sweet treats",
+        "rows": ["EKUCTAG", "APGPENU", "CNUGUHO", "IDHYLMC", "DOYJLDA", "NACDERN", "EYNPOGA"],
+        "words": [
+          {
+            "word": "CUPCAKE",
+            "cells": [
+              [0, 3],
+              [0, 2],
+              [1, 1],
+              [2, 0],
+              [1, 0],
+              [0, 1],
+              [0, 0]
+            ]
+          },
+          {
+            "word": "NOUGAT",
+            "cells": [
+              [1, 5],
+              [2, 6],
+              [1, 6],
+              [0, 6],
+              [0, 5],
+              [0, 4]
+            ]
+          },
+          {
+            "word": "PUDDING",
+            "cells": [
+              [1, 3],
+              [2, 2],
+              [3, 1],
+              [4, 0],
+              [3, 0],
+              [2, 1],
+              [1, 2]
+            ]
+          },
+          {
+            "word": "GANACHE",
+            "cells": [
+              [6, 5],
+              [6, 6],
+              [5, 6],
+              [4, 6],
+              [3, 6],
+              [2, 5],
+              [1, 4]
+            ]
+          },
+          {
+            "word": "GUMDROP",
+            "cells": [
+              [2, 3],
+              [2, 4],
+              [3, 5],
+              [4, 5],
+              [5, 5],
+              [6, 4],
+              [6, 3]
             ]
           },
           {
             "word": "HONEY",
             "cells": [
-              [4, 6],
-              [3, 5],
-              [3, 4],
-              [3, 3],
-              [3, 2]
+              [3, 2],
+              [4, 1],
+              [5, 0],
+              [6, 0],
+              [6, 1]
             ]
           },
           {
-            "word": "HEART",
+            "word": "JELLY",
             "cells": [
-              [5, 3],
-              [6, 3],
-              [5, 2],
               [4, 3],
+              [5, 4],
+              [4, 4],
+              [3, 4],
+              [3, 3]
+            ]
+          },
+          {
+            "word": "CANDY",
+            "cells": [
+              [5, 2],
+              [5, 1],
+              [6, 2],
+              [5, 3],
               [4, 2]
             ]
           }
         ],
-        "code": "GTA"
+        "code": "UY"
       }
     }
   ]

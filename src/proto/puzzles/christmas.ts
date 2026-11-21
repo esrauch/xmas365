@@ -149,7 +149,7 @@ export const LOVELETTER: LightsPanel[] = [
     message: '10 8 3',
     word: 'RED',
     blanks: [10, 8, 3],
-    tip: '💌 Love-Letter: Route the wire so letter bulbs sit at step distances that spell the word.',
+    tip: '💌 Love-Letter: The numbered blanks spell a word from the letter bulbs—each number is that bulb’s wire steps from the plug!',
   },
   {
     name: 'Frosty card',

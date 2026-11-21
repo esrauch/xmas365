@@ -307,7 +307,8 @@ export function makePanel(
             .filter((w) => w.length === len && !onBoard.has(w))
             .slice(0, 8)) {
             const next = swapWord(base, i, word);
-            if (trouble(next, p).troubled.size < troubled.size) {
+            const res = trouble(next, p);
+            if (res.p && res.troubled.size < troubled.size) {
               base = next;
               swapped = true;
               break;
@@ -395,11 +396,114 @@ export function makePanel(
     return bows;
   }
 
-  /** A board's twists put back on a swapped board (the same squares; the code keeps its letters). */
-  function reuse(b: Panel, from: Panel): Panel {
+  /** Does `code` hide >=2 letters, each appearing >=2 times, with at most 1 coded square per word? */
+  function isValidCodeOn(q: Panel, code: string): boolean {
+    if (code.length < 2) return false;
+    const set = new Set([...code]);
+    if (set.size !== code.length) return false;
+    const text = q.rows.join('');
+    for (const ch of set) {
+      if ([...text].filter((c) => c === ch).length < 2) return false;
+    }
+    for (const w of q.words) {
+      if (w.cells.filter((s) => set.has(letterAt(q, s))).length > 1) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Choose up to `shape.code` (>= 2) coded letters so each appears in >= 2 words
+   * and every word on the board has at most 1 coded square (preferring letters
+   * that aren't a word's ringed first letter or inside a word that already has a dark tile).
+   */
+  function pickCode(q: Panel, random: Rng): string | null {
+    const load = (cand: Panel): number =>
+      framedOptions(cand, { noCode: true }, budget).reduce((n, o) => n + o.length, 0);
+    const darkKeys = new Set((q.dark ?? []).map(key));
+    const darkWords = new Set<number>();
+    q.words.forEach((w, idx) => {
+      if (w.cells.some((s) => darkKeys.has(key(s)))) darkWords.add(idx);
+    });
+
+    const tier0: string[] = []; // neither ringed-first nor sharing a word with '?'
+    const tier1: string[] = []; // not ringed-first
+    const tier2: string[] = []; // fallback (touches a ringed-first cell)
+
+    for (const ch of new Set(q.rows.join(''))) {
+      let valid = true;
+      let wordHits = 0;
+      let hitsFirst = false;
+      let hitsDarkWord = false;
+      q.words.forEach((w, idx) => {
+        let inWord = 0;
+        for (let i = 0; i < w.word.length; i++) {
+          if (w.word[i] === ch) {
+            inWord++;
+            if (i === 0) hitsFirst = true;
+          }
+        }
+        if (inWord > 1) valid = false;
+        if (inWord === 1) {
+          wordHits++;
+          if (darkWords.has(idx)) hitsDarkWord = true;
+        }
+      });
+      if (!valid || wordHits < 2) continue;
+      if (!hitsFirst && !hitsDarkWord) tier0.push(ch);
+      else if (!hitsFirst) tier1.push(ch);
+      else tier2.push(ch);
+    }
+
+    const candidates = [
+      ...shuffle(random, tier0),
+      ...shuffle(random, tier1),
+      ...shuffle(random, tier2),
+    ];
+    if (candidates.length < 2) return null;
+
+    const uncoded: Panel = { ...q };
+    delete uncoded.code;
+    const baseLoad = load(uncoded);
+    let best: string[] = [];
+
+    const dfs = (idx: number, chosen: string[], usedWords: Set<number>, curLoad: number): void => {
+      if (chosen.length > best.length) best = [...chosen];
+      if (best.length >= shape.code || idx >= candidates.length) return;
+      for (let i = idx; i < candidates.length; i++) {
+        const ch = candidates[i] as string;
+        let clash = false;
+        const nextUsed = new Set(usedWords);
+        q.words.forEach((w, wIdx) => {
+          if (w.word.includes(ch)) {
+            if (usedWords.has(wIdx)) clash = true;
+            nextUsed.add(wIdx);
+          }
+        });
+        if (clash) continue;
+        const next = { ...q, code: [...chosen, ch].join('') };
+        const after = load(next);
+        if (after > curLoad) continue;
+        dfs(i + 1, [...chosen, ch], nextUsed, after);
+        if (best.length >= shape.code) return;
+      }
+    };
+
+    dfs(0, [], new Set(), baseLoad);
+    return best.length >= 2 ? best.join('') : null;
+  }
+
+  /** A board's twists put back on a swapped board (the same squares; re-picks code if the swap clashed). */
+  function reuse(b: Panel, from: Panel): Panel | null {
     const q: Panel = { ...b };
     if (from.dark) q.dark = from.dark;
-    if (from.code) q.code = from.code;
+    if (from.code) {
+      if (isValidCodeOn(q, from.code)) q.code = from.code;
+      else {
+        const repicked = pickCode(q, rng(seed * 104729));
+        if (!repicked) return null;
+        q.code = repicked;
+      }
+    }
     if (from.colours) {
       q.colours = from.colours;
       q.bows = placeBows(q, from.colours, rng(seed * 104729));
@@ -521,24 +625,9 @@ export function makePanel(
       p = { ...p, dark };
     }
     if (on.has('letters')) {
-      // Code letters that appear more than once, so a number does work across words.
-      const counts = new Map<string, number>();
-      for (const ch of p.rows.join('')) counts.set(ch, (counts.get(ch) ?? 0) + 1);
-      const code: string[] = [];
-      let before = load(p);
-      for (const ch of shuffle(
-        random,
-        [...counts].filter(([, n]) => n >= 2).map(([c]) => c),
-      )) {
-        if (code.length >= shape.code) break;
-        const next = { ...p, code: [...code, ch].join('') };
-        const after = load(next);
-        if (after > before) continue;
-        code.push(ch);
-        before = after;
-      }
-      if (code.length < 2) return why.no('no two letters can be coded safely');
-      p = { ...p, code: code.join('') };
+      const code = pickCode(p, random);
+      if (!code) return why.no('no two letters can be coded safely');
+      p = { ...p, code };
     }
     if (on.has('cuts')) {
       // Fences on boundary edges between different words (never stepped across by a true word or

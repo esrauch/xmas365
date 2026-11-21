@@ -190,14 +190,14 @@ export const LOCKET: Panel[] = [
     rows: ['S . . W .', '. . . . .', '6 . W E .', '. . . . .', '. . 2 . T'],
     sizeLetters: ' WET S   ',
     message: '62334',
-    tip: '💌 Love-Letter: Same letter = same rectangle area; different letters = different areas.',
+    tip: '💌 Love-Letter: The numbered blanks spell a word from the clue letters—each letter’s number is its rectangle area!',
   },
   {
     name: 'Stuffing',
     rows: ['. . F . .', '. T T . .', '. . U . T', 'S . . T T', '. . F . .'],
     sizeLetters: ' TFUS    ',
     message: '52433',
-    tip: '💌 Love-Letter: The numbered blanks spell a word: unscramble the clue letters into it to learn each letter’s area.',
+    tip: '💌 Love-Letter: Same letter = same area, different letters = different areas—unscramble the word to learn each size.',
   },
   {
     name: 'The Heart Locket',
@@ -212,7 +212,7 @@ export const LOCKET: Panel[] = [
     ],
     sizeLetters: ' AT HE R ',
     message: '56283',
-    tip: '💌 Love-Letter: Unscramble the letters on the 7×7 platter into the message first, then carve the board knowing their areas.',
+    tip: '💌 Love-Letter: Unscramble the letters on the 7×7 platter into the message word first, then carve knowing their areas.',
   },
 ];
 

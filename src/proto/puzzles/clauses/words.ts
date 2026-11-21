@@ -28,7 +28,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       key: 'letters',
       icon: '💌',
       label: 'Love-Letter',
-      rule: 'Numbered tiles (1, 2, …) stand for coded letters; every matching number hides the same letter.',
+      rule: 'Numbered tiles (1, 2, …) stand for coded letters (at most one per word); every matching number hides the same letter.',
     },
     {
       key: 'colours',
@@ -110,47 +110,52 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       name: 'Intro 2: Love Letters',
       section: 'intro',
       twists: ['letters'],
-      tip: '💌 Matching numbers stand for the same secret letter',
+      tip: '💌 Matching numbers share a letter (at most 1 per word)',
       explain:
-        '💌 Love Letters in Heartstrings: Numbered tiles (1, 2, …) form a board-wide cipher where every matching number hides the exact same letter.',
+        '💌 Love Letters in Heartstrings: Numbered tiles (1, 2, …) form a board-wide cipher—at most one per word—where every matching number hides the exact same letter.',
       panel: {
         name: 'Secret Cipher',
-        theme: 'Garden of love',
-        rows: ['LLAC', 'IGST', 'NPHO', 'IRRN'],
+        theme: 'Date night',
+        rows: ['IXTA', 'AGBO', 'TNMN', 'OSEU'],
         words: [
           {
-            word: 'LILAC',
+            word: 'TAXI',
             cells: [
-              [0, 0],
+              [2, 0],
               [1, 0],
               [0, 1],
-              [0, 2],
-              [0, 3],
+              [0, 0],
             ],
           },
           {
-            word: 'SPRING',
+            word: 'BOAT',
             cells: [
               [1, 2],
-              [2, 1],
+              [1, 3],
+              [0, 3],
+              [0, 2],
+            ],
+          },
+          {
+            word: 'SONG',
+            cells: [
               [3, 1],
               [3, 0],
-              [2, 0],
+              [2, 1],
               [1, 1],
             ],
           },
           {
-            word: 'THORN',
+            word: 'MENU',
             cells: [
-              [1, 3],
               [2, 2],
-              [2, 3],
               [3, 2],
+              [2, 3],
               [3, 3],
             ],
           },
         ],
-        code: 'IR',
+        code: 'NA',
       },
     },
     {
@@ -317,14 +322,14 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['dark', 'letters'],
       tip: '🎃 Spooky + 💌 Love Letters',
       explain:
-        '🎃 Spooky (A ? tile hides a vowel in the dark until you trace a word through it.) combined with 💌 Love Letters (Numbered tiles (1, 2, …) stand for coded letters; every matching number hides the same letter.)',
+        '🎃 Spooky (A ? tile hides a vowel in the dark until you trace a word through it.) combined with 💌 Love Letters (Numbered tiles (1, 2, …) stand for coded letters, at most one per word; every matching number hides the same letter.)',
       panel: {
         name: 'Spooky + Love Letters',
         theme: 'Sweet treats',
-        rows: ['EKUCW', 'APLLO', 'CAGPY', 'MNUCD', 'IDDAN'],
+        rows: ['EHAGT', 'CNUGA', 'AOGPR', 'NNUWE', 'IDDAF'],
         words: [
           {
-            word: 'CUPCAKE',
+            word: 'GANACHE',
             cells: [
               [0, 3],
               [0, 2],
@@ -336,7 +341,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'MALLOW',
+            word: 'NOUGAT',
             cells: [
               [3, 0],
               [2, 1],
@@ -359,7 +364,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
           {
-            word: 'CANDY',
+            word: 'WAFER',
             cells: [
               [3, 3],
               [4, 3],
@@ -373,7 +378,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
           [0, 2],
           [1, 4],
         ],
-        code: 'CA',
+        code: 'UE',
       },
     },
     {
@@ -667,65 +672,65 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['letters', 'colours'],
       tip: '💌 Love Letters + 🎆 Red, White & Blue',
       explain:
-        '💌 Love Letters (Numbered tiles (1, 2, …) stand for coded letters; every matching number hides the same letter.) combined with 🎆 Red, White & Blue (Bowed tiles reveal their word’s Red or Blue color; two words of the same color can never touch orthogonally.)',
+        '💌 Love Letters (Numbered tiles (1, 2, …) stand for coded letters, at most one per word; every matching number hides the same letter.) combined with 🎆 Red, White & Blue (Bowed tiles reveal their word’s Red or Blue color; two words of the same color can never touch orthogonally.)',
       panel: {
         name: 'Love Letters + Red, White & Blue',
-        theme: 'Sweet treats',
-        rows: ['ELRTT', 'FUUGA', 'FODCT', 'NRUTA', 'ATSRE'],
+        theme: 'Garden of love',
+        rows: ['EUFFE', 'MRMAR', 'EWAGN', 'PMOIN', 'EADLO'],
         words: [
           {
-            word: 'TRUFFLE',
+            word: 'PERFUME',
             cells: [
-              [0, 3],
-              [0, 2],
-              [1, 1],
+              [3, 0],
               [2, 0],
-              [1, 0],
+              [1, 1],
+              [0, 2],
               [0, 1],
+              [1, 0],
               [0, 0],
             ],
           },
           {
-            word: 'NOUGAT',
+            word: 'FERN',
             cells: [
-              [3, 0],
-              [2, 1],
-              [1, 2],
-              [1, 3],
-              [1, 4],
+              [0, 3],
               [0, 4],
+              [1, 4],
+              [2, 4],
             ],
           },
           {
-            word: 'CUSTARD',
+            word: 'MAGNOLIA',
             cells: [
+              [1, 2],
+              [1, 3],
               [2, 3],
-              [3, 2],
-              [4, 2],
-              [4, 1],
-              [4, 0],
-              [3, 1],
+              [3, 4],
+              [4, 4],
+              [4, 3],
+              [3, 3],
               [2, 2],
             ],
           },
           {
-            word: 'TREAT',
+            word: 'MEADOW',
             cells: [
-              [3, 3],
-              [4, 3],
-              [4, 4],
-              [3, 4],
-              [2, 4],
+              [3, 1],
+              [4, 0],
+              [4, 1],
+              [4, 2],
+              [3, 2],
+              [2, 1],
             ],
           },
         ],
-        colours: ['bbbbr', 'bbrrr', 'br..b', 'r..bb', '...bb'],
+        colours: ['...bb', '..rrb', '.brrb', '.bbrr', 'bbbrr'],
         bows: [
-          [1, 2],
-          [0, 0],
-          [2, 4],
+          [0, 3],
+          [1, 3],
+          [4, 1],
         ],
-        code: 'UE',
+        code: 'OR',
       },
     },
     {
@@ -734,7 +739,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['letters', 'eggs'],
       tip: '💌 Love Letters + 🥚 Egg Hunt',
       explain:
-        '💌 Love Letters (Numbered tiles (1, 2, …) stand for coded letters; every matching number hides the same letter.) combined with 🥚 Egg Hunt (A numbered egg gives its letter’s place in its word: 3 or more, since the ringed first letter is 1.)',
+        '💌 Love Letters (Numbered tiles (1, 2, …) stand for coded letters, at most one per word; every matching number hides the same letter.) combined with 🥚 Egg Hunt (A numbered egg gives its letter’s place in its word: 3 or more, since the ringed first letter is 1.)',
       panel: {
         name: 'Love Letters + Egg Hunt',
         theme: 'Love letters',
@@ -791,7 +796,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
         ],
-        code: 'TR',
+        code: 'MR',
         eggs: [
           [4, 1],
           [1, 1],
@@ -804,7 +809,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['letters', 'cuts'],
       tip: '💌 Love Letters + 🥧 Portions',
       explain:
-        '💌 Love Letters (Numbered tiles (1, 2, …) stand for coded letters; every matching number hides the same letter.) combined with 🥧 Portions (A word path cannot step across a thick fence bar or diagonally through a fenced corner.)',
+        '💌 Love Letters (Numbered tiles (1, 2, …) stand for coded letters, at most one per word; every matching number hides the same letter.) combined with 🥧 Portions (A word path cannot step across a thick fence bar or diagonally through a fenced corner.)',
       panel: {
         name: 'Love Letters + Portions',
         theme: 'Love letters',
@@ -861,7 +866,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
             ],
           },
         ],
-        code: 'SR',
+        code: 'MA',
         walls: [
           [3, 4, 'h'],
           [4, 1, 'v'],
@@ -880,7 +885,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
       twists: ['letters', 'snow'],
       tip: '💌 Love Letters + ❄️ Snowflakes',
       explain:
-        '💌 Love Letters (Numbered tiles (1, 2, …) stand for coded letters; every matching number hides the same letter.) combined with ❄️ Snowflakes (Inside the frosty frame, words come in mirror-footprint pairs across the icy line.)',
+        '💌 Love Letters (Numbered tiles (1, 2, …) stand for coded letters, at most one per word; every matching number hides the same letter.) combined with ❄️ Snowflakes (Inside the frosty frame, words come in mirror-footprint pairs across the icy line.)',
       panel: {
         name: 'Love Letters + Snowflakes',
         theme: 'Love notes',
@@ -934,7 +939,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
           right: 3,
           axis: 'v',
         },
-        code: 'RT',
+        code: 'UN',
       },
     },
     {
@@ -1442,7 +1447,7 @@ export const CLAUSE_WORDS: ClauseDef<WordPanel> = {
           axis: 'v',
         },
         dark: [[2, 3]],
-        code: 'KS',
+        code: 'HW',
         colours: ['bbrr', 'bbrr', 'rrww', 'rrww', 'bbbb'],
         bows: [
           [3, 0],

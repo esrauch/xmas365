@@ -247,9 +247,10 @@ a refill of its squares as the fallback. Every single twist now generates
 at every tier in seconds or less (eggs on hard is the slowest, ~6 s).
 
 - **Love Letters, at home (Valentine Mailbox, ✅; ⚙️):** some letters are written
-  as numbers, like a codeword (at least two). Tracing counts coded letters
-  as known (the key fills in); the whole board must have one answer with the
-  code unknown.
+  as numbers, like a codeword (at least two different letters, each appearing at
+  least twice on the board, and at most one coded square in any word). Tracing
+  counts coded letters as known (the key fills in); the whole board must have one
+  answer with the code unknown.
 - **Snowflakes (⚙️):** the whole board is the frame, one column narrower
   than the tier's size (5×4, 7×6, 9×8, or turned) so the mirror line runs
   between squares; a leftover column would only have held a straight word

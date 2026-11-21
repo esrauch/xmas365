@@ -19,8 +19,8 @@
  * - numbered eggs (Easter): some letters carry their place in their word
  *   (3 or more: the first letter is highlighted already);
  * - letters for numbers (Valentine's own): some letters are written as
- *   numbers, the same number always the same letter, revealed everywhere
- *   when a word through one is found.
+ *   numbers (at most one per word), the same number always the same letter,
+ *   revealed everywhere when a word through one is found.
  *
  * Here: the rules, the checks the tests use (the words fill the grid, each
  * word can be spelled only one way), and the generator that lays words out.

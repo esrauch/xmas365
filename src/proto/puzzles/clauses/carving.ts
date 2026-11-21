@@ -70,7 +70,7 @@ const PANELS: readonly ClausePanelItem<CarvePanel>[] = [
     name: 'Coded Menu',
     section: 'intro',
     twists: ['letters'],
-    tip: '💌 Love Letters: Same letter = same area; different letters = different areas.',
+    tip: '💌 Love Letters: Clue letters spell a word in the numbered blanks—each number is its area.',
     explain:
       'Letters replace some area numbers. The numbered message blanks above the board spell a word: unscramble the letters into it to learn each letter’s area.',
     panel: {

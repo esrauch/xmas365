@@ -144,7 +144,7 @@ const PANELS: readonly ClausePanelItem<HopPanel>[] = [
     name: 'Egg Mail',
     section: 'intro',
     twists: ['letters'],
-    tip: '💌 Love Letters: Land on letter eggs at the exact hop numbers shown in the message blanks.',
+    tip: '💌 Love Letters: Letter eggs spell a word on the hop numbers shown in the message blanks.',
     explain:
       'Some eggs carry letters instead of numbers. The numbered blanks above the board tell you which hop steps must land on letter eggs to spell out the secret word.',
     panel: {

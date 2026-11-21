@@ -109,13 +109,6 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         const buttons: HTMLElement[] = [
           makeBtn('📖 Story Puzzles', storyActive, () => {
             if (activeFreePlayTier !== null) {
-              freePlayToken++;
-              cancelGenerating();
-              activeFreePlayTier = null;
-              currentFreePlayPanel = null;
-              strip.style.display = 'flex';
-              newFreePlayBtn.style.display = 'none';
-              renderModeBar();
               open(at);
             }
           }),
@@ -193,8 +186,10 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
             color: '#1f2430',
           },
           onclick: () => {
-            if (activeFreePlayTier && currentFreePlayPanel) {
-              mountFreePlayPanel(activeFreePlayTier, currentFreePlayPanel, currentFreePlaySeed);
+            if (activeFreePlayTier) {
+              if (currentFreePlayPanel) {
+                mountFreePlayPanel(activeFreePlayTier, currentFreePlayPanel, currentFreePlaySeed);
+              }
             } else {
               open(at);
             }
@@ -506,6 +501,81 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         strip.replaceChildren(...nodes);
       };
 
+      let shufflingTimer = 0;
+      let shufflingOverlay: HTMLElement | null = null;
+      let shufflingBadge: HTMLElement | null = null;
+
+      const clearShufflingOverlay = (): void => {
+        if (shufflingTimer) {
+          clearTimeout(shufflingTimer);
+          shufflingTimer = 0;
+        }
+        if (shufflingOverlay) {
+          shufflingOverlay.remove();
+          shufflingOverlay = null;
+          shufflingBadge = null;
+        }
+      };
+
+      const preparePaneSwap = (
+        dir: 'forward' | 'backward' | 'reset',
+      ): { prevHeight: number; nextPane: HTMLElement } => {
+        clearShufflingOverlay();
+        const prevPane = activePane && activePane.parentElement === board ? activePane : null;
+        const prevHeight = prevPane ? board.offsetHeight : 0;
+        if (prevPane) {
+          const pTop = prevPane.offsetTop;
+          const pLeft = prevPane.offsetLeft;
+          const pWidth = prevPane.offsetWidth;
+          prevPane.style.transition = '';
+          prevPane.style.opacity = '';
+          Object.assign(prevPane.style, {
+            position: 'absolute',
+            top: `${pTop}px`,
+            left: `${pLeft}px`,
+            width: `${pWidth}px`,
+            pointerEvents: 'none',
+          });
+          prevPane.className = `puzz-board-pane puzz-pane-exit-${dir}`;
+          window.setTimeout(() => {
+            prevPane.remove();
+          }, 240);
+        } else {
+          board.replaceChildren();
+        }
+        board.style.minHeight = '';
+        const nextPane = h('div', {
+          class: prevPane ? `puzz-board-pane puzz-pane-enter-${dir}` : 'puzz-board-pane',
+        });
+        activePane = nextPane;
+        board.append(nextPane);
+        return { prevHeight, nextPane };
+      };
+
+      const finishPaneSwap = (prevHeight: number): void => {
+        if (stageHeightTimer) {
+          clearTimeout(stageHeightTimer);
+          stageHeightTimer = 0;
+        }
+        if (prevHeight > 0) {
+          board.style.height = 'auto';
+          const targetHeight = board.offsetHeight;
+          if (Math.abs(targetHeight - prevHeight) > 2) {
+            board.style.height = `${prevHeight}px`;
+            void board.offsetHeight;
+            board.style.height = `${targetHeight}px`;
+            stageHeightTimer = window.setTimeout(() => {
+              stageHeightTimer = 0;
+              board.style.height = '';
+            }, 260);
+          } else {
+            board.style.height = '';
+          }
+        } else {
+          board.style.height = '';
+        }
+      };
+
       const updateFreePlayTitle = (tier: Tier, seed: number): void => {
         const sizeLbl = TIER_SIZE_LABELS[tier];
         const count = gameState.freePlaySolvedCount(proto.id, tier);
@@ -530,10 +600,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         next.style.visibility = 'hidden';
         ctx.status('');
 
-        board.replaceChildren();
-        const nextPane = h('div', { class: 'puzz-board-pane' });
-        activePane = nextPane;
-        board.append(nextPane);
+        const { prevHeight, nextPane } = preparePaneSwap('reset');
 
         const sig = panelSignature(fpPanel);
         let restoredBoardState: unknown;
@@ -590,7 +657,11 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
             }
           },
         });
+
+        finishPaneSwap(prevHeight);
       };
+
+      const MAX_FREE_PLAY_ATTEMPTS = 25;
 
       const openFreePlay = async (tier: Tier): Promise<void> => {
         if (!freePlaySpec) return;
@@ -600,39 +671,104 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         }
         stopAdvanceBar();
         cancelGenerating();
+        clearShufflingOverlay();
+
+        const prevTier = activeFreePlayTier;
         activeFreePlayTier = tier;
+
+        // Lock the board stage's current height and keep the outgoing board mounted
+        // in-place while the worker generates so the modal never collapses or blinks.
+        if (stageHeightTimer) {
+          clearTimeout(stageHeightTimer);
+          stageHeightTimer = 0;
+        }
+        const currentStageHeight = board.offsetHeight;
+        if (currentStageHeight > 0) {
+          board.style.height = `${currentStageHeight}px`;
+          board.style.minHeight = `${currentStageHeight}px`;
+        }
+        if (activePane && activePane.parentElement === board) {
+          activePane.style.pointerEvents = 'none';
+        }
+
         strip.style.display = 'none';
         newFreePlayBtn.style.display = 'inline-block';
+        footer.style.display = 'flex';
         renderModeBar();
 
         const sizeLbl = TIER_SIZE_LABELS[tier];
         const count = gameState.freePlaySolvedCount(proto.id, tier);
-        title.textContent = `Free Play · ${sizeLbl} (✓ ${count} solved) · Generating…`;
+        if (prevTier !== tier || !currentFreePlayPanel) {
+          title.textContent = `Free Play · ${sizeLbl} (✓ ${count} solved)`;
+        }
         rulePill.textContent = defaultPillText;
         next.style.visibility = 'hidden';
         message.textContent = '';
 
-        const shuffling = h(
-          'div',
-          {
-            style: {
-              padding: '32px 16px',
-              textAlign: 'center',
-              fontWeight: '700',
-              fontSize: '14px',
-              color: '#4a5568',
-            },
-          },
-          `🎲 Shuffling a ${sizeLbl} board…`,
-        );
-        board.replaceChildren(shuffling);
-
-        // Keep trying fresh seeds until one lands: never stand in a story puzzle, never give up.
         const token = ++freePlayToken;
+        let currentAttempt = 1;
+
+        const showShufflingOverlay = (text: string): void => {
+          if (!shufflingOverlay) {
+            if (activePane && activePane.parentElement === board) {
+              activePane.style.transition = 'opacity 0.15s ease';
+              activePane.style.opacity = '0.35';
+            }
+            shufflingBadge = h(
+              'div',
+              {
+                style: {
+                  padding: '8px 16px',
+                  borderRadius: '999px',
+                  background: 'rgba(255, 253, 249, 0.94)',
+                  border: '1.5px solid #cbbba0',
+                  boxShadow: '0 4px 12px rgba(31, 36, 48, 0.14)',
+                  fontWeight: '700',
+                  fontSize: '13.5px',
+                  color: '#2d3748',
+                  textAlign: 'center',
+                },
+              },
+              text,
+            );
+            shufflingOverlay = h(
+              'div',
+              {
+                style: {
+                  position: 'absolute',
+                  inset: '0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '16px',
+                  pointerEvents: 'none',
+                  zIndex: '5',
+                },
+              },
+              shufflingBadge,
+            );
+            board.append(shufflingOverlay);
+          } else if (shufflingBadge) {
+            shufflingBadge.textContent = text;
+          }
+        };
+
+        // Only surface the shuffling indicator if generation isn't instant (<120 ms),
+        // avoiding a 1-frame flash on fast boards.
+        shufflingTimer = window.setTimeout(() => {
+          shufflingTimer = 0;
+          if (token !== freePlayToken || !board.isConnected || activeFreePlayTier !== tier) return;
+          title.textContent = `Free Play · ${sizeLbl} (✓ ${count} solved) · Generating…`;
+          const suffix = currentAttempt > 1 ? ` (try ${currentAttempt})` : '';
+          showShufflingOverlay(`🎲 Shuffling a ${sizeLbl} board…${suffix}`);
+        }, 120);
+
         const sizeNum = tier === 'easy' ? 5 : tier === 'medium' ? 7 : 9;
-        for (let attempt = 1; ; attempt++) {
-          if (attempt > 1)
-            shuffling.textContent = `🎲 Shuffling a ${sizeLbl} board… (try ${attempt})`;
+        for (let attempt = 1; attempt <= MAX_FREE_PLAY_ATTEMPTS; attempt++) {
+          currentAttempt = attempt;
+          if (attempt > 1 && shufflingBadge) {
+            shufflingBadge.textContent = `🎲 Shuffling a ${sizeLbl} board… (try ${attempt})`;
+          }
           const seed = Math.floor(Math.random() * 900000) + 100000;
           const reply = await generateInBrowser({
             genre: freePlaySpec.genre,
@@ -654,6 +790,12 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
             return;
           }
         }
+
+        if (shufflingTimer) {
+          clearTimeout(shufflingTimer);
+          shufflingTimer = 0;
+        }
+        showShufflingOverlay(`Couldn't deal a ${sizeLbl} board — tap 🎲 New Board to retry.`);
       };
 
       const open = (i: number): void => {
@@ -666,6 +808,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
           freePlayToken++;
           cancelGenerating();
         }
+        clearShufflingOverlay();
         activeFreePlayTier = null;
         currentFreePlayPanel = null;
         strip.style.display = 'flex';
@@ -689,33 +832,8 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
         next.style.visibility =
           done.has(`${proto.id}:${i}`) && i < panels.length - 1 ? 'visible' : 'hidden';
 
-        const prevPane = activePane;
-        const prevHeight = prevPane ? board.offsetHeight : 0;
-        if (prevPane) {
-          const dir = i > prevIdx ? 'forward' : i < prevIdx ? 'backward' : 'reset';
-          const pTop = prevPane.offsetTop;
-          const pLeft = prevPane.offsetLeft;
-          const pWidth = prevPane.offsetWidth;
-          Object.assign(prevPane.style, {
-            position: 'absolute',
-            top: `${pTop}px`,
-            left: `${pLeft}px`,
-            width: `${pWidth}px`,
-            pointerEvents: 'none',
-          });
-          prevPane.className = `puzz-board-pane puzz-pane-exit-${dir}`;
-          window.setTimeout(() => {
-            prevPane.remove();
-          }, 240);
-        }
-
-        const enterDir =
-          prevPane === null ? null : i > prevIdx ? 'forward' : i < prevIdx ? 'backward' : 'reset';
-        const nextPane = h('div', {
-          class: enterDir ? `puzz-board-pane puzz-pane-enter-${enterDir}` : 'puzz-board-pane',
-        });
-        activePane = nextPane;
-        board.append(nextPane);
+        const dir = i > prevIdx ? 'forward' : i < prevIdx ? 'backward' : 'reset';
+        const { prevHeight, nextPane } = preparePaneSwap(dir);
 
         const sig = panelSignature(panel);
         let restoredBoardState: unknown;
@@ -802,22 +920,7 @@ export function run<P extends { name: string; tip?: string }>(def: RunDef<P>): P
           },
         });
 
-        if (prevPane && prevHeight > 0) {
-          if (stageHeightTimer) clearTimeout(stageHeightTimer);
-          board.style.height = 'auto';
-          const targetHeight = board.offsetHeight;
-          if (Math.abs(targetHeight - prevHeight) > 2) {
-            board.style.height = `${prevHeight}px`;
-            void board.offsetHeight;
-            board.style.height = `${targetHeight}px`;
-            stageHeightTimer = window.setTimeout(() => {
-              stageHeightTimer = 0;
-              board.style.height = '';
-            }, 260);
-          } else {
-            board.style.height = '';
-          }
-        }
+        finishPaneSwap(prevHeight);
       };
 
       next.addEventListener('click', () => {

@@ -5,17 +5,80 @@
   "panels": [
     {
       "seed": 1,
-      "stats": { "words": 5, "steps": 896 },
+      "stats": { "words": 5, "steps": 318 },
       "panel": {
         "name": "Words, letters: easy 1",
-        "theme": "Cupid's kit",
-        "rows": ["THBHA", "GUCPR", "IRLHS", "LEOAS", "FHCUD"],
+        "theme": "Garden of love",
+        "rows": ["SRING", "PYEES", "SNJAV", "OIAFA", "PMSLE"],
         "words": [
           {
-            "word": "FLIGHT",
+            "word": "SPRING",
+            "cells": [
+              [0, 0],
+              [1, 0],
+              [0, 1],
+              [0, 2],
+              [0, 3],
+              [0, 4]
+            ]
+          },
+          {
+            "word": "POSY",
             "cells": [
               [4, 0],
               [3, 0],
+              [2, 0],
+              [1, 1]
+            ]
+          },
+          {
+            "word": "JASMINE",
+            "cells": [
+              [2, 2],
+              [3, 2],
+              [4, 2],
+              [4, 1],
+              [3, 1],
+              [2, 1],
+              [1, 2]
+            ]
+          },
+          {
+            "word": "VASE",
+            "cells": [
+              [2, 4],
+              [2, 3],
+              [1, 4],
+              [1, 3]
+            ]
+          },
+          {
+            "word": "LEAF",
+            "cells": [
+              [4, 3],
+              [4, 4],
+              [3, 4],
+              [3, 3]
+            ]
+          }
+        ],
+        "code": "AP"
+      }
+    },
+    {
+      "seed": 3,
+      "stats": { "words": 4, "steps": 330 },
+      "panel": {
+        "name": "Words, letters: easy 2",
+        "theme": "Sweet treats",
+        "rows": ["EHAGT", "CNUGA", "AOGPR", "NNUWE", "IDDAF"],
+        "words": [
+          {
+            "word": "GANACHE",
+            "cells": [
+              [0, 3],
+              [0, 2],
+              [1, 1],
               [2, 0],
               [1, 0],
               [0, 1],
@@ -23,170 +86,97 @@
             ]
           },
           {
-            "word": "CHERUB",
+            "word": "NOUGAT",
             "cells": [
+              [3, 0],
+              [2, 1],
+              [1, 2],
+              [1, 3],
+              [1, 4],
+              [0, 4]
+            ]
+          },
+          {
+            "word": "PUDDING",
+            "cells": [
+              [2, 3],
+              [3, 2],
               [4, 2],
               [4, 1],
-              [3, 1],
-              [2, 1],
-              [1, 1],
-              [0, 2]
-            ]
-          },
-          {
-            "word": "HARP",
-            "cells": [
-              [0, 3],
-              [0, 4],
-              [1, 4],
-              [1, 3]
-            ]
-          },
-          {
-            "word": "CLOUD",
-            "cells": [
-              [1, 2],
-              [2, 2],
-              [3, 2],
-              [4, 3],
-              [4, 4]
-            ]
-          },
-          {
-            "word": "SASH",
-            "cells": [
-              [3, 4],
-              [3, 3],
-              [2, 4],
-              [2, 3]
-            ]
-          }
-        ],
-        "code": "CL"
-      }
-    },
-    {
-      "seed": 2,
-      "stats": { "words": 5, "steps": 928 },
-      "panel": {
-        "name": "Words, letters: easy 2",
-        "theme": "Ghostly crushes",
-        "rows": ["SPCAN", "ELMED", "LKRIL", "CTVAS", "IRNET"],
-        "words": [
-          {
-            "word": "SPELL",
-            "cells": [
-              [0, 0],
-              [0, 1],
-              [1, 0],
-              [2, 0],
-              [1, 1]
-            ]
-          },
-          {
-            "word": "CANDLE",
-            "cells": [
-              [0, 2],
-              [0, 3],
-              [0, 4],
-              [1, 4],
-              [2, 4],
-              [1, 3]
-            ]
-          },
-          {
-            "word": "MIST",
-            "cells": [
-              [1, 2],
-              [2, 3],
-              [3, 4],
-              [4, 4]
-            ]
-          },
-          {
-            "word": "TRICK",
-            "cells": [
-              [3, 1],
-              [4, 1],
               [4, 0],
-              [3, 0],
-              [2, 1]
+              [3, 1],
+              [2, 2]
             ]
           },
           {
-            "word": "RAVEN",
+            "word": "WAFER",
             "cells": [
-              [2, 2],
               [3, 3],
-              [3, 2],
               [4, 3],
-              [4, 2]
-            ]
-          }
-        ],
-        "code": "IL"
-      }
-    },
-    {
-      "seed": 3,
-      "stats": { "words": 5, "steps": 1216 },
-      "panel": {
-        "name": "Words, letters: easy 3",
-        "theme": "Love notes",
-        "rows": ["CHEUC", "ALDGN", "RDLRI", "MKSOA", "ISEVC"],
-        "words": [
-          {
-            "word": "CHARM",
-            "cells": [
-              [0, 0],
-              [0, 1],
-              [1, 0],
-              [2, 0],
-              [3, 0]
-            ]
-          },
-          {
-            "word": "CUDDLE",
-            "cells": [
-              [0, 4],
-              [0, 3],
-              [1, 2],
-              [2, 1],
-              [1, 1],
-              [0, 2]
-            ]
-          },
-          {
-            "word": "CARING",
-            "cells": [
               [4, 4],
               [3, 4],
-              [2, 3],
-              [2, 4],
-              [1, 4],
-              [1, 3]
+              [2, 4]
             ]
-          },
+          }
+        ],
+        "code": "EU"
+      }
+    },
+    {
+      "seed": 6,
+      "stats": { "words": 4, "steps": 479 },
+      "panel": {
+        "name": "Words, letters: easy 3",
+        "theme": "Garden of love",
+        "rows": ["EUFFE", "MRMAR", "EWAGN", "PMOIN", "EADLO"],
+        "words": [
           {
-            "word": "LOVE",
+            "word": "PERFUME",
             "cells": [
-              [2, 2],
-              [3, 3],
-              [4, 3],
-              [4, 2]
+              [3, 0],
+              [2, 0],
+              [1, 1],
+              [0, 2],
+              [0, 1],
+              [1, 0],
+              [0, 0]
             ]
           },
           {
-            "word": "KISS",
+            "word": "FERN",
+            "cells": [
+              [0, 3],
+              [0, 4],
+              [1, 4],
+              [2, 4]
+            ]
+          },
+          {
+            "word": "MAGNOLIA",
+            "cells": [
+              [1, 2],
+              [1, 3],
+              [2, 3],
+              [3, 4],
+              [4, 4],
+              [4, 3],
+              [3, 3],
+              [2, 2]
+            ]
+          },
+          {
+            "word": "MEADOW",
             "cells": [
               [3, 1],
               [4, 0],
               [4, 1],
-              [3, 2]
+              [4, 2],
+              [3, 2],
+              [2, 1]
             ]
           }
         ],
-        "code": "EL"
+        "code": "OR"
       }
     }
   ]

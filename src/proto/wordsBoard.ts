@@ -581,7 +581,7 @@ export function mountWords(host: HTMLElement, panel: Panel, hooks: WordsHooks): 
     if (code)
       keyLine.textContent = `Key: ${[...code]
         .map((letter, i) => `${i + 1} = ${revealed().has(letter) ? letter : '?'}`)
-        .join(' · ')}`;
+        .join(' · ')}  (max 1 per word)`;
     // Once solved, the run's own message stands.
     if (found.size < panel.words.length)
       hooks.status(`${found.size} of ${panel.words.length} theme words`);

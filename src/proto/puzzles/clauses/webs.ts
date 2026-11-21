@@ -73,7 +73,7 @@ export const CLAUSE_WEBS: ClauseDef<WebPanel> = {
       name: 'Secret Initials',
       section: 'intro',
       twists: ['letters'],
-      tip: '💌 Love Letters: Equal letters share a count; different letters take different counts.',
+      tip: '💌 Love Letters: Knot letters spell a word in the numbered blanks—each number is its thread count.',
       explain:
         'Unscramble the letters on the knots into MOON to learn their thread counts and fill the numbered blanks in the message above!',
       panel: {

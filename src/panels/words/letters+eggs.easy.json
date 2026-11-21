@@ -4,167 +4,26 @@
   "tier": "easy",
   "panels": [
     {
-      "seed": 8,
-      "stats": { "words": 5, "steps": 1046 },
+      "seed": 1,
+      "stats": { "words": 5, "steps": 318 },
       "panel": {
         "name": "Words, letters and eggs: easy 1",
         "theme": "Garden of love",
-        "rows": ["GNSLO", "IPNST", "RESRU", "MBLAO", "OOVTH"],
+        "rows": ["SRING", "PYEES", "SNJAV", "OIAFA", "PMSLE"],
         "words": [
           {
             "word": "SPRING",
             "cells": [
-              [0, 2],
-              [1, 1],
-              [2, 0],
-              [1, 0],
-              [0, 1],
-              [0, 0]
-            ]
-          },
-          {
-            "word": "LOTUS",
-            "cells": [
-              [0, 3],
-              [0, 4],
-              [1, 4],
-              [2, 4],
-              [1, 3]
-            ]
-          },
-          {
-            "word": "THORN",
-            "cells": [
-              [4, 3],
-              [4, 4],
-              [3, 4],
-              [2, 3],
-              [1, 2]
-            ]
-          },
-          {
-            "word": "VASE",
-            "cells": [
-              [4, 2],
-              [3, 3],
-              [2, 2],
-              [2, 1]
-            ]
-          },
-          {
-            "word": "BLOOM",
-            "cells": [
-              [3, 1],
-              [3, 2],
-              [4, 1],
-              [4, 0],
-              [3, 0]
-            ]
-          }
-        ],
-        "code": "SL",
-        "eggs": [
-          [2, 2],
-          [1, 4]
-        ]
-      }
-    },
-    {
-      "seed": 10,
-      "stats": { "words": 5, "steps": 668 },
-      "panel": {
-        "name": "Words, letters and eggs: easy 2",
-        "theme": "Ghostly crushes",
-        "rows": ["MSTRA", "INHEV", "IANTN", "GUSOK", "HTPOY"],
-        "words": [
-          {
-            "word": "MIST",
-            "cells": [
               [0, 0],
               [1, 0],
               [0, 1],
-              [0, 2]
-            ]
-          },
-          {
-            "word": "RAVEN",
-            "cells": [
-              [0, 3],
-              [0, 4],
-              [1, 4],
-              [1, 3],
-              [2, 4]
-            ]
-          },
-          {
-            "word": "NIGHT",
-            "cells": [
-              [1, 1],
-              [2, 0],
-              [3, 0],
-              [4, 0],
-              [4, 1]
-            ]
-          },
-          {
-            "word": "HAUNT",
-            "cells": [
-              [1, 2],
-              [2, 1],
-              [3, 1],
-              [2, 2],
-              [2, 3]
-            ]
-          },
-          {
-            "word": "SPOOKY",
-            "cells": [
-              [3, 2],
-              [4, 2],
-              [3, 3],
-              [4, 3],
-              [3, 4],
-              [4, 4]
-            ]
-          }
-        ],
-        "code": "OI",
-        "eggs": [
-          [2, 2],
-          [1, 4]
-        ]
-      }
-    },
-    {
-      "seed": 14,
-      "stats": { "words": 5, "steps": 549 },
-      "panel": {
-        "name": "Words, letters and eggs: easy 3",
-        "theme": "Cupid's kit",
-        "rows": ["WLGFL", "OTAGI", "ORREH", "HRVQT", "SOWIU"],
-        "words": [
-          {
-            "word": "GLOW",
-            "cells": [
               [0, 2],
-              [0, 1],
-              [1, 0],
-              [0, 0]
-            ]
-          },
-          {
-            "word": "FLIGHT",
-            "cells": [
               [0, 3],
-              [0, 4],
-              [1, 4],
-              [1, 3],
-              [2, 4],
-              [3, 4]
+              [0, 4]
             ]
           },
           {
-            "word": "SHOT",
+            "word": "POSY",
             "cells": [
               [4, 0],
               [3, 0],
@@ -173,31 +32,162 @@
             ]
           },
           {
-            "word": "ARROW",
+            "word": "JASMINE",
             "cells": [
-              [1, 2],
-              [2, 1],
-              [3, 1],
+              [2, 2],
+              [3, 2],
+              [4, 2],
               [4, 1],
-              [4, 2]
+              [3, 1],
+              [2, 1],
+              [1, 2]
             ]
           },
           {
-            "word": "QUIVER",
+            "word": "VASE",
             "cells": [
-              [3, 3],
-              [4, 4],
-              [4, 3],
-              [3, 2],
+              [2, 4],
               [2, 3],
-              [2, 2]
+              [1, 4],
+              [1, 3]
+            ]
+          },
+          {
+            "word": "LEAF",
+            "cells": [
+              [4, 3],
+              [4, 4],
+              [3, 4],
+              [3, 3]
             ]
           }
         ],
-        "code": "GR",
+        "code": "AP",
         "eggs": [
-          [3, 1],
-          [2, 2]
+          [1, 3],
+          [0, 2]
+        ]
+      }
+    },
+    {
+      "seed": 3,
+      "stats": { "words": 4, "steps": 316 },
+      "panel": {
+        "name": "Words, letters and eggs: easy 2",
+        "theme": "Sweet treats",
+        "rows": ["EHAGT", "CNUGA", "AOGPR", "NNUWE", "IDDAF"],
+        "words": [
+          {
+            "word": "GANACHE",
+            "cells": [
+              [0, 3],
+              [0, 2],
+              [1, 1],
+              [2, 0],
+              [1, 0],
+              [0, 1],
+              [0, 0]
+            ]
+          },
+          {
+            "word": "NOUGAT",
+            "cells": [
+              [3, 0],
+              [2, 1],
+              [1, 2],
+              [1, 3],
+              [1, 4],
+              [0, 4]
+            ]
+          },
+          {
+            "word": "PUDDING",
+            "cells": [
+              [2, 3],
+              [3, 2],
+              [4, 2],
+              [4, 1],
+              [4, 0],
+              [3, 1],
+              [2, 2]
+            ]
+          },
+          {
+            "word": "WAFER",
+            "cells": [
+              [3, 3],
+              [4, 3],
+              [4, 4],
+              [3, 4],
+              [2, 4]
+            ]
+          }
+        ],
+        "code": "EU",
+        "eggs": [
+          [0, 0],
+          [2, 4]
+        ]
+      }
+    },
+    {
+      "seed": 6,
+      "stats": { "words": 4, "steps": 334 },
+      "panel": {
+        "name": "Words, letters and eggs: easy 3",
+        "theme": "Garden of love",
+        "rows": ["EUFFE", "MRMAR", "EWAGN", "PMOIN", "EADLO"],
+        "words": [
+          {
+            "word": "PERFUME",
+            "cells": [
+              [3, 0],
+              [2, 0],
+              [1, 1],
+              [0, 2],
+              [0, 1],
+              [1, 0],
+              [0, 0]
+            ]
+          },
+          {
+            "word": "FERN",
+            "cells": [
+              [0, 3],
+              [0, 4],
+              [1, 4],
+              [2, 4]
+            ]
+          },
+          {
+            "word": "MAGNOLIA",
+            "cells": [
+              [1, 2],
+              [1, 3],
+              [2, 3],
+              [3, 4],
+              [4, 4],
+              [4, 3],
+              [3, 3],
+              [2, 2]
+            ]
+          },
+          {
+            "word": "MEADOW",
+            "cells": [
+              [3, 1],
+              [4, 0],
+              [4, 1],
+              [4, 2],
+              [3, 2],
+              [2, 1]
+            ]
+          }
+        ],
+        "code": "OR",
+        "eggs": [
+          [2, 2],
+          [1, 0]
         ]
       }
     }
